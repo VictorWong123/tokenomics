@@ -8,6 +8,7 @@
 #include "speculative.h"
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstring>
 #include <mutex>
 #include <stdexcept>
@@ -300,6 +301,28 @@ Result Engine::generate(const Request &r) {
         t = Clock::now();
         require(llama_process(tgt, LLAMA_PROCESS_TYPE_DECODE, batch.get()) == 0,
                 "target verification decode failed");
+        if (r.diagnostic_logits) {
+            // Observe raw target rows without changing the upstream sampler.
+            // Rows beyond the committed prefix describe hypothetical drafts.
+            const int size = llama_vocab_n_tokens(vocab);
+            require(size >= 2, "logit diagnostic requires at least two tokens");
+            for (int row = 0; row <= c.actual; ++row) {
+                const float *values = llama_get_logits_ith(tgt, row);
+                require(values != nullptr, "missing diagnostic logits");
+                int best = -1, second = -1;
+                for (int id = 0; id < size; ++id) {
+                    require(std::isfinite(values[id]), "nonfinite diagnostic logit");
+                    if (best < 0 || values[id] > values[best]) {
+                        second = best;
+                        best = id;
+                    } else if (second < 0 || values[id] > values[second]) {
+                        second = id;
+                    }
+                }
+                c.logits.push_back({row, int(out.tokens.size()) + row, best, second, values[best],
+                                    values[second]});
+            }
+        }
         // Upstream sampler owns verification, including correction and bonus.
         const auto ids = common_sampler_sample_and_accept_n(smpl.get(), tgt, proposed);
         c.verify_ms = elapsed(t); // reading logits synchronizes target backend work

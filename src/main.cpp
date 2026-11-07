@@ -19,28 +19,39 @@ static const char *help = R"(Tokenomics: greedy speculative decoding laboratory
   --out FILE.jsonl (default stdout; refuses overwrite)
   --cycles FILE.jsonl --script 0,1,4,0,8 (diagnostic transitions only)
 Jobs contain prompt, policy, k, max_tokens, cache, drafter, confidence,
-detailed, warmup, and arbitrary metadata. prefix_tokens supports diagnostic
+detailed, diagnostic_logits, warmup, and arbitrary metadata. prefix_tokens supports diagnostic
 replay from exact target trace IDs. No stochastic sampling or context shifting.
 Cost-aware scheduling remains unimplemented until the feasibility gate supports it.
 )";
 static json cycle_json(const Cycle &c) {
-    return {{"cycle", c.cycle},
-            {"action", c.action},
-            {"actual_drafts", c.actual},
-            {"accepted", c.accepted},
-            {"committed", c.committed},
-            {"context_tokens", c.context},
-            {"target_cached", c.target_cached},
-            {"draft_cached", c.draft_cached},
-            {"stale_before", c.stale_before},
-            {"synced", c.synced},
-            {"decision_ms", c.decision_ms},
-            {"sync_ms", c.sync_ms},
-            {"draft_ms", c.draft_ms},
-            {"verify_ms", c.verify_ms},
-            {"cache_ms", c.cache_ms},
-            {"wall_ms", c.wall_ms},
-            {"switched", c.switched}};
+    json result = {{"cycle", c.cycle},
+                   {"action", c.action},
+                   {"actual_drafts", c.actual},
+                   {"accepted", c.accepted},
+                   {"committed", c.committed},
+                   {"context_tokens", c.context},
+                   {"target_cached", c.target_cached},
+                   {"draft_cached", c.draft_cached},
+                   {"stale_before", c.stale_before},
+                   {"synced", c.synced},
+                   {"decision_ms", c.decision_ms},
+                   {"sync_ms", c.sync_ms},
+                   {"draft_ms", c.draft_ms},
+                   {"verify_ms", c.verify_ms},
+                   {"cache_ms", c.cache_ms},
+                   {"wall_ms", c.wall_ms},
+                   {"switched", c.switched}};
+    if (!c.logits.empty()) {
+        result["diagnostic_logits"] = json::array();
+        for (const auto &probe : c.logits)
+            result["diagnostic_logits"].push_back({{"row", probe.row},
+                                                   {"output_index", probe.output_index},
+                                                   {"top_id", probe.top_id},
+                                                   {"second_id", probe.second_id},
+                                                   {"top_logit", probe.top_logit},
+                                                   {"second_logit", probe.second_logit}});
+    }
+    return result;
 }
 static int number(const std::string &s) {
     size_t end;
@@ -145,6 +156,7 @@ int main(int argc, char **argv) {
             r.drafter = job.value("drafter", "model");
             r.confidence = job.value("confidence", 0.5);
             r.detailed = job.value("detailed", true);
+            r.diagnostic_logits = job.value("diagnostic_logits", false);
             r.script = job.value("script", std::vector<int>{});
             r.prefix_tokens = job.value("prefix_tokens", std::vector<int>{});
             const auto request_start = std::chrono::steady_clock::now();
@@ -181,6 +193,7 @@ int main(int argc, char **argv) {
                                {"detailed", r.detailed}};
             rec["settings"]["max_cycles"] = r.max_cycles;
             rec["settings"]["script"] = r.script;
+            rec["settings"]["diagnostic_logits"] = r.diagnostic_logits;
             rec["llama_revision"] = TOKENOMICS_LLAMA_REV;
             rec["system_info"] = engine.system_info();
             rec["prompt_ids"] = result.prompt_ids;

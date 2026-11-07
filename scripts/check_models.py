@@ -105,6 +105,36 @@ def stream_process(command, result_path, log, timeout, on_row):
             stream.close()
 
 
+def validate_record(a, job, row):
+    if any(
+        row[key] != job[key] for key in ("prompt_id", "configuration_id", "repetition")
+    ):
+        raise RuntimeError("output identity/order mismatch")
+    expected = {
+        "context": a.context,
+        "batch": a.batch,
+        "threads": a.threads,
+        "gpu_layers": a.gpu_layers,
+        "sampler": "greedy-temperature-only",
+    }
+    for key, default in (
+        ("policy", "target"),
+        ("k", 4),
+        ("cache", "retain"),
+        ("drafter", "model"),
+        ("confidence", 0.5),
+        ("max_tokens", 128),
+        ("max_cycles", 0),
+        ("script", []),
+        ("diagnostic_logits", False),
+    ):
+        expected[key] = job.get(key, default)
+    if row["output_cap"] != expected["max_tokens"] or any(
+        row["settings"].get(key) != value for key, value in expected.items()
+    ):
+        raise RuntimeError("output execution settings mismatch")
+
+
 def execute(a, name, jobs, resident, on_row=None):
     job_path = a.out / f"{name}.jobs.jsonl"
     job_path.write_text("".join(json.dumps(j) + "\n" for j in jobs))
@@ -133,11 +163,9 @@ def execute(a, name, jobs, resident, on_row=None):
 
     def checked_row(row):
         nonlocal seen
-        if seen >= len(jobs) or any(
-            row[key] != jobs[seen][key]
-            for key in ("prompt_id", "configuration_id", "repetition")
-        ):
+        if seen >= len(jobs):
             raise RuntimeError(f"{name}: output identity/order mismatch")
+        validate_record(a, jobs[seen], row)
         seen += 1
         on_row(row)
 
@@ -154,11 +182,7 @@ def execute(a, name, jobs, resident, on_row=None):
     if len(rows) != len(jobs):
         raise RuntimeError(f"{name}: incomplete outputs ({len(rows)}/{len(jobs)})")
     for job, row in zip(jobs, rows):
-        if any(
-            row[key] != job[key]
-            for key in ("prompt_id", "configuration_id", "repetition")
-        ):
-            raise RuntimeError(f"{name}: output identity/order mismatch")
+        validate_record(a, job, row)
     return rows
 
 

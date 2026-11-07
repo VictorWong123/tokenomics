@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed model correctness workload for the verified Codespace lifecycle.
+"""Fixed model divergence diagnosis workload for the verified Codespace lifecycle.
 
 No lifecycle token, arbitrary command input, or resource creation. Initialize
 and finalize remain owned by scripts/codespaces/controller.py.
@@ -24,8 +24,15 @@ GATE_FILES = ("manifest.json", "status.json", "correctness.jsonl") + tuple(
     for name in ("reference", "boundary-reference", "candidate")
     for suffix in (".jobs.jsonl", ".jsonl", ".cycles.jsonl", ".stderr.log")
 )
-FILES = ("status.json", "environment.json", "models.lock.json") + tuple(
-    "gate/" + name for name in GATE_FILES
+DIAGNOSTIC_FILES = ("manifest.json", "status.json") + tuple(
+    name + suffix
+    for name in ("reference", "full", "replay")
+    for suffix in (".jobs.jsonl", ".jsonl", ".cycles.jsonl", ".stderr.log")
+)
+FILES = (
+    ("status.json", "environment.json", "models.lock.json")
+    + tuple("gate/" + name for name in GATE_FILES)
+    + tuple("diagnostic/" + name for name in DIAGNOSTIC_FILES)
 )
 MAX_FILE = 16 * 1024**2
 MAX_TOTAL = 48 * 1024**2
@@ -58,7 +65,12 @@ def pack(results, destination, owner):
     status = json.loads((results / "status.json").read_text())
     if status.get("state") == "passed":
         lifecycle.require(
-            {name for name, _, _ in entries} == set(FILES),
+            {
+                "status.json",
+                "environment.json",
+                "models.lock.json",
+                *("gate/" + name for name in GATE_FILES),
+            }.issubset({name for name, _, _ in entries}),
             "Incomplete successful model evidence",
         )
         checks = [
@@ -72,6 +84,21 @@ def pack(results, destination, owner):
             and gate.get("state") == "passed"
             and gate.get("synthetic_fixture") is False,
             "Invalid model correctness evidence",
+        )
+    if status.get("state") == "diagnostic_complete":
+        lifecycle.require(
+            {"diagnostic/" + name for name in DIAGNOSTIC_FILES}.issubset(
+                {name for name, _, _ in entries}
+            ),
+            "Incomplete diagnostic evidence",
+        )
+        diagnostic = json.loads((results / "diagnostic/status.json").read_text())
+        lifecycle.require(
+            diagnostic.get("state") == "diagnostic_complete"
+            and diagnostic.get("synthetic_fixture") is False
+            and diagnostic.get("correctness_supported") is False
+            and len(diagnostic.get("full_comparisons", [])) == 14,
+            "Invalid diagnostic evidence",
         )
     manifest = {
         **owner,
@@ -93,7 +120,7 @@ def pack(results, destination, owner):
 
 def child(results):
     from scripts.download_models import download
-    from scripts.check_models import parser, run
+    from scripts.diagnose_models import diagnose
 
     status = {"schema_version": 1, "state": "started", "stage": "resource-screen"}
     atomic_json(results / "environment.json", hardware())
@@ -125,36 +152,17 @@ def child(results):
         locked = json.loads(lock.read_text())["models"]
         status["target_sha256"] = locked["qwen25-15"]["sha256"]
         status["draft_sha256"] = locked["qwen25-05"]["sha256"]
-        status["stage"] = "correctness"
+        status["stage"] = "divergence-diagnosis"
         atomic_json(results / "status.json", status)
-        print("TOKENOMICS_MODEL_STAGE correctness", flush=True)
-        args = parser().parse_args(
-            [
-                "--target",
-                str(target),
-                "--draft",
-                str(draft),
-                "--threads",
-                "2",
-                "--out",
-                str(results / "gate"),
-            ]
-        )
-        gate = run(args)
+        print("TOKENOMICS_MODEL_STAGE divergence-diagnosis", flush=True)
+        diagnostic = diagnose(target, draft, results / "diagnostic", threads=2)
         lifecycle.require(
-            gate["state"] == "passed"
-            and gate["comparisons"] == 272
-            and gate["synthetic_fixture"] is False,
-            "Model gate contract failed",
+            diagnostic["state"] == "diagnostic_complete"
+            and diagnostic["synthetic_fixture"] is False
+            and diagnostic["correctness_supported"] is False,
+            "Diagnostic contract failed",
         )
-        status.update(
-            state="passed",
-            comparisons=272,
-            observed_coverage=gate["observed_coverage"],
-            available_bytes=free,
-            target_sha256=sha256(target),
-            draft_sha256=sha256(draft),
-        )
+        status.update(state="diagnostic_complete", diagnosis=diagnostic)
     except Exception as exc:
         status.update(state="failed", error_type=type(exc).__name__, error=str(exc))
         gate_status = results / "gate/status.json"
@@ -164,7 +172,7 @@ def child(results):
             status["first_mismatch"] = diagnostic.get("first_mismatch")
     atomic_json(results / "status.json", status)
     print("TOKENOMICS_MODEL_STAGE " + status["state"], flush=True)
-    return 0 if status["state"] == "passed" else 1
+    return 0 if status["state"] == "diagnostic_complete" else 1
 
 
 def workload():
@@ -247,7 +255,8 @@ def workload():
         # No raw model output, prompts, credentials or network errors in Actions logs.
         report = {
             **owner,
-            "workload": "trained-model-correctness",
+            "workload": "trained-model-divergence-diagnosis",
+            "diagnosis": status.get("diagnosis"),
             "state": status["state"],
             "stage": status["stage"],
             "archive_sha256": digest,
@@ -267,7 +276,7 @@ def workload():
         print(
             "TOKENOMICS_MODEL_SUMMARY " + json.dumps(report, sort_keys=True), flush=True
         )
-    return 0 if code == 0 and status["state"] == "passed" else 1
+    return 0 if code == 0 and status["state"] == "diagnostic_complete" else 1
 
 
 if __name__ == "__main__":

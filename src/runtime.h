@@ -15,17 +15,23 @@ struct Request {
     int max_cycles = 0; // nonzero only for one-cycle diagnostic replay
     double confidence = 0.5;
     bool detailed = true;
+    bool diagnostic_logits = false; // opt-in correctness probe; never benchmark timing
     std::vector<int> script;
     // Test-only fault injection after upstream drafting. Never exposed by CLI.
     std::function<void(std::vector<int> &, int)> proposal_transform;
     // Diagnostic common-prefix replay; authoritative token IDs, no re-tokenization.
     std::vector<int> prefix_tokens;
 };
+struct LogitProbe {
+    int row = 0, output_index = 0, top_id = 0, second_id = 0;
+    float top_logit = 0, second_logit = 0;
+};
 struct Cycle {
     int cycle = 0, action = 0, actual = 0, accepted = 0, committed = 0;
     int context = 0, target_cached = 0, draft_cached = 0, stale_before = 0, synced = 0;
     double decision_ms = 0, sync_ms = 0, draft_ms = 0, verify_ms = 0, cache_ms = 0, wall_ms = 0;
     bool switched = false;
+    std::vector<LogitProbe> logits;
 };
 struct Result {
     std::vector<int> prompt_ids, tokens;

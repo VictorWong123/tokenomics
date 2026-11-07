@@ -98,6 +98,18 @@ int main(int argc, char **argv) {
     auto state = wrong.generate(replay);
     CHECK(state.final_draft_cached == 9 && state.final_target_cached == 10);
     CHECK(state.tokens == std::vector<int>{259});
+    r.diagnostic_logits = true;
+    auto diagnostic = wrong.generate(r);
+    CHECK(diagnostic.tokens == w.tokens);
+    for (const auto &cycle : diagnostic.cycles) {
+        CHECK(cycle.logits.size() == size_t(cycle.actual + 1));
+        for (const auto &probe : cycle.logits) {
+            CHECK(probe.top_id == 259);
+            CHECK(probe.top_logit >= probe.second_logit);
+            if (probe.row < cycle.committed)
+                CHECK(diagnostic.tokens.at(probe.output_index) == probe.top_id);
+        }
+    }
     CHECK(zero && partial && full && catchup && switched);
     std::cout << comparisons
               << " differential fixture cases passed; zero/partial/full acceptance, EOS, rollback, "
