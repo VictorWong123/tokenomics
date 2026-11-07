@@ -1,0 +1,37 @@
+name: Codespace fixtures
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [work, 'codex/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codespace-fixtures-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fixtures:
+    if: github.repository == 'VictorWong123/tokenomics'
+    runs-on: [self-hosted, linux, x64, tokenomics-codespace]
+    timeout-minutes: 30
+    env:
+      TOKENOMICS_BUILD_JOBS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          submodules: recursive
+          persist-credentials: false
+      - name: Print execution evidence
+        shell: bash
+        run: |
+          hostname
+          uname -a
+          pwd
+          git rev-parse HEAD
+      - name: Run CPU fixtures
+        shell: bash
+        run: bash run.sh cpu --fixtures-only --threads 2 --run-dir results/local/codespace-fixtures
