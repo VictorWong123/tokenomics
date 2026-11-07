@@ -127,6 +127,24 @@ def fixture_environment():
     return dict(os.environ, PATH='/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin', TOKENOMICS_BUILD_JOBS='2')
 
 
+
+def verify_lease(ident):
+    lease = OPS / 'lease.json'
+    require(not lease.is_symlink() and lease.is_file()
+            and json.loads(lease.read_text()) == ident, 'Remote lease owner mismatch')
+    return lease
+
+
+def acquire_lease(ident):
+    # O_EXCL is the persistent ownership boundary across separate SSH phases.
+    lease = OPS / 'lease.json'
+    with lease.open('x') as stream:
+        json.dump(ident, stream)
+        stream.flush()
+        os.fsync(stream.fileno())
+    return lease
+
+
 def remote(phase, ident, bundle_digest):
     import fcntl
     require(bool(re.fullmatch('[0-9a-f]{64}', bundle_digest)), 'Invalid bundle digest')
@@ -134,22 +152,34 @@ def remote(phase, ident, bundle_digest):
     OPS.mkdir(mode=0o700, exist_ok=True)
     require(OPS.stat().st_uid == os.getuid(), 'Operations root owner mismatch')
     require(not (OPS / 'controller.lock').is_symlink(), 'Unsafe operation lock')
-    lock = open(OPS / 'controller.lock', 'a')
-    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    with open(OPS / 'controller.lock', 'a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return remote_owned(phase, ident, bundle_digest)
+
+
+def remote_owned(phase, ident, bundle_digest):
     root = OPS / key(ident)
     marker = root / 'owner.json'
     if phase == 'prepare':
         origin = command(['git', '-C', '/workspaces/tokenomics', 'remote', 'get-url', 'origin'])
         require(origin in ('https://github.com/' + REPO + '.git', 'https://github.com/' + REPO,
                            'git@github.com:' + REPO + '.git'), 'User checkout origin mismatch')
-        root.mkdir(mode=0o700)  # Existing run/attempt is rejected, never adopted.
-        marker.write_text(json.dumps(ident))
-        return {'prepared': True}
+        require(not root.exists() and not root.is_symlink(), 'Operation already exists')
+        acquire_lease(ident)
+        try:
+            root.mkdir(mode=0o700)
+            marker.write_text(json.dumps(ident))
+        except Exception:
+            verify_lease(ident).unlink()
+            raise
+        return {'prepared': True, 'lease_owner': ident}
+    verify_lease(ident)
     require(not root.is_symlink() and not marker.is_symlink() and marker.is_file() and json.loads(marker.read_text()) == ident,
             'Owned operation marker mismatch')
     if phase == 'clean':
         shutil.rmtree(root)  # Only the exact uniquely created, marker-verified operation.
-        return {'cleaned': True}
+        verify_lease(ident).unlink()
+        return {'cleaned': True, 'released_owner': ident}
     require(phase == 'run', 'Invalid remote phase')
     bundle = root / 'source.bundle'
     require(bundle.is_file() and not bundle.is_symlink() and digest(bundle) == bundle_digest,
@@ -196,7 +226,7 @@ def remote(phase, ident, bundle_digest):
 
 
 def controller():
-    report = {'passed': False, 'claimed': False, 'remote_prepared': False, 'shutdown_confirmed': False}
+    report = {'passed': False, 'admitted': False, 'claimed': False, 'remote_prepared': False, 'shutdown_confirmed': False}
     output = Path(os.environ['RUNNER_TEMP']) / 'tokenomics-controller'
     output.mkdir(exist_ok=True)
     log = output / 'controller.log'
@@ -227,10 +257,13 @@ def controller():
         report['bundle_sha256'] = bundle_digest
         event('Exact-source bundle created')
         target(json.loads(command(['gh', 'api', '/user/codespaces/' + name])), name)
+        report['admitted'] = True
+        event('Stopped dedicated Codespace admitted; lease not yet acquired')
+        prepared = remote_call('prepare')
+        require(prepared.get('lease_owner') == ident, 'Lease acquisition not confirmed')
         report['claimed'] = True
-        event('Stopped dedicated Codespace admitted; ownership claimed')
-        remote_call('prepare')
         report['remote_prepared'] = True
+        event('Exact remote lease acquired')
         command(['gh', 'codespace', 'cp', '--codespace', name, str(bundle),
                  'remote:' + str(OPS / key(ident) / 'source.bundle')], timeout=180)
         proof = remote_call('run', timeout=1500)
@@ -251,17 +284,20 @@ def controller():
     finally:
         if report['claimed']:
             try:
-                if report['remote_prepared']:
-                    remote_call('clean', timeout=90)
-                    event('Owned operation removed')
+                released = remote_call('clean', timeout=90)
+                require(released.get('released_owner') == ident, 'Lease release not confirmed')
+                report['lease_released'] = True
+                event('Owned operation removed and exact lease released')
             except Exception as ex:
                 report.update(passed=False, cleanup_error=type(ex).__name__)
-            try:
-                stop_and_confirm(name)
-                report['shutdown_confirmed'] = True
-                event('Actual Shutdown confirmed')
-            except Exception as ex:
-                report.update(passed=False, stop_error=type(ex).__name__)
+                event('Lease cleanup not confirmed; refusing stop')
+            if report.get('lease_released'):
+                try:
+                    stop_and_confirm(name)
+                    report['shutdown_confirmed'] = True
+                    event('Actual Shutdown confirmed')
+                except Exception as ex:
+                    report.update(passed=False, stop_error=type(ex).__name__)
         if not report['passed']:
             (output / 'evidence.tar.gz').unlink(missing_ok=True)
         (output / 'controller-report.json').write_text(json.dumps(report, indent=2) + '\n')

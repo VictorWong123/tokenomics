@@ -131,9 +131,9 @@ class ControllerTests(unittest.TestCase):
     def test_owned_stop_failure_fails_job_and_retains_diagnostic_report(self):
         proof = c.manifest(IDENT, 'host', DIGEST)
         responses = [SHA, '', json.dumps(self.space()),
-                     'RESULT {"ok":true,"result":{"prepared":true}}', '',
+                     'RESULT ' + json.dumps({'ok': True, 'result': {'prepared': True, 'lease_owner': IDENT}}), '',
                      'RESULT ' + json.dumps({'ok': True, 'result': {'manifest': proof, 'archive_sha256': DIGEST}}), '',
-                     'RESULT {"ok":true,"result":{"cleaned":true}}']
+                     'RESULT ' + json.dumps({'ok': True, 'result': {'cleaned': True, 'released_owner': IDENT}})]
         with tempfile.TemporaryDirectory() as tmp, \
                 patch.dict(c.os.environ, RUNNER_TEMP=tmp, GH_TOKEN='test-placeholder',
                            TOKENOMICS_CODESPACE='target', GITHUB_REPOSITORY=c.REPO,
@@ -154,6 +154,68 @@ class ControllerTests(unittest.TestCase):
             self.assertEqual(len(cp), 2)
             self.assertTrue(cp[0][-1].endswith('/123-2/source.bundle'))
             self.assertTrue(cp[1][-2].endswith('/123-2/evidence.tar.gz'))
+
+
+    def test_persistent_lease_rejects_second_controller_across_ssh_phases(self):
+        other = c.identity('c' * 40, '456', '1')
+        with tempfile.TemporaryDirectory() as tmp, patch.object(c, 'OPS', Path(tmp)), \
+                patch.object(c, 'command', return_value='https://github.com/' + c.REPO + '.git'):
+            prepared = c.remote('prepare', IDENT, DIGEST)
+            self.assertEqual(prepared['lease_owner'], IDENT)
+            with self.assertRaises(FileExistsError):
+                c.remote('prepare', other, DIGEST)
+            with self.assertRaisesRegex(RuntimeError, 'lease owner mismatch'):
+                c.remote('run', other, DIGEST)
+            with self.assertRaisesRegex(RuntimeError, 'lease owner mismatch'):
+                c.remote('clean', other, DIGEST)
+            self.assertEqual(c.verify_lease(IDENT), Path(tmp) / 'lease.json')
+            self.assertTrue((Path(tmp) / c.key(IDENT)).exists())
+            result = c.remote('clean', IDENT, DIGEST)
+            self.assertEqual(result['released_owner'], IDENT)
+            self.assertFalse((Path(tmp) / 'lease.json').exists())
+
+    def test_second_controller_lease_denial_never_cleans_or_stops(self):
+        responses = [SHA, '', json.dumps(self.space()),
+                     'RESULT {"ok":false,"error_type":"FileExistsError"}']
+        with tempfile.TemporaryDirectory() as tmp, \
+                patch.dict(c.os.environ, RUNNER_TEMP=tmp, GH_TOKEN='test-placeholder',
+                           TOKENOMICS_CODESPACE='target', GITHUB_REPOSITORY=c.REPO,
+                           GITHUB_SHA=SHA, GITHUB_RUN_ID='123', GITHUB_RUN_ATTEMPT='2'), \
+                patch.object(c, 'command', side_effect=responses) as run, \
+                patch.object(c, 'digest', return_value=DIGEST), \
+                patch.object(c, 'stop_and_confirm') as stop, patch('builtins.print'):
+            self.assertEqual(c.controller(), 1)
+            stop.assert_not_called()
+            self.assertEqual(run.call_count, 4)
+            report = json.loads((Path(tmp) / 'tokenomics-controller/controller-report.json').read_text())
+            self.assertTrue(report['admitted'])
+            self.assertFalse(report['claimed'])
+
+    def test_artifact_copy_failure_cleans_and_stops_only_verified_owner(self):
+        proof = c.manifest(IDENT, 'host', DIGEST)
+        for cleanup_ok in (True, False):
+            cleanup = {'ok': True, 'result': {'released_owner': IDENT, 'cleaned': True}} if cleanup_ok else {
+                'ok': False, 'error': 'Remote lease owner mismatch'}
+            responses = [SHA, '', json.dumps(self.space()),
+                         'RESULT ' + json.dumps({'ok': True, 'result': {'lease_owner': IDENT, 'prepared': True}}), '',
+                         'RESULT ' + json.dumps({'ok': True, 'result': {'manifest': proof, 'archive_sha256': DIGEST}}),
+                         RuntimeError('Command failed: gh'), 'RESULT ' + json.dumps(cleanup)]
+            with self.subTest(cleanup_ok=cleanup_ok), tempfile.TemporaryDirectory() as tmp, \
+                    patch.dict(c.os.environ, RUNNER_TEMP=tmp, GH_TOKEN='test-placeholder',
+                               TOKENOMICS_CODESPACE='target', GITHUB_REPOSITORY=c.REPO,
+                               GITHUB_SHA=SHA, GITHUB_RUN_ID='123', GITHUB_RUN_ATTEMPT='2'), \
+                    patch.object(c, 'command', side_effect=responses), \
+                    patch.object(c, 'digest', return_value=DIGEST), \
+                    patch.object(c, 'stop_and_confirm') as stop, patch('builtins.print'):
+                self.assertEqual(c.controller(), 1)
+                self.assertEqual(stop.call_count, int(cleanup_ok))
+                report = json.loads((Path(tmp) / 'tokenomics-controller/controller-report.json').read_text())
+                self.assertFalse(report['passed'])
+                self.assertTrue(report['claimed'])
+                self.assertEqual(report['shutdown_confirmed'], cleanup_ok)
+                self.assertIn('error', report)
+                self.assertTrue((Path(tmp) / 'tokenomics-controller/controller.log').is_file())
+                self.assertFalse((Path(tmp) / 'tokenomics-controller/evidence.tar.gz').exists())
 
     def test_no_stop_if_target_admission_fails(self):
         with tempfile.TemporaryDirectory() as tmp, \

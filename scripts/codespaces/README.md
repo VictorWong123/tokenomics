@@ -5,8 +5,15 @@ controller code from the triggering commit. There are no PR or manual triggers.
 This replaces—not supplements—the self-hosted listener. Retire that listener
 before enabling the controller; the dedicated machine must initially be Shutdown
 and must not be used interactively during an owned run. Workflow concurrency
-serializes this repository's controllers; admission rejects an already active
-machine and the remote helper rejects concurrent operations.
+serializes this repository's controllers but is not the ownership boundary.
+Admission rejects an already active machine. Prepare atomically creates a
+persistent global remote lease containing exact SHA/run/attempt identity; an
+existing lease rejects a contender without ownership. Every run and cleanup
+phase verifies that lease as well as the exact operation marker. Only confirmed
+lease acquisition permits cleanup. Stop is gated on successful owner-verified
+cleanup and release; lost/ambiguous ownership fails without stopping a possibly
+foreign session. Do not delete a stale lease automatically; inspect the machine
+and its recorded owner before operator recovery.
 
 Configure a fine-grained `CODESPACES_TOKEN` restricted **only** to
 `VictorWong123/tokenomics`, with Codespaces read and Codespaces lifecycle admin
@@ -27,8 +34,9 @@ rebuild, idle-timeout change, model download, or core pilot is performed.
 
 The fixture command has a 20-minute deadline; the hosted job has a 45-minute
 limit reserving time for transfer, cleanup and stop polling. Catchable failures
-retain a nonsecret controller report/log and always attempt owned-path cleanup
-and actual Shutdown confirmation. Failed cleanup or unconfirmed Shutdown fails
+retain a nonsecret controller report/log and attempt owner-verified cleanup/release followed by actual Shutdown
+confirmation. A controller that never acquires the lease never cleans or stops;
+failed ownership revalidation/release suppresses stop. Failed cleanup or unconfirmed Shutdown fails
 the job. Forced runner termination or service outage can defeat in-process
 cleanup; inspect the dedicated machine before retrying. No unrelated active
 machine is adopted or stopped.
