@@ -98,6 +98,7 @@ def child(results):
     status = {"schema_version": 1, "state": "started", "stage": "resource-screen"}
     atomic_json(results / "environment.json", hardware())
     atomic_json(results / "status.json", status)
+    print("TOKENOMICS_MODEL_STAGE resource-screen", flush=True)
     try:
         free = available_memory()
         lifecycle.require(
@@ -115,11 +116,13 @@ def child(results):
             lifecycle.require(not path.is_symlink(), "Unsafe model cache entry")
         status["stage"] = "model-download"
         atomic_json(results / "status.json", status)
+        print("TOKENOMICS_MODEL_STAGE model-download", flush=True)
         draft = download("qwen25-05", CACHE, lock)
         target = download("qwen25-15", CACHE, lock)
         shutil.copyfile(lock, results / "models.lock.json")
         status["stage"] = "correctness"
         atomic_json(results / "status.json", status)
+        print("TOKENOMICS_MODEL_STAGE correctness", flush=True)
         args = parser().parse_args(
             [
                 "--target",
@@ -150,6 +153,7 @@ def child(results):
     except Exception as exc:
         status.update(state="failed", error_type=type(exc).__name__, error=str(exc))
     atomic_json(results / "status.json", status)
+    print("TOKENOMICS_MODEL_STAGE " + status["state"], flush=True)
     return 0 if status["state"] == "passed" else 1
 
 
@@ -183,6 +187,7 @@ def workload():
     env = lifecycle.fixture_environment()
     status = {"schema_version": 1, "state": "started", "stage": "bootstrap"}
     atomic_json(results / "status.json", status)
+    print("TOKENOMICS_MODEL_STAGE bootstrap", flush=True)
     code = 1
     try:
         subprocess.run(
@@ -215,7 +220,7 @@ def workload():
             cwd=workspace,
             env=env,
             timeout=9030,
-            stdout=subprocess.DEVNULL,
+            stdout=None,  # child emits only fixed stage names; engine output is captured
             stderr=subprocess.DEVNULL,
         ).returncode
         status = json.loads((results / "status.json").read_text())

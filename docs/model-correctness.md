@@ -72,3 +72,9 @@ correctness records, duration estimate, actual model lock, RSS and hardware.
 still needs an outer timeout. Full Pilot A/B should be scheduled only after
 inspecting this result and fitting the actual lifecycle budget; do not launch
 the 1,080-request pilot blindly on the two-core machine.
+
+On the dedicated Codespace, supply
+`--model-dir /workspaces/.tokenomics-model-cache` to reuse the SHA-verified
+weights and lock from the model gate. The default remains `models/`. Changing
+the result directory never changes the model lock; incompatible results must
+not be resumed under different source, binaries, weights or settings.
