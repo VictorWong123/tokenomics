@@ -64,6 +64,20 @@ class FailureReportingTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             issue_payload(env)
 
+    def test_timeout_keeps_partial_progress_without_inventing_a_mismatch(self):
+        env = self.env()
+        env["MODEL_REPORT"] = json.dumps(
+            {
+                "stage": "correctness",
+                "error_type": "TimeoutExpired",
+                "checked_comparisons": 249,
+            }
+        )
+        body = issue_payload(env)["body"]
+        self.assertIn("TimeoutExpired", body)
+        self.assertIn("Completed comparisons: 249", body)
+        self.assertNotIn("16417", body)
+
     def test_retry_deduplicates_and_never_edits_manual_issues(self):
         env = self.env()
         payload = issue_payload(env)

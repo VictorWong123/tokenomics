@@ -39,9 +39,9 @@ long long peak_rss_bytes() {
 struct Backend {
     Backend() {
 #ifdef TOKENOMICS_CPU_BATCH_INVARIANT
-        // This pinned backend also selects tiled K-quant matmul at eight rows.
-        // Set its process-wide switch before the backend caches the setting.
-        if (setenv("GGML_CPU_TILED_MM", "0", 1) != 0)
+        // The guarded backend uses tiled kernels only above the nine-row
+        // verification ceiling. Keep larger common prefills accelerated.
+        if (setenv("GGML_CPU_TILED_MM", "1", 1) != 0)
             throw std::runtime_error("cannot select consistent CPU kernels");
 #endif
         llama_log_set(
@@ -170,7 +170,7 @@ double Engine::load_ms() const { return impl_->loading; }
 std::string Engine::system_info() const {
     auto info = std::string(llama_print_system_info()) + impl_->execution_evidence;
 #ifdef TOKENOMICS_CPU_BATCH_INVARIANT
-    info += "; TOKENOMICS_CPU_BATCH_INVARIANT=ON; GGML_CPU_TILED_MM=0";
+    info += "; TOKENOMICS_CPU_BATCH_INVARIANT=ON; GGML_CPU_TILED_MM=1; tiled_min_rows=10";
 #endif
     return info;
 }
