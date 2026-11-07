@@ -56,3 +56,23 @@ ownership, existing resource selection and shutdown logic are unchanged.
 Local synthetic validation exercises this diagnostic path, including incorrect
 record matching and uncommitted-row exclusion. Synthetic agreement cannot resolve
 the trained-model failure. No root cause is established yet.
+
+## Cancelled diagnostic attempt
+
+Run [42404730880](https://github.com/VictorWong123/tokenomics/actions/runs/42404730880)
+at `fd37f5b3fed054010252f91dae122d56e5adbf57` was cancelled at
+2026-11-07 19:17:54 UTC during model verification, before the diagnostic stage.
+It did not reach the job deadline. No evidence archive was uploaded (artifact
+count zero). The finalizer explicitly confirmed Shutdown at 19:19:01 UTC.
+The cancellation's initiator/reason is not established by the inspected metadata;
+no replacement run was launched automatically.
+
+Follow-up preparation on `review/divergence-followup` records selected CMake
+switches and checks committed logit mapping on random fixtures. Native CPU,
+`GGML_CPU_REPACK=OFF`, and additionally `GGML_LLAMAFILE=OFF` builds each passed
+four local CTests. Native and no-repack synthetic diagnostics each completed
+14 comparisons and six fresh-prefix probes. These checks establish usable
+build options, not a trained-model fix. The pinned CPU repack implementation
+switches from GEMV to GEMM at four rows; that is a testable source-based hypothesis,
+not an established explanation. Obtain the cancelled diagnostic's replacement
+results before selecting a backend ablation or making a root-cause claim.
