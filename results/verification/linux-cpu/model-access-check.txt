@@ -1,0 +1,16 @@
+Internal ctest changing into directory: /workspace/tokenomics/build-cpu
+Test project /workspace/tokenomics/build-cpu
+    Start 1: core
+1/4 Test #1: core .............................   Passed    0.00 sec
+    Start 2: fixtures
+2/4 Test #2: fixtures .........................   Passed    0.15 sec
+    Start 3: runtime
+3/4 Test #3: runtime ..........................   Passed    0.40 sec
+    Start 4: tooling
+4/4 Test #4: tooling ..........................   Passed    0.40 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.95 sec
+blocked: Cannot resolve https://huggingface.co/api/models/Qwen/Qwen2.5-0.5B-Instruct-GGUF?blobs=true: <urlopen error Tunnel connection failed: 403 Forbidden>. Allow huggingface.co and its redirected *.hf.co/*.huggingface.co hosts; rerun unchanged. No model results exist yet.
+Cannot resolve https://huggingface.co/api/models/Qwen/Qwen2.5-0.5B-Instruct-GGUF?blobs=true: <urlopen error Tunnel connection failed: 403 Forbidden>. Allow huggingface.co and its redirected *.hf.co/*.huggingface.co hosts; rerun unchanged. No model results exist yet.

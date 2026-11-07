@@ -1,0 +1,13 @@
+{
+  "name": "Tokenomics Linux CPU",
+  "build": { "dockerfile": "Dockerfile" },
+  "hostRequirements": { "cpus": 4, "memory": "16gb", "storage": "32gb" },
+  "remoteUser": "vscode",
+  "postCreateCommand": "bash scripts/bootstrap.sh cpu",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-vscode.cpptools", "ms-vscode.cmake-tools", "ms-python.python"],
+      "settings": {"python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"}
+    }
+  }
+}

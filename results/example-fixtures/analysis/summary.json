@@ -1,0 +1,438 @@
+{
+  "baseline_table": {
+    "acceptance": {
+      "cells": 12,
+      "geomean_median_tps": 14068.29376736239,
+      "median_load_ms": 3.4517805,
+      "median_warm_ms": 5.3947725,
+      "peak_lifetime_rss_bytes": 39792640
+    },
+    "confidence": {
+      "cells": 12,
+      "geomean_median_tps": 15994.847651536169,
+      "median_load_ms": 3.105734,
+      "median_warm_ms": 4.9293715,
+      "peak_lifetime_rss_bytes": 39792640
+    },
+    "fixed2": {
+      "cells": 12,
+      "geomean_median_tps": 13722.691209595763,
+      "median_load_ms": 3.0969265,
+      "median_warm_ms": 5.64883,
+      "peak_lifetime_rss_bytes": 39792640
+    },
+    "fixed4": {
+      "cells": 12,
+      "geomean_median_tps": 13557.11160866421,
+      "median_load_ms": 3.188113,
+      "median_warm_ms": 6.320323,
+      "peak_lifetime_rss_bytes": 39792640
+    },
+    "resident": {
+      "cells": 12,
+      "geomean_median_tps": 22496.030775426694,
+      "median_load_ms": 3.2519894999999996,
+      "median_warm_ms": 3.578166,
+      "peak_lifetime_rss_bytes": 39792640
+    },
+    "target": {
+      "cells": 12,
+      "geomean_median_tps": 22200.30580244054,
+      "median_load_ms": 1.8082445,
+      "median_warm_ms": 3.4671835,
+      "peak_lifetime_rss_bytes": 39792640
+    },
+    "upstream-style": {
+      "cells": 12,
+      "geomean_median_tps": 11122.001062771766,
+      "median_load_ms": 3.1294245,
+      "median_warm_ms": 7.320739,
+      "peak_lifetime_rss_bytes": 39792640
+    }
+  },
+  "categories": {
+    "code": {
+      "ci95": [
+        0.6687220118529448,
+        0.8873415178546461
+      ],
+      "losses": 3,
+      "more_than_10pct_slower": 3,
+      "prompt_cap_cells": 4,
+      "prompts": 2,
+      "ratio": 0.7703147441276226,
+      "ties": 0,
+      "wins": 1,
+      "worst_ratio": 0.5723104194178443
+    },
+    "qa": {
+      "ci95": [
+        0.5056750552783231,
+        0.5325979944119982
+      ],
+      "losses": 4,
+      "more_than_10pct_slower": 4,
+      "prompt_cap_cells": 4,
+      "prompts": 2,
+      "ratio": 0.5189619641798532,
+      "ties": 0,
+      "wins": 0,
+      "worst_ratio": 0.41214501123965314
+    },
+    "summary": {
+      "ci95": [
+        0.5800051747553016,
+        0.6017868008912983
+      ],
+      "losses": 4,
+      "more_than_10pct_slower": 4,
+      "prompt_cap_cells": 4,
+      "prompts": 2,
+      "ratio": 0.5907956149265086,
+      "ties": 0,
+      "wins": 0,
+      "worst_ratio": 0.55049644166561
+    }
+  },
+  "comparisons": {
+    "acceptance/confidence": {
+      "ci95": [
+        0.7645242629609501,
+        0.9709897299522596
+      ],
+      "losses": 8,
+      "more_than_10pct_slower": 5,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.8795515952295576,
+      "ties": 1,
+      "wins": 3,
+      "worst_ratio": 0.45948578066576745
+    },
+    "acceptance/fixed2": {
+      "ci95": [
+        0.8548660732706441,
+        1.195720139954869
+      ],
+      "losses": 3,
+      "more_than_10pct_slower": 3,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.0251847507524594,
+      "ties": 3,
+      "wins": 6,
+      "worst_ratio": 0.5407633286363837
+    },
+    "acceptance/target": {
+      "ci95": [
+        0.610346557449617,
+        0.6602010398122746
+      ],
+      "losses": 12,
+      "more_than_10pct_slower": 12,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.6336981973381566,
+      "ties": 0,
+      "wins": 0,
+      "worst_ratio": 0.5440366242006989
+    },
+    "confidence/confidence": {
+      "ci95": [
+        1.0,
+        1.0
+      ],
+      "losses": 0,
+      "more_than_10pct_slower": 0,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.0,
+      "ties": 12,
+      "wins": 0,
+      "worst_ratio": 1.0
+    },
+    "confidence/fixed2": {
+      "ci95": [
+        1.0857330435967862,
+        1.2494762340173926
+      ],
+      "losses": 0,
+      "more_than_10pct_slower": 0,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.165576591882472,
+      "ties": 4,
+      "wins": 8,
+      "worst_ratio": 0.99503837485064
+    },
+    "confidence/target": {
+      "ci95": [
+        0.6686156961936375,
+        0.8150440932041546
+      ],
+      "losses": 11,
+      "more_than_10pct_slower": 11,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.720478708440936,
+      "ties": 0,
+      "wins": 1,
+      "worst_ratio": 0.575620332288607
+    },
+    "fixed2/confidence": {
+      "ci95": [
+        0.8003353507451187,
+        0.9210367188302825
+      ],
+      "losses": 8,
+      "more_than_10pct_slower": 8,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.8579444774066227,
+      "ties": 4,
+      "wins": 0,
+      "worst_ratio": 0.6106236777775653
+    },
+    "fixed2/fixed2": {
+      "ci95": [
+        1.0,
+        1.0
+      ],
+      "losses": 0,
+      "more_than_10pct_slower": 0,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.0,
+      "ties": 12,
+      "wins": 0,
+      "worst_ratio": 1.0
+    },
+    "fixed2/target": {
+      "ci95": [
+        0.5420349223453141,
+        0.7224459637039811
+      ],
+      "losses": 11,
+      "more_than_10pct_slower": 11,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.6181307289959573,
+      "ties": 0,
+      "wins": 1,
+      "worst_ratio": 0.41214501123965314
+    },
+    "fixed4/confidence": {
+      "ci95": [
+        0.7126528765741035,
+        0.9732590471921068
+      ],
+      "losses": 7,
+      "more_than_10pct_slower": 6,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.8475924187600596,
+      "ties": 3,
+      "wins": 2,
+      "worst_ratio": 0.4700195714088129
+    },
+    "fixed4/fixed2": {
+      "ci95": [
+        0.8132814187365635,
+        1.1480956628480146
+      ],
+      "losses": 4,
+      "more_than_10pct_slower": 3,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.9879338827637715,
+      "ties": 1,
+      "wins": 7,
+      "worst_ratio": 0.4756321851841057
+    },
+    "fixed4/target": {
+      "ci95": [
+        0.5753468400086235,
+        0.6576846549072293
+      ],
+      "losses": 11,
+      "more_than_10pct_slower": 11,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.6106722911525767,
+      "ties": 1,
+      "wins": 0,
+      "worst_ratio": 0.32467561002799944
+    },
+    "resident/confidence": {
+      "ci95": [
+        1.3051039887994171,
+        1.493394008544856
+      ],
+      "losses": 0,
+      "more_than_10pct_slower": 0,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.4064548325514135,
+      "ties": 0,
+      "wins": 12,
+      "worst_ratio": 1.1958189489269826
+    },
+    "resident/fixed2": {
+      "ci95": [
+        1.474078565948269,
+        1.832719131652878
+      ],
+      "losses": 0,
+      "more_than_10pct_slower": 0,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.6393308303619096,
+      "ties": 0,
+      "wins": 12,
+      "worst_ratio": 1.2398681592329264
+    },
+    "resident/target": {
+      "ci95": [
+        0.9103236298961019,
+        1.1369511159657826
+      ],
+      "losses": 4,
+      "more_than_10pct_slower": 4,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.0133207612371553,
+      "ties": 4,
+      "wins": 4,
+      "worst_ratio": 0.7561046664124285
+    },
+    "target/confidence": {
+      "ci95": [
+        1.2269274856882095,
+        1.495627466858616
+      ],
+      "losses": 1,
+      "more_than_10pct_slower": 1,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.3879660679549128,
+      "ties": 0,
+      "wins": 11,
+      "worst_ratio": 0.7366508077608263
+    },
+    "target/fixed2": {
+      "ci95": [
+        1.3841865692943995,
+        1.8448995789295841
+      ],
+      "losses": 1,
+      "more_than_10pct_slower": 1,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.617780759135403,
+      "ties": 0,
+      "wins": 11,
+      "worst_ratio": 0.8669555394515895
+    },
+    "target/target": {
+      "ci95": [
+        1.0,
+        1.0
+      ],
+      "losses": 0,
+      "more_than_10pct_slower": 0,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 1.0,
+      "ties": 12,
+      "wins": 0,
+      "worst_ratio": 1.0
+    },
+    "upstream-style/confidence": {
+      "ci95": [
+        0.6299647060645048,
+        0.748981842462417
+      ],
+      "losses": 12,
+      "more_than_10pct_slower": 12,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.6953489839400611,
+      "ties": 0,
+      "wins": 0,
+      "worst_ratio": 0.4447525771742043
+    },
+    "upstream-style/fixed2": {
+      "ci95": [
+        0.7544387518914505,
+        0.8699337903106311
+      ],
+      "losses": 11,
+      "more_than_10pct_slower": 9,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.8104824988697963,
+      "ties": 0,
+      "wins": 1,
+      "worst_ratio": 0.5620409151377549
+    },
+    "upstream-style/target": {
+      "ci95": [
+        0.4350983201789289,
+        0.5794103773618929
+      ],
+      "losses": 12,
+      "more_than_10pct_slower": 11,
+      "prompt_cap_cells": 12,
+      "prompts": 6,
+      "ratio": 0.5009841378648524,
+      "ties": 0,
+      "wins": 0,
+      "worst_ratio": 0.30057090343294174
+    }
+  },
+  "hardware": {
+    "compiler": {
+      "output": "c++ (Debian 14.2.0-19) 14.2.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+      "returncode": 0
+    },
+    "cpu_count": 5,
+    "cpu_quota": "400000 100000",
+    "execution_environment": "linux-other",
+    "git_dirty": "",
+    "git_revision": "d9628ded7abc6399dc00541e199304e6538c67ff",
+    "llama_revision": "fd27b2034905f8dadd8bd6d2cc44595f4929d391",
+    "loadavg": "0.54 0.46 0.79 3/199 15176",
+    "lscpu": {
+      "output": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           46 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  5\nOn-line CPU(s) list:                     0-4\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 9V74 80-Core Processor\nCPU family:                              25\nModel:                                   17\nThread(s) per core:                      1\nCore(s) per socket:                      5\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                5192.25\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm arch_capabilities\nHypervisor vendor:                       KVM\nVirtualization type:                     full\nL1d cache:                               96 KiB (3 instances)\nL1i cache:                               96 KiB (3 instances)\nL2 cache:                                3 MiB (3 instances)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-4\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Vulnerable\nVulnerability Spec store bypass:         Vulnerable\nVulnerability Spectre v1:                Vulnerable: __user pointer sanitization and usercopy barriers only; no swapgs barriers\nVulnerability Spectre v2:                Vulnerable; STIBP: disabled; PBRSB-eIBRS: Not affected; BHI: Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Vulnerable\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected",
+      "returncode": 0
+    },
+    "machine": "x86_64",
+    "meminfo": "MemTotal:       18440100 kB\nMemFree:        10858248 kB\nMemAvailable:   16853932 kB\nBuffers:           36748 kB\nCached:          6034568 kB\nSwapCached:            0 kB\nActive:          1284772 kB\nInactive:        5474704 kB\nActive(anon):        184 kB\nInactive(anon):   717952 kB\nActive(file):    1284588 kB\nInactive(file):  4756752 kB\nUnevictable:       29944 kB\nMlocked:               0 kB\nSwapTotal:             0 kB\nSwapFree:              0 kB\nDirty:             21472 kB\nWriteback:             0 kB\nAnonPages:        718328 kB\nMapped:           160792 kB\nShmem:               108 kB\nKReclaimable:     306356 kB\nSlab:             376208 kB\nSReclaimable:     306356 kB\nSUnreclaim:        69852 kB\nKernelStack:        3116 kB\nPageTables:         5776 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     9220048 kB\nCommitted_AS:    1587048 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:        5568 kB\nVmallocChunk:          0 kB\nPercpu:             1368 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:     22528 kB\nFilePmdMapped:         0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      135168 kB\nDirectMap2M:     5646336 kB\nDirectMap1G:    30408704 kB",
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+    "memory_limit": "17179869184",
+    "memory_pressure": null,
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "timestamp_utc": "2026-11-07T06:23:13Z",
+    "vmstat": "nr_free_pages 2714562\nnr_free_pages_blocks 2382848\nnr_zone_inactive_anon 179488\nnr_zone_active_anon 46\nnr_zone_inactive_file 1189188\nnr_zone_active_file 321147\nnr_zone_unevictable 7486\nnr_zone_write_pending 5368\nnr_mlock 0\nnr_free_cma 0\nnuma_hit 73632934\nnuma_miss 0\nnuma_foreign 0\nnuma_interleave 1236\nnuma_local 73632934\nnuma_other 0\nnr_inactive_anon 179488\nnr_active_anon 46\nnr_inactive_file 1189188\nnr_active_file 321147\nnr_unevictable 7486\nnr_slab_reclaimable 76589\nnr_slab_unreclaimable 17463\nnr_isolated_anon 0\nnr_isolated_file 0\nworkingset_nodes 0\nworkingset_refault_anon 0\nworkingset_refault_file 0\nworkingset_activate_anon 0\nworkingset_activate_file 0\nworkingset_restore_anon 0\nworkingset_restore_file 0\nworkingset_nodereclaim 0\nnr_anon_pages 179582\nnr_mapped 40198\nnr_file_pages 1517829\nnr_dirty 5368\nnr_writeback 0\nnr_shmem 27\nnr_shmem_hugepages 0\nnr_shmem_pmdmapped 0\nnr_file_hugepages 11\nnr_file_pmdmapped 0\nnr_anon_transparent_hugepages 0\nnr_vmscan_write 0\nnr_vmscan_immediate_reclaim 0\nnr_dirtied 3911426\nnr_written 2853463\nnr_throttled_written 0\nnr_kernel_misc_reclaimable 0\nnr_foll_pin_acquired 0\nnr_foll_pin_released 0\nnr_kernel_stack 3116\nnr_page_table_pages 1444\nnr_sec_page_table_pages 0\nnr_iommu_pages 0\nnr_swapcached 0\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\npgdemote_proactive 0\nnr_hugetlb 0\nnr_balloon_pages 0\nnr_kernel_file_pages 0\nnr_dirty_threshold 835786\nnr_dirty_background_threshold 417383\nnr_memmap_pages 59448\nnr_memmap_boot_pages 73728\npgpgin 21817\npgpgout 11439256\npswpin 0\npswpout 0\npgalloc_dma 0\npgalloc_dma32 0\npgalloc_normal 75538377\npgalloc_movable 0\npgalloc_device 0\nallocstall_dma 0\nallocstall_dma32 0\nallocstall_normal 0\nallocstall_movable 0\nallocstall_device 0\npgskip_dma 0\npgskip_dma32 0\npgskip_normal 0\npgskip_movable 0\npgskip_device 0\npgfree 78291169\npgactivate 849403\npgdeactivate 0\npglazyfree 198\npgfault 82831332\npgmajfault 0\npglazyfreed 0\npgrefill 0\npgreuse 153276\npgsteal_kswapd 0\npgsteal_direct 0\npgsteal_khugepaged 0\npgsteal_proactive 0\npgscan_kswapd 0\npgscan_direct 0\npgscan_khugepaged 0\npgscan_proactive 0\npgscan_direct_throttle 0\npgscan_anon 0\npgscan_file 0\npgsteal_anon 0\npgsteal_file 0\nzone_reclaim_success 0\nzone_reclaim_failed 0\npginodesteal 0\nslabs_scanned 0\nkswapd_inodesteal 0\nkswapd_low_wmark_hit_quickly 0\nkswapd_high_wmark_hit_quickly 0\npageoutrun 0\npgrotated 9\ndrop_pagecache 0\ndrop_slab 0\noom_kill 0\npgmigrate_success 0\npgmigrate_fail 0\nthp_migration_success 0\nthp_migration_fail 0\nthp_migration_split 0\ncompact_migrate_scanned 0\ncompact_free_scanned 0\ncompact_isolated 0\ncompact_stall 0\ncompact_fail 0\ncompact_success 0\ncompact_daemon_wake 0\ncompact_daemon_migrate_scanned 0\ncompact_daemon_free_scanned 0\nhtlb_buddy_alloc_success 0\nhtlb_buddy_alloc_fail 0\nunevictable_pgs_culled 7486\nunevictable_pgs_scanned 0\nunevictable_pgs_rescued 0\nunevictable_pgs_mlocked 0\nunevictable_pgs_munlocked 0\nunevictable_pgs_cleared 0\nunevictable_pgs_stranded 0\nthp_fault_alloc 0\nthp_fault_fallback 212021\nthp_fault_fallback_charge 0\nthp_collapse_alloc 0\nthp_collapse_alloc_failed 0\nthp_file_alloc 0\nthp_file_fallback 0\nthp_file_fallback_charge 0\nthp_file_mapped 0\nthp_split_page 0\nthp_split_page_failed 0\nthp_deferred_split_page 0\nthp_underused_split_page 0\nthp_split_pmd 0\nthp_scan_exceed_none_pte 0\nthp_scan_exceed_swap_pte 0\nthp_scan_exceed_share_pte 0\nthp_split_pud 0\nthp_zero_page_alloc 0\nthp_zero_page_alloc_failed 0\nthp_swpout 0\nthp_swpout_fallback 0\nballoon_inflate 0\nballoon_deflate 0\nswap_ra 0\nswap_ra_hit 0\nswpin_zero 0\nswpout_zero 0\ndirect_map_level2_splits 58\ndirect_map_level3_splits 2\ndirect_map_level2_collapses 0\ndirect_map_level3_collapses 0\nnr_unstable 0"
+  },
+  "q1_supported": false,
+  "q1_validation": {
+    "ci95": [
+      0.5576249826087208,
+      0.5974237165308773
+    ],
+    "fit_selected_fixed": "fixed4",
+    "losses": 5,
+    "more_than_10pct_slower": 5,
+    "prompt_cap_cells": 6,
+    "prompts": 3,
+    "ratio": 0.5801458137075874,
+    "ties": 1,
+    "wins": 0,
+    "worst_ratio": 0.32467561002799944
+  },
+  "schema_version": 1,
+  "selected_fixed": "fixed2",
+  "selection_rule": "maximum geometric mean prompt/cap median decode throughput on development only",
+  "synthetic_fixture": true
+}

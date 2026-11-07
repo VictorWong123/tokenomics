@@ -1,0 +1,14 @@
+Internal ctest changing into directory: /workspace/tokenomics/build-asan
+Test project /workspace/tokenomics/build-asan
+    Start 1: core
+1/4 Test #1: core .............................   Passed    0.01 sec
+    Start 2: fixtures
+2/4 Test #2: fixtures .........................   Passed    0.16 sec
+    Start 3: runtime
+3/4 Test #3: runtime ..........................   Passed   13.25 sec
+    Start 4: tooling
+4/4 Test #4: tooling ..........................   Passed    1.60 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  15.02 sec

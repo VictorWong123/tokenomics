@@ -1,0 +1,307 @@
+"""Pilot B: common-prefix action replay, fit/validation on different prompts.
+
+Setup/prefill is diagnostic and excluded from cycle action cost; all work inside
+the cycle remains charged. Transition tests are timed as actual generation.
+"""
+
+from __future__ import annotations
+import json
+import pathlib
+import random
+import statistics
+import subprocess
+import math
+import numpy as np
+from bench.common import atomic_json, read_jsonl, sha256, source_fingerprint
+from bench.run import first_mismatch
+
+
+def run_jobs(exe, target, draft, jobs, directory, cfg, gpu_layers):
+    directory.mkdir(parents=True, exist_ok=True)
+    jobpath = directory / "jobs.jsonl"
+    encoded = "".join(json.dumps(j) + "\n" for j in jobs)
+    if jobpath.exists() and jobpath.read_text() != encoded:
+        raise RuntimeError("replay job changed; use new directory")
+    jobpath.write_text(encoded)
+    done = directory / "complete.json"
+    if done.exists():
+        return read_jsonl(directory / "requests.jsonl"), read_jsonl(
+            directory / "cycles.jsonl"
+        )
+    attempt = len(list(directory.glob("attempt-*")))
+    d = directory / f"attempt-{attempt}"
+    d.mkdir()
+    args = [
+        str(exe),
+        "--target",
+        str(target),
+        "--jobs",
+        str(jobpath),
+        "--out",
+        str(d / "requests.jsonl"),
+        "--cycles",
+        str(d / "cycles.jsonl"),
+        "--context",
+        str(cfg["context"]),
+        "--batch",
+        str(cfg["batch"]),
+        "--threads",
+        str(cfg["threads"]),
+        "--gpu-layers",
+        str(gpu_layers),
+    ]
+    if draft:
+        args += ["--draft", str(draft)]
+    # Excluded warm-up primes weights/graphs before any action measurement.
+    warm = {**jobs[0], "warmup": True, "max_tokens": 9, "max_cycles": 1}
+    attempt_jobs = d / "jobs.jsonl"
+    attempt_jobs.write_text(json.dumps(warm) + "\n" + encoded)
+    args[args.index("--jobs") + 1] = str(attempt_jobs)
+    with open(d / "stderr.txt", "w") as f:
+        subprocess.run(args, stderr=f, check=True)
+    rows = read_jsonl(d / "requests.jsonl")
+    cycles = read_jsonl(d / "cycles.jsonl")
+    rows = [r for r in rows if not r.get("warmup", False)]
+    cycles = [c for c in cycles if not c.get("warmup", False)]
+    if len(rows) != len(jobs):
+        raise RuntimeError("incomplete replay records")
+    for name, values in (("requests.jsonl", rows), ("cycles.jsonl", cycles)):
+        (directory / name).write_text("".join(json.dumps(x) + "\n" for x in values))
+    atomic_json(done, {"jobs": len(jobs), "attempt": attempt})
+    return rows, cycles
+
+
+def investigate(exe, target, draft, pilot_dir, out, cfg, gpu_layers=0, drafter="model"):
+    out = pathlib.Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    manifest = json.loads((pathlib.Path(pilot_dir) / "run_manifest.json").read_text())
+    frozen = {
+        "code": source_fingerprint(),
+        "binary": sha256(exe),
+        "target": sha256(target),
+        "draft": sha256(draft) if draft else None,
+        "config": cfg,
+        "gpu_layers": gpu_layers,
+        "drafter": drafter,
+        "pilot": sha256(pathlib.Path(pilot_dir) / "run_manifest.json"),
+    }
+    if (out / "manifest.json").exists() and json.loads(
+        (out / "manifest.json").read_text()
+    ) != frozen:
+        raise RuntimeError("replay resume fingerprint changed")
+    atomic_json(out / "manifest.json", frozen)
+    rows = read_jsonl(pathlib.Path(pilot_dir) / "requests.jsonl")
+    refs = {}
+    for r in rows:
+        if (
+            r["configuration_id"] == "target"
+            and r["output_cap"] == max(cfg["output_caps"])
+            and r["repetition"] == 0
+        ):
+            refs[r["prompt_id"]] = r
+    actions = [0, 1, 2, 4, 6, 8]
+    rng = random.Random(cfg["seed"] + 1)
+    measurements = []
+    transitions = []
+    for pid, ref in sorted(refs.items()):
+        tokens = ref["token_ids"]
+        prompt_ids = ref["prompt_ids"]
+        jobs = []
+        # No checkpoint after the final target trace token, which might be EOG.
+        checkpoints = [x for x in (32, 96, 224, 400) if x + 9 < len(tokens)]
+        for cp in checkpoints:
+            for rep in range(3):
+                order = list(actions)
+                rng.shuffle(order)
+                for action in order:
+                    jobs.append(
+                        {
+                            "run_id": out.name,
+                            "configuration_id": f"action{action}",
+                            "prompt_id": pid,
+                            "repetition": rep,
+                            "checkpoint": cp,
+                            "policy": "target" if action == 0 else "fixed",
+                            "k": action or 4,
+                            "drafter": drafter,
+                            "prefix_tokens": prompt_ids + tokens[:cp],
+                            "max_tokens": 9,
+                            "max_cycles": 1,
+                            "warmup": False,
+                        }
+                    )
+            # Available historical signal: completed canonical k=4 probe at cp-8.
+            jobs.append(
+                {
+                    "run_id": out.name,
+                    "configuration_id": "signal",
+                    "prompt_id": pid,
+                    "repetition": 0,
+                    "checkpoint": cp,
+                    "policy": "fixed",
+                    "k": 4,
+                    "drafter": drafter,
+                    "prefix_tokens": prompt_ids + tokens[: cp - 8],
+                    "max_tokens": 9,
+                    "max_cycles": 1,
+                }
+            )
+        if not jobs:
+            continue
+        rr, cc = run_jobs(exe, target, draft, jobs, out / pid, cfg, gpu_layers)
+        for r in rr:
+            cp = r["checkpoint"] - (8 if r["configuration_id"] == "signal" else 0)
+            expect = tokens[cp : cp + len(r["token_ids"])]
+            mismatch = first_mismatch(expect, r["token_ids"])
+            if mismatch is not None:
+                atomic_json(
+                    out / "correctness_failure.json",
+                    {"prompt_id": pid, "checkpoint": cp, "first_mismatch": mismatch},
+                )
+                raise RuntimeError("replay token mismatch")
+        for cp in checkpoints:
+            signal = [
+                c
+                for c in cc
+                if c["configuration_id"] == "signal" and c["checkpoint"] == cp
+            ][0]
+            outcomes = {}
+            for action in actions:
+                cs = [
+                    c
+                    for c in cc
+                    if c["configuration_id"] == f"action{action}"
+                    and c["checkpoint"] == cp
+                ]
+                outcomes[str(action)] = {
+                    "rate": statistics.median(
+                        c["committed"] / c["wall_ms"] for c in cs
+                    ),
+                    "ms": statistics.median(c["wall_ms"] for c in cs),
+                    "tokens": statistics.median(c["committed"] for c in cs),
+                }
+            measurements.append(
+                {
+                    "prompt_id": pid,
+                    "checkpoint": cp,
+                    "acceptance": signal["accepted"] / max(signal["actual_drafts"], 1),
+                    "context": len(prompt_ids) + cp,
+                    "probe_ms": signal["wall_ms"],
+                    "outcomes": outcomes,
+                }
+            )
+        if drafter == "model":
+            job = {
+                "run_id": out.name,
+                "configuration_id": "transition",
+                "prompt_id": pid,
+                "repetition": 0,
+                "policy": "script",
+                "script": [0] * 16 + [4],
+                "prompt": next(
+                    p["prompt"] for p in manifest["frozen"]["prompts"] if p["id"] == pid
+                ),
+                "max_tokens": 64,
+                "k": 4,
+            }
+            tr, tc = run_jobs(
+                exe, target, draft, [job], out / pid / "transition", cfg, gpu_layers
+            )
+            mismatch = first_mismatch(
+                tokens[: len(tr[0]["token_ids"])], tr[0]["token_ids"]
+            )
+            if mismatch is not None:
+                raise RuntimeError("transition token mismatch")
+            transitions += [
+                c["sync_ms"] for c in tc if c["action"] > 0 and c["stale_before"] >= 16
+            ]
+    atomic_json(out / "checkpoints.json", measurements)
+    answer = fit_validate(
+        measurements, statistics.median(transitions) if transitions else 0, cfg["seed"]
+    )
+    if manifest["frozen"].get("identity", {}).get("synthetic_fixture", False):
+        answer["synthetic_fixture"] = True
+        answer["q2_supported"] = False
+        answer["status"] = (
+            "Synthetic transformer pipeline check; not scheduling feasibility evidence"
+        )
+    answer["transition_sync_ms"] = transitions
+    atomic_json(out / "decision.json", answer)
+    return answer
+
+
+def fit_validate(data, transition_ms, seed=20261107):
+    fit = [r for r in data if int(r["prompt_id"].rsplit("-", 1)[1]) % 6 < 3]
+    val = [r for r in data if int(r["prompt_id"].rsplit("-", 1)[1]) % 6 >= 3]
+    if not fit or not val:
+        return {
+            "q2_supported": False,
+            "status": "insufficient common-prefix checkpoints",
+        }
+    actions = list(fit[0]["outcomes"])
+
+    def bucket(r):
+        return (r["acceptance"] >= 0.5, r["context"] >= 256)
+
+    def best(rows):
+        return max(
+            actions,
+            key=lambda a: statistics.mean(
+                math.log(r["outcomes"][a]["rate"]) for r in rows
+            ),
+        )
+
+    global_action = best(fit)
+    rules = {}
+    for r in fit:
+        b = bucket(r)
+        if b not in rules:
+            rules[b] = best([x for x in fit if bucket(x) == b])
+    by_prompt = {}
+    raw_ratios = []
+    winners = set()
+    trajectories = {}
+    for r in val:
+        action = rules.get(bucket(r), global_action)
+        o = r["outcomes"][action]
+        g = r["outcomes"][global_action]
+        # Conservative feasibility estimate: full canonical probe every 16 cycles,
+        # fixed 0.05 ms decision allowance, transition catch-up over a 4-cycle hold.
+        # It is a declared estimate, not a measured deployable controller gain.
+        charged = (
+            o["ms"]
+            + 0.05
+            + r["probe_ms"] / 16
+            + (transition_ms / 4 if action != "0" else 0)
+        )
+        ratio = (o["tokens"] / charged) / g["rate"]
+        raw_ratios.append(ratio)
+        by_prompt.setdefault(r["prompt_id"], []).append(math.log(ratio))
+        winners.add(max(actions, key=lambda a: r["outcomes"][a]["rate"]))
+        trajectories.setdefault(r["prompt_id"], set()).add(action)
+    values = np.array([statistics.mean(v) for v in by_prompt.values()])
+    rng = np.random.default_rng(seed)
+    draws = np.exp(rng.choice(values, (10000, len(values)), replace=True).mean(axis=1))
+    ratio = math.exp(float(values.mean()))
+    ci = [float(np.quantile(draws, 0.025)), float(np.quantile(draws, 0.975))]
+    within = any(len(v) > 1 for v in trajectories.values())
+    return {
+        "schema_version": 1,
+        "q2_supported": len(winners) > 1 and within and ratio > 1.05 and ci[0] > 1,
+        "status": "exploratory development replay; not a deployable speedup claim",
+        "global_action": int(global_action),
+        "rule": {str(k): int(v) for k, v in rules.items()},
+        "features": "historical canonical acceptance >=0.5; context >=256",
+        "validation_ratio_after_estimated_overhead": ratio,
+        "ci95": ci,
+        "validation_prompts": len(by_prompt),
+        "validation_checkpoints": len(val),
+        "different_hindsight_winners": sorted(winners),
+        "predicted_within_request_variation": within,
+        "overhead_assumptions": {
+            "decision_ms": 0.05,
+            "probe_every": 16,
+            "transition_amortization_cycles": 4,
+        },
+        "limitation": "Hindsight action variation is diagnostic, not an achievable bound. Canonical probe history differs from a learned policy history; a passing pilot still needs an online controller evaluation.",
+    }

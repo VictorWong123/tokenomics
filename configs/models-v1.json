@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "candidates": [
+    {"id":"qwen25-05-15-q4", "target":"qwen25-15", "draft":"qwen25-05", "min_available_gib":5, "reason":"Small compatible-family smoke/first feasibility candidate; no assumed gain"},
+    {"id":"qwen25-05-3-q4", "target":"qwen25-3", "draft":"qwen25-05", "min_available_gib":7, "reason":"Larger target cost separation, still within inspected 16 GiB limit; actual RSS and swap checked"}
+  ],
+  "models": {
+    "qwen25-05":{"repo":"Qwen/Qwen2.5-0.5B-Instruct-GGUF", "file":"qwen2.5-0.5b-instruct-q4_k_m.gguf", "license":"Apache-2.0"},
+    "qwen25-15":{"repo":"Qwen/Qwen2.5-1.5B-Instruct-GGUF", "file":"qwen2.5-1.5b-instruct-q4_k_m.gguf", "license":"Apache-2.0"},
+    "qwen25-3":{"repo":"Qwen/Qwen2.5-3B-Instruct-GGUF", "file":"qwen2.5-3b-instruct-q4_k_m.gguf", "license":"Qwen Research License; inspect upstream terms before redistribution"}
+  },
+  "format":"Qwen2.5 ChatML prompt string frozen in bench/prompts-v1.jsonl; automatic chat templates disabled",
+  "download_contract":"Resolve repository commit and file LFS SHA-256 from Hub API; download exact revision; verify SHA-256 before atomic rename; retain lock outside Git. Freeze/copy lock across machines to use identical weights. URLs/licenses require successful remote validation."
+}
