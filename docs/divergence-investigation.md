@@ -107,3 +107,11 @@ The follow-up restores tiled larger prefills while protecting all supported
 generation widths. Exact-token comparisons, all 272 cases, context size and
 deadlines are unchanged. Q4_K fixtures now exercise large-prefill/small-decode
 transitions and exact first-row top-two logit equality across proposal caps.
+
+
+Run 42414433936 at `d11a1fd79f316ebd619eead6a924e40fbdad6679` again passed all
+14 diagnostics and reached 258 passing comparisons, with no mismatch, before
+the same 3,600-second candidate deadline. The fixed Linux integration-test
+budget is now 7,200 seconds per subprocess, inside the existing 9,000-second
+child and 210-minute job limits. This changes no cases, contexts, models,
+comparison rules or CPU profile. All 272 cases still have to finish.

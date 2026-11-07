@@ -187,7 +187,7 @@ def child(results):
                     "--threads",
                     "2",
                     "--timeout-seconds",
-                    "3600",
+                    "7200",
                 ]
             )
         )

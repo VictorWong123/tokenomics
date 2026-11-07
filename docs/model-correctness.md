@@ -19,7 +19,7 @@ configurations, each repeated twice. The boundary uses valid tokenizer IDs
 repeated to the requested logical context, not an invented vocabulary mapping.
 No held-out outputs are generated. `--max-tokens` defaults to 32 for the three
 development prompts. The CLI defaults to a 1,800-second subprocess timeout;
-the fixed Codespace gate uses 3,600 seconds. The enclosing
+the fixed Codespace gate uses 7,200 seconds. The enclosing
 remote workload must also enforce its overall lifecycle budget.
 
 An existing output directory is refused. Use a new attempt directory after a
@@ -90,7 +90,7 @@ The original trained-model gate failed; see `docs/divergence-investigation.md`.
 The fixed workload now runs the targeted diagnostic followed by the complete
 272-comparison gate. Any diagnostic mismatch prevents the full gate from
 starting. Only a complete trained-model gate can produce `state: passed`.
-The candidate batch has a 3,600-second timeout, accommodating the original
+The candidate batch has a 7,200-second timeout, accommodating the original
 243/272 partial batch within the unchanged 150-minute child deadline.
 
 The default `TOKENOMICS_CPU_BATCH_INVARIANT` CMake option selects the CPU dot
