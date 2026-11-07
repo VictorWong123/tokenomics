@@ -6,6 +6,7 @@ import pathlib
 import random
 import subprocess
 import time
+import re
 from bench.common import ROOT,atomic_json,sha256,hardware,read_jsonl
 
 def balanced_blocks(prompts,caps,repetitions,configs,seed):
@@ -24,6 +25,14 @@ def first_mismatch(a,b):
     return None
 
 def run(exe,target,draft,prompts,config,out,gpu_layers=0,identity=None):
+    conf_ids=[c['id'] for c in config['configurations']]
+    prompt_ids=[p['id'] for p in prompts]
+    if not prompts or not conf_ids or len(set(conf_ids))!=len(conf_ids) or len(set(prompt_ids))!=len(prompt_ids):
+        raise ValueError('nonempty unique prompt/configuration IDs required')
+    if 'target' not in conf_ids or any(not re.fullmatch(r'[A-Za-z0-9_-]+',x) for x in conf_ids+prompt_ids):
+        raise ValueError('safe IDs and an ordinary target reference are required')
+    if config['repetitions']<=0 or not config['output_caps'] or any(n<=0 for n in config['output_caps']):
+        raise ValueError('positive repetitions and output caps required')
     out=pathlib.Path(out);out.mkdir(parents=True,exist_ok=True)
     settings={"schema_version":1,"config":config,"prompts":prompts,
               "target_sha256":sha256(target),"draft_sha256":sha256(draft) if draft else None,
@@ -43,6 +52,8 @@ def run(exe,target,draft,prompts,config,out,gpu_layers=0,identity=None):
         bdir=out/'blocks'/block_id;done=bdir/'complete.json'
         if done.exists():
             complete=json.loads(done.read_text())
+            for path,digest in complete.get('sha256',{}).items():
+                if sha256(bdir/path)!=digest:raise RuntimeError('Completed record hash changed; investigate artifact integrity')
             records=[json.loads((bdir/x).read_text()) for x in complete['records']]
             requests.extend(records);correctness.extend(complete['correctness']);continue
         bdir.mkdir(parents=True,exist_ok=True)
@@ -84,7 +95,7 @@ def run(exe,target,draft,prompts,config,out,gpu_layers=0,identity=None):
             if not all(x['ok'] for x in checks):raise RuntimeError('token_mismatch: performance gate closed; investigate first mismatch')
             for row,path in zip(records,paths):
                 row['correctness']='pass';atomic_json(bdir/path,row)
-            atomic_json(done,{"records":paths,"correctness":checks,"attempt":attempt})
+            atomic_json(done,{"records":paths,"correctness":checks,"attempt":attempt,"sha256":{p:sha256(bdir/p) for p in paths}})
             requests.extend(records);correctness.extend(checks)
         except (Exception,KeyboardInterrupt) as ex:
             atomic_json(adir/'failure.json',{"schema_version":1,"block_id":block_id,"attempt":attempt,"reason":str(ex),"hardware":hardware()})

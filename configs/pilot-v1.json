@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "phase": "pilot",
+  "split": "development",
+  "prompt_ids": "pilot18",
+  "output_caps": [128, 512],
+  "repetitions": 3,
+  "seed": 20261107,
+  "warmup_tokens": 16,
+  "context": 2048,
+  "batch": 512,
+  "threads": 4,
+  "configurations": [
+    {"id":"target", "policy":"target", "resident":false},
+    {"id":"resident", "policy":"target", "resident":true},
+    {"id":"upstream-style", "policy":"fixed", "k":4, "cache":"upstream"},
+    {"id":"fixed1", "policy":"fixed", "k":1},
+    {"id":"fixed2", "policy":"fixed", "k":2},
+    {"id":"fixed4", "policy":"fixed", "k":4},
+    {"id":"fixed6", "policy":"fixed", "k":6},
+    {"id":"fixed8", "policy":"fixed", "k":8},
+    {"id":"confidence", "policy":"confidence", "k":8, "confidence":0.5},
+    {"id":"acceptance", "policy":"acceptance", "k":4}
+  ],
+  "primary_metric": "geomean_prompt_cap_median_throughput_ratio",
+  "practical_margin": 0.05,
+  "bootstrap_samples": 10000,
+  "gate_min_speedup": 1.05,
+  "gate_confidence_lower": 1.0,
+  "memory_headroom_fraction": 0.2,
+  "invalid_run_reasons": ["process_failure", "missing_or_malformed_record", "token_mismatch", "documented_external_interruption"]
+}

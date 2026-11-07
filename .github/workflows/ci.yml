@@ -1,0 +1,21 @@
+name: portable-correctness
+on: [push, pull_request]
+jobs:
+  cpu:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {submodules: recursive}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: bash scripts/bootstrap.sh cpu
+      - run: .venv/bin/python scripts/run_all.py --backend cpu --fixtures-only --run-dir results/local/ci
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with: {submodules: recursive}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: bash scripts/bootstrap.sh metal
+      - run: .venv/bin/python scripts/run_all.py --backend metal --fixtures-only --run-dir results/local/ci-metal

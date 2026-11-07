@@ -191,6 +191,8 @@ Result Engine::generate(const Request & r) {
             dp.id_last = pending; dp.prompt = &prefix; dp.result = &proposed;
             common_speculative_draft(spec.get());
             if (use_model) llama_synchronize(dft);
+            require(!use_model || r.mode == "confidence" || !proposed.empty(),
+                    "unconditional upstream drafter produced no proposal (possible execution failure)");
             require(int(proposed.size()) <= cap, "upstream exceeded requested draft cap");
             if (r.proposal_transform) r.proposal_transform(proposed, c.cycle);
             require(int(proposed.size()) <= cap, "test proposal exceeded cap");
@@ -232,6 +234,7 @@ Result Engine::generate(const Request & r) {
         c.cache_ms += elapsed(t);
         c.wall_ms = elapsed(cycle_start);
         policy->observe({c.action, c.actual, c.accepted, c.committed, c.wall_ms});
+        c.wall_ms = elapsed(cycle_start); // include policy-update work in the diagnostic cycle
         if (out.tokens.size() == plan.tokens.size()) out.first_token_ms = elapsed(begin);
         out.cycles.push_back(c); // buffered; serialization occurs after generation
         if (plan.eog) { out.stop = "eog"; break; }

@@ -1,3 +1,119 @@
 # Tokenomics
 
-New project.
+Portable C++20 speculative-decoding runtime engineering on a pinned llama.cpp.
+It keeps greedy verification upstream and implements draft-cache retention,
+checked rollback, lazy synchronization, target-only/re-entry, and policy hooks.
+CPU is the initial reference. macOS Metal is supported by configuration;
+CUDA is optional. Linux cloud, Codespaces and Mac results are separate.
+
+**Status: in progress.** Linux CPU synthetic-transformer correctness and the
+resumable artifact pipeline run here. Trained-model downloads are currently
+network-blocked. Neither feasibility question has a real-model answer. No
+cost-aware controller, held-out speedup, Mac execution or Codespaces execution
+is claimed. See [the handoff](docs/handoff.md) and [feasibility](docs/feasibility.md).
+
+## Build and check
+
+Linux needs Git, a C++20 compiler, Python 3.12+, a Python venv implementation and
+curl. macOS needs Xcode Command Line Tools (`xcode-select --install`) and Python
+3.12+ (for example `brew install python@3.12`). No NVIDIA GPU is required.
+
+```bash
+git clone --recurse-submodules --branch work https://github.com/VictorWong123/tokenomics.git
+cd tokenomics
+bash scripts/bootstrap.sh cpu              # Linux
+# bash scripts/bootstrap.sh metal          # macOS, Metal enabled
+```
+
+The bootstrap creates `.venv`, installs pinned Python/CMake/Ninja versions,
+builds `build-cpu` or `build-metal`, and runs unit, differential runtime and
+tooling tests. The default is four build/runtime threads. Set
+`TOKENOMICS_BUILD_JOBS=2` if compilation memory is limited. The devcontainer
+includes a compiler and prerequisites, then calls the same bootstrap.
+
+No-model end-to-end smoke (generated fixtures are not language models):
+
+```bash
+bash run.sh cpu --fixtures-only --run-dir results/local/linux-fixtures
+# bash run.sh metal --fixtures-only --run-dir results/local/mac-fixtures
+```
+
+## Real-model feasibility: one entry point
+
+```bash
+bash run.sh cpu --run-dir results/local/linux-pilot
+# On the Mac:
+# bash run.sh metal --run-dir results/local/mac-metal-pilot
+```
+
+The script checks hardware/RAM, verifies models against Hub LFS SHA-256,
+checks frozen prompt/context fit, times a small batch and estimates duration,
+then runs both feasibility investigations. It uses at most two memory-safe
+independent-model candidates; if both are unprofitable, it investigates upstream
+ngram lookup drafting. `--candidate qwen25-05-15-q4` restricts the investigation;
+`--threads 2` changes the frozen runtime allocation. `--max-hours 8` stops after
+the timing batch if the rough Pilot A estimate exceeds that budget.
+
+**Rerun the identical command to resume.** Each request is saved and each
+complete comparison block is committed atomically. An incomplete/failed block
+gets a new retained attempt; slow runs are not excluded. Binary, model, prompt
+or configuration changes require a new run directory. Raw local results and
+models are ignored by Git.
+
+The workflow deliberately stops at the scientific decision. Exit 20 means Q1
+and Q2 support proceeding with controller implementation; 21 means speculation
+helps but cycle-level prediction is unresolved; 22 means review the bounded
+investigation before a scope decision. Exit 2 means an execution/access blocker,
+12 a user-specified duration limit, 130 an interruption. Exit 0 is reserved for
+the fixture workflow and **does not mean the full project is complete**.
+This script runs the feasibility phase; controller implementation and held-out
+evaluation follow its evidence, not an automatic success message.
+
+Manual smoke after model download:
+
+```bash
+.venv/bin/python scripts/download_models.py --model qwen25-05
+.venv/bin/python scripts/download_models.py --model qwen25-15
+build-cpu/tokenomics --target models/qwen2.5-1.5b-instruct-q4_k_m.gguf \
+  --draft models/qwen2.5-0.5b-instruct-q4_k_m.gguf \
+  --policy fixed --k 4 --max-tokens 128 --prompt 'Explain binary search.'
+```
+
+Show all C++ options with `build-cpu/tokenomics --help`. Jobs in JSONL can
+change policy/cap per request while retaining model weights. The Python runner
+uses separate processes for fair target-alone versus resident-draft memory
+comparisons, excluding a warm-up and retaining cold-load and whole-process costs.
+
+## Analysis and transfer
+
+```bash
+.venv/bin/python -m analysis.report results/local/linux-pilot/qwen25-05-15-q4/pilot-a
+# A checked-in example is available without model downloads:
+.venv/bin/python -m analysis.report results/example-fixtures --out results/local/example-analysis
+```
+
+The example contains observed synthetic-fixture timings for analysis testing;
+it is explicitly unsuitable for feasibility/speedup claims. Plot generation
+also retains unfavorable comparisons. See [the protocol](docs/experiment.md)
+for uncertainty, invalid runs, prompt provenance, baseline deviations and gates.
+
+Copy `models/models.lock.json` and the exact project commit between machines;
+the downloader then fetches the same pinned GGUFs. Transfer completed result
+directories as archives (`tar -czf linux-pilot.tgz results/local/linux-pilot`),
+outside Git. Each includes model/binary hashes, hardware and frozen settings.
+Do not combine Linux and Metal measurements into one performance estimate.
+
+## Ownership and limits
+
+Our source is in `src/`; upstream inference, drafting and verification are in
+the unmodified submodule. [The source audit](docs/upstream.md) explains exactly
+what is reused. The `cache=upstream` control reproduces the supported example's
+cache behavior; it is not an execution of the unmodified stock executable.
+Full-attention transformers with arbitrary partial KV removal are supported;
+hybrid/recurrent models, stochastic sampling and context shifting are rejected.
+
+The [architecture](docs/architecture.md) explains cache invariants and timing.
+All original prompt text is CC0, including original summary documents;
+the software is MIT, llama.cpp retains its own license, and model licenses
+remain upstream. The 3B Qwen candidate has different terms from smaller Qwen
+models; inspect its license before use or redistribution. No weights are in Git.

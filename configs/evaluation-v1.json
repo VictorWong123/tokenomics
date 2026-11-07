@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "phase": "evaluation",
+  "split": "heldout",
+  "output_caps": [128, 512],
+  "repetitions": 5,
+  "seed": 20261108,
+  "warmup_tokens": 16,
+  "context": 2048,
+  "batch": 512,
+  "threads": 4,
+  "configurations": [],
+  "practical_margin": 0.05,
+  "bootstrap_samples": 10000,
+  "invalid_run_reasons": ["process_failure", "missing_or_malformed_record", "token_mismatch", "documented_external_interruption"]
+}

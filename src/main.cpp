@@ -5,6 +5,7 @@
 #include <map>
 #include <stdexcept>
 #include <filesystem>
+#include <chrono>
 using json = nlohmann::json;
 using namespace tokenomics;
 static const char * help = R"(Tokenomics: greedy speculative decoding laboratory
@@ -44,6 +45,8 @@ int main(int argc, char ** argv) {
         }
         if (!a.count("target")) throw std::invalid_argument("--target is required");
         if (a.count("prompt") && a.count("jobs")) throw std::invalid_argument("choose prompt or jobs");
+        if (a.count("jobs")) for (auto key : {"policy","k","max-tokens","cache","drafter","confidence","script"})
+            if (a.count(key)) throw std::invalid_argument("per-request options belong in --jobs records");
         EngineConfig ec;
         ec.target = a["target"]; ec.draft = a.count("draft") ? a["draft"] : "";
         if(a.count("context")) ec.context = number(a["context"]);
@@ -85,7 +88,9 @@ int main(int argc, char ** argv) {
             r.confidence = job.value("confidence",0.5); r.detailed = job.value("detailed",true);
             r.script = job.value("script",std::vector<int>{});
             r.prefix_tokens = job.value("prefix_tokens",std::vector<int>{});
+            const auto request_start = std::chrono::steady_clock::now();
             auto result = engine.generate(r);
+            const auto request_ms = std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-request_start).count();
             json meta;
             for(auto key : {"run_id","configuration_id","prompt_id","repetition","output_cap","order","warmup","checkpoint"}) if(job.contains(key)) meta[key] = job[key];
             meta["schema_version"] = 1;
@@ -102,7 +107,7 @@ int main(int argc, char ** argv) {
             rec["prompt_ids"] = result.prompt_ids; rec["token_ids"] = result.tokens; rec["text"] = result.text; rec["stop"] = result.stop;
             rec["load_ms"] = engine.load_ms(); rec["setup_ms"] = result.setup_ms;
             rec["prompt_target_ms"] = result.prompt_target_ms; rec["prompt_draft_ms"] = result.prompt_draft_ms;
-            rec["generation_ms"] = result.generation_ms; rec["warm_ms"] = result.warm_ms; rec["first_token_ms"] = result.first_token_ms;
+            rec["generation_ms"] = result.generation_ms; rec["warm_ms"] = request_ms; rec["commit_boundary_ms"] = result.warm_ms; rec["first_token_ms"] = result.first_token_ms;
             rec["peak_rss_bytes"] = result.peak_rss_bytes;
             rec["target_cached"] = result.final_target_cached; rec["draft_cached"] = result.final_draft_cached;
             rec["generated_tokens"] = result.tokens.size();

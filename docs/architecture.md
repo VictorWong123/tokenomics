@@ -42,8 +42,10 @@ paths; prompt prefill times exclude that final prompt token. A zero-token reques
 does setup/tokenization, no model work. EOG is retained in token-ID counts, but
 is omitted from rendered text. First-token latency is the first completed
 commit block (an upper bound on the first row's availability), not a streaming
-timestamp. Text conversion/JSON serialization occur after generation and warm
-timing; whole-process wall time is also retained by the Python runner.
+timestamp. Text conversion and request-local teardown occur after generation
+but within the driver's warm-request timer. `commit_boundary_ms` stops at the
+last cache reconciliation. JSON serialization is outside warm timing;
+whole-process wall time, including serialization, is retained by the Python runner.
 
 Cycle logs are buffered, then serialized after generation. Minimal mode omits
 cycle serialization but currently still collects timing records in memory;
