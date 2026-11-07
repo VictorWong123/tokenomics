@@ -1,0 +1,184 @@
+# Tokenomics: portable speculative-decoding runtime engineering
+
+Technical report, implementation checkpoint, 7 November 2026.
+This is an in-progress engineering result, not an acceleration or research
+novelty claim. The full feasibility and held-out evaluation remain unexecuted.
+
+## Objective and current conclusion
+
+Speculative decoding tries to reduce autoregressive generation time by asking
+a smaller model for several likely tokens, then verifying them in one larger
+target-model pass. Its benefit depends on both acceptance and execution cost.
+Drafting can be too expensive, batched target verification can save too little,
+and synchronization can erase an apparent benefit. A controller is useful only
+if speculation first helps and available observations predict useful changes
+in the preferred action.
+
+Tokenomics preserves that ordering. The implemented C++ runtime supports the
+feasibility experiments and contributes explicit cache-state management inside
+the inference loop. It does not select a cost-aware controller from fabricated
+or synthetic speedups. The two feasibility questions are currently unresolved
+because trained-model downloads and external execution access are blocked in
+this chat's cloud environment.
+
+| Environment | Actual execution | Feasibility evidence |
+|---|---|---|
+| Codex Cloud, Linux CPU | Release and sanitizer builds; synthetic-transformer correctness; resumable experiment and analysis | No trained-model evidence |
+| GitHub Codespaces | User-created machine identified; direct connection attempted | API request blocked before SSH; no execution claimed |
+| User's Mac, Metal | Commands and build configuration supplied | No attached execution route; hardware/RAM uninspected |
+
+The development host exposes an AMD EPYC 9V74 with five logical CPUs, but its
+cgroup quota is four cores. Memory is limited to 16 GiB with no swap or GPU.
+These observations informed the candidate screen; host-reported total RAM or
+CPU count alone would overstate the allocation. Shared-cloud timing would apply
+to that allocation, not to an M3 Mac or all computers.
+
+## Implementation and ownership
+
+llama.cpp is an unmodified submodule pinned to
+`fd27b2034905f8dadd8bd6d2cc44595f4929d391`. CMake rejects a different revision.
+Upstream supplies loading, tokenization, tensor execution, draft generation,
+sampling and greedy speculative verification. In particular, Tokenomics calls
+`common_sampler_sample_and_accept_n` rather than introducing another acceptance
+algorithm. An empty draft uses the same upstream greedy sampler for ordinary
+target decoding.
+
+Our implementation owns the C++ request lifecycle, policy interface, draft-cap
+budgeting, cache reconciliation, fallback/re-entry, measurements and structured
+results. It adds fixed caps, the pinned upstream confidence stop and the
+project-proposed acceptance heuristic. A scripted action policy is diagnostic
+only. Policy code has no backend-specific calls; the adapter uses supported
+llama.cpp/ggml APIs. CPU is the default; optional Metal/CUDA builds use the same
+policy code. GPU-layer requests fail if no local GPU backend exists, and result
+metadata retains available devices and upstream offload messages.
+
+The central state invariant separates a cached committed prefix P from one
+pending token L. At a cycle boundary P+L is the exact prompt plus generated
+sequence. The target evaluates L followed by proposed drafts, then upstream
+returns the matching prefix plus a correction or bonus. The adapter commits
+only through the first target EOG or output limit, moves all but the final
+emitted token into P, and removes target/draft cache entries after the new P.
+The target cache must equal P's length; the draft cache may be a shorter valid
+prefix. All positions and removal return values are checked.
+
+The retained-cache path avoids discarding valid draft computation. Before the
+next speculative cycle it decodes only missing committed tokens into the draft.
+This supports lazy synchronization after target-only execution and handles the
+less obvious full-acceptance case: upstream may not have evaluated its final
+proposal, so accepting every proposal does not guarantee equal cache lengths.
+An upstream-style control discards proposal KV and reprocesses the entire
+target verification batch on the draft before trimming. Comparing these paths
+can isolate saved draft work, including rejected suffixes. This control
+reproduces the supported example's behavior; it is not an execution of the
+stock executable, and an exact stock comparison remains additional work.
+
+Only full-attention transformers with arbitrary partial sequence removal are
+accepted. Recurrent/hybrid/checkpoint-only contexts, stochastic sampling and
+context shifting are outside the adapter's verified contract. The logical
+context limit is enforced explicitly because upstream can round its allocation
+upward. Vocabulary compatibility is checked more strictly than upstream's
+permissive check: size, every token's text/attributes and EOG status must match.
+
+## Correctness evidence
+
+The portable suite uses tiny deterministic/random F32 transformers generated
+locally as GGUF files. These are actual transformer forward passes but are not
+trained language models. Controlled logits make full acceptance and EOG
+reproducible; test-only proposal corruption forces zero and partial acceptance
+without replacing upstream verification. Random weights exercise less uniform
+token sequences. Tests compare emitted IDs, not rendered text or random seeds.
+
+The current runtime suite passes 183 differential cases, covering zero/partial/
+full acceptance, correction/bonus handling, EOG, changing draft caps, rollback,
+fallback, draft catch-up, re-entry, repeated-request reset, empty/short requests,
+output truncation and logical context boundaries. Unit tests separately cover
+commit counting and acceptance-policy bookkeeping. Address/undefined-behavior
+sanitizer testing with leak detection has passed on Linux.
+
+The Python suite checks deterministic balanced ordering, first-divergence
+reporting, fit/validation separation, prompt-clustered statistics, atomically
+saved artifacts, identical-command resume and configuration-change rejection.
+A deliberately incorrect fake engine demonstrates that a token mismatch cannot
+produce a complete performance block. The end-to-end fixture workflow has run
+168 request comparisons plus common-prefix replays and real scripted catch-up.
+Fixture timing is retained only to exercise artifact generation; it cannot
+answer whether useful language-model speculation helps.
+
+## Experiment design and timing
+
+Candidate selection begins with Qwen2.5 0.5B/1.5B Q4_K_M as an initial pair,
+then 0.5B/3B if available RAM and measured peak RSS permit. Size alone does not
+establish a useful cost gap. If both independent drafters fail, the bounded
+investigation includes upstream ngram-simple lookup drafting before a scope
+decision. Hashes and model repository revisions are resolved and verified at
+download; weights remain outside Git. Exact locks must be copied between
+machines for cross-platform comparisons.
+
+Pilot A uses 18 development prompts, six each for Q&A, C++ code and summaries,
+two output caps and three repeated balanced blocks. It compares target-alone,
+resident-draft target-only, upstream-style cache replay, five fixed caps,
+confidence stopping and acceptance scheduling. A small measured timing batch
+precedes the long run and produces a duration estimate. The resident control
+warms both weight sets; merely mapping a draft would understate physical RSS.
+Each request resets KV and policy state. Target weights and settings stay
+identical within each comparison.
+
+Pilot B uses common prefixes from ordinary target traces. Every action is
+replayed from equivalent prefix IDs/KV, one complete cycle at a time, with
+three repetitions. A historical acceptance signal and context length feed a
+small bucket rule fitted on different development prompts from validation.
+The analysis retains actual action cost and separately measures target-only
+to speculation catch-up. Conservative decision/probe/transition allowances
+are estimates for the feasibility decision, never claimed as observed
+controller performance. Hindsight action winners indicate an opportunity,
+not an achievable bound.
+
+Monotonic timing separates weight/context loading, request setup, target/draft
+prefill, first completed commit block and generation. Prefill excludes the
+pending final prompt token in every path. Generation includes drafting, target
+verification, decisions, cache work, synchronization and fallback. Logit reads
+synchronize upstream target work; prefill/drafting explicitly synchronize
+completed work. Warm request time also includes text conversion and teardown.
+Whole-process wall time retains loading, excluded warm-up, serialization and
+other initialization. First-token timing is a commit-block upper bound, not a
+streaming measurement. Stage overlap and backend-specific profiling still need
+verification on actual Metal hardware.
+
+RSS is the process lifetime peak from `getrusage`, including load and warm-up.
+It is not per-request allocation, GPU VRAM or energy. No reduction in memory,
+energy or dollar cost follows merely from lower generation time. Detailed cycle
+records are buffered. The current minimal option omits serialization but still
+collects timers in memory, so a true instrumentation-cost ablation remains
+necessary before final performance claims.
+
+## Reproducibility and next decision
+
+The repository includes a versioned original CC0 workload: 40 development and
+90 held-out prompts with embedded summary documents. These synthetic tasks
+have known structural correlations and are not an external quality benchmark.
+The final protocol uses five repetitions, exact token-ID correctness gates,
+development-selected fixed settings and an appropriate dynamic baseline.
+Paired median-throughput ratios are aggregated geometrically and bootstrapped
+by prompt with both caps kept together. Repeats are not independent prompts.
+Regressions and failed attempts remain visible.
+
+Completed comparison blocks are atomic and resumable; incompatible binary,
+model or configuration changes require a new run directory. Partial requests
+are saved before interruption. A failed block is rerun as a whole with its
+earlier attempt retained. Model files, environments, builds and local full runs
+are ignored before pushing. The README provides one build/check command and
+one feasibility entry script for CPU or Metal, plus independent analysis and
+result-transfer commands.
+
+No held-out controller evaluation has occurred. If both platform-local
+feasibility questions pass, the next contribution is a cost-aware policy with
+development-only frozen priors, exploration, hysteresis, target-only fallback
+and fully charged synchronization. It must then beat tuned fixed and dynamic
+comparators under exact correctness and honest uncertainty/regression analysis.
+If only request-level variation is supported, narrow the contribution
+explicitly; if speculation loses, report the bounded evidence and agree the
+next technical objective. A generic profiler/dashboard substitution and a
+claim that the full project is already complete would misrepresent the work.
+
+Pinned-source findings and reference links are in `docs/upstream.md`. Detailed
+commands, blockers and current résumé wording are in `docs/handoff.md`.

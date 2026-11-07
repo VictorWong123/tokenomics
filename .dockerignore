@@ -1,0 +1,10 @@
+.git
+build*
+.venv
+models
+results/local
+.env
+.env.*
+__pycache__
+**/__pycache__
+.cache

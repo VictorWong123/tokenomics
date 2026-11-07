@@ -17,6 +17,10 @@ ID comparison and generated analysis artifacts; resume was tested. These use
 tiny, controlled/random F32 transformer weights generated locally. They are
 correctness evidence only, not useful language-model generation or feasibility.
 
+Address/undefined-behavior sanitizer checks with leak detection passed.
+The documented bootstrap was also exercised in a fresh virtual environment,
+which caught and fixed missing GGUF-helper dependencies before final handoff.
+
 Real model metadata/download probe:
 
 ```bash

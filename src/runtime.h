@@ -39,14 +39,15 @@ struct Result {
 class Engine {
     struct Impl;
     std::unique_ptr<Impl> impl_;
-public:
+
+  public:
     explicit Engine(const EngineConfig &);
     ~Engine();
     Engine(const Engine &) = delete;
-    Engine & operator=(const Engine &) = delete;
+    Engine &operator=(const Engine &) = delete;
     Result generate(const Request &);
     double load_ms() const;
     std::string system_info() const;
 };
 long long peak_rss_bytes();
-}
+} // namespace tokenomics

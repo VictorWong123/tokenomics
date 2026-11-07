@@ -25,7 +25,7 @@ bash scripts/bootstrap.sh cpu              # Linux
 # bash scripts/bootstrap.sh metal          # macOS, Metal enabled
 ```
 
-The bootstrap creates `.venv`, installs pinned Python/CMake/Ninja versions,
+The bootstrap creates `.venv`, installs pinned Python packages and CMake/Ninja,
 builds `build-cpu` or `build-metal`, and runs unit, differential runtime and
 tooling tests. The default is four build/runtime threads. Set
 `TOKENOMICS_BUILD_JOBS=2` if compilation memory is limited. The devcontainer
@@ -36,6 +36,12 @@ No-model end-to-end smoke (generated fixtures are not language models):
 ```bash
 bash run.sh cpu --fixtures-only --run-dir results/local/linux-fixtures
 # bash run.sh metal --fixtures-only --run-dir results/local/mac-fixtures
+```
+
+Terminal state-transition demonstration:
+
+```bash
+.venv/bin/python scripts/demo.py --build-dir build-cpu
 ```
 
 ## Real-model feasibility: one entry point
@@ -117,3 +123,7 @@ All original prompt text is CC0, including original summary documents;
 the software is MIT, llama.cpp retains its own license, and model licenses
 remain upstream. The 3B Qwen candidate has different terms from smaller Qwen
 models; inspect its license before use or redistribution. No weights are in Git.
+
+Development formatting uses `requirements-dev.txt`, Black and clang-format on
+owned code. The container base tag/system APT packages are versioned inputs but
+not an immutable full OS lock; run manifests retain the actual compiler/build.

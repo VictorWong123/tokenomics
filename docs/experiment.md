@@ -41,7 +41,10 @@ is active at a time. Each trial starts a process, loads appropriate models,
 runs an excluded 16-token warm-up, clears request state and measures the real
 request. Initialization, warm-up and whole-process cost are retained separately
 from warm generation. This avoids a resident draft contaminating target-alone
-peak RSS. Load/file-cache variability remains visible, not silently discarded.
+peak RSS. The resident-draft control warms both models through an excluded
+speculative request before measuring target-only; merely mapping the draft file
+would not establish physical weight residency. Load/file-cache variability
+remains visible, not silently discarded.
 
 The initial timing batch is three longer development requests (one per category) at cap 64 with target,
 fixed4 and confidence; its wall time predicts an approximate full run budget.

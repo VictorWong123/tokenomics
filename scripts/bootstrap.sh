@@ -12,6 +12,7 @@ git submodule update --init --recursive
 python3 -m venv .venv
 .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
 .venv/bin/cmake -S . -B "build-$backend" -G Ninja -DCMAKE_BUILD_TYPE=Release \
+  -DPython3_EXECUTABLE="$PWD/.venv/bin/python" \
   -DGGML_NATIVE=OFF -DGGML_METAL="$metal" -DGGML_CUDA="$cuda"
 .venv/bin/cmake --build "build-$backend" -j "${TOKENOMICS_BUILD_JOBS:-4}"
 .venv/bin/ctest --test-dir "build-$backend" --output-on-failure

@@ -19,15 +19,21 @@ are versioned. Devcontainer and optional Metal build/CI definitions are supplied
 
 ## Actually verified
 
-Linux **Codex Cloud**, not Codespaces: Release CPU compilation, CTest, the
+Linux **Codex Cloud**, not Codespaces: a fresh-venv bootstrap, Release CPU compilation, CTest, the
 fixture artifact/analysis workflow, same-command resume and resume-fingerprint
-rejection. Synthetic transformer tests are not trained-model correctness or
+rejection. Address/undefined-behavior sanitizer checks with leak detection also
+passed. Synthetic transformer tests are not trained-model correctness or
 feasibility results. No useful-model performance numbers exist yet.
 
 Codespaces and the user's Mac have **not** run through this chat. The direct
 Codespace connection fails at the GitHub API allowlist. The Mac has no attached
 execution route. The devcontainer/Metal CI definitions are not reports of
 execution. See `feasibility.md` for hardware and exact observed blockers.
+
+An independent local Docker build of the devcontainer was attempted. The base
+image pull was denied at its registry CDN (`westcentralus.data.mcr.microsoft.com`).
+The container definition therefore remains unexecuted here; this is separate
+from the successfully exercised non-container Linux bootstrap.
 
 ## Exact reproduction
 
