@@ -191,6 +191,55 @@ class ControllerTests(unittest.TestCase):
             self.assertTrue(report['admitted'])
             self.assertFalse(report['claimed'])
 
+
+    def test_post_prepare_origin_failure_releases_lease_and_stops(self):
+        # Exercise the real remote lease/marker protocol, with only transport,
+        # original-origin lookup and lifecycle calls mocked.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            ops = root / 'ops'
+            hosted = root / 'hosted'
+            hosted.mkdir()
+            phases = []
+            def transport(args, **kwargs):
+                if args == ['git', 'rev-parse', 'HEAD']:
+                    return SHA
+                if args[:3] == ['git', 'bundle', 'create'] or args[:3] == ['gh', 'codespace', 'cp']:
+                    return ''
+                if args[:2] == ['gh', 'api']:
+                    return json.dumps(self.space())
+                if args[:3] == ['gh', 'codespace', 'ssh']:
+                    phase = args[-1].split()[3]
+                    phases.append(phase)
+                    try:
+                        result = c.remote(phase, IDENT, DIGEST)
+                        return 'RESULT ' + json.dumps({'ok': True, 'result': result})
+                    except RuntimeError as ex:
+                        return 'RESULT ' + json.dumps({'ok': False, 'error': str(ex)})
+                if args == ['git', '-C', '/workspaces/tokenomics', 'remote', 'get-url', 'origin']:
+                    # Origin validation happens only after exact ownership exists.
+                    c.verify_lease(IDENT)
+                    self.assertEqual(json.loads((ops / c.key(IDENT) / 'owner.json').read_text()), IDENT)
+                    return 'https://github.com/other/repository.git'
+                self.fail('Unexpected command: ' + repr(args))
+            with patch.object(c, 'OPS', ops), \
+                    patch.dict(c.os.environ, RUNNER_TEMP=str(hosted), GH_TOKEN='test-placeholder',
+                               TOKENOMICS_CODESPACE='target', GITHUB_REPOSITORY=c.REPO,
+                               GITHUB_SHA=SHA, GITHUB_RUN_ID='123', GITHUB_RUN_ATTEMPT='2'), \
+                    patch.object(c, 'command', side_effect=transport), \
+                    patch.object(c, 'digest', return_value=DIGEST), \
+                    patch.object(c, 'stop_and_confirm') as stop, patch('builtins.print'):
+                self.assertEqual(c.controller(), 1)
+                stop.assert_called_once_with('target')
+            self.assertEqual(phases, ['prepare', 'run', 'clean'])
+            self.assertFalse((ops / 'lease.json').exists())
+            self.assertFalse((ops / c.key(IDENT)).exists())
+            report = json.loads((hosted / 'tokenomics-controller/controller-report.json').read_text())
+            self.assertTrue(report['claimed'])
+            self.assertTrue(report['lease_released'])
+            self.assertTrue(report['shutdown_confirmed'])
+            self.assertIn('User checkout origin mismatch', report['error'])
+
     def test_artifact_copy_failure_cleans_and_stops_only_verified_owner(self):
         proof = c.manifest(IDENT, 'host', DIGEST)
         for cleanup_ok in (True, False):

@@ -161,9 +161,6 @@ def remote_owned(phase, ident, bundle_digest):
     root = OPS / key(ident)
     marker = root / 'owner.json'
     if phase == 'prepare':
-        origin = command(['git', '-C', '/workspaces/tokenomics', 'remote', 'get-url', 'origin'])
-        require(origin in ('https://github.com/' + REPO + '.git', 'https://github.com/' + REPO,
-                           'git@github.com:' + REPO + '.git'), 'User checkout origin mismatch')
         require(not root.exists() and not root.is_symlink(), 'Operation already exists')
         acquire_lease(ident)
         try:
@@ -181,6 +178,9 @@ def remote_owned(phase, ident, bundle_digest):
         verify_lease(ident).unlink()
         return {'cleaned': True, 'released_owner': ident}
     require(phase == 'run', 'Invalid remote phase')
+    origin = command(['git', '-C', '/workspaces/tokenomics', 'remote', 'get-url', 'origin'])
+    require(origin in ('https://github.com/' + REPO + '.git', 'https://github.com/' + REPO,
+                       'git@github.com:' + REPO + '.git'), 'User checkout origin mismatch')
     bundle = root / 'source.bundle'
     require(bundle.is_file() and not bundle.is_symlink() and digest(bundle) == bundle_digest,
             'Source bundle digest mismatch')
