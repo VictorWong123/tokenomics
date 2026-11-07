@@ -1,4 +1,4 @@
-name: Codespace fixtures
+name: Codespace model correctness
 
 on:
   push:
@@ -48,18 +48,18 @@ jobs:
           submodules: recursive
           persist-credentials: false
       - id: fixtures
-        name: Run owned CPU fixtures and validate bounded evidence
+        name: Run owned trained-model correctness and preserve bounded evidence
         env:
           TOKENOMICS_RUNNER_NAME: ${{ vars.TOKENOMICS_RUNNER_NAME }}
           TOKENOMICS_RUNNER_ID: ${{ vars.TOKENOMICS_RUNNER_ID }}
-        run: /usr/bin/python3 scripts/codespaces/controller.py workload
+        run: /usr/bin/python3 scripts/model_workload.py
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
         with:
-          name: tokenomics-fixtures-${{ github.run_id }}-${{ github.run_attempt }}
+          name: tokenomics-model-check-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
-            ${{ runner.temp }}/tokenomics-artifacts/evidence.tar.gz
-            ${{ runner.temp }}/tokenomics-artifacts/report.json
+            ${{ runner.temp }}/tokenomics-model-${{ github.run_id }}-${{ github.run_attempt }}/evidence.tar.gz
+            ${{ runner.temp }}/tokenomics-model-${{ github.run_id }}-${{ github.run_attempt }}/report.json
           retention-days: 3
           if-no-files-found: error
 

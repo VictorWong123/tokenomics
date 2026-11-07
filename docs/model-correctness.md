@@ -41,10 +41,20 @@ small three-category development prompt manifest; pass `--synthetic-fixture`.
 Such results are explicitly synthetic, even though they execute real forward
 passes. Do not present them as trained-model validation.
 
-The Codespace lifecycle controller and artifact contract currently run fixtures.
-This script does not alter that contract or start a Codespace. Integration must
-retain exact ownership, cleanup, bounded execution and an explicit model-result
-artifact allowlist, excluding weights, credentials, builds and environments.
+The trusted Codespace workflow now calls `scripts/model_workload.py` for this
+gate, reusing the unchanged lifecycle controller's ownership checks and hosted
+initialize/finalize jobs. It does not run timing or full pilots. Models persist
+under `/workspaces/.tokenomics-model-cache`, outside the clean Actions checkout;
+the downloader verifies their hashes on reuse. Available RAM must be at least
+5 GiB and free disk at least 4 GiB before the first candidate is downloaded.
+
+Bootstrap has a 30-minute deadline and the model child a 150-minute deadline,
+within the 210-minute workload job. Artifacts use unique run/attempt paths and
+an exact file allowlist (16 MiB per file, 48 MiB total), retaining partial model
+gate outputs on failure. Model bytes, credentials, builds and environments are
+excluded. `TOKENOMICS_MODEL_SUMMARY` reports model-stage state; generic finalizer
+cleanup reports confirmed shutdown separately, without a fixture-success line.
+Neither a successful archive upload nor shutdown proves the model gate passed.
 
 After this gate passes on trained models, measure the initial budget without
 starting a full pilot:
