@@ -62,7 +62,7 @@ the timing batch if the rough Pilot A estimate exceeds that budget.
 
 **Rerun the identical command to resume.** Each request is saved and each
 complete comparison block is committed atomically. An incomplete/failed block
-gets a new retained attempt; slow runs are not excluded. Binary, model, prompt
+gets a new retained attempt; slow runs are not excluded. Code, binary, model, prompt
 or configuration changes require a new run directory. Raw local results and
 models are ignored by Git.
 

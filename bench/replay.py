@@ -12,7 +12,7 @@ import statistics
 import subprocess
 import math
 import numpy as np
-from bench.common import atomic_json, read_jsonl, sha256
+from bench.common import atomic_json, read_jsonl, sha256, source_fingerprint
 from bench.run import first_mismatch
 
 
@@ -76,6 +76,7 @@ def investigate(exe, target, draft, pilot_dir, out, cfg, gpu_layers=0, drafter="
     out.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((pathlib.Path(pilot_dir) / "run_manifest.json").read_text())
     frozen = {
+        "code": source_fingerprint(),
         "binary": sha256(exe),
         "target": sha256(target),
         "draft": sha256(draft) if draft else None,

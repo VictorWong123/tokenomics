@@ -34,6 +34,18 @@ def save_status(out, state, **fields):
     print(state + ": " + fields.get("message", ""), flush=True)
 
 
+def decision_state(decisions):
+    """Resource failures are not negative scientific results."""
+    tested = [d for d in decisions if "q1_supported" in d]
+    if any(d["q1_supported"] and d["q2_supported"] for d in tested):
+        return "proceed_controller_implementation", 20
+    if any(d["q1_supported"] for d in tested):
+        return "narrow_or_investigate", 21
+    if tested:
+        return "scope_decision_required", 22
+    return "resource_blocked", 2
+
+
 def pipeline(a):
     out = a.run_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -129,6 +141,7 @@ def pipeline(a):
     all_prompts = read_jsonl(ROOT / "bench/prompts-v1.jsonl")
     prompts = [p for p in all_prompts if p["pilot"]]
     decisions = []
+    lookup_target = None
     for candidate in catalog["candidates"]:
         if a.candidate and candidate["id"] != a.candidate:
             continue
@@ -259,6 +272,7 @@ def pipeline(a):
                 }
             )
             continue
+        lookup_target = target
         if a.max_hours is not None and estimated > a.max_hours * 3600:
             save_status(
                 out,
@@ -304,20 +318,10 @@ def pipeline(a):
                 decisions=decisions,
             )
             return 20
-        if summary["q1_supported"]:
-            save_status(
-                out,
-                "narrow_or_investigate",
-                message="Speculation benefit supported; cycle-level prediction not established. Inspect Pilot B and request-level variation before selecting a narrower runtime contribution.",
-                decisions=decisions,
-            )
-            return 21
     if not decisions:
         raise RuntimeError("unknown or unavailable candidate")
-    if all(
-        x.get("status") in ("insufficient_available_memory", "memory_headroom_failed")
-        for x in decisions
-    ):
+    state, code = decision_state(decisions)
+    if code == 2:
         save_status(
             out,
             "resource_blocked",
@@ -325,8 +329,17 @@ def pipeline(a):
             decisions=decisions,
         )
         return 2
+    if code == 21:
+        save_status(
+            out,
+            state,
+            message="Independent-model candidates investigated: speculation helps, but cycle-level prediction is unresolved. Inspect Pilot B before choosing a narrower contribution.",
+            decisions=decisions,
+        )
+        return code
     # One cheaper supported drafting mechanism after independent model candidates.
-    if "target" in locals() and not a.skip_ngram:
+    if lookup_target is not None and not a.skip_ngram:
+        target = lookup_target
         ng = copy.deepcopy(cfg)
         ng["configurations"] = [{"id": "target", "policy": "target"}] + [
             {"id": f"fixed{k}", "policy": "fixed", "k": k, "drafter": "ngram"}
@@ -355,13 +368,14 @@ def pipeline(a):
             }
         )
     atomic_json(out / "feasibility.json", decisions)
+    state, code = decision_state(decisions)
     save_status(
         out,
-        "scope_decision_required",
-        message="Bounded investigation finished without selecting a justified adaptive implementation. Review evidence; no silent pivot or held-out controller claim.",
+        state,
+        message="Bounded investigation finished; inspect the separate Q1/Q2 records for the selected direction. Controller implementation and held-out evaluation remain locked until justified; no silent pivot.",
         decisions=decisions,
     )
-    return 22
+    return code
 
 
 if __name__ == "__main__":

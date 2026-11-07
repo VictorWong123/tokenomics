@@ -12,6 +12,32 @@ from bench.replay import fit_validate
 
 
 class ToolingTests(unittest.TestCase):
+    def test_feasibility_decisions_do_not_confuse_access_with_science(self):
+        from scripts.run_all import decision_state
+
+        self.assertEqual(
+            decision_state([{"status": "insufficient_available_memory"}])[1], 2
+        )
+        self.assertEqual(
+            decision_state([{"q1_supported": False, "q2_supported": True}])[1], 22
+        )
+        self.assertEqual(
+            decision_state([{"q1_supported": True, "q2_supported": False}])[1], 21
+        )
+        self.assertEqual(
+            decision_state(
+                [
+                    {
+                        "candidate": "model",
+                        "q1_supported": False,
+                        "q2_supported": False,
+                    },
+                    {"candidate": "ngram", "q1_supported": True, "q2_supported": True},
+                ]
+            )[1],
+            20,
+        )
+
     def test_balanced_order_and_determinism(self):
         prompts = [{"id": str(i)} for i in range(6)]
         confs = [{"id": str(i)} for i in range(3)]

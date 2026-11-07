@@ -28,6 +28,12 @@ def curate(source, out):
         row["source_cycles"] = "cycles.jsonl"
     (out / "requests.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
     (out / "cycles.jsonl").write_text("".join(json.dumps(c) + "\n" for c in cycles))
+    checks = [
+        c for c in read_jsonl(source / "correctness.jsonl") if c["repetition"] == 0
+    ]
+    (out / "correctness.jsonl").write_text(
+        "".join(json.dumps(c) + "\n" for c in checks)
+    )
     atomic_json(out / "run_manifest.json", manifest)
     atomic_json(
         out / "complete.json",

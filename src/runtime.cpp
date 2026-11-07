@@ -123,8 +123,10 @@ struct Engine::Impl {
         cp.n_batch = c.batch;
         cp.n_ubatch = c.batch;
         cp.n_seq_max = 1;
-        cp.n_outputs_max = c.batch;
-        cp.n_outputs_max_per_seq = c.batch;
+        // At most eight proposals plus the pending token; prefill only requests
+        // its final row. Apply the same output capacity to every comparison.
+        cp.n_outputs_max = 9;
+        cp.n_outputs_max_per_seq = 9;
         cp.n_threads = c.threads;
         cp.n_threads_batch = c.threads;
         cp.flash_attn_type = LLAMA_FLASH_ATTN_TYPE_DISABLED;

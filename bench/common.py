@@ -20,6 +20,25 @@ def sha256(path):
     return h.hexdigest()
 
 
+def source_fingerprint():
+    """Freeze owned executable/analysis source, including uncommitted edits."""
+    h = hashlib.sha256()
+    paths = [ROOT / "CMakeLists.txt", ROOT / "requirements.txt"]
+    for folder in ("src", "bench", "analysis", "scripts"):
+        paths += [
+            p
+            for p in (ROOT / folder).rglob("*")
+            if p.suffix in (".py", ".cpp", ".h", ".sh")
+        ]
+    for path in sorted(paths):
+        h.update(str(path.relative_to(ROOT)).encode())
+        h.update(path.read_bytes())
+    return {
+        "revision": command(["git", "rev-parse", "HEAD"])["output"],
+        "owned_source_sha256": h.hexdigest(),
+    }
+
+
 def atomic_json(path, obj):
     path = pathlib.Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)

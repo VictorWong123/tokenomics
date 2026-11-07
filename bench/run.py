@@ -8,7 +8,14 @@ import random
 import subprocess
 import time
 import re
-from bench.common import ROOT, atomic_json, sha256, hardware, read_jsonl
+from bench.common import (
+    ROOT,
+    atomic_json,
+    sha256,
+    hardware,
+    read_jsonl,
+    source_fingerprint,
+)
 
 
 def balanced_blocks(prompts, caps, repetitions, configs, seed):
@@ -66,6 +73,7 @@ def run(exe, target, draft, prompts, config, out, gpu_layers=0, identity=None):
         "binary_sha256": sha256(exe),
         "gpu_layers": gpu_layers,
         "identity": identity or {},
+        "code": source_fingerprint(),
     }
     manifest_path = out / "run_manifest.json"
     if manifest_path.exists():
