@@ -124,7 +124,7 @@ def fixture_environment():
         command(['/usr/bin/python3', '-c', 'import venv, ensurepip'])
     except RuntimeError:
         raise RuntimeError('Remote Python 3.12 venv support unavailable') from None
-    return dict(os.environ, PATH='/usr/bin:/bin:/usr/sbin:/sbin', TOKENOMICS_BUILD_JOBS='2')
+    return dict(os.environ, PATH='/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin', TOKENOMICS_BUILD_JOBS='2')
 
 
 def remote(phase, ident, bundle_digest):

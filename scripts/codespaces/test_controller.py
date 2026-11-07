@@ -51,7 +51,7 @@ class ControllerTests(unittest.TestCase):
     def test_remote_python_preflight_and_controlled_path(self):
         with patch.object(c, 'command', side_effect=['3.12', '']) as run:
             env = c.fixture_environment()
-            self.assertEqual(env['PATH'], '/usr/bin:/bin:/usr/sbin:/sbin')
+            self.assertEqual(env['PATH'], '/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin')
             self.assertEqual(env['TOKENOMICS_BUILD_JOBS'], '2')
             self.assertTrue(all(call.args[0][0] == '/usr/bin/python3' for call in run.call_args_list))
             self.assertIn('import venv, ensurepip', run.call_args_list[1].args[0])

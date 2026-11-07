@@ -22,7 +22,7 @@ for its origin. The helper creates its own bare repository and detached worktree
 under `/workspaces/.tokenomics-operations/<run>-<attempt>`. Only the pinned public
 llama.cpp submodule initializes normally. The machine must provide `/usr/bin/python3` version 3.12 with venv/ensurepip support,
 `git`, `timeout`, and the existing fixture build prerequisites. The helper checks this before building and uses PATH
-`/usr/bin:/bin:/usr/sbin:/sbin`, excluding `/usr/local` and runner toolcaches. No container
+`/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin`, keeping system Python first, allowing `/usr/local/bin/git`, and excluding runner toolcaches. No container
 rebuild, idle-timeout change, model download, or core pilot is performed.
 
 The fixture command has a 20-minute deadline; the hosted job has a 45-minute
