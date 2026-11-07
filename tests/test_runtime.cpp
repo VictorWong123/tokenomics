@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     std::string dir = argv[1];
     int comparisons = 0;
     bool zero = false, partial = false, full = false, catchup = false, switched = false;
-    for (const std::string name : {"target", "random", "eos", "quantized"}) {
+    for (const std::string name : {"target", "random", "eos", "quantized", "quantized-k"}) {
         EngineConfig ec{dir + "/" + name + ".gguf", dir + "/" + name + ".gguf", 64, 32, 1, 0};
         Engine e(ec);
         for (int cap : {0, 1, 2, 7, 19, 80}) {
@@ -90,6 +90,32 @@ int main(int argc, char **argv) {
             throws = true;
         }
         CHECK(throws);
+        // K-quant prefills exceed the tiled threshold, while target verification
+        // remains on consistent dot kernels at every supported proposal cap.
+        Request long_prefix;
+        long_prefix.prefix_tokens = std::vector<int>(32, 259);
+        long_prefix.max_tokens = 19;
+        auto prefetched = e.generate(long_prefix);
+        for (int k : {1, 2, 4, 6, 8}) {
+            long_prefix.mode = "fixed";
+            long_prefix.k = k;
+            CHECK(e.generate(long_prefix).tokens == prefetched.tokens);
+            ++comparisons;
+        }
+        auto probe_request = long_prefix;
+        probe_request.mode = "target";
+        probe_request.max_cycles = 1;
+        probe_request.diagnostic_logits = true;
+        auto reference_probe = e.generate(probe_request).cycles.at(0).logits.at(0);
+        for (int k : {1, 2, 4, 6, 8}) {
+            probe_request.mode = "fixed";
+            probe_request.k = k;
+            auto probe = e.generate(probe_request).cycles.at(0).logits.at(0);
+            CHECK(probe.top_id == reference_probe.top_id);
+            CHECK(probe.second_id == reference_probe.second_id);
+            CHECK(probe.top_logit == reference_probe.top_logit);
+            CHECK(probe.second_logit == reference_probe.second_logit);
+        }
         Request empty;
         empty.prompt = "";
         empty.max_tokens = 2;

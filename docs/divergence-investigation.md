@@ -91,8 +91,19 @@ prior incremental history. This supports a CPU arithmetic explanation; it
 does not independently prove every cache-content invariant.
 
 The candidate default `TOKENOMICS_CPU_BATCH_INVARIANT` configuration disables
-weight repacking, llamafile SGEMM, BLAS and the pinned tiled K-quant path so
-verification uses consistent dot kernels across widths. The full 272-case
+weight repacking, llamafile SGEMM and BLAS. The pinned tiled K-quant path is
+excluded from the at-most-nine verification rows, while larger common prefills
+retain tiling. Verification uses consistent dot kernels across widths. The full 272-case
 trained-model gate, unchanged exact-token comparisons, and explicit shutdown
 must pass before this correction is considered verified. The generated unit
 fixtures now also cover quantized weights; these are not trained-model proof.
+
+The first correction run, 42407413173 at `8d796fd7625f7ddc676ef4106b99dcbeec345251`,
+completed all 14 diagnostics without a mismatch and 249 gate comparisons without
+a mismatch. It then hit the 3,600-second candidate timeout during the repeated
+2,048-token boundary cases. Evidence artifact 13589584594 was retained; actual
+Shutdown was confirmed and the workflow automatically created issue #7.
+The follow-up restores tiled larger prefills while protecting all supported
+generation widths. Exact-token comparisons, all 272 cases, context size and
+deadlines are unchanged. Q4_K fixtures now exercise large-prefill/small-decode
+transitions and exact first-row top-two logit equality across proposal caps.

@@ -73,9 +73,14 @@ def issue_payload(env):
         + " -->"
     )
     url = f"https://github.com/{REPOSITORY}/actions/runs/{run}/attempts/{attempt}"
+    error_type = slug(report.get("error_type"))
+    checked = report.get("checked_comparisons")
+    if type(checked) is not int or not 0 <= checked <= 100000:
+        checked = "unknown"
     body = (
         f"{marker}\nLinux verification failed in {', '.join(failed)} (stage `{stage}`).\n\n"
         f"Source: `{sha}`\nRun: {url}\n"
+        f"Failure type: `{error_type}`\nCompleted comparisons: {checked}\n"
         f"Codespace shutdown confirmed: **{env.get('SHUTDOWN_CONFIRMED') == 'true'}**\n\n"
         f"First failing test case:\n```json\n{json.dumps(case, indent=2, sort_keys=True)}\n```\n\n"
         "See the run's logs and bounded artifact for the complete evidence. "

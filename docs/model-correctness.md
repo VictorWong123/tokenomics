@@ -95,7 +95,10 @@ The candidate batch has a 3,600-second timeout, accommodating the original
 
 The default `TOKENOMICS_CPU_BATCH_INVARIANT` CMake option selects the CPU dot
 paths consistently across target-only and speculative verification batches.
-It disables repacked weights, llamafile SGEMM, BLAS, and tiled K-quant matmul;
-the executable records this choice in `system_info`. Vector dot kernels remain
-enabled. This is a correctness configuration, not a speedup claim. Remote
+It disables repacked weights, llamafile SGEMM and BLAS. A guarded build copy of
+the pinned CPU tiled selector excludes the at-most-nine verification rows,
+while larger common prefills retain tiling. The pinned submodule is untouched;
+configuration fails if its expected selector changes. The executable records
+the profile in `system_info`. Vector dot kernels remain enabled.
+This is a correctness configuration, not a speedup claim. Remote
 validation of the change must be recorded before claiming the failure resolved.
