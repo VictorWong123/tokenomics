@@ -1,53 +1,108 @@
-# Dedicated Codespace fixture controller
+# Hybrid dedicated Codespace fixtures
 
-Private trusted-writer infrastructure: pushes to `work` and `codex/**` run fixed
-controller code from the triggering commit. There are no PR or manual triggers.
-This replaces—not supplements—the self-hosted listener. Retire that listener
-before enabling the controller; the dedicated machine must initially be Shutdown
-and must not be used interactively during an owned run. Workflow concurrency
-serializes this repository's controllers but is not the ownership boundary.
-Admission rejects an already active machine. Prepare atomically creates a
-persistent global remote lease containing exact SHA/run/attempt identity; an
-existing lease rejects a contender without ownership. Every run and cleanup
-phase verifies that lease as well as the exact operation marker. Only confirmed
-lease acquisition permits cleanup. Stop is gated on successful owner-verified
-cleanup and release; lost/ambiguous ownership fails without stopping a possibly
-foreign session. Do not delete a stale lease automatically; inspect the machine
-and its recorded owner before operator recovery.
+Private trusted-writer infrastructure. Only pushes to `work` and `codex/**`
+trigger the hybrid workflow; there are no PR/manual/scheduled triggers. Global
+concurrency serializes runs, without cancellation. The legacy portability
+workflow is manual-only; its optional Linux/macOS commands are preserved.
 
-Configure a fine-grained `CODESPACES_TOKEN` restricted **only** to
-`VictorWong123/tokenomics`, with Codespaces read and Codespaces lifecycle admin
-write. Store it as the GitHub Actions repository secret, never in Cloud or the
-Codespace. Cloud never receives the secret. Set repository variable
-`TOKENOMICS_CODESPACE` to the exact named two-CPU private Tokenomics machine.
+Short hosted `initialize` and `finalize` jobs perform lifecycle work (normally
+about one minute each; five-minute ceilings). The long workload uses the
+repo-only self-hosted label `tokenomics-codespace-long-tasks`, with a 210-minute
+ceiling including setup and artifact transfer. Self-hosted Actions execution
+uses no hosted runner minutes; Codespaces compute/storage remains billable.
+Do not use an expensive hosted runner to wait for the workload. The fixed CPU
+fixture subprocess has a 200-minute deadline, build parallelism two, and
+`--threads 2`; current fixture code overrides inference threads to one.
 
-The hosted checkout uses the read-only GitHub token and complete history to
-create a credential-free exact-commit bundle. Authenticated `gh codespace cp`
-transfers it; no PAT or credential is sent remotely and no private-origin fetch
-is attempted. The original `/workspaces/tokenomics` checkout is only inspected
-for its origin. The helper creates its own bare repository and detached worktree
-under `/workspaces/.tokenomics-operations/<run>-<attempt>`. Only the pinned public
-llama.cpp submodule initializes normally. The machine must provide `/usr/bin/python3` version 3.12 with venv/ensurepip support,
-`git`, `timeout`, and the existing fixture build prerequisites. The helper checks this before building and uses PATH
-`/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin`, keeping system Python first, allowing `/usr/local/bin/git`, and excluding runner toolcaches. No container
-rebuild, idle-timeout change, model download, or core pilot is performed.
+Prerequisites, provisioned once by the runtime owner:
 
-The fixture command has a 20-minute deadline; the hosted job has a 45-minute
-limit reserving time for transfer, cleanup and stop polling. Catchable failures
-retain a nonsecret controller report/log and attempt owner-verified cleanup/release followed by actual Shutdown
-confirmation. A controller that never acquires the lease never cleans or stops;
-failed ownership revalidation/release suppresses stop. Failed cleanup or unconfirmed Shutdown fails
-the job. Forced runner termination or service outage can defeat in-process
-cleanup; inspect the dedicated machine before retrying. No unrelated active
-machine is adopted or stopped.
+- A **new** repo-only runner registration, never copied old ID 2 credentials.
+  Its exact name/ID are repository variables `TOKENOMICS_RUNNER_NAME` and
+  `TOKENOMICS_RUNNER_ID`. Register it under
+  `/workspaces/.tokenomics-actions-runner`, current UID, directory mode 0700,
+  with repository URL exactly `https://github.com/VictorWong123/tokenomics` and
+  label `tokenomics-codespace-long-tasks`. No auto-start listener/service/tmux.
+- Repository variable `TOKENOMICS_CODESPACE`: dedicated private Tokenomics
+  two-CPU machine, **Shutdown**, created with idle timeout **240 minutes**.
+  The controller validates 240; it never PATCHes idle timeout. The platform
+  maximum is 12 hours; this workflow does not request it.
+- Repository secret `CODESPACES_TOKEN`: fine-grained, only Tokenomics repository,
+  Codespaces read and Codespaces lifecycle admin write. Only hosted lifecycle
+  steps receive it. Never enter it in Cloud or the Codespace. The workload sees
+  only normal ephemeral Actions job/runtime credentials used by checkout and
+  artifact upload; no lifecycle PAT is sent over SSH or installed remotely.
+- `/usr/bin/python3` 3.12 with venv/ensurepip; bash, git, tmux, GNU timeout/stat,
+  C/C++20 compiler/build tools and system Ninja discoverable on PATH.
+  The fixture PATH is `/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin`, ensuring
+  system Python wins while allowing `/usr/local/bin/git`. Public pinned
+  llama.cpp/submodule and Python package-index network access are required.
+  Bootstrap installs the pinned CMake/Ninja/Python requirements, builds CPU,
+  and runs four CTest tests. No real model download or project pilot is run.
 
-The bounded archive contains only root `status.json`, `environment.json`, five
-fixture-pipeline files (`complete.json`, `correctness.jsonl`, `cycles.jsonl`,
-`requests.jsonl`, `run_manifest.json`), and `execution-manifest.json`. Digest,
-member names/types/sizes, JSON syntax and manifest identity are checked before
-acceptance. The manifest records exact source SHA, host, run/attempt and bundle
-digest; the bundle itself is never uploaded. Artifacts expire after three days.
-No credential, runner log, model, build tree, venv or broad results directory is
-collected. The controller log contains only fixed phase summaries, not remote
-command output. Run unit tests with `python3 -m unittest discover -s
-scripts/codespaces -p 'test_*.py'`.
+Initialize admits only exact target metadata and Shutdown. SSH wakes it and
+atomically creates `/dev/shm/tokenomics-codespace-lifecycle.lease` after verifying
+tmpfs. Exclusive/no-follow creation, mode 0600, current UID and regular-file
+checks protect the exact SHA/run/attempt identity. A persistent exact operation
+marker lives at `/workspaces/.tokenomics-operations/<run>-<attempt>/owner.json`.
+The helper validates BOM-tolerant `.runner` metadata and refuses any existing
+worker/listener/tmux conflict, then starts only the fixed tmux listener session
+and confirms `Listening for Jobs` from its freshly truncated per-run-owned log
+plus the current exact listener process. Old runner logs are never readiness evidence. Only then is `claimed=true` published.
+Failed readiness attempts owner-verified cleanup; a nonowner never stops.
+If lease acquisition/transport fails without provable ownership, initialization
+fails closed and may leave a woken machine for operator inspection/idle fallback.
+
+The workload starts with exact lease/marker/registration verification, and uses
+its own clean Actions workspace at the exact triggering SHA, never the original
+`/workspaces/tokenomics` checkout. Checkout credentials are not persisted. Its
+results directory is unique to the owned run; existing results are rejected.
+The genuine producer contract is 24 blocks and 168 request/correctness records
+(seven configurations per block), every correctness `ok` true. Aggregate
+`cycles.jsonl` does not exist; cycles remain in per-block raw output.
+
+Canonical evidence is a bounded archive containing root `status.json` and
+`environment.json`, fixture-pipeline `complete.json`, `correctness.jsonl`,
+`requests.jsonl`, `run_manifest.json`, and a nonsecret exact execution manifest.
+Member names/types/sizes, JSON/count/block layout, correctness and identity are
+validated. The artifact also carries the fixed nonsecret controller report,
+with three-day retention, never runner logs/registration files, credentials,
+build/venv trees, real models or broad results. A failed archive is not uploaded.
+Only a strict compact summary with source/host, 24/168 counts and fixed file/
+archive digests is passed to finalize; prompts/raw records/hardware are omitted.
+
+Finalize runs with `always()` after failed/cancelled workloads when initialize
+claimed ownership. An already Shutdown machine is confirmed without SSH.
+Otherwise only Available is accepted: verify lease/marker, wait for no worker,
+stop the fixed owned tmux listener, remove only the owned operation root, retain
+the tmpfs lease, then request stop and poll actual Shutdown. Ownership ambiguity,
+active workers or failed cleanup prevents stopping a possibly foreign session.
+Stop failure fails closed. The lease fences new controllers until Shutdown;
+runtime owner has demonstrated tmpfs clears on stop/start, but stale leases
+are never deleted automatically. Rerun all jobs together, not workload alone.
+
+Only actual Shutdown plus a schema/identity-valid workload summary permits one
+`TOKENOMICS_EVIDENCE_SUMMARY` log line. Failure/cancellation still attempts stop. Missing/malformed/custom workload
+evidence produces only a fixed nonsecret lifecycle report with confirmed
+shutdown and `fixture_evidence_valid=false`, never a fixture success line.
+Cleanup success does not turn a failed workload job into a passing workload. Canonical artifacts remain on
+Actions. Hard hosted outage/cancellation or lost runner connectivity can prevent
+cleanup despite `always()`; inspect the machine and rely on the creation-time
+240-minute idle fallback as a backstop, not a precise maximum billing guarantee.
+Offline tests: `python3 -m unittest discover -s scripts/codespaces -p 'test_*.py'`.
+
+## Reusing the remote computer for authorized long tasks
+
+For a future approved roughly three-hour task, a Cloud author may change the
+trusted self-hosted workload step and its checked-in helper/result allowlist to
+that task's fixed command and explicit expected output paths. Keep the hosted
+initialize/finalize jobs, exact lease/marker checks, runner variables/label,
+secret isolation and `always()` finalize dependency. Review source before a
+trusted push; there is no arbitrary command/input interface. The current
+workload wrapper is 200 minutes (not the retired 20-minute wrapper), within the
+210-minute job budget and 240-minute creation-time idle setting. Size any future
+fixed task and evidence transfer to fit those budgets. Current 24/168 fixture
+validation is local to fixture evidence generation; it cannot gate generic
+ownership cleanup or shutdown. Custom tasks without fixture summaries still
+get cleanup-only finalization, never `TOKENOMICS_EVIDENCE_SUMMARY`. Define an
+appropriate separate success/result contract for a future custom task rather
+than pretending its output is fixture evidence.

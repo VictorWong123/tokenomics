@@ -1,5 +1,5 @@
 name: portable-correctness
-on: [push, pull_request]
+on: [workflow_dispatch]
 jobs:
   cpu:
     runs-on: ubuntu-24.04
@@ -14,7 +14,7 @@ jobs:
       - run: clang-format --dry-run --Werror src/*.cpp src/*.h tests/*.cpp
       - run: .venv/bin/python scripts/run_all.py --backend cpu --fixtures-only --run-dir results/local/ci
   macos:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
         with: {submodules: recursive}
