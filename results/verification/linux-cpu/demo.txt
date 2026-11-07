@@ -1,0 +1,16 @@
+SYNTHETIC TRANSFORMER STATE DEMO — not a language-model speedup claim
+cycle  k  actual  accepted  committed  draft catch-up tokens
+    0  0       0         0          1                     0
+    1  0       0         0          1                     0
+    2  4       4         4          5                     2
+    3  1       1         1          2                     1
+    4  0       0         0          1                     0
+    5  8       8         8          9                     2
+    6  2       2         2          3                     1
+    7  0       0         0          1                     0
+    8  0       0         0          1                     0
+    9  4       4         4          5                     3
+   10  1       1         1          2                     1
+   11  0       0         0          1                     0
+   12  8       7         7          8                     2
+Committed 40 IDs; stop=budget; target cached=42; draft cached=41
