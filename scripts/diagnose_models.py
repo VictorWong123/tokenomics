@@ -18,6 +18,31 @@ from bench.common import (
 from scripts.check_models import check_cycles, compare, execute
 
 
+def build_configuration(binary):
+    """Record selected build switches without copying arbitrary cache values."""
+    keys = {
+        "CMAKE_BUILD_TYPE",
+        "GGML_NATIVE",
+        "GGML_CPU_REPACK",
+        "GGML_LLAMAFILE",
+        "GGML_BLAS",
+        "GGML_METAL",
+        "GGML_CUDA",
+        "GGML_AVX",
+        "GGML_AVX2",
+        "GGML_FMA",
+        "GGML_F16C",
+    }
+    cache = Path(binary).resolve().parent / "CMakeCache.txt"
+    values = {key: None for key in sorted(keys)}
+    if cache.is_file():
+        for line in cache.read_text().splitlines():
+            key = line.split(":", 1)[0]
+            if key in keys and "=" in line:
+                values[key] = line.split("=", 1)[1]
+    return {"cache_available": cache.is_file(), "values": values}
+
+
 def probe_at(
     cycles, configuration, repetition, output_index, prompt_id="development-qa-00"
 ):
@@ -82,6 +107,7 @@ def diagnose(target, draft, out, binary=None, threads=2, synthetic_fixture=False
                 "target_sha256": sha256(a.target),
                 "draft_sha256": sha256(a.draft),
                 "binary_sha256": sha256(a.binary),
+                "build_configuration": build_configuration(a.binary),
                 "prompt_id": prompt["id"],
                 "settings": {
                     "context": a.context,
