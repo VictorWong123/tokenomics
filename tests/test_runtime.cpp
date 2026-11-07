@@ -92,6 +92,12 @@ int main(int argc, char **argv) {
     r.k = 8;
     auto w = wrong.generate(r);
     CHECK(w.tokens == std::vector<int>(19, 259));
+    Request replay;
+    replay.prefix_tokens = std::vector<int>(10, 259);
+    replay.max_tokens = 1;
+    auto state = wrong.generate(replay);
+    CHECK(state.final_draft_cached == 9 && state.final_target_cached == 10);
+    CHECK(state.tokens == std::vector<int>{259});
     CHECK(zero && partial && full && catchup && switched);
     std::cout << comparisons
               << " differential fixture cases passed; zero/partial/full acceptance, EOS, rollback, "

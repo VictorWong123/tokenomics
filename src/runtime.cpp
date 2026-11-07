@@ -228,7 +228,10 @@ Result Engine::generate(const Request &r) {
     auto t = Clock::now();
     decode(tgt, prefix, 0, n, 0, e.cfg.batch);
     out.prompt_target_ms = elapsed(t);
-    if (use_model) {
+    // Diagnostic replay must start every action, including action 0, from the
+    // same two-model KV state. Ordinary target-only requests do not do this.
+    const bool replay_resident = !r.prefix_tokens.empty() && r.drafter == "model" && dft != nullptr;
+    if (use_model || replay_resident) {
         t = Clock::now();
         decode(dft, prefix, 0, n, 0, e.cfg.batch);
         out.prompt_draft_ms = elapsed(t);
