@@ -1,5 +1,29 @@
 # Review handoff (in progress)
 
+## Current continuation status (2026-11-07)
+
+The implementation remains in progress. The verified dedicated two-core
+Codespace is `tokenomics-long-tasks-jwgxp7j7xvqfq76w`; use the trusted Actions
+route documented in `.codex/cloud.md`, not direct integration-token SSH/API
+access or a newly created resource. Run 42397563260 at work revision ff21ebc
+verified 24 fixture blocks / 168 synthetic records and actual shutdown.
+
+Trained Qwen2.5 0.5B/1.5B Q4_K_M downloads now work in that Codespace. The
+trained-model gate fails exact-token equality: run 42403427793 reproduced
+retain-fixed4/development-qa-00/repetition 0 at token 29, reference 16417 versus
+candidate 2415, then stopped and confirmed shutdown. Earlier run 42399562084
+retained partial mismatches before timeout. See `divergence-investigation.md`
+for hashes, evidence, limitations and the targeted diagnostic contract. Resolve
+this failure before performance pilots; no controller or speedup is established.
+
+Draft PR #4 contains the model execution and diagnostic changes; work remains
+the verified setup baseline until reviewed/merged. Do not assume changes on a
+draft branch are on work. Exact-stock budget audit is separately retained in
+draft PR #5. Mac execution and final evaluation remain unverified.
+
+The sections below retain the original cloud verification history; statements
+about unavailable model/Codespace access describe that earlier session only.
+
 ## Implemented
 
 C++20 driver pinned to llama.cpp, upstream greedy verifier and independent/lookup

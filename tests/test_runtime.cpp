@@ -48,7 +48,18 @@ int main(int argc, char **argv) {
                 if (!ids.empty())
                     ids[std::min(size_t(cycle % 3), ids.size() - 1)] = 260;
             };
+            // Random fixtures exercise varying logit winners and partial commits.
+            pert.diagnostic_logits = true;
             auto altered = e.generate(pert);
+            for (const auto &cycle : altered.cycles) {
+                CHECK(cycle.logits.size() == size_t(cycle.actual + 1));
+                for (const auto &probe : cycle.logits) {
+                    CHECK(probe.top_id != probe.second_id);
+                    CHECK(probe.top_logit >= probe.second_logit);
+                    if (probe.row < cycle.committed)
+                        CHECK(altered.tokens.at(probe.output_index) == probe.top_id);
+                }
+            }
             CHECK(altered.tokens == expected.tokens);
             ++comparisons;
             for (auto c : altered.cycles) {

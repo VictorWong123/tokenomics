@@ -47,8 +47,8 @@ small three-category development prompt manifest; pass `--synthetic-fixture`.
 Such results are explicitly synthetic, even though they execute real forward
 passes. Do not present them as trained-model validation.
 
-The trusted Codespace workflow now calls `scripts/model_workload.py` for this
-gate, reusing the unchanged lifecycle controller's ownership checks and hosted
+The trusted Codespace workflow calls `scripts/model_workload.py`, reusing
+the unchanged lifecycle controller's ownership checks and hosted
 initialize/finalize jobs. It does not run timing or full pilots. Models persist
 under `/workspaces/.tokenomics-model-cache`, outside the clean Actions checkout;
 the downloader verifies their hashes on reuse. Available RAM must be at least
@@ -84,3 +84,8 @@ On the dedicated Codespace, supply
 weights and lock from the model gate. The default remains `models/`. Changing
 the result directory never changes the model lock; incompatible results must
 not be resumed under different source, binaries, weights or settings.
+
+The trained-model gate has since failed; the fixed workload currently runs the
+bounded divergence investigation in `docs/divergence-investigation.md`. Its
+`diagnostic_complete` state is evidence collection, never a correctness pass.
+The direct 272-comparison gate remains available after the cause is resolved.
