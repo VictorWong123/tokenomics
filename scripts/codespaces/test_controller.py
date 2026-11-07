@@ -152,6 +152,7 @@ class ControllerTests(unittest.TestCase):
             self.assertIn('stop_error', report)
             cp = [call.args[0] for call in run.call_args_list if call.args[0][:3] == ['gh', 'codespace', 'cp']]
             self.assertEqual(len(cp), 2)
+            self.assertTrue(all('--expand' in args for args in cp))
             self.assertTrue(cp[0][-1].endswith('/123-2/source.bundle'))
             self.assertTrue(cp[1][-2].endswith('/123-2/evidence.tar.gz'))
 
@@ -263,8 +264,39 @@ class ControllerTests(unittest.TestCase):
                 self.assertTrue(report['claimed'])
                 self.assertEqual(report['shutdown_confirmed'], cleanup_ok)
                 self.assertIn('error', report)
+                self.assertEqual(report['failed_stage'], 'evidence_download')
                 self.assertTrue((Path(tmp) / 'tokenomics-controller/controller.log').is_file())
                 self.assertFalse((Path(tmp) / 'tokenomics-controller/evidence.tar.gz').exists())
+
+
+    def test_transfer_and_run_failure_stages_preserve_owned_cleanup(self):
+        proof = c.manifest(IDENT, 'host', DIGEST)
+        prepared = 'RESULT ' + json.dumps({'ok': True, 'result': {'lease_owner': IDENT}})
+        ran = 'RESULT ' + json.dumps({'ok': True, 'result': {'manifest': proof, 'archive_sha256': DIGEST}})
+        cleaned = 'RESULT ' + json.dumps({'ok': True, 'result': {'released_owner': IDENT}})
+        for failed_stage, operations in (
+                ('source_upload', [RuntimeError('Command failed: gh')]),
+                ('remote_run', ['', RuntimeError('Command failed: gh')]),
+                ('evidence_validation', ['', ran, ''])):
+            with self.subTest(stage=failed_stage), tempfile.TemporaryDirectory() as tmp, \
+                    patch.dict(c.os.environ, RUNNER_TEMP=tmp, GH_TOKEN='test-placeholder',
+                               TOKENOMICS_CODESPACE='target', GITHUB_REPOSITORY=c.REPO,
+                               GITHUB_SHA=SHA, GITHUB_RUN_ID='123', GITHUB_RUN_ATTEMPT='2'), \
+                    patch.object(c, 'command', side_effect=[SHA, '', json.dumps(self.space()), prepared, *operations, cleaned]) as run, \
+                    patch.object(c, 'digest', return_value=DIGEST), \
+                    patch.object(c, 'validate_archive', side_effect=RuntimeError('Archive digest mismatch')), \
+                    patch.object(c, 'stop_and_confirm') as stop, patch('builtins.print'):
+                self.assertEqual(c.controller(), 1)
+                stop.assert_called_once_with('target')
+                output = Path(tmp) / 'tokenomics-controller'
+                report = json.loads((output / 'controller-report.json').read_text())
+                self.assertEqual(report['failed_stage'], failed_stage)
+                self.assertTrue(report['lease_released'])
+                self.assertTrue(report['shutdown_confirmed'])
+                self.assertIn('Stage: ' + failed_stage, (output / 'controller.log').read_text())
+                self.assertNotIn('test-placeholder', json.dumps(report))
+                transfers = [call.args[0] for call in run.call_args_list if call.args[0][:3] == ['gh', 'codespace', 'cp']]
+                self.assertTrue(all('--expand' in args for args in transfers))
 
     def test_no_stop_if_target_admission_fails(self):
         with tempfile.TemporaryDirectory() as tmp, \

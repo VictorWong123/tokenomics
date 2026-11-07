@@ -237,6 +237,9 @@ def controller():
     def event(message):
         with log.open('a') as f:
             f.write(message + '\n')
+    def stage(name):
+        report['stage'] = name
+        event('Stage: ' + name)
     def remote_call(phase, timeout=90):
         raw = command(ssh_args(name, phase, ident, bundle_digest), timeout=timeout, data=source)
         lines = [line[7:] for line in raw.splitlines() if line.startswith('RESULT ')]
@@ -264,20 +267,27 @@ def controller():
         report['claimed'] = True
         report['remote_prepared'] = True
         event('Exact remote lease acquired')
-        command(['gh', 'codespace', 'cp', '--codespace', name, str(bundle),
+        stage('source_upload')
+        command(['gh', 'codespace', 'cp', '--expand', '--codespace', name, str(bundle),
                  'remote:' + str(OPS / key(ident) / 'source.bundle')], timeout=180)
+        stage('remote_run')
         proof = remote_call('run', timeout=1500)
+        stage('remote_manifest_validation')
         expected = manifest(ident, proof['manifest']['hostname'], bundle_digest)
         require(proof['manifest'] == expected, 'Remote manifest mismatch')
         archive = output / 'evidence.tar.gz'
-        command(['gh', 'codespace', 'cp', '--codespace', name,
+        stage('evidence_download')
+        command(['gh', 'codespace', 'cp', '--expand', '--codespace', name,
                  'remote:' + str(OPS / key(ident) / 'evidence.tar.gz'), str(archive)], timeout=120)
+        stage('evidence_validation')
         validate_archive(archive, proof['archive_sha256'], expected)
         report.update(manifest=expected, archive_sha256=proof['archive_sha256'], passed=True)
+        stage('evidence_verified')
         event('Fixture evidence copied and verified')
     except Exception as ex:
         # Only our fixed RuntimeError messages; never external process output.
         report['error_type'] = type(ex).__name__
+        report['failed_stage'] = report.get('stage', 'preflight')
         if isinstance(ex, RuntimeError):
             report['error'] = str(ex)
         event('Controller failed: ' + type(ex).__name__)
