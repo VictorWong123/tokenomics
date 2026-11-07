@@ -1,9 +1,20 @@
 # Hybrid dedicated Codespace fixtures
 
-Private trusted-writer infrastructure. Only pushes to `work` and `codex/**`
-trigger the hybrid workflow; there are no PR/manual/scheduled triggers. Global
-concurrency serializes runs, without cancellation. The legacy portability
-workflow is manual-only; its optional Linux/macOS commands are preserved.
+Private trusted-writer infrastructure. Pushes to canonical `main` and explicit
+manual **Run workflow** actions trigger Linux verification. There are no PR or
+scheduled triggers. Global concurrency serializes runs, without cancellation.
+The legacy portability workflow is manual-only; its optional Linux/macOS
+commands are preserved. The current fixed workload runs trained-model
+diagnostics and the 272-comparison correctness gate; see
+`docs/model-correctness.md`. The fixture contract below also remains supported
+by the lifecycle controller.
+
+Failed initialization, workload or finalization runs a short hosted reporter
+after cleanup, with `issues: write` on its ephemeral Actions token. It creates
+or updates an issue per failure signature, retaining exact token mismatches,
+commit/run links and whether shutdown was confirmed. The Codespace workload
+has no issue-write or lifecycle-token access. Cancelled tests are preserved as
+cancelled runs rather than automatically retried or filed as failing cases.
 
 Short hosted `initialize` and `finalize` jobs perform lifecycle work (normally
 about one minute each; five-minute ceilings). The long workload uses the

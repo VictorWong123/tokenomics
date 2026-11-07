@@ -1,17 +1,38 @@
 # Cloud setup and test route
 
-Canonical tested source is `work`, not default `main` or the old `e089` seed.
-Fresh Cloud tasks should fetch and inspect `origin/work`, then base `codex/**`
-feature branches on the user-intended exact revision. Preserve dirty/unpublished
-work; never reset it merely to follow the branch.
+Canonical source is now `main`. It includes the project and the Codespace test
+workflow; `work` retains the earlier setup baseline. Fresh Cloud tasks should
+fetch and inspect `origin/main`, then base feature branches on the intended
+revision. Preserve dirty/unpublished work; never reset it to follow a branch.
 
-The supported Cloud → Codespace test route is a user-authorized trusted
-`work`/`codex/**` push into `.github/workflows/codespace-fixtures.yml`. Pushes can
-start billable Codespaces compute, so obey any hold before publishing. Do not
+The supported Cloud → Codespace test route is a trusted `main` push or an
+authorized manual run of `.github/workflows/codespace-fixtures.yml`. Runs can
+start billable Codespaces compute, so obey any hold before triggering. Do not
 retry managed Cloud `/user/codespaces` calls, copy PATs, direct-SSH, or add
 Tailscale. The lifecycle secret stays in short hosted Actions initialize/finalize
 jobs. The long workload runs on the dedicated self-hosted Codespace runner.
 Target/runner identities are repository variables, not names embedded here.
+
+Cloud access is through this Actions lifecycle, not an interactive Codespaces
+connection. An empty `gh codespace list` in Cloud does not test that route:
+Cloud's repository credential is separate from the hosted lifecycle secret.
+Do not replace credentials or transfer that secret to obtain direct access.
+To find the latest verification across branches, use:
+
+```bash
+gh run list --repo VictorWong123/tokenomics --workflow codespace-fixtures.yml
+gh run view RUN_ID --repo VictorWong123/tokenomics --json headSha,status,conclusion,jobs
+```
+
+Require successful initialization, workload, artifact upload and the finalizer's
+`shutdown_confirmed: true`. Check the workload's own result contract: model
+correctness requires `TOKENOMICS_MODEL_SUMMARY` with `state: passed` and 272
+comparisons; `diagnostic_complete` alone is not a correctness pass. A rerun
+appears as another attempt of the same run, not a new Actions list entry.
+The Actions page exposes **Run workflow** for the fixed Linux verification.
+Failed initialization, tests or cleanup file/update a deduplicated GitHub issue
+with the source, run, failing case and shutdown confirmation. Only the short
+failure-reporting job gets issue-write permission; the Codespace has none.
 
 Read `TOKENOMICS_EVIDENCE_SUMMARY` in the final Actions log for validated compact
 results and confirmed Shutdown. A workload summary alone does not prove shutdown.

@@ -1,6 +1,7 @@
 # Trained-model divergence investigation
 
-The trained-model correctness gate has **failed**. No feasibility or speedup
+The original trained-model correctness gate failed. The consistent-CPU-kernel
+fix is awaiting the full trained-model verification. No feasibility or speedup
 claim is supported. Do not continue to performance evaluation or controller
 selection until exact-token equivalence is resolved.
 
@@ -47,7 +48,7 @@ the original computation's floating-point history. Top-logit margins and agreeme
 between raw top1 and emitted tokens are evidence, not a tolerance that excuses
 an exact-token failure. Repeated references check reset stability.
 
-The fixed Codespace workload temporarily runs this bounded diagnostic instead of
+The fixed Codespace workload runs this bounded diagnostic before
 the full gate. `diagnostic_complete` only means evidence collection completed;
 it explicitly carries `correctness_supported: false`. The artifact includes all
 submitted jobs, token records, cycle traces, manifests and stderr. Lifecycle
@@ -76,3 +77,22 @@ build options, not a trained-model fix. The pinned CPU repack implementation
 switches from GEMV to GEMM at four rows; that is a testable source-based hypothesis,
 not an established explanation. Obtain the cancelled diagnostic's replacement
 results before selecting a backend ablation or making a root-cause claim.
+
+## Completed native diagnostic and candidate correction
+
+Run 42405912017 at `9a660860cdbca5cde5e74036e35ceb48ee75c669` completed the
+diagnostic and confirmed Shutdown. Both reference repetitions were identical.
+Retain and upstream cache modes reproduced the same fixed4/fixed6 mismatches
+in both repetitions; the raw top-one logit IDs matched emitted tokens.
+At fixed4 token 29, ordinary decoding favored 16417 by 0.6522 logits while
+verification favored 2415 by 0.1184. Fresh identical-prefix replays also
+changed logits with batch width, showing numerical batch dependence without
+prior incremental history. This supports a CPU arithmetic explanation; it
+does not independently prove every cache-content invariant.
+
+The candidate default `TOKENOMICS_CPU_BATCH_INVARIANT` configuration disables
+weight repacking, llamafile SGEMM, BLAS and the pinned tiled K-quant path so
+verification uses consistent dot kernels across widths. The full 272-case
+trained-model gate, unchanged exact-token comparisons, and explicit shutdown
+must pass before this correction is considered verified. The generated unit
+fixtures now also cover quantized weights; these are not trained-model proof.

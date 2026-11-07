@@ -22,6 +22,7 @@ def build_configuration(binary):
     """Record selected build switches without copying arbitrary cache values."""
     keys = {
         "CMAKE_BUILD_TYPE",
+        "TOKENOMICS_CPU_BATCH_INVARIANT",
         "GGML_NATIVE",
         "GGML_CPU_REPACK",
         "GGML_LLAMAFILE",

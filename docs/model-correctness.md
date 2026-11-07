@@ -18,7 +18,8 @@ category), four output-budget cases, and one logical-context boundary; 17
 configurations, each repeated twice. The boundary uses valid tokenizer IDs
 repeated to the requested logical context, not an invented vocabulary mapping.
 No held-out outputs are generated. `--max-tokens` defaults to 32 for the three
-development prompts. Each subprocess has a 1,800-second timeout; the enclosing
+development prompts. The CLI defaults to a 1,800-second subprocess timeout;
+the fixed Codespace gate uses 3,600 seconds. The enclosing
 remote workload must also enforce its overall lifecycle budget.
 
 An existing output directory is refused. Use a new attempt directory after a
@@ -85,7 +86,16 @@ weights and lock from the model gate. The default remains `models/`. Changing
 the result directory never changes the model lock; incompatible results must
 not be resumed under different source, binaries, weights or settings.
 
-The trained-model gate has since failed; the fixed workload currently runs the
-bounded divergence investigation in `docs/divergence-investigation.md`. Its
-`diagnostic_complete` state is evidence collection, never a correctness pass.
-The direct 272-comparison gate remains available after the cause is resolved.
+The original trained-model gate failed; see `docs/divergence-investigation.md`.
+The fixed workload now runs the targeted diagnostic followed by the complete
+272-comparison gate. Any diagnostic mismatch prevents the full gate from
+starting. Only a complete trained-model gate can produce `state: passed`.
+The candidate batch has a 3,600-second timeout, accommodating the original
+243/272 partial batch within the unchanged 150-minute child deadline.
+
+The default `TOKENOMICS_CPU_BATCH_INVARIANT` CMake option selects the CPU dot
+paths consistently across target-only and speculative verification batches.
+It disables repacked weights, llamafile SGEMM, BLAS, and tiled K-quant matmul;
+the executable records this choice in `system_info`. Vector dot kernels remain
+enabled. This is a correctness configuration, not a speedup claim. Remote
+validation of the change must be recorded before claiming the failure resolved.

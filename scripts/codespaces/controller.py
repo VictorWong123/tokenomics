@@ -446,6 +446,7 @@ def lifecycle(mode, owner, expected):
             raise
         return {'claimed': True}
     finalize_owned(name, owner, expected)
+    output('shutdown_confirmed', 'true')
     # Lifecycle success is independent of any workload-specific evidence contract.
     # Missing/failed/custom workloads must never bypass owned shutdown cleanup.
     try:

@@ -81,11 +81,18 @@ class HybridTests(unittest.TestCase):
     def test_workflow_structure_secret_isolation_and_legacy_manual_only(self):
         import yaml
         workflow = yaml.load((REPO_ROOT / '.github/workflows/codespace-fixtures.yml').read_text(), Loader=yaml.BaseLoader)
-        self.assertEqual(workflow['on'], {'push': {'branches': ['work', 'codex/**']}})
+        self.assertEqual(workflow['on'], {'push': {'branches': ['main'], 'paths-ignore': ['**/*.md']}, 'workflow_dispatch': ''})
         self.assertEqual(workflow['permissions'], {'contents': 'read'})
         self.assertEqual(workflow['concurrency'], {'group': 'tokenomics-dedicated-codespace', 'cancel-in-progress': 'false'})
         jobs = workflow['jobs']
-        self.assertEqual(set(jobs), {'initialize', 'workload', 'finalize'})
+        self.assertEqual(set(jobs), {'initialize', 'workload', 'finalize', 'report_failure'})
+        reporter = jobs['report_failure']
+        self.assertEqual(reporter['permissions'], {'contents': 'read', 'issues': 'write'})
+        self.assertEqual(reporter['needs'], ['initialize', 'workload', 'finalize'])
+        self.assertEqual(reporter['runs-on'], 'ubuntu-24.04')
+        self.assertEqual(reporter['timeout-minutes'], '5')
+        self.assertNotIn('secrets.CODESPACES_TOKEN', json.dumps(reporter))
+        self.assertIn("needs.workload.result == 'failure'", reporter['if'])
         for name in ('initialize', 'finalize'):
             self.assertEqual(jobs[name]['runs-on'], 'ubuntu-24.04')
             self.assertEqual(jobs[name]['timeout-minutes'], '5')

@@ -1,8 +1,10 @@
-name: Codespace model correctness
+name: Codespace Linux verification
 
 on:
   push:
-    branches: [work, 'codex/**']
+    branches: [main]
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -39,6 +41,7 @@ jobs:
     timeout-minutes: 210
     outputs:
       summary: ${{ steps.fixtures.outputs.summary }}
+      model_report: ${{ steps.fixtures.outputs.model_report }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -68,12 +71,15 @@ jobs:
     if: ${{ always() && needs.initialize.outputs.claimed == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    outputs:
+      shutdown_confirmed: ${{ steps.lifecycle.outputs.shutdown_confirmed }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - name: Verify ownership, stop runner and confirm actual Shutdown
+      - id: lifecycle
+        name: Verify ownership, stop runner and confirm actual Shutdown
         env:
           GH_TOKEN: ${{ secrets.CODESPACES_TOKEN }}
           TOKENOMICS_CODESPACE: ${{ vars.TOKENOMICS_CODESPACE }}
@@ -81,3 +87,26 @@ jobs:
           TOKENOMICS_RUNNER_ID: ${{ vars.TOKENOMICS_RUNNER_ID }}
           WORKLOAD_SUMMARY: ${{ needs.workload.outputs.summary }}
         run: python3 scripts/codespaces/controller.py finalize
+
+  report_failure:
+    needs: [initialize, workload, finalize]
+    if: ${{ always() && (needs.initialize.result == 'failure' || needs.workload.result == 'failure' || needs.finalize.result == 'failure') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: File or update the failing Linux test case
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODEL_REPORT: ${{ needs.workload.outputs.model_report }}
+          INITIALIZE_RESULT: ${{ needs.initialize.result }}
+          WORKLOAD_RESULT: ${{ needs.workload.result }}
+          FINALIZE_RESULT: ${{ needs.finalize.result }}
+          SHUTDOWN_CONFIRMED: ${{ needs.finalize.outputs.shutdown_confirmed }}
+        run: python3 scripts/codespaces/report_failure.py

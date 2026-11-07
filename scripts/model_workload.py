@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed model divergence diagnosis workload for the verified Codespace lifecycle.
+"""Fixed Linux model verification workload for the verified Codespace lifecycle.
 
 No lifecycle token, arbitrary command input, or resource creation. Initialize
 and finalize remain owned by scripts/codespaces/controller.py.
@@ -121,6 +121,7 @@ def pack(results, destination, owner):
 def child(results):
     from scripts.download_models import download
     from scripts.diagnose_models import diagnose
+    from scripts.check_models import parser, run as check_models
 
     status = {"schema_version": 1, "state": "started", "stage": "resource-screen"}
     atomic_json(results / "environment.json", hardware())
@@ -162,7 +163,45 @@ def child(results):
             and diagnostic["correctness_supported"] is False,
             "Diagnostic contract failed",
         )
-        status.update(state="diagnostic_complete", diagnosis=diagnostic)
+        status["diagnosis"] = diagnostic
+        lifecycle.require(
+            diagnostic["reference_reset_equal"] is True
+            and all(row["mismatch"] is None for row in diagnostic["full_comparisons"])
+            and all(
+                row["probe_matches_emitted"] for row in diagnostic["replay_probes"]
+            ),
+            "CPU diagnostic still diverges",
+        )
+        status["stage"] = "correctness"
+        atomic_json(results / "status.json", status)
+        print("TOKENOMICS_MODEL_STAGE correctness", flush=True)
+        gate = check_models(
+            parser().parse_args(
+                [
+                    "--target",
+                    str(target),
+                    "--draft",
+                    str(draft),
+                    "--out",
+                    str(results / "gate"),
+                    "--threads",
+                    "2",
+                    "--timeout-seconds",
+                    "3600",
+                ]
+            )
+        )
+        lifecycle.require(
+            gate["state"] == "passed"
+            and gate["comparisons"] == 272
+            and gate["synthetic_fixture"] is False,
+            "Trained-model correctness contract failed",
+        )
+        status.update(
+            state="passed",
+            comparisons=gate["comparisons"],
+            observed_coverage=gate["observed_coverage"],
+        )
     except Exception as exc:
         status.update(state="failed", error_type=type(exc).__name__, error=str(exc))
         gate_status = results / "gate/status.json"
@@ -172,7 +211,7 @@ def child(results):
             status["first_mismatch"] = diagnostic.get("first_mismatch")
     atomic_json(results / "status.json", status)
     print("TOKENOMICS_MODEL_STAGE " + status["state"], flush=True)
-    return 0 if status["state"] == "diagnostic_complete" else 1
+    return 0 if status["state"] == "passed" else 1
 
 
 def workload():
@@ -255,7 +294,13 @@ def workload():
         # No raw model output, prompts, credentials or network errors in Actions logs.
         report = {
             **owner,
-            "workload": "trained-model-divergence-diagnosis",
+            "workload": "trained-model-correctness",
+            "hostname": socket.gethostname(),
+            "runner_name": expected["name"],
+            "runner_id": expected["id"],
+            "execution_environment": (
+                "codespaces" if os.environ.get("CODESPACES") == "true" else "other"
+            ),
             "diagnosis": status.get("diagnosis"),
             "state": status["state"],
             "stage": status["stage"],
@@ -273,10 +318,41 @@ def workload():
             "draft_sha256": status.get("draft_sha256"),
         }
         atomic_json(artifacts / "report.json", report)
+        failure = status.get("first_mismatch")
+        if failure is None:
+            failure = next(
+                (
+                    row
+                    for row in status.get("diagnosis", {}).get("full_comparisons", [])
+                    if row.get("mismatch") is not None
+                ),
+                None,
+            )
+        case = (
+            None
+            if failure is None
+            else {
+                key: failure.get(key)
+                for key in ("prompt_id", "configuration_id", "repetition", "mismatch")
+            }
+        )
+        lifecycle.output(
+            "model_report",
+            json.dumps(
+                {
+                    "state": status["state"],
+                    "stage": status["stage"],
+                    "error_type": status.get("error_type"),
+                    "first_mismatch": case,
+                    "checked_comparisons": report["checked_comparisons"],
+                },
+                sort_keys=True,
+            ),
+        )
         print(
             "TOKENOMICS_MODEL_SUMMARY " + json.dumps(report, sort_keys=True), flush=True
         )
-    return 0 if code == 0 and status["state"] == "diagnostic_complete" else 1
+    return 0 if code == 0 and status["state"] == "passed" else 1
 
 
 if __name__ == "__main__":

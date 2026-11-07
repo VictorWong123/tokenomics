@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <mutex>
 #include <stdexcept>
@@ -37,6 +38,12 @@ long long peak_rss_bytes() {
 }
 struct Backend {
     Backend() {
+#ifdef TOKENOMICS_CPU_BATCH_INVARIANT
+        // This pinned backend also selects tiled K-quant matmul at eight rows.
+        // Set its process-wide switch before the backend caches the setting.
+        if (setenv("GGML_CPU_TILED_MM", "0", 1) != 0)
+            throw std::runtime_error("cannot select consistent CPU kernels");
+#endif
         llama_log_set(
             [](ggml_log_level l, const char *s, void *) {
                 if (std::strstr(s, "offloaded ")) {
@@ -161,7 +168,11 @@ Engine::Engine(const EngineConfig &c) : impl_(std::make_unique<Impl>(c)) {}
 Engine::~Engine() = default;
 double Engine::load_ms() const { return impl_->loading; }
 std::string Engine::system_info() const {
-    return std::string(llama_print_system_info()) + impl_->execution_evidence;
+    auto info = std::string(llama_print_system_info()) + impl_->execution_evidence;
+#ifdef TOKENOMICS_CPU_BATCH_INVARIANT
+    info += "; TOKENOMICS_CPU_BATCH_INVARIANT=ON; GGML_CPU_TILED_MM=0";
+#endif
+    return info;
 }
 
 Result Engine::generate(const Request &r) {

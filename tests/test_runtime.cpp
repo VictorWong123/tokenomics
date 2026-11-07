@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     std::string dir = argv[1];
     int comparisons = 0;
     bool zero = false, partial = false, full = false, catchup = false, switched = false;
-    for (const std::string name : {"target", "random", "eos"}) {
+    for (const std::string name : {"target", "random", "eos", "quantized"}) {
         EngineConfig ec{dir + "/" + name + ".gguf", dir + "/" + name + ".gguf", 64, 32, 1, 0};
         Engine e(ec);
         for (int cap : {0, 1, 2, 7, 19, 80}) {
