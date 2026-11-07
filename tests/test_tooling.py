@@ -12,6 +12,153 @@ from bench.replay import fit_validate
 
 
 class ToolingTests(unittest.TestCase):
+    def test_timing_only_stops_before_full_pilots(self):
+        from argparse import Namespace
+        from unittest.mock import patch
+        from scripts import run_all
+
+        binary = os.getenv("TOKENOMICS_TEST_BINARY")
+        if not binary:
+            self.skipTest("requires built fixture engine")
+        binary = pathlib.Path(binary).resolve()
+        fixture = binary.parent / "fixtures/target.gguf"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            (root / "configs").mkdir()
+            (root / "bench").mkdir()
+            (root / "models").mkdir()
+            config = json.loads((run_all.ROOT / "configs/pilot-v1.json").read_text())
+            atomic_json(root / "configs/pilot-v1.json", config)
+            atomic_json(
+                root / "configs/models-v1.json",
+                {
+                    "candidates": [
+                        {
+                            "id": "fixture",
+                            "target": "t",
+                            "draft": "d",
+                            "min_available_gib": 0,
+                        }
+                    ]
+                },
+            )
+            atomic_json(
+                root / "models/models.lock.json", {"models": {"t": {}, "d": {}}}
+            )
+            (root / "bench/prompts-v1.jsonl").write_text(
+                "".join(
+                    json.dumps(
+                        {
+                            "id": f"development-{cat}-00",
+                            "category": cat,
+                            "length_bucket": "long",
+                            "pilot": True,
+                            "split": "development",
+                            "prompt": "a b",
+                        }
+                    )
+                    + "\n"
+                    for cat in ("qa", "code", "summary")
+                )
+            )
+            args = Namespace(
+                run_dir=root / "run",
+                build_dir=binary.parent,
+                backend="cpu",
+                threads=1,
+                fixtures_only=False,
+                candidate="fixture",
+                timing_only=True,
+                max_hours=None,
+                skip_ngram=False,
+            )
+            real_run = run_all.subprocess.run
+
+            def child_run(command, *positional, **kwargs):
+                if pathlib.Path(command[0]).name == "ctest":
+                    return run_all.subprocess.CompletedProcess(command, 0)
+                return real_run(command, *positional, **kwargs)
+
+            with patch.object(run_all, "ROOT", root), patch.object(
+                run_all, "download", return_value=fixture
+            ), patch.object(
+                run_all,
+                "investigate",
+                side_effect=AssertionError("must not run Pilot B"),
+            ), patch.object(
+                run_all.subprocess, "run", side_effect=child_run
+            ):
+                # Only skip the recursive ctest call; execute the real tokenizer
+                # and nine timing requests through the fixture engine.
+                self.assertEqual(run_all.pipeline(args), 10)
+            self.assertEqual(
+                json.loads((args.run_dir / "status.json").read_text())["state"],
+                "timing_complete",
+            )
+            self.assertEqual(
+                len(
+                    (args.run_dir / "fixture/timing/requests.jsonl")
+                    .read_text()
+                    .splitlines()
+                ),
+                9,
+            )
+            self.assertFalse((args.run_dir / "fixture/pilot-a").exists())
+
+    def test_model_gate_rejects_divergence_and_stop_differences(self):
+        from scripts.check_models import compare, variants
+
+        expected = {
+            "prompt_ids": [1],
+            "token_ids": [2, 3],
+            "stop": "budget",
+            "generated_tokens": 2,
+        }
+        self.assertIsNone(compare(expected, dict(expected)))
+        for field, value in (
+            ("prompt_ids", [9]),
+            ("token_ids", [2]),
+            ("stop", "eog"),
+            ("generated_tokens", 99),
+        ):
+            self.assertEqual(
+                compare(expected, {**expected, field: value})["field"], field
+            )
+        configs = list(variants())
+        self.assertEqual(len({c["configuration_id"] for c in configs}), 17)
+        for cache in ("retain", "upstream"):
+            self.assertEqual(
+                {
+                    c["k"]
+                    for c in configs
+                    if c.get("cache") == cache and c["policy"] == "fixed"
+                },
+                {1, 2, 4, 6, 8},
+            )
+
+    def test_model_gate_checks_cycle_and_cache_accounting(self):
+        from scripts.check_models import check_cycles
+
+        identity = {"prompt_id": "p", "configuration_id": "fixed4", "repetition": 0}
+        row = {
+            **identity,
+            "prompt_ids": [1, 2],
+            "generated_tokens": 2,
+            "target_cached": 3,
+            "draft_cached": 2,
+        }
+        cycle = {**identity, "committed": 2}
+        check_cycles([row], [cycle])
+        for changed in (
+            {"generated_tokens": 3},
+            {"target_cached": 4},
+            {"draft_cached": 4},
+        ):
+            with self.assertRaises(RuntimeError):
+                check_cycles([{**row, **changed}], [cycle])
+        with self.assertRaises(RuntimeError):
+            check_cycles([row], [{**cycle, "prompt_id": "unknown"}])
+
     def test_feasibility_decisions_do_not_confuse_access_with_science(self):
         from scripts.run_all import decision_state
 

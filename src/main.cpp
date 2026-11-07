@@ -180,6 +180,7 @@ int main(int argc, char **argv) {
                                {"sampler", "greedy-temperature-only"},
                                {"detailed", r.detailed}};
             rec["settings"]["max_cycles"] = r.max_cycles;
+            rec["settings"]["script"] = r.script;
             rec["llama_revision"] = TOKENOMICS_LLAMA_REV;
             rec["system_info"] = engine.system_info();
             rec["prompt_ids"] = result.prompt_ids;

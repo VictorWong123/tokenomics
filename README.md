@@ -85,6 +85,12 @@ build-cpu/tokenomics --target models/qwen2.5-1.5b-instruct-q4_k_m.gguf \
   --policy fixed --k 4 --max-tokens 128 --prompt 'Explain binary search.'
 ```
 
+Before interpreting trained-model timings, run the [differential model gate](docs/model-correctness.md).
+It checks exact IDs, stops, repeated-request resets and cycle/cache accounting
+across 272 comparisons. Its observed coverage report distinguishes exercised
+paths from unverified ones. `run.sh ... --timing-only` then stops after the small
+development timing screen (exit 10), without launching full Pilot A/B.
+
 Show all C++ options with `build-cpu/tokenomics --help`. Jobs in JSONL can
 change policy/cap per request while retaining model weights. The Python runner
 uses separate processes for fair target-alone versus resident-draft memory

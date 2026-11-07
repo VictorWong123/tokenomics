@@ -273,6 +273,16 @@ def pipeline(a):
             )
             continue
         lookup_target = target
+        if a.timing_only:
+            save_status(
+                out,
+                "timing_complete",
+                message="Development timing screen completed. Full Pilot A/B and feasibility decisions were not run.",
+                candidate=candidate["id"],
+                estimated_full_pilot_seconds=estimated,
+                peak_rss_bytes=rss,
+            )
+            return 10
         if a.max_hours is not None and estimated > a.max_hours * 3600:
             save_status(
                 out,
@@ -387,8 +397,15 @@ if __name__ == "__main__":
     p.add_argument("--threads", type=int)
     p.add_argument("--candidate")
     p.add_argument("--max-hours", type=float)
+    p.add_argument(
+        "--timing-only",
+        action="store_true",
+        help="Stop after the first resource-safe candidate timing screen (exit 10); no full pilot",
+    )
     p.add_argument("--skip-ngram", action="store_true")
     a = p.parse_args()
+    if a.timing_only and a.fixtures_only:
+        p.error("--timing-only and --fixtures-only are mutually exclusive")
     if a.build_dir is None:
         a.build_dir = pathlib.Path("build-" + a.backend)
     try:
