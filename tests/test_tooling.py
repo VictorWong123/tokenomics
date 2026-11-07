@@ -26,7 +26,7 @@ class ToolingTests(unittest.TestCase):
             root = pathlib.Path(tmp)
             (root / "configs").mkdir()
             (root / "bench").mkdir()
-            (root / "models").mkdir()
+            (root / "model-cache").mkdir()
             config = json.loads((run_all.ROOT / "configs/pilot-v1.json").read_text())
             atomic_json(root / "configs/pilot-v1.json", config)
             atomic_json(
@@ -43,7 +43,7 @@ class ToolingTests(unittest.TestCase):
                 },
             )
             atomic_json(
-                root / "models/models.lock.json", {"models": {"t": {}, "d": {}}}
+                root / "model-cache/models.lock.json", {"models": {"t": {}, "d": {}}}
             )
             (root / "bench/prompts-v1.jsonl").write_text(
                 "".join(
@@ -71,6 +71,7 @@ class ToolingTests(unittest.TestCase):
                 timing_only=True,
                 max_hours=None,
                 skip_ngram=False,
+                model_dir=root / "model-cache",
             )
             real_run = run_all.subprocess.run
 
@@ -81,7 +82,7 @@ class ToolingTests(unittest.TestCase):
 
             with patch.object(run_all, "ROOT", root), patch.object(
                 run_all, "download", return_value=fixture
-            ), patch.object(
+            ) as download, patch.object(
                 run_all,
                 "investigate",
                 side_effect=AssertionError("must not run Pilot B"),
@@ -91,6 +92,10 @@ class ToolingTests(unittest.TestCase):
                 # Only skip the recursive ctest call; execute the real tokenizer
                 # and nine timing requests through the fixture engine.
                 self.assertEqual(run_all.pipeline(args), 10)
+                self.assertEqual(
+                    download.call_args.args[1:],
+                    (args.model_dir, args.model_dir / "models.lock.json"),
+                )
             self.assertEqual(
                 json.loads((args.run_dir / "status.json").read_text())["state"],
                 "timing_complete",

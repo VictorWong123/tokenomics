@@ -155,7 +155,7 @@ def pipeline(a):
                 }
             )
             continue
-        model_dir = ROOT / "models"
+        model_dir = getattr(a, "model_dir", ROOT / "models")
         lock = model_dir / "models.lock.json"
         draft = download(candidate["draft"], model_dir, lock)
         target = download(candidate["target"], model_dir, lock)
@@ -396,6 +396,12 @@ if __name__ == "__main__":
     p.add_argument("--fixtures-only", action="store_true")
     p.add_argument("--threads", type=int)
     p.add_argument("--candidate")
+    p.add_argument(
+        "--model-dir",
+        type=pathlib.Path,
+        default=ROOT / "models",
+        help="Verified model cache and models.lock.json directory",
+    )
     p.add_argument("--max-hours", type=float)
     p.add_argument(
         "--timing-only",
