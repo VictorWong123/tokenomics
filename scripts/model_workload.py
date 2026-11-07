@@ -101,11 +101,13 @@ def child(results):
     print("TOKENOMICS_MODEL_STAGE resource-screen", flush=True)
     try:
         free = available_memory()
+        status["available_bytes"] = free
+        status["disk_free_bytes"] = shutil.disk_usage(CACHE.parent).free
         lifecycle.require(
             free >= 5 * 2**30, "Less than 5 GiB available for initial candidate"
         )
         lifecycle.require(
-            shutil.disk_usage(CACHE.parent).free >= 4 * 2**30,
+            status["disk_free_bytes"] >= 4 * 2**30,
             "Less than 4 GiB free disk",
         )
         CACHE.mkdir(mode=0o700, exist_ok=True)
@@ -120,6 +122,9 @@ def child(results):
         draft = download("qwen25-05", CACHE, lock)
         target = download("qwen25-15", CACHE, lock)
         shutil.copyfile(lock, results / "models.lock.json")
+        locked = json.loads(lock.read_text())["models"]
+        status["target_sha256"] = locked["qwen25-15"]["sha256"]
+        status["draft_sha256"] = locked["qwen25-05"]["sha256"]
         status["stage"] = "correctness"
         atomic_json(results / "status.json", status)
         print("TOKENOMICS_MODEL_STAGE correctness", flush=True)
@@ -152,6 +157,11 @@ def child(results):
         )
     except Exception as exc:
         status.update(state="failed", error_type=type(exc).__name__, error=str(exc))
+        gate_status = results / "gate/status.json"
+        if gate_status.exists():
+            diagnostic = json.loads(gate_status.read_text())
+            status["checked_comparisons"] = diagnostic.get("checked_comparisons", 0)
+            status["first_mismatch"] = diagnostic.get("first_mismatch")
     atomic_json(results / "status.json", status)
     print("TOKENOMICS_MODEL_STAGE " + status["state"], flush=True)
     return 0 if status["state"] == "passed" else 1
@@ -243,6 +253,15 @@ def workload():
             "archive_sha256": digest,
             "comparisons": status.get("comparisons", 0),
             "observed_coverage": status.get("observed_coverage", {}),
+            "error_type": status.get("error_type"),
+            "checked_comparisons": status.get(
+                "checked_comparisons", status.get("comparisons", 0)
+            ),
+            "first_mismatch": status.get("first_mismatch"),
+            "available_bytes": status.get("available_bytes"),
+            "disk_free_bytes": status.get("disk_free_bytes"),
+            "target_sha256": status.get("target_sha256"),
+            "draft_sha256": status.get("draft_sha256"),
         }
         atomic_json(artifacts / "report.json", report)
         print(

@@ -29,6 +29,12 @@ converted into a successful performance record. Investigate that divergence
 before expanding measurements. Script actions are now retained in the engine's
 serialized settings as well as the input job file.
 
+Candidate records are checked as soon as the engine flushes each JSONL row.
+The first mismatch stops the candidate process; timeouts retain completed
+per-request checks and raw partial outputs. A partial check count is not a
+passed gate. Failure summaries include the exception type, checked count and
+first mismatch, avoiding dependence on archive transfer for basic diagnosis.
+
 `status.json` reports observed zero/partial/full acceptance, catch-up, switching
 and stop reasons. A pass does not imply every path occurred on trained weights;
 missing coverage needs targeted follow-up. Forced EOG and proposal corruption

@@ -12,6 +12,35 @@ from bench.replay import fit_validate
 
 
 class ToolingTests(unittest.TestCase):
+    def test_model_gate_streams_and_stops_on_first_failure(self):
+        import subprocess
+        import sys
+        from scripts.check_models import stream_process
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "rows.jsonl"
+            command = [
+                sys.executable,
+                "-c",
+                "import pathlib,sys,time; pathlib.Path(sys.argv[1]).write_text('{\\\"token\\\": 1}\\n'); time.sleep(10)",
+                str(out),
+            ]
+            seen = []
+
+            def reject(row):
+                seen.append(row)
+                raise ValueError("first divergence")
+
+            with (pathlib.Path(tmp) / "stderr").open("w") as log:
+                with self.assertRaisesRegex(ValueError, "first divergence"):
+                    stream_process(command, out, log, 2, reject)
+            self.assertEqual(seen, [{"token": 1}])
+            out.unlink()
+            with (pathlib.Path(tmp) / "stderr").open("w") as log:
+                with self.assertRaises(subprocess.TimeoutExpired):
+                    stream_process(command, out, log, 0.5, seen.append)
+            self.assertEqual(json.loads(out.read_text()), {"token": 1})
+
     def test_timing_only_stops_before_full_pilots(self):
         from argparse import Namespace
         from unittest.mock import patch

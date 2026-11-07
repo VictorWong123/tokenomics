@@ -13,6 +13,7 @@ import json
 import pathlib
 import subprocess
 import sys
+import time
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 from bench.common import (
@@ -58,7 +59,53 @@ def compare(expected, actual):
     return None
 
 
-def execute(a, name, jobs, resident):
+def stream_process(command, result_path, log, timeout, on_row):
+    """Read only complete flushed records; stop immediately on a failed check."""
+    process = subprocess.Popen(command, stdout=log, stderr=log)
+    deadline = time.monotonic() + timeout
+    stream = None
+    pending = b""
+
+    def drain():
+        nonlocal stream, pending
+        if stream is None and result_path.exists():
+            stream = result_path.open("rb")
+        if stream is not None:
+            pending += stream.read()
+            while b"\n" in pending:
+                line, pending = pending.split(b"\n", 1)
+                if line.strip():
+                    on_row(json.loads(line))
+            if len(pending) > 4 * 1024**2:
+                raise RuntimeError("oversized incomplete engine record")
+
+    try:
+        while True:
+            drain()
+            code = process.poll()
+            if code is not None:
+                drain()  # include a last flush racing with the previous read
+                if code:
+                    raise subprocess.CalledProcessError(code, command)
+                if pending.strip():
+                    raise RuntimeError("incomplete final engine record")
+                return
+            if time.monotonic() >= deadline:
+                raise subprocess.TimeoutExpired(command, timeout)
+            time.sleep(0.05)
+    finally:
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+        if stream is not None:
+            stream.close()
+
+
+def execute(a, name, jobs, resident, on_row=None):
     job_path = a.out / f"{name}.jobs.jsonl"
     job_path.write_text("".join(json.dumps(j) + "\n" for j in jobs))
     command = [
@@ -82,10 +129,27 @@ def execute(a, name, jobs, resident):
     ]
     if resident:
         command += ["--draft", str(a.draft.resolve())]
+    seen = 0
+
+    def checked_row(row):
+        nonlocal seen
+        if seen >= len(jobs) or any(
+            row[key] != jobs[seen][key]
+            for key in ("prompt_id", "configuration_id", "repetition")
+        ):
+            raise RuntimeError(f"{name}: output identity/order mismatch")
+        seen += 1
+        on_row(row)
+
     with (a.out / f"{name}.stderr.log").open("w") as log:
-        subprocess.run(
-            command, stdout=log, stderr=log, check=True, timeout=a.timeout_seconds
-        )
+        if on_row is None:
+            subprocess.run(
+                command, stdout=log, stderr=log, check=True, timeout=a.timeout_seconds
+            )
+        else:
+            stream_process(
+                command, a.out / f"{name}.jsonl", log, a.timeout_seconds, checked_row
+            )
     rows = read_jsonl(a.out / f"{name}.jsonl")
     if len(rows) != len(jobs):
         raise RuntimeError(f"{name}: incomplete outputs ({len(rows)}/{len(jobs)})")
@@ -127,6 +191,8 @@ def run(a):
     # A fresh directory preserves every failed/partial attempt. No implicit resume.
     a.out = a.out.resolve()
     a.out.mkdir(parents=True, exist_ok=False)
+    checked = 0
+    first_failure = None
     try:
         if min(a.context, a.batch, a.threads, a.max_tokens, a.timeout_seconds) <= 0:
             raise ValueError("positive settings required")
@@ -207,12 +273,11 @@ def run(a):
             for variant in variants()
             for rep in (0, 1)
         ]
-        actual = execute(a, "candidate", jobs, True)
-        cycles = read_jsonl(a.out / "candidate.cycles.jsonl")
-        check_cycles(actual, cycles)
         expected = {r["prompt_id"]: r for r in references}
         with (a.out / "correctness.jsonl").open("w") as stream:
-            for row in actual:
+
+            def check_row(row):
+                nonlocal checked, first_failure
                 mismatch = compare(expected[row["prompt_id"]], row)
                 record = {
                     "prompt_id": row["prompt_id"],
@@ -223,8 +288,14 @@ def run(a):
                 }
                 stream.write(json.dumps(record) + "\n")
                 stream.flush()
+                checked += 1
                 if mismatch is not None:
+                    first_failure = record
                     raise RuntimeError(f"first divergence: {json.dumps(record)}")
+
+            actual = execute(a, "candidate", jobs, True, check_row)
+        cycles = read_jsonl(a.out / "candidate.cycles.jsonl")
+        check_cycles(actual, cycles)
         coverage = {
             "zero_acceptance": any(
                 c["actual_drafts"] > 0 and c["accepted"] == 0 for c in cycles
@@ -253,7 +324,14 @@ def run(a):
     except Exception as exc:
         atomic_json(
             a.out / "status.json",
-            {"schema_version": 1, "state": "failed", "error": str(exc)},
+            {
+                "schema_version": 1,
+                "state": "failed",
+                "error": str(exc),
+                "error_type": type(exc).__name__,
+                "checked_comparisons": checked,
+                "first_mismatch": first_failure,
+            },
         )
         raise
 
