@@ -469,6 +469,10 @@ def verify_run(run_id, out, publish=False):
                 "Controller study failed",
             )
             checked = check_partial(evidence) if state == "paused" else check(evidence)
+        elif state == "profile_comparison_complete":
+            from scripts.verify_profile_evidence import check
+
+            checked = check(evidence, EXPECTED[run_id])
         else:
             require(state == "kernel_profile_passed", "Experimental CPU profile failed")
             checked = verify_kernel(evidence, EXPECTED[run_id])
