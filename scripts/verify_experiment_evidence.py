@@ -371,7 +371,11 @@ def retain(evidence, receipt_path):
                 )
             else:
                 shutil.copy2(source, target)
-    canonical = root / "verification.json"
+    canonical = root / (
+        f"verification-attempt-{receipt['attempt']}-paused.json"
+        if run_id == 42492089188 and receipt["state"] == "paused"
+        else "verification.json"
+    )
     if canonical.exists():
         previous = json.loads(canonical.read_text())
         for key in (
@@ -432,10 +436,13 @@ def verify_run(run_id, out, publish=False):
             require(state in ("paused", "confirmation_complete"), "Confirmation failed")
             checked = verify_confirmation(evidence, state)
         elif run_id == 42492089188:
-            from scripts.verify_controller_evidence import check
+            from scripts.verify_controller_evidence import check, check_partial
 
-            require(state == "controller_study_complete", "Controller study incomplete")
-            checked = check(evidence)
+            require(
+                state in ("paused", "controller_study_complete"),
+                "Controller study failed",
+            )
+            checked = check_partial(evidence) if state == "paused" else check(evidence)
         else:
             require(state == "kernel_profile_passed", "Experimental CPU profile failed")
             checked = verify_kernel(evidence)

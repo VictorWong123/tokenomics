@@ -24,7 +24,9 @@ evaluation and Metal execution remain incomplete. See [the handoff](docs/handoff
 The [requirements and documentation index](docs/requirements.md) distinguishes
 implemented behavior, measured evidence and remaining research work. See
 [workspace/test-environment roles](docs/environments.md) and
-[CPU profiles](docs/cpu-profiles.md) for operational details.
+[CPU profiles](docs/cpu-profiles.md) for operational details. The
+[full evaluation guide](docs/evaluation.md) separates the implemented held-out
+runner from model measurements that have actually completed.
 
 ## Build and check
 

@@ -132,3 +132,35 @@ def check(evidence, *, source=SOURCE, synthetic_fixture=False):
         peak_rss_bytes=status["peak_rss_bytes"],
         binary_sha256=build["binary_sha256"],
     )
+
+
+def check_partial(evidence, *, source=SOURCE, synthetic_fixture=False):
+    """Audit retained complete blocks without estimating an unfinished grid."""
+    checked = {}
+    for name in ("fit", "validation", "logging"):
+        directory = evidence / name
+        if not (directory / "run_manifest.json").exists():
+            continue
+        rows, manifest = verify(directory, complete_required=False)
+        frozen = manifest["frozen"]
+        if (
+            frozen["code"]["revision"] != source
+            or frozen["identity"]["synthetic_fixture"] != synthetic_fixture
+        ):
+            raise ValueError("Partial controller source/fixture identity changed")
+        checked[name] = len(rows)
+    if (evidence / "prior.json").exists():
+        prior = calibrate(
+            evidence / "fit",
+            evidence / "replay",
+            "ngram",
+            synthetic_fixture=synthetic_fixture,
+        )
+        if prior != json.loads((evidence / "prior.json").read_text()):
+            raise ValueError("Partial controller calibration differs")
+    return dict(
+        partial=True,
+        exact_comparisons=sum(checked.values()),
+        verified_records_by_stage=checked,
+        limitation="Complete retained blocks only; no unfinished-grid performance estimate.",
+    )

@@ -257,3 +257,15 @@ receipts and generated-source hashes are retained under
 study remains locked by its pending trained-proof hash. The recorded-controller
 demo checks a completed study's priors and raw logging grid without inference;
 its default trained archive is unavailable until the active study is complete.
+
+
+Full held-out execution and supplementary analysis are now implemented and
+fixture-tested (`scripts/evaluate_controller.py`, `analysis/controller_details.py`).
+Real full evaluation requires all 90 held-out prompts, caps128/512 and at least
+five repeats; the development prior fixes the baseline and operating point.
+The old confirmation's whole-process costs extrapolate to roughly 119 hours for
+that seven-condition matrix, so no shortened/bounded run is claimed as full.
+Planned controller pauses have independently checked complete blocks and
+attempt-specific partial receipts; they do not freeze the final canonical result
+or permit incomplete-grid performance summaries. Resume the current exact-source
+controller study before starting the separate packed trained gate.

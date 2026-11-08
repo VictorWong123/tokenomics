@@ -403,3 +403,17 @@ actions, probes, actual proposals/acceptance, committed tokens, predicted/actual
 cycle cost, fallback and mandatory tails. It never starts inference. Once a
 completed trained archive is retained, omit `--run-dir` to replay its verified
 recorded trace. Synthetic fixture studies are labeled explicitly.
+
+
+The complete held-out runner is `scripts/evaluate_controller.py`; its model
+measurements remain unexecuted. It rejects an incomplete 90-prompt matrix,
+shortened caps/repetitions, synthetic priors and fit/evaluation leakage for a real
+run. Supplemental analysis provides memory, fixed-cap fit cost/acceptance,
+per-category regressions and ablations without modifying raw measurements.
+See [evaluation and analysis](evaluation.md) for exact commands and scope.
+
+Planned pauses retain independently checked complete blocks without producing
+unfinished-grid performance estimates. Partial controller receipts use a separate
+attempt-specific filename; they cannot become the final canonical result.
+The finalizer's actual Shutdown proof is still required for every retained
+attempt. Resume the same source before starting a different Codespaces study.

@@ -295,14 +295,87 @@ class StudyPipeline(unittest.TestCase):
                 synthetic_fixture=True,
             )
             self.assertEqual(receipt["verified_validation_records"], 28)
+            from scripts.verify_controller_evidence import check_partial
+            from analysis.controller import report
+
+            partial = out / "partial"
+            shutil.copytree(out / "study", partial)
+            shutil.rmtree(partial / "logging")
+            (partial / "validation/complete.json").unlink()
+            blocks = sorted((partial / "validation/blocks").iterdir())
+            for block in blocks[1:]:
+                shutil.rmtree(block)
+            for name in ("requests.jsonl", "correctness.jsonl"):
+                records = [
+                    json.loads(line)
+                    for line in (partial / "validation" / name).read_text().splitlines()
+                ]
+                records = [r for r in records if r["block_id"] == blocks[0].name]
+                (partial / "validation" / name).write_text(
+                    "".join(json.dumps(r) + "\n" for r in records)
+                )
+            verified_partial = check_partial(
+                partial, source=source_fingerprint()["revision"], synthetic_fixture=True
+            )
+            self.assertTrue(verified_partial["partial"])
+            self.assertEqual(
+                verified_partial["verified_records_by_stage"]["validation"], 7
+            )
+            with self.assertRaisesRegex(ValueError, "Incomplete"):
+                report(partial / "validation")
+            from analysis.controller_details import generate
+
+            details = generate(
+                out / "study/validation", fit=out / "study/fit", out=out / "details"
+            )
+            self.assertTrue(details["synthetic_fixture"])
+            self.assertIn("qa", details["categories"])
+            self.assertGreater(
+                details["policies"]["cost-aware"]["decision_update_ns_per_cycle"], 0
+            )
+            for name in (
+                "memory.png",
+                "ablations-and-regressions.png",
+                "fit-cost-acceptance.png",
+            ):
+                self.assertTrue((out / "details" / name).exists())
+            from scripts.evaluate_controller import evaluate, prepare
+
+            eval_prompts = [
+                {**p, "id": "heldout-" + p["id"], "split": "heldout"}
+                for p in prompts[:2]
+            ]
+            prior = json.loads((out / "study/prior.json").read_text())
+            template = {**cfg, "output_caps": [16], "repetitions": 1}
+            with self.assertRaisesRegex(ValueError, "correctly labeled"):
+                prepare(prior, digest, eval_prompts, template)
+            self.assertEqual(
+                evaluate(
+                    exe,
+                    model,
+                    None,
+                    out / "study/prior.json",
+                    eval_prompts,
+                    template,
+                    out / "heldout",
+                    synthetic_fixture=True,
+                ),
+                0,
+            )
+            heldout_result = json.loads(
+                (out / "heldout/evaluation/analysis/summary.json").read_text()
+            )
+            self.assertTrue(heldout_result["heldout"])
+            self.assertTrue(heldout_result["synthetic_fixture"])
+            self.assertEqual(
+                heldout_result["selected_fixed"], prior["provenance"]["selected_fixed"]
+            )
             from scripts.demo_controller import render
 
             demonstration = render(out / "study", max_cycles=8)
             self.assertIn("Synthetic transformer fixtures", demonstration)
             self.assertIn(
-                prior_id := json.loads((out / "study/prior.json").read_text())[
-                    "prior_id"
-                ],
+                json.loads((out / "study/prior.json").read_text())["prior_id"],
                 demonstration,
             )
             self.assertIn("exact tokens", demonstration)

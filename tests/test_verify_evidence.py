@@ -125,3 +125,49 @@ class FrozenArchiveTests(unittest.TestCase):
                 (evidence / "status.json").write_text("changed")
                 with self.assertRaisesRegex(ValueError, "immutable"):
                     retain(evidence, path)
+
+
+class PartialControllerRetention(unittest.TestCase):
+    def test_partial_attempt_cannot_become_final_canonical_point(self):
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            evidence = root / "evidence"
+            evidence.mkdir()
+            (evidence / "status.json").write_text('{"state":"paused"}\n')
+            receipt = dict(
+                run_id=42492089188,
+                attempt=1,
+                source_sha="a" * 40,
+                state="paused",
+                zip_sha256="b" * 64,
+                archive_sha256="c" * 64,
+                exact_comparisons=7,
+                shutdown_confirmed=True,
+                independent_output_checks=True,
+            )
+            path = root / "receipt.json"
+            path.write_text(json.dumps(receipt))
+            with patch("scripts.verify_experiment_evidence.ROOT", root):
+                retain(evidence, path)
+                retained = root / "results/verification/codespace-controller-20261108"
+                self.assertTrue(
+                    (retained / "verification-attempt-1-paused.json").exists()
+                )
+                self.assertFalse((retained / "verification.json").exists())
+                path.write_text(
+                    json.dumps(
+                        {
+                            **receipt,
+                            "attempt": 2,
+                            "state": "controller_study_complete",
+                            "exact_comparisons": 308,
+                        }
+                    )
+                )
+                retain(evidence, path)
+                final = (retained / "verification.json").read_bytes()
+                path.write_text(json.dumps(receipt))
+                retain(evidence, path)
+                self.assertEqual((retained / "verification.json").read_bytes(), final)

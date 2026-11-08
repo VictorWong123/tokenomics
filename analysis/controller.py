@@ -10,18 +10,40 @@ from bench.common import atomic_json, read_jsonl, sha256
 from bench.controller import point_from_frozen, validate_binding
 
 
-def verify(directory):
+def verify(directory, *, complete_required=True):
     directory = Path(directory)
     manifest = json.loads((directory / "run_manifest.json").read_text())
-    complete = json.loads((directory / "complete.json").read_text())
+    complete_path = directory / "complete.json"
+    complete = json.loads(complete_path.read_text()) if complete_path.exists() else None
     rows = read_jsonl(directory / "requests.jsonl")
-    validate_run(rows, manifest, complete)
     frozen = manifest["frozen"]
+    if complete_required:
+        if complete is None:
+            raise ValueError("Incomplete controller grid")
+        validate_run(rows, manifest, complete)
+    else:
+        cfg = frozen["config"]
+        expected = {
+            (p["id"], cap, c["id"], rep)
+            for p in frozen["prompts"]
+            for cap in cfg["output_caps"]
+            for c in cfg["configurations"]
+            for rep in range(cfg["repetitions"])
+        }
+        actual = [
+            (r["prompt_id"], r["output_cap"], r["configuration_id"], r["repetition"])
+            for r in rows
+        ]
+        if len(actual) != len(set(actual)) or not set(actual) <= expected:
+            raise ValueError("Unexpected or duplicate partial controller records")
     fixture = frozen.get("identity", {}).get("synthetic_fixture", False)
     configurations = {c["id"]: c for c in frozen["config"]["configurations"]}
     retained = []
     receipts = list((directory / "blocks").glob("*/complete.json"))
-    if len(receipts) != complete["blocks"]:
+    expected_blocks = (
+        complete["blocks"] if complete_required else len({r["block_id"] for r in rows})
+    )
+    if len(receipts) != expected_blocks:
         raise ValueError("Missing immutable comparison blocks")
     for path in receipts:
         receipt = json.loads(path.read_text())
@@ -44,6 +66,8 @@ def verify(directory):
     for row in rows:
         groups.setdefault(key(row)[:3], {})[row["configuration_id"]] = row
     for group in groups.values():
+        if set(group) != set(configurations):
+            raise ValueError("Incomplete controller comparison block")
         ref = group["target"]
         for cid, row in group.items():
             conf = configurations[cid]
@@ -230,8 +254,12 @@ def report(directory, out=None, *, plots=True):
         .get("identity", {})
         .get("synthetic_fixture", False),
         full_feasibility_cleared=False,
-        heldout=False,
-        limitation="Bounded, frozen development engineering comparison; uncertainty resamples distinct prompts, not repetitions. No full Pilot A/B or 90-prompt held-out result.",
+        heldout=cfg.get("split") == "heldout",
+        limitation=(
+            "Frozen held-out evaluation using development-only calibration and baseline selection; prompt-bootstrap uncertainty, not independent timing repeats. Results apply to this operating point."
+            if cfg.get("split") == "heldout"
+            else "Bounded, frozen development engineering comparison; uncertainty resamples distinct prompts, not repetitions. No full Pilot A/B or 90-prompt held-out result."
+        ),
         stage_costs=costs,
     )
     if "cost-aware" in configs:
@@ -252,7 +280,11 @@ def report(directory, out=None, *, plots=True):
         }
     atomic_json(out / "summary.json", result)
     lines = [
-        "# Controller development measurements",
+        (
+            "# Frozen held-out controller evaluation"
+            if result["heldout"]
+            else "# Controller development measurements"
+        ),
         "",
         result["limitation"],
         "",
@@ -325,7 +357,11 @@ def plot(result, out):
     fig.suptitle(
         "Synthetic fixtures only"
         if result["synthetic_fixture"]
-        else "Bounded development controller study"
+        else (
+            "Frozen held-out controller evaluation"
+            if result["heldout"]
+            else "Bounded development controller study"
+        )
     )
     fig.tight_layout()
     fig.savefig(out / "controller-comparison.png", dpi=160)
@@ -390,3 +426,25 @@ def plot_traces(directory):
             directory / "analysis" / (row["prompt_id"] + "-trajectory.png"), dpi=160
         )
         plt.close(fig)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("run", type=Path)
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--no-plots", action="store_true")
+    args = parser.parse_args()
+    summary = report(args.run, args.out, plots=not args.no_plots)
+    print(
+        json.dumps(
+            {
+                "phase": summary["phase"],
+                "heldout": summary["heldout"],
+                "synthetic_fixture": summary["synthetic_fixture"],
+                "selected_fixed": summary["selected_fixed"],
+            },
+            sort_keys=True,
+        )
+    )

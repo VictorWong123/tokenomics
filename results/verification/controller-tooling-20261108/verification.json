@@ -1,0 +1,14 @@
+{
+  "evidence": {
+    "calibration-evaluation-retention.txt": "9b50e766c3bdb28fe682a6af658acaddd436e87c78cbb8500ebb9cf8c8fd572f",
+    "tooling-ctest.txt": "42673c78b6cb5eeae084fc3b7d7b39a5a7dd0185be15da7f7f410c5027fe32a8"
+  },
+  "full_heldout_measured": false,
+  "schema_version": 1,
+  "scope": "Codex Cloud fixture validation of full evaluation entry point, supplemental analysis and partial evidence retention; no held-out model measurement",
+  "source": {
+    "owned_source_sha256": "309a34af99624d0cdb52cb31313e6584c481ed8d3e6f317a9007258ab0f59358",
+    "revision": "a87dd2de2c7fae26691457b2deb978cb92de4db9"
+  },
+  "timestamp_utc": "2026-11-08T15:52:09.687364+00:00"
+}
