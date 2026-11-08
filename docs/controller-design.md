@@ -417,3 +417,9 @@ unfinished-grid performance estimates. Partial controller receipts use a separat
 attempt-specific filename; they cannot become the final canonical result.
 The finalizer's actual Shutdown proof is still required for every retained
 attempt. Resume the same source before starting a different Codespaces study.
+
+
+`.github/workflows/policy-contract.yml` automatically runs the pure C++ policy,
+commit and strict configuration tests on relevant pushes/PRs, without model
+execution or Codespaces. Full inference differential and sanitizer checks remain
+separate because that small CI job does not validate backend/model behavior.

@@ -1,0 +1,53 @@
+name: C++ policy contract
+
+on:
+  pull_request:
+    paths:
+      - 'src/policy.*'
+      - 'src/commit.*'
+      - 'src/controller_io.*'
+      - 'tests/test_core.cpp'
+      - 'tests/test_controller*.cpp'
+      - 'CMakeLists.txt'
+      - '.gitmodules'
+      - 'third_party/llama.cpp'
+      - '.github/workflows/policy-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/policy.*'
+      - 'src/commit.*'
+      - 'src/controller_io.*'
+      - 'tests/test_core.cpp'
+      - 'tests/test_controller*.cpp'
+      - 'CMakeLists.txt'
+      - '.gitmodules'
+      - 'third_party/llama.cpp'
+      - '.github/workflows/policy-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: policy-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  policy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Configure pinned CPU sources
+        run: >-
+          cmake -S . -B build-policy -G Ninja
+          -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=OFF
+          -DGGML_METAL=OFF -DGGML_CUDA=OFF
+      - name: Build independent controller and JSON contract
+        run: cmake --build build-policy --target test_core test_controller test_controller_io -j2
+      - name: Check arithmetic, transitions, reset and strict configuration
+        run: ctest --test-dir build-policy -R '^(core|controller|controller_io)$' --output-on-failure
