@@ -1,0 +1,5 @@
+{
+  "contract_tests_passed": true,
+  "evidence_sha256": "665755765e26d6f38ff7af86a4700db61c052ca7f192b76a17c0beced454b0f7",
+  "scope": "Narrow automatic trained-verification trigger after a redundant data-publication merge; inference source and lifecycle ownership/cleanup remain unchanged."
+}

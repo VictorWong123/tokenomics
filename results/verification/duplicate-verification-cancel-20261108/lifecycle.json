@@ -1,0 +1,15 @@
+{
+  "controller_report": {
+    "attempt": "1",
+    "evidence_status": "No valid fixture summary; lifecycle cleanup only",
+    "fixture_evidence_valid": false,
+    "mode": "finalize",
+    "passed": true,
+    "run_id": "42519928413",
+    "sha": "c834026c6bdddc4d219a25945befc318361e74fb",
+    "shutdown_confirmed": true
+  },
+  "scope": "Cancelled redundant automatic main-merge trained verification; no algorithmic failure or performance claim.",
+  "source_job_id": 128852595208,
+  "source_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/42519928413"
+}

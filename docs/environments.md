@@ -132,8 +132,21 @@ independent output checks and actual Shutdown flag. A pending/changed proof fail
 before power-on. Workflow-dispatch commands remain supported when CLI API
 credentials are available; tag execution does not need that shell API token.
 
-If the shell API token expires, Git transport, connected GitHub readers and
-public read-only API requests may remain usable independently. Check their
+If the shell API token expires, Git transport, connected GitHub readers and authenticated HTTP requests through
+the inherited network configuration may remain usable independently. Check their
 actual outcomes. An authentication failure in a local status monitor does not
 establish that the inference workload failed. Do not copy lifecycle credentials
 into the Cloud workspace or change the Codespaces lease to repair a monitor.
+
+Automatic trained verification on main is limited to runtime/build/model/gate
+and lifecycle sources. Artifact, benchmark-analysis and documentation publication
+alone does not rerun the expensive model gate. The automatic pure C++ policy CI
+remains separate; explicit workflow dispatch and checked test tags still control
+measurements. Review merge-commit messages and workflow triggers before pushing
+published evidence, particularly when a trained experiment is already queued.
+
+During this continuation, an evidence merge without a skip marker launched a
+redundant automatic verification. It was cancelled, its owned finalizer proved
+actual Shutdown, and the paired experiment then initialized successfully. The
+[operational record](../results/verification/duplicate-verification-cancel-20261108)
+retains that interruption; it is not a performance failure or result.

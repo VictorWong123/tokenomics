@@ -150,7 +150,24 @@ class HybridTests(unittest.TestCase):
         self.assertEqual(
             workflow["on"],
             {
-                "push": {"branches": ["main"], "paths-ignore": ["**/*.md"]},
+                "push": {
+                    "branches": ["main"],
+                    "paths": [
+                        "src/**",
+                        "cmake/**",
+                        "CMakeLists.txt",
+                        ".gitmodules",
+                        "third_party/llama.cpp",
+                        "requirements*.txt",
+                        "configs/models-v1.json",
+                        "scripts/bootstrap.sh",
+                        "scripts/check_models.py",
+                        "scripts/download_models.py",
+                        "scripts/model_workload.py",
+                        "scripts/codespaces/**",
+                        ".github/workflows/codespace-fixtures.yml",
+                    ],
+                },
                 "workflow_dispatch": "",
             },
         )
