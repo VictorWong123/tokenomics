@@ -46,7 +46,14 @@ Terminal state-transition demonstration:
 
 ```bash
 .venv/bin/python scripts/demo.py --build-dir build-cpu
+# Verify and replay the retained trained-model trace, with no inference/download:
+.venv/bin/python scripts/demo.py --recorded
 ```
+
+The recorded demo shows scripted fallback, partial/full acceptance and lazy
+catch-up from the passing trained gate. It verifies original artifact file
+hashes and the selected request against ordinary target IDs before display.
+It demonstrates correctness mechanics; the cost-aware policy remains gated.
 
 ## Real-model feasibility: one entry point
 

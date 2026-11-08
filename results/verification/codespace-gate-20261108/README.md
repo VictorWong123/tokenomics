@@ -23,6 +23,13 @@ The models are Qwen2.5 0.5B draft and 1.5B target Q4_K_M. Their exact verified
 hashes and public upstream revisions are in `models.lock.json` and
 `gate/manifest.json`. Model weights, credentials and build trees are excluded.
 
+`terminal-demo.txt` is a derived display of the scripted `development-qa-00`
+request, repetition zero. Regenerate it with
+`.venv/bin/python scripts/demo.py --recorded`. The command verifies original
+file hashes, exact target IDs and cycle accounting before showing transitions;
+it performs no inference. This is a scripted mechanics demo, not an adaptive
+controller or a speedup result.
+
 Recheck the emitted-token comparisons without downloading weights:
 
 ```python

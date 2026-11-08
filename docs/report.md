@@ -132,6 +132,13 @@ tiled selector. See `docs/divergence-investigation.md` for failures and resoluti
 
 ## Preliminary trained-model measurements
 
+A reproducible terminal demo can show an actual retained trained trace without
+model download: `.venv/bin/python scripts/demo.py --recorded`. It verifies the
+original evidence hashes and ordinary target IDs before displaying scripted
+caps, acceptance, committed tokens and lazy draft catch-up. The recorded output
+is `results/verification/codespace-gate-20261108/terminal-demo.txt`; its scripted
+choices are correctness exercises, not cost-aware decisions.
+
 Run 42452778183 used two logical CPUs on an AMD EPYC 7763 Codespace with
 approximately 7.8 GiB physical RAM and no swap. It tested three long development
 prompts, one per category, at cap 64 with one repetition. All nine comparisons

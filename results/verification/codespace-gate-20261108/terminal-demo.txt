@@ -1,0 +1,21 @@
+RECORDED TRAINED-QWEN TRACE — scripted correctness demo; not cost-aware scheduling or a speedup claim
+Run 42420516268; source d1bb6fb778695515614d21cf78959f63f544db7b
+Original artifact file hashes and ordinary target token IDs verified.
+cycle  k  actual  accepted  committed  draft catch-up tokens
+    0  0       0         0          1                     0
+    1  0       0         0          1                     0
+    2  4       4         4          5                     2
+    3  1       1         1          2                     1
+    4  0       0         0          1                     0
+    5  8       8         2          3                     2
+    6  2       2         2          3                     0
+    7  0       0         0          1                     0
+    8  0       0         0          1                     0
+    9  4       4         2          3                     3
+   10  1       1         1          2                     0
+   11  0       0         0          1                     0
+   12  8       7         3          4                     2
+   13  2       2         1          2                     0
+   14  0       0         0          1                     0
+   15  0       0         0          1                     0
+Committed 32 IDs; stop=budget; target cached=73; draft cached=71
