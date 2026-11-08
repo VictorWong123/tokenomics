@@ -2,6 +2,36 @@
 
 ## Current continuation (8 November 2026)
 
+Current checkpoint:
+
+- The experimental C++ controller is implemented, documented and pushed to main.
+  Its inference source is `e98c0fa`; subsequent changes are offline tooling/docs.
+- Guarded and packed Release plus ASan/UBSan/leak checks pass six suites,
+  including 906 differential fixture cases. Automatic pure-policy CI also passes.
+- Controller trained gates pass 28 model-drafter and 28 ngram records, covering
+  every action. Raw IDs/stops/cache accounting are independently checked.
+- Study42492089188 attempt1 paused at 25/36 validation blocks, with 175 exact
+  records and all 18 calibration fit records retained. Actual Shutdown is proven.
+  Attempt2 is active at the same e98c0fa source and frozen fixed1 baseline,
+  finishing 11 blocks and the separate logging/trajectory grid. No incomplete-grid
+  throughput estimate is claimed.
+- Packed gate42503429351 is queued at exact source708993c, behind the current
+  controller attempt under global Codespace concurrency. Its successful trained
+  proof is required before the prepared 54-record paired profile/logging study.
+- Full 90-prompt held-out model evaluation is unexecuted; its guarded entry point
+  and supplemental analysis are implemented/tested. The older CPU point suggests
+  roughly119 hours for 6300 conditions, not a same-day default experiment.
+- Preserve source/binary/model/configuration bindings. Use attempt-specific
+  lifecycle proof for the legacy controller run. Future workflows retain a small
+  hosted shutdown artifact automatically. Do not start a competing Codespace job
+  or apply the already-integrated named stash again.
+
+The detailed design/API/commands are in `docs/controller-design.md`; full-grid
+rules and figures are in `docs/evaluation.md`. Follow actual artifact/finalizer
+status rather than inferring completion from an in-progress workload.
+
+### Execution history
+
 The user requested completion of the broader project and clarified: develop
 and check in Codex Cloud, push checked stages to `main`, then execute trained
 tests and measurements in Codespaces. This supersedes the earlier test-only

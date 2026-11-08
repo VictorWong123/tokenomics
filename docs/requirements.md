@@ -16,13 +16,13 @@ See [the technical report](report.md) for interpretation and
 | Original-history common-prefix replay | Implemented: bounded target/draft snapshots; trained 3B screens validate 66 action continuations per point |
 | Candidate benefit and scheduling opportunity | Incomplete: independent-model screens lose; the completed nine-prompt frozen ngram confirmation fails the practical-gain criterion; full Pilot A/B and Q2 remain unresolved |
 | Cost-aware EWMA controller, priors, probes and hysteresis | Implemented experimentally by explicit user override: automatic pure-policy/config CI, C++ six-action EWMA, full transition charge, hold/hysteresis, rotating probes, resets, explicit frozen priors and detailed/minimal telemetry; see controller design |
-| Online transition scoring and controller ablations | Implemented: no-fallback/no-probe variants, actual sync-separated updates and operating-point binding. Full trained comparison is pending |
+| Online transition scoring and controller ablations | Implemented: no-fallback/no-probe variants, actual sync-separated updates and operating-point binding. Both trained mechanisms pass focused correctness gates; the balanced timing grid is resuming |
 | Frozen 40-development / 90-held-out workload | Implemented with original CC0 prompts and embedded summary sources; the full evaluation entry point freezes the development baseline and rejects shortened/leaking grids; held-out model measurements have not run |
 | Balanced ordering, resumability and complete-grid analysis | Implemented; full/partial fixture runs, immutable blocks and real resumed confirmation are checked |
 | Fixed baseline selected on development only | Implemented; validation/held-out paths reject retuning and incomplete grids |
 | Timing, RSS, minimal/detailed logging | Implemented with documented boundaries. Paired trained logging/profile measurement is prepared, not yet complete |
 | Stock executable | Optional unmodified diagnostic builds and stopping-semantic investigation exist; no equivalent-endpoint stock performance claim |
-| CPU performance optimization | Buffer reuse is implemented. Row-consistent packed verification is experimental; trained run was cancelled and shutdown confirmed; revalidation is deferred until the controller passes Cloud checks. Rejected alternatives and raw diagnostics are retained |
+| CPU performance optimization | Buffer reuse is implemented. Row-consistent packed verification is experimental; the controller-compatible build passes Cloud Release/sanitizers and 906 differential cases. Trained revalidation is queued after controller attempt2. Rejected alternatives and raw diagnostics are retained |
 | Final held-out result, controller figures and resume claim | Bounded controller study and figures implemented; trained execution and full held-out evaluation remain incomplete. Current plots/demo show only their labeled executed experiments; no cost-aware speedup, research novelty or M3 execution is claimed |
 | Reproducible documentation and evidence | Build/CLI/runtime/experiment/lifecycle docs, raw artifacts, verification receipts and decision records are maintained alongside code |
 
