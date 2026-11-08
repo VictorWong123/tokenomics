@@ -60,7 +60,8 @@ def pack(results, destination, owner):
 def workload():
     phase = os.environ.get("TOKENOMICS_EXPERIMENT_PHASE", "timing")
     lifecycle.require(
-        phase in ("timing", "pilot", "confirmation", "kernel", "controller"),
+        phase
+        in ("timing", "pilot", "confirmation", "kernel", "controller", "profiles"),
         "Unsupported fixed experiment",
     )
     selected = os.environ.get("TOKENOMICS_EXPERIMENT_CANDIDATE", "all")
@@ -72,9 +73,9 @@ def workload():
     drafter = os.environ.get("TOKENOMICS_EXPERIMENT_DRAFTER", "model")
     lifecycle.require(drafter in ("model", "ngram"), "Unsupported fixed drafter")
     lifecycle.require(
-        phase not in ("confirmation", "kernel", "controller")
+        phase not in ("confirmation", "kernel", "controller", "profiles")
         or (selected == "qwen25-05-3-q4" and drafter == "ngram"),
-        "Confirmation/kernel/controller experiments require the 3B target and ngram drafter",
+        "Confirmation/kernel/controller/profile experiments require the 3B target and ngram drafter",
     )
     point = candidate + ("-ngram" if drafter == "ngram" else "")
     owner = lifecycle.current()
@@ -185,14 +186,18 @@ def workload():
                 "--budget-seconds",
                 "6600",
             ]
-        elif phase == "kernel":
+        elif phase in ("kernel", "profiles"):
             args = [
                 "timeout",
                 "--signal=TERM",
                 "--kill-after=15s",
                 "9000s",
                 str(workspace / ".venv/bin/python"),
-                "scripts/check_kernel_profile.py",
+                (
+                    "scripts/check_kernel_profile.py"
+                    if phase == "kernel"
+                    else "scripts/compare_cpu_profiles.py"
+                ),
                 "--model-dir",
                 str(CACHE),
                 "--run-dir",
@@ -229,6 +234,7 @@ def workload():
             "confirmation": {0: "confirmation_complete", 11: "paused"},
             "kernel": {0: "kernel_profile_passed"},
             "controller": {0: "controller_study_complete", 11: "paused"},
+            "profiles": {0: "profile_comparison_complete"},
             "timing": {10: "timing_complete"},
             "pilot": {
                 11: "paused",
@@ -242,12 +248,16 @@ def workload():
             "Experiment did not satisfy its result contract",
         )
         timing = (
-            results / "validation"
-            if phase == "controller"
+            results / "profiles"
+            if phase == "profiles"
             else (
-                results / "confirmation"
-                if phase == "confirmation"
-                else results / point / "timing"
+                results / "validation"
+                if phase == "controller"
+                else (
+                    results / "confirmation"
+                    if phase == "confirmation"
+                    else results / point / "timing"
+                )
             )
         )
         if phase == "controller" and status["state"] == "paused":
@@ -280,7 +290,12 @@ def workload():
                         )
                     )
                     if phase == "controller"
-                    else len(rows) == (18 if drafter == "ngram" else 21)
+                    else len(rows)
+                    == (
+                        54
+                        if phase == "profiles"
+                        else (18 if drafter == "ngram" else 21)
+                    )
                 )
             )
             and len(checks) == len(rows)
@@ -388,6 +403,7 @@ def workload():
                 ("controller_logging", results / "logging/analysis/summary.json"),
                 ("kernel_gate", results / "kernel-gate/status.json"),
                 ("kernel_screen", results / point / "analysis/measurements.json"),
+                ("cpu_profiles", results / "profiles/analysis/summary.json"),
             ):
                 if path.exists():
                     report[label] = json.loads(path.read_text())
@@ -404,6 +420,7 @@ def workload():
             "confirmation_complete",
             "kernel_profile_passed",
             "controller_study_complete",
+            "profile_comparison_complete",
             "paused",
             "proceed_controller_implementation",
             "narrow_or_investigate",

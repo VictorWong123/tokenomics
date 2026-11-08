@@ -24,13 +24,18 @@ POINT_KEYS = (
 )
 
 
-def point_from_frozen(frozen, drafter, cache="retain"):
-    return {
+def point_from_frozen(frozen, drafter, cache="retain", *, configuration_id=None):
+    result = {
         **{k: frozen[k] for k in POINT_KEYS[:4]},
         **{k: frozen["config"][k] for k in ("context", "batch", "threads")},
         "drafter": drafter,
         "cache": cache,
     }
+    if configuration_id is not None and "configuration_binary_sha256" in frozen:
+        result["binary_sha256"] = frozen["configuration_binary_sha256"][
+            configuration_id
+        ]
+    return result
 
 
 def validate_binding(

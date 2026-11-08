@@ -12,6 +12,74 @@ from bench.replay import fit_validate
 
 
 class ToolingTests(unittest.TestCase):
+    @unittest.skipUnless(
+        os.getenv("TOKENOMICS_TEST_BINARY"), "requires built fixture engine"
+    )
+    def test_paired_executables_are_used_and_frozen_on_resume(self):
+        import subprocess
+        import sys
+        from unittest.mock import patch
+        from bench.run import run
+
+        exe = pathlib.Path(os.environ["TOKENOMICS_TEST_BINARY"])
+        cfg = {
+            "context": 128,
+            "batch": 32,
+            "threads": 1,
+            "warmup_tokens": 2,
+            "seed": 20261108,
+            "output_caps": [4, 7],
+            "repetitions": 1,
+            "configurations": [
+                {"id": "target", "policy": "target"},
+                {"id": "alternate", "policy": "fixed", "k": 4, "drafter": "ngram"},
+            ],
+        }
+        prompts = [{"id": "development-qa-00", "category": "qa", "prompt": "abcabcabc"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            alternate = root / "alternate"
+            alternate.symlink_to(exe)
+            mapping = {"target": exe, "alternate": alternate}
+            original = subprocess.run
+            launched = []
+
+            def execute(args, **kwargs):
+                launched.append(str(args[0]))
+                return original(args, **kwargs)
+
+            with patch("bench.run.subprocess.run", side_effect=execute):
+                rows = run(
+                    exe,
+                    exe.parent / "fixtures/ngram-cycle.gguf",
+                    None,
+                    prompts,
+                    cfg,
+                    root / "run",
+                    identity={"synthetic_fixture": True},
+                    executables=mapping,
+                )
+            self.assertEqual(len(rows), 4)
+            self.assertEqual(launched.count(str(alternate)), 2)
+            frozen = json.loads((root / "run/run_manifest.json").read_text())["frozen"]
+            self.assertEqual(
+                frozen["configuration_binary_sha256"],
+                {cid: sha256(path) for cid, path in mapping.items()},
+            )
+            with self.assertRaisesRegex(RuntimeError, "Resume refused"):
+                run(
+                    exe,
+                    exe.parent / "fixtures/ngram-cycle.gguf",
+                    None,
+                    prompts,
+                    cfg,
+                    root / "run",
+                    identity={"synthetic_fixture": True},
+                    executables={**mapping, "alternate": pathlib.Path(sys.executable)},
+                )
+            with self.assertRaisesRegex(ValueError, "explicit executable"):
+                run(exe, None, None, prompts, cfg, root / "bad", executables={})
+
     def test_confirmation_never_retunes_on_validation_and_rejects_partial_grid(self):
         from scripts.confirm_ngram import analyze
 

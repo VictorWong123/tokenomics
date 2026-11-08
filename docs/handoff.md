@@ -131,12 +131,12 @@ does not improve verification, so it is rejected; see
 
 The Codex Cloud shell attachment recovered after the workspace context refreshed;
 the project files remained intact. Development has resumed there. Codespaces
-was stopped after cancellation; development continues in Codex Cloud. A paired CPU/logging benchmark is
-prepared and locally tested but not published to main: check the Cloud worktree
-and backup branch `codex/paired-cpu-profile` for `analysis/profile_comparison.py`,
+was stopped after cancellation; development continues in Codex Cloud. A paired CPU/logging benchmark was
+preserved on backup branch `codex/paired-cpu-profile` and in the named stash.
+It is now integrated and locally tested with the current controller runner; the source includes `analysis/profile_comparison.py`,
 `scripts/compare_cpu_profiles.py`, `configs/cpu-profile-screen-v1.json`, the
 per-configuration executable extension in `bench/run.py`, and their tests.
-Its gate-proof SHA is deliberately pending. Publish it only after the trained
+Its gate-proof SHA is deliberately pending. Keep actual execution locked until the trained
 packed-profile evidence is verified; retain the same binary/target hashes.
 Hosted preflight run 42485374155 passes both CPU builds and their suites for
 that prepared source. The Codex Cloud version also checks generated-token
@@ -248,3 +248,12 @@ exact-token rules remain. See [investigation](divergence-investigation.md) and
 This establishes the bounded Linux test route and its trained-model checks.
 Performance, Mac execution, stochastic sampling and completion of the broader
 research project were not established by that verification.
+
+
+Current controller-compatible packed CPU checks pass a fresh Release build and
+ASan/UBSan/leak detection: six suites, 906 differential fixture cases. Raw check
+receipts and generated-source hashes are retained under
+`results/verification/controller-packed-local-20261108`. The paired profile
+study remains locked by its pending trained-proof hash. The recorded-controller
+demo checks a completed study's priors and raw logging grid without inference;
+its default trained archive is unavailable until the active study is complete.

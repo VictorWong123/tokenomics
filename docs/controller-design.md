@@ -390,3 +390,16 @@ changed summaries or altered calibration. It does not start inference or a
 Codespace. A separate short publisher may retain only verified artifacts.
 The earlier cancelled packed run is explicitly skipped as an interrupted point;
 it never receives a successful performance receipt.
+
+
+The read-only controller demonstration accepts a completed study directory:
+
+```bash
+.venv/bin/python scripts/demo_controller.py --run-dir results/controller
+```
+
+It verifies calibration and raw logging-grid outputs before printing selected
+actions, probes, actual proposals/acceptance, committed tokens, predicted/actual
+cycle cost, fallback and mandatory tails. It never starts inference. Once a
+completed trained archive is retained, omit `--run-dir` to replay its verified
+recorded trace. Synthetic fixture studies are labeled explicitly.

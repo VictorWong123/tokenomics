@@ -69,6 +69,13 @@ class Calibration(unittest.TestCase):
             frozen = json.loads((root / "fit/run_manifest.json").read_text())["frozen"]
             point = point_from_frozen(frozen, "ngram")
             validate_binding(prior, point, synthetic_fixture=True)
+            mapped = {**frozen, "configuration_binary_sha256": {"alternate": "0" * 64}}
+            with self.assertRaisesRegex(ValueError, "operating point"):
+                validate_binding(
+                    prior,
+                    point_from_frozen(mapped, "ngram", configuration_id="alternate"),
+                    synthetic_fixture=True,
+                )
             with self.assertRaisesRegex(ValueError, "non-synthetic"):
                 validate_binding(prior, point)
             with self.assertRaisesRegex(ValueError, "backend"):
@@ -288,6 +295,17 @@ class StudyPipeline(unittest.TestCase):
                 synthetic_fixture=True,
             )
             self.assertEqual(receipt["verified_validation_records"], 28)
+            from scripts.demo_controller import render
+
+            demonstration = render(out / "study", max_cycles=8)
+            self.assertIn("Synthetic transformer fixtures", demonstration)
+            self.assertIn(
+                prior_id := json.loads((out / "study/prior.json").read_text())[
+                    "prior_id"
+                ],
+                demonstration,
+            )
+            self.assertIn("exact tokens", demonstration)
             path = out / "study/validation/analysis/summary.json"
             summary = json.loads(path.read_text())
             summary["comparisons"]["cost-aware/target"]["ratio"] += 0.1

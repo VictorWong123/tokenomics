@@ -138,6 +138,7 @@ def verify(directory):
                         frozen,
                         conf.get("drafter", "model"),
                         conf.get("cache", "retain"),
+                        configuration_id=conf["id"],
                     ),
                     synthetic_fixture=fixture,
                     system_info=row["system_info"],

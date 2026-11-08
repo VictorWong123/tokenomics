@@ -68,8 +68,17 @@ def run(
     *,
     deadline=None,
     max_new_blocks=None,
+    executables=None,
 ):
+    """Measure complete blocks with frozen binaries and exact ordinary references.
+
+    An optional per-configuration executable map supports the paired CPU-profile
+    component study. It must cover every condition; its ordinary target must
+    match exe. Every executable hash participates in resume identity.
+    """
     conf_ids = [c["id"] for c in config["configurations"]]
+    if executables is not None and set(executables) != set(conf_ids):
+        raise ValueError("Each configuration requires an explicit executable")
     if any(
         c.get(key)
         for c in config["configurations"]
@@ -114,6 +123,15 @@ def run(
         "identity": identity or {},
         "code": source_fingerprint(),
     }
+    if executables is not None:
+        settings["configuration_binary_sha256"] = {
+            cid: sha256(path) for cid, path in sorted(executables.items())
+        }
+        if (
+            settings["configuration_binary_sha256"]["target"]
+            != settings["binary_sha256"]
+        ):
+            raise ValueError("The ordinary target executable must match --exe")
     # Reject stale or synthetic calibration before any model execution. Backend
     # identity is checked again on the returned record below.
     from bench.controller import point_from_frozen, validate_binding
@@ -123,7 +141,10 @@ def run(
             validate_binding(
                 conf.get("controller", {}),
                 point_from_frozen(
-                    settings, conf.get("drafter", "model"), conf.get("cache", "retain")
+                    settings,
+                    conf.get("drafter", "model"),
+                    conf.get("cache", "retain"),
+                    configuration_id=conf["id"],
                 ),
                 synthetic_fixture=settings["identity"].get("synthetic_fixture", False),
             )
@@ -212,7 +233,7 @@ def run(
                 result_path = adir / f"{cid}.requests.jsonl"
                 cycles_path = adir / f"{cid}.cycles.jsonl"
                 args = [
-                    str(exe),
+                    str(executables[cid] if executables is not None else exe),
                     "--target",
                     str(target),
                     "--jobs",
@@ -258,6 +279,7 @@ def run(
                             settings,
                             conf.get("drafter", "model"),
                             conf.get("cache", "retain"),
+                            configuration_id=conf["id"],
                         ),
                         synthetic_fixture=settings["identity"].get(
                             "synthetic_fixture", False

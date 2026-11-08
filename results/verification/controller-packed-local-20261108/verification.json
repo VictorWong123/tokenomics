@@ -1,0 +1,59 @@
+{
+  "asan_binary_sha256": "4f98cbaac6b225e08bfec54985d690bea380e7ee3d9fb5e48d1f78465aff76a3",
+  "build": {
+    "cache_available": true,
+    "values": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "GGML_AVX": "ON",
+      "GGML_AVX2": "ON",
+      "GGML_BLAS": "OFF",
+      "GGML_CPU_REPACK": "ON",
+      "GGML_CUDA": "OFF",
+      "GGML_F16C": "ON",
+      "GGML_FMA": "ON",
+      "GGML_LLAMAFILE": "OFF",
+      "GGML_METAL": "OFF",
+      "GGML_NATIVE": "OFF",
+      "TOKENOMICS_CPU_BATCH_INVARIANT": "OFF",
+      "TOKENOMICS_CPU_PACKED_VERIFY": "ON"
+    }
+  },
+  "detect_leaks": true,
+  "differential_fixture_cases": 906,
+  "evidence": {
+    "asan-ctest.txt": "8e75f8eb7346fd1033b7158d518b4fae0d4d327aec8bffdf25058c793b9be790",
+    "demo-tests.txt": "1cd7bb84de6b1bde4b218d8c505b9c4bca219104d22f9dc14815c2970bfea041",
+    "paired-tooling-tests.txt": "831683f2c82d10e1b3aca52a6f6416d055ea2f5612ba7ff4cdc78dc5f9e53d1e",
+    "release-ctest.txt": "801946d9eb1359251b5d2ffdce230b2a79cf4b9b167ec7995a127dc6c8cb39a8"
+  },
+  "generated_source_sha256": {
+    "tokenomics-repack.cpp": "061d22c5f901ee238fc14a649c07705897f2a4660a984870d948a8fa57862d64",
+    "tokenomics-tiled.cpp": "29eb6d6805be81da81e1af7ecd79b5081e0b968c7fb222b2bf0fc845be6c0220"
+  },
+  "release_binary_sha256": "02eb1bfbd4aa50bb6c997d5ff7552fb0cc2ff5b4abe3838c01c45b9df2e23503",
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "schema_version": 1,
+  "scope": "Codex Cloud experimental packed CPU controller correctness; no trained performance claim",
+  "source": {
+    "owned_source_sha256": "4c2fec954925b4ec2feefd96dcf469ef9cabbbd751b1fbf1e8f50f18259a13cb",
+    "revision": "4db20ffb6683de2c8e2836851925598c4478f2eb"
+  },
+  "source_files": {
+    "CMakeLists.txt": "dc733c6ffef1a9547ee44236b94ce44a79dd9b1b51f920da078f747d8a936f1e",
+    "src/commit.cpp": "b559ba87623f585f3f432402390b05793364e881155eca3fc6409e8499300f43",
+    "src/commit.h": "6e67152bd1a1e000448b12f22a865c3debe30c06b2cf0f5305248e56d191b4ba",
+    "src/controller_io.cpp": "80331d30a9a147bfd7e0326e9aa81249d71db40a0c434fbbcc2306c37109b817",
+    "src/controller_io.h": "d67cd75ec71c380f58b9815919e2d84fc7419f94322aef44e969c5fd646a93a6",
+    "src/main.cpp": "6f61233b836df4ea774ae0c79fc7bcb092271a15c33b3e6cd84f91ddc665df02",
+    "src/policy.cpp": "9c088df669e21c66e3ce6cac767a4c517f557f48c3302087b1ff5d85de9fc604",
+    "src/policy.h": "03ff1f18e2715ce58ee4676ba4b56c9fd8beaadb71011b0690993ceae447cb55",
+    "src/runtime.cpp": "8f207013557d7571cc538b1e9aa9ff0ba52d5011ca85ac3527d1ce63ba7a5cf1",
+    "src/runtime.h": "1021eb27fda8f0561205824d96a4cd5d42f4f3803bbabc36ba8cc3367f2837b2",
+    "tests/test_runtime.cpp": "de641e04b35f5cd0f9cc8dcb39d0ed2b86e5217e3515f20de909de1eca3da3b6"
+  },
+  "suites": 6,
+  "timestamp_utc": "2026-11-08T15:19:00.862976+00:00"
+}

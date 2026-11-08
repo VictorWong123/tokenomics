@@ -178,7 +178,10 @@ def validate_run(rows, manifest, complete):
             prior = conf.get("controller", {})
             fixture = frozen.get("identity", {}).get("synthetic_fixture", False)
             point = point_from_frozen(
-                frozen, conf.get("drafter", "model"), conf.get("cache", "retain")
+                frozen,
+                conf.get("drafter", "model"),
+                conf.get("cache", "retain"),
+                configuration_id=conf["id"],
             )
             validate_binding(prior, point, synthetic_fixture=fixture)
             if not fixture and {p["id"] for p in frozen["prompts"]} & set(

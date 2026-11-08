@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "phase": "cpu_profile_comparison",
+  "split": "development",
+  "prompt_ids": [
+    "development-qa-01",
+    "development-code-01",
+    "development-summary-01"
+  ],
+  "output_caps": [
+    128
+  ],
+  "repetitions": 3,
+  "seed": 20261108,
+  "warmup_tokens": 16,
+  "warmup_prompt": "Warm-up: continue briefly.",
+  "context": 2048,
+  "batch": 512,
+  "threads": 2,
+  "trained_gate": "results/verification/codespace-packed-20261108/verification.json",
+  "trained_gate_sha256": "pending-trained-gate",
+  "configurations": [
+    {
+      "id": "target",
+      "policy": "target",
+      "kernel_profile": "guarded",
+      "detailed": false
+    },
+    {
+      "id": "guarded-detailed",
+      "policy": "target",
+      "kernel_profile": "guarded",
+      "detailed": true
+    },
+    {
+      "id": "packed-target",
+      "policy": "target",
+      "kernel_profile": "packed",
+      "detailed": false
+    },
+    {
+      "id": "packed-detailed",
+      "policy": "target",
+      "kernel_profile": "packed",
+      "detailed": true
+    },
+    {
+      "id": "guarded-fixed8",
+      "policy": "fixed",
+      "k": 8,
+      "drafter": "ngram",
+      "kernel_profile": "guarded",
+      "detailed": false
+    },
+    {
+      "id": "packed-fixed8",
+      "policy": "fixed",
+      "k": 8,
+      "drafter": "ngram",
+      "kernel_profile": "packed",
+      "detailed": false
+    }
+  ]
+}

@@ -92,3 +92,35 @@ prototype. All strict fixture checks pass, but verification does not improve.
 Unexplained ordinary-row timing variation is retained rather than attributed to
 the intended mechanism. This prototype is also rejected. Neither controlled
 study supplies trained-model, Codespaces or Mac performance evidence.
+
+
+## Controller-compatible local checks and paired study
+
+The experimental controller now passes the fresh packed Release build's six
+suites, including 906 differential fixture cases. Packed ASan/UBSan/leak checks
+also pass all six suites (309.14 seconds). The generated packed/tiled sources
+match the fresh Release build exactly; see the retained
+[local receipts](../results/verification/controller-packed-local-20261108). This is local correctness evidence, not trained throughput.
+The first trained controller study remains on the guarded profile at source
+`e98c0fa`; subsequent profile work cannot change that frozen experiment.
+
+The prepared paired component study is integrated with the current controller
+runner. An explicit executable map freezes each condition's binary hash and
+requires the ordinary target to use the supplied reference executable. If a
+controller is used with such a map, its calibration binds to its actual selected
+binary, not an unrelated default. Changing any mapped executable invalidates
+resume. Normal single-binary controller runs keep their existing identity.
+
+`configs/cpu-profile-screen-v1.json` specifies three development fit prompts,
+cap128, three repeats and six conditions: guarded/packed target with minimal
+and detailed logs, plus guarded/packed fixed8 ngram. This is 54 records. The
+analysis pairs complete blocks and reports prompt-bootstrap uncertainty,
+cross-profile exact IDs/stops, logging cost, memory and within-profile draft
+ratios. It does not use a slower profile as the algorithm's ordinary baseline.
+
+Execution remains locked by `trained_gate_sha256: pending-trained-gate` until
+the current executable passes the separate trained gate, artifact checks and
+actual Shutdown confirmation. Then freeze that exact proof digest and retain
+the same packed executable/target hashes. All actual records are checked again
+against immutable blocks and raw totals before summarizing. The previous
+cancelled run supplies no passing gate or performance evidence.
