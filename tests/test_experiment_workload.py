@@ -8,6 +8,40 @@ from scripts.experiment_workload import pack
 
 
 class ExperimentEvidenceTests(unittest.TestCase):
+    def test_tagged_measurements_are_explicit_and_preflight_before_power_on(self):
+        import yaml
+        from bench.common import ROOT
+
+        workflow = yaml.load(
+            (ROOT / ".github/workflows/codespace-experiment.yml").read_text(),
+            Loader=yaml.BaseLoader,
+        )
+        self.assertEqual(
+            workflow["on"]["push"],
+            {"tags": ["tokenomics-profiles-*", "tokenomics-controller-packed-*"]},
+        )
+        self.assertEqual(
+            workflow["concurrency"]["group"], "tokenomics-dedicated-codespace"
+        )
+        steps = workflow["jobs"]["initialize"]["steps"]
+        checks = [
+            i for i, s in enumerate(steps) if "verified_packed_gate" in s.get("run", "")
+        ]
+        start = next(i for i, s in enumerate(steps) if s.get("id") == "lifecycle")
+        self.assertEqual(len(checks), 1)
+        self.assertLess(checks[0], start)
+        self.assertEqual(steps[checks[0]]["if"], "github.event_name == 'push'")
+        self.assertNotIn("GH_TOKEN", steps[checks[0]].get("env", {}))
+        workload = workflow["jobs"]["workload"]
+        self.assertEqual(workload["needs"], "initialize")
+        self.assertEqual(workload["if"], "needs.initialize.outputs.claimed == 'true'")
+        environment = next(
+            s["env"] for s in workload["steps"] if s.get("id") == "fixtures"
+        )
+        self.assertNotIn("GH_TOKEN", environment)
+        self.assertIn("controller-packed", environment["TOKENOMICS_EXPERIMENT_PHASE"])
+        self.assertIn("'profiles'", environment["TOKENOMICS_EXPERIMENT_PHASE"])
+
     def test_archive_hashes_and_rejects_unexpected_files(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

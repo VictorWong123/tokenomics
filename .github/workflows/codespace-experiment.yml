@@ -1,7 +1,9 @@
 name: Codespace development experiments
-run-name: Tokenomics ${{ inputs.phase }} | ${{ inputs.candidate }} | ${{ inputs.drafter }}
+run-name: Tokenomics ${{ inputs.phase || (startsWith(github.ref, 'refs/tags/tokenomics-controller-packed-') && 'controller-packed' || 'profiles') }} | ${{ inputs.candidate || 'qwen25-05-3-q4' }} | ${{ inputs.drafter || 'ngram' }}
 
 on:
+  push:
+    tags: [tokenomics-profiles-*, tokenomics-controller-packed-*]
   workflow_dispatch:
     inputs:
       phase:
@@ -39,6 +41,22 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+      - name: Check the frozen trained prerequisite before starting a tagged study
+        if: github.event_name == 'push'
+        env:
+          TOKENOMICS_TAG_STUDY: ${{ startsWith(github.ref, 'refs/tags/tokenomics-controller-packed-') && 'controller-packed' || 'profiles' }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from bench.common import ROOT
+          from bench.cpu_profile import verified_packed_gate
+          name = ('controller-packed-study-v1.json'
+                  if os.environ['TOKENOMICS_TAG_STUDY'] == 'controller-packed'
+                  else 'cpu-profile-screen-v1.json')
+          cfg = json.loads((ROOT / 'configs' / name).read_text())
+          verified_packed_gate(ROOT, cfg)
+          print('Frozen trained prerequisite verified; tagged study may initialize.')
+          PY
       - id: lifecycle
         name: Start dedicated runner with exact ownership
         env:
@@ -68,9 +86,9 @@ jobs:
         env:
           TOKENOMICS_RUNNER_NAME: ${{ vars.TOKENOMICS_RUNNER_NAME }}
           TOKENOMICS_RUNNER_ID: ${{ vars.TOKENOMICS_RUNNER_ID }}
-          TOKENOMICS_EXPERIMENT_PHASE: ${{ inputs.phase }}
-          TOKENOMICS_EXPERIMENT_CANDIDATE: ${{ inputs.candidate }}
-          TOKENOMICS_EXPERIMENT_DRAFTER: ${{ inputs.drafter }}
+          TOKENOMICS_EXPERIMENT_PHASE: ${{ inputs.phase || (startsWith(github.ref, 'refs/tags/tokenomics-controller-packed-') && 'controller-packed' || 'profiles') }}
+          TOKENOMICS_EXPERIMENT_CANDIDATE: ${{ inputs.candidate || 'qwen25-05-3-q4' }}
+          TOKENOMICS_EXPERIMENT_DRAFTER: ${{ inputs.drafter || 'ngram' }}
         run: /usr/bin/python3 scripts/experiment_workload.py
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()

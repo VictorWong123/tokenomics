@@ -115,3 +115,25 @@ verification receipt, so the proof survives artifact expiry. This supports
 independent shutdown checks when a hosted read
 token cannot fetch another job's logs. Legacy exact-source runs retain their
 job-log/API proof path, with separate lifecycle files for each attempt.
+
+## Explicit test tags when CLI API authentication is unavailable
+
+The existing owned experiment workflow also accepts two explicit tag namespaces:
+`tokenomics-profiles-*` runs the fixed 54-record CPU comparison, and
+`tokenomics-controller-packed-*` runs the separately calibrated packed controller
+study. Normal code/documentation pushes do not launch these experiments. Create
+a unique lightweight tag at the checked source after pushing it to main, then
+push that tag. Both routes preserve the same runner ownership, global
+concurrency, fixed models/settings, artifacts and always-finalize shutdown.
+
+Before a tagged study can initialize Codespaces, a hosted preflight checks the
+protocol's frozen trained-proof digest, complete 272-comparison status,
+independent output checks and actual Shutdown flag. A pending/changed proof fails
+before power-on. Workflow-dispatch commands remain supported when CLI API
+credentials are available; tag execution does not need that shell API token.
+
+If the shell API token expires, Git transport, connected GitHub readers and
+public read-only API requests may remain usable independently. Check their
+actual outcomes. An authentication failure in a local status monitor does not
+establish that the inference workload failed. Do not copy lifecycle credentials
+into the Cloud workspace or change the Codespaces lease to repair a monitor.
