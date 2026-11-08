@@ -5,7 +5,11 @@ frozen-action confirmation does not clear the practical margin.
 Q2 (predictable preferable action): **unresolved**.
 Recommendation: evaluate the opt-in packed CPU implementation as a new operating
 point. The guarded-profile results do not justify a full cycle controller;
-full Pilot A/B and held-out requirements remain incomplete.
+full Pilot A/B and held-out requirements remain incomplete. The user explicitly
+authorized the experimental controller anyway. Its completed, independently
+verified six-prompt development study is documented in
+[controller results](controller-results.md): 0.9709× ordinary decoding, 0.9943×
+frozen fixed1 and 1.2048× cap8 ngram. It does not reverse the feasibility decision.
 
 ## Current evidence (8 November 2026)
 
@@ -157,5 +161,5 @@ bash run.sh metal --run-dir results/local/mac-metal-pilot
 
 Results are local, ignored, resumable, and transferable. A prior from one
 platform is not evidence for a different machine. The script stops at a
-scientific gate and records its reason; controller implementation/held-out
-validation remains future work until the gate is answered.
+scientific gate and records its reason. The separately authorized experimental
+controller is now implemented; its full held-out validation remains future work.

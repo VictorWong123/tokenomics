@@ -1,0 +1,22 @@
+{
+  "id": 42509187514,
+  "head_sha": "0a65d0be7845740049dffee34d0034f86c737e42",
+  "run_attempt": 1,
+  "status": "completed",
+  "conclusion": "success",
+  "html_url": "https://github.com/VictorWong123/tokenomics/actions/runs/42509187514",
+  "created_at": "2026-11-08T18:16:45Z",
+  "updated_at": "2026-11-08T18:17:06Z",
+  "jobs": [
+    {
+      "id": 128818326450,
+      "name": "verify",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-08T18:16:48Z",
+      "completed_at": "2026-11-08T18:17:05Z",
+      "html_url": "https://github.com/VictorWong123/tokenomics/actions/runs/42509187514/job/128818326450"
+    }
+  ],
+  "scope": "Read-only independent hosted artifact/hash/semantic/calibration/statistics and actual Shutdown verification; no inference or Codespace start."
+}

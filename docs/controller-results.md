@@ -127,6 +127,9 @@ records artifact ZIP/inner archive hashes, source/model/binary identity,
 regenerated statistics and actual Shutdown from finalizer job 128815104360.
 All 1587 archive members and raw block/IDs/stops/cache checks pass independent
 verification. The hosted job's success alone was not used as shutdown proof.
+Read-only [hosted re-verification](https://github.com/VictorWong123/tokenomics/actions/runs/42509187514)
+also passes against the retained evidence, independently reconstructing the prior
+and summary. It starts no inference or Codespace.
 
 - [Raw attempt2](../results/verification/codespace-controller-20261108/attempt-2).
 - [Audited primary table and figures](../results/verification/codespace-controller-20261108/derived).

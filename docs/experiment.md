@@ -185,13 +185,13 @@ older Pilot A traces without mixing measurement implementations:
 
 This command does not run held-out evaluation or claim the project is complete.
 
-The 90 held-out prompts and five-repetition protocol are versioned, but their
-configuration list stays empty until feasibility selects a contribution.
-If Q1 and Q2 pass, implement/calibrate the cost-aware controller, test real
-fallback/re-entry, freeze priors/settings and select comparable baselines on
-development. Then evaluate target-alone/resident, tuned fixed, confidence,
-acceptance and cost-aware, plus no-fallback/probe/init ablations. The executable
-and current entry point do not pretend that stage is implemented. If only
-request-level selection is supported, make that contribution explicit; if
-neither drafting mechanism helps, report the bounded negative result and seek
-a technical scope decision. No generic profiler/dashboard pivot is authorized.
+The 90 held-out prompts and five-repetition protocol are versioned. The original
+feasibility configuration does not silently turn a failed pilot into controller
+evaluation. By explicit user instruction, the experimental C++ controller has
+now been implemented despite the negative feasibility finding. Its separately
+calibrated development study is complete; see [the measured result](controller-results.md).
+The full held-out runner freezes comparable baselines from the development prior,
+checks all 90 prompts before generation and requires the complete matrix. Its
+implementation and commands are in [the evaluation guide](evaluation.md); full
+held-out model execution remains unperformed. No generic profiler/dashboard
+pivot, ordinary-decoding speedup or research novelty is claimed.

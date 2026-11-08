@@ -2,7 +2,9 @@
 
 The bounded trained development study and the full held-out experiment have
 separate completion criteria. The former supplies a first engineering result;
-it does not become a 90-prompt result by changing its label.
+it does not become a 90-prompt result by changing its label. The bounded trained
+study has completed; its [result, raw evidence and figures](controller-results.md)
+are available. Full held-out model execution remains unperformed.
 
 | Protocol | Prompts | Output caps | Repetitions | Ngram conditions | Measured records |
 |---|---:|---|---:|---:|---:|
