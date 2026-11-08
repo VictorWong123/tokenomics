@@ -121,7 +121,8 @@ ngram screen and validates original-state checkpoints. Do not mix this binary
 with earlier fit/confirmation measurements or promote it before trained checks.
 The `kernel` phase is running as **42474834521**, attempt 2, at
 `63265d36939f802abb73b88962d96862c6c9169c`. Attempt 1 failed startup before
-inference; the same initialize/workload/finalize graph succeeds on retry.
+inference; startup succeeds on retry and the workload is active. Inspect its
+artifact and finalizer before claiming a trained-profile pass.
 An additional 128 KiB cache-chunk study passes its strict fixture tests but
 does not improve verification, so it is rejected; see
 `results/verification/cache-study-20261108`.
