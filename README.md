@@ -19,6 +19,11 @@ remain incomplete. See [the handoff](docs/handoff.md),
 [feasibility](docs/feasibility.md) and the
 [verified raw confirmation](results/verification/codespace-confirmation-20261108).
 
+The [requirements and documentation index](docs/requirements.md) distinguishes
+implemented behavior, measured evidence and remaining research work. See
+[workspace/test-environment roles](docs/environments.md) and
+[CPU profiles](docs/cpu-profiles.md) for operational details.
+
 ## Build and check
 
 Linux needs Git, a C++20 compiler, Python 3.12+, a Python venv implementation and

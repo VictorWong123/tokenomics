@@ -4,11 +4,10 @@
 
 Policy code uses no Metal/CUDA APIs. Build and compare supported llama.cpp
 backends on each actual machine. Codespaces is an allocated Linux VM/container;
-its throughput is not a result for a typical desktop or a Mac. The current
-executed host is Codex Cloud, not Codespaces. Record cgroup CPU and memory
-limits in addition to exposed hardware. The Codespace trained-model correctness
-route is now verified; development performance execution is a separate task.
-Develop/check changes in Cloud, push checked stages to main, then run the
+its throughput is not a result for a typical desktop or a Mac. Codex Cloud is
+the development workspace; Codespaces runs trained correctness and performance
+experiments. Record cgroup CPU and memory limits in addition to exposed hardware.
+Develop/check changes in Codex Cloud, push checked stages to main, then run the
 measurement workload in Codespaces. Mac tests must record chip, RAM,
 macOS, power/thermal state and Metal build. No NVIDIA GPU is required.
 
@@ -51,6 +50,7 @@ remains visible, not silently discarded.
 
 The current timing batch uses three longer development prompts (one per
 category) at cap 64 with target, all five fixed caps and confidence: 21 requests.
+The cheaper ngram screen omits the model-confidence condition and has 18 requests.
 The historical nine-request screen used only fixed4 and confidence. The sweep
 avoids rejecting a candidate solely because an arbitrary cap is unfavorable;
 it still does not replace the repeated Pilot A/B protocol.
@@ -62,7 +62,8 @@ it as a separate operating point. Request initialization and any graph setup
 left for the measured request remain charged. The duration estimator separates
 fixed load/prefill/warm-up/output costs from per-token generation, and assumes
 full output caps for its decode budget. It remains a rough estimate, not an ETA.
-Pilot A has 1,080 measured requests per pair (18×2×3×10), plus warm-ups and
+Independent-model Pilot A has 1,080 measured requests per pair (18×2×3×10);
+ngram has 648 (18×2×3×6), plus warm-ups and
 replays. EOS and hardware can make a CPU run take hours. The script prints its
 measured estimate before proceeding; it does not promise an overnight finish.
 
@@ -129,7 +130,7 @@ a slow run alone is valid evidence. Detailed cycle logging is buffered and
 must be compared with request-only logging on development data before final
 performance claims. `getrusage` peak RSS is lifetime process memory, not VRAM.
 
-## Next stage, deliberately locked
+## Targeted confirmation and the remaining gate
 
 The near-neutral ngram screen (ratio 1.0113, one repetition) motivates the
 predeclared targeted confirmation in `configs/ngram-confirmation-v1.json`.
@@ -140,6 +141,10 @@ wins validation, clusters bootstrap resampling by prompt, and requires the full
 54-block/162-record grid. It records whether the chosen action exceeds 5% with
 a lower confidence limit above one; it never labels this subset as full Pilot
 A/B completion. Synthetic confirmation checks cannot support a practical gain.
+The real confirmation has now completed: all 162 comparisons pass; frozen
+cap1/target is 0.9846 [0.9721, 1.0019], below the practical-gain criterion.
+See [the decision record](feasibility.md). A separate packed CPU implementation
+defines a new operating point; its evidence is not mixed into that confirmation.
 
 Long development runs can pause at a complete comparison-block or checkpoint-
 group boundary using `--budget-seconds`. These pauses are planned scheduling,

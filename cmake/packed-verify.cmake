@@ -1,6 +1,8 @@
 # Owned integration against the checked, unmodified llama.cpp pin. Keep native
 # packed matrix-vector arithmetic for every verification row, including its
 # activation quantizer. Large prefills retain upstream's matrix path.
+# The pinned dispatcher chunks src1 in complete planes: nrows == ne11.
+# Keep its quantization-layout and GEMV/GEMM thresholds synchronized.
 function(tokenomics_packed_verify)
   set(cpu_dir "${CMAKE_CURRENT_SOURCE_DIR}/third_party/llama.cpp/ggml/src/ggml-cpu")
   file(READ "${cpu_dir}/repack.cpp" source)

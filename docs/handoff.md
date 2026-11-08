@@ -127,17 +127,23 @@ An additional 128 KiB cache-chunk study passes its strict fixture tests but
 does not improve verification, so it is rejected; see
 `results/verification/cache-study-20261108`.
 
-The Cloud service recovered from a transport interruption, but this chat's
-execution attachment remains unavailable. Tested C++ changes are already on
-main. A paired CPU/logging benchmark is prepared and locally tested but not
-published: check the Cloud worktree for `analysis/profile_comparison.py`,
+The Codex Cloud shell attachment recovered after the workspace context refreshed;
+the project files remained intact. Development has resumed there. Codespaces
+remained available for the trained run. A paired CPU/logging benchmark is
+prepared and locally tested but not published to main: check the Cloud worktree
+and backup branch `codex/paired-cpu-profile` for `analysis/profile_comparison.py`,
 `scripts/compare_cpu_profiles.py`, `configs/cpu-profile-screen-v1.json`, the
 per-configuration executable extension in `bench/run.py`, and their tests.
 Its gate-proof SHA is deliberately pending. Publish it only after the trained
 packed-profile evidence is verified; retain the same binary/target hashes.
+Hosted preflight run 42485374155 passes both CPU builds and their suites for
+that prepared source. The Codex Cloud version also checks generated-token
+counts explicitly and documents the optional per-condition executable map.
 The hosted `verify-evidence.yml` independently checks the two frozen runs.
 Its read-only job precedes a short `publish-evidence.yml` job that rechecks
 and stages only verified raw data, with the repository staging guard.
+The documentation index is `docs/requirements.md`; environment roles and CPU
+dispatch details are in `docs/environments.md` and `docs/cpu-profiles.md`.
 
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;

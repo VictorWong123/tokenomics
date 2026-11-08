@@ -4,6 +4,11 @@ Canonical source is `main`. Fresh Cloud tasks should fetch and inspect
 `origin/main`, preserving dirty or unpublished work. `work` retains the earlier
 setup baseline.
 
+Terminology: **Codex Cloud workspace** is the development shell; **Codespaces
+test environment** is the dedicated trained-run host. See
+[environment roles and recovery](../docs/environments.md) and the
+[requirements/documentation index](../docs/requirements.md).
+
 ## Project continuation (8 November 2026)
 
 The user has now explicitly requested completion of the remaining project,
