@@ -47,6 +47,16 @@ def decision_state(decisions):
     return "resource_blocked", 2
 
 
+def ngram_config(config):
+    """The supported cheaper drafter; fixed8 is its variable-length comparator."""
+    config = copy.deepcopy(config)
+    config["configurations"] = [{"id": "target", "policy": "target"}] + [
+        {"id": f"fixed{k}", "policy": "fixed", "k": k, "drafter": "ngram"}
+        for k in (1, 2, 4, 6, 8)
+    ]
+    return config
+
+
 def pipeline(a):
     deadline = (
         time.monotonic() + a.budget_seconds
@@ -71,6 +81,9 @@ def pipeline(a):
     )
     atomic_json(out / "environment.json", hardware())
     cfg = json.loads((ROOT / "configs/pilot-v1.json").read_text())
+    ngram_only = getattr(a, "ngram_only", False)
+    if ngram_only:
+        cfg = ngram_config(cfg)
     if a.threads:
         cfg["threads"] = a.threads
     gpu_layers = 0 if a.backend == "cpu" else 99
@@ -163,18 +176,24 @@ def pipeline(a):
             continue
         model_dir = getattr(a, "model_dir", ROOT / "models")
         lock = model_dir / "models.lock.json"
-        draft = download(candidate["draft"], model_dir, lock)
+        draft = None if ngram_only else download(candidate["draft"], model_dir, lock)
         target = download(candidate["target"], model_dir, lock)
-        pair_dir = out / candidate["id"]
+        point = candidate["id"] + ("-ngram" if ngram_only else "")
+        pair_dir = out / point
         pair_dir.mkdir(exist_ok=True)
         model_lock = json.loads(lock.read_text())
         pair_identity = {
             **identity,
             "model_lock": {
                 key: model_lock["models"][key]
-                for key in (candidate["target"], candidate["draft"])
+                for key in (
+                    (candidate["target"],)
+                    if ngram_only
+                    else (candidate["target"], candidate["draft"])
+                )
             },
-            "candidate": candidate["id"],
+            "candidate": point,
+            "drafter": "ngram" if ngram_only else "model",
         }
         # Tokenize every frozen prompt before long execution. No held-out answers
         # are generated; this only checks prompt and requested output fit.
@@ -284,7 +303,7 @@ def pipeline(a):
                 out,
                 "timing_complete",
                 message="Development timing screen completed. Full Pilot A/B and feasibility decisions were not run.",
-                candidate=candidate["id"],
+                candidate=point,
                 estimated_full_pilot_seconds=estimated,
                 peak_rss_bytes=rss,
             )
@@ -317,10 +336,11 @@ def pipeline(a):
             pair_dir / "pilot-b",
             cfg,
             gpu_layers,
+            "ngram" if ngram_only else "model",
             deadline=deadline,
         )
         decision = {
-            "candidate": candidate["id"],
+            "candidate": point,
             "q1_supported": summary["q1_supported"],
             "q2_supported": q2["q2_supported"],
             "pilot_a": str(pair_dir / "pilot-a"),
@@ -356,13 +376,9 @@ def pipeline(a):
         )
         return code
     # One cheaper supported drafting mechanism after independent model candidates.
-    if lookup_target is not None and not a.skip_ngram:
+    if lookup_target is not None and not a.skip_ngram and not ngram_only:
         target = lookup_target
-        ng = copy.deepcopy(cfg)
-        ng["configurations"] = [{"id": "target", "policy": "target"}] + [
-            {"id": f"fixed{k}", "policy": "fixed", "k": k, "drafter": "ngram"}
-            for k in (1, 2, 4, 6, 8)
-        ]
+        ng = ngram_config(cfg)
         ngdir = out / "ngram-pilot"
         run(
             exe,
@@ -431,6 +447,11 @@ if __name__ == "__main__":
         help="Stop after the first resource-safe candidate timing screen (exit 10); no full pilot",
     )
     p.add_argument("--skip-ngram", action="store_true")
+    p.add_argument(
+        "--ngram-only",
+        action="store_true",
+        help="Investigate upstream ngram-simple on the selected target without a draft model",
+    )
     a = p.parse_args()
     if a.timing_only and a.fixtures_only:
         p.error("--timing-only and --fixtures-only are mutually exclusive")

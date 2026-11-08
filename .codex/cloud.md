@@ -28,8 +28,9 @@ checkpoint-capable driver; do not mix versions or disable binary/model/settings
 identity checks. Timing screens now also exercise checkpoint correctness.
 
 Main additionally fixes incomplete-UTF-8 display serialization. The older
-`87c7811` invocation may still finish or expose this failure; preserve its raw
-evidence and shutdown. It is an exploratory older point. The corrected main
+`87c7811` invocation paused at 11/108 complete blocks with 110 passing checks;
+its artifact hashes and actual Shutdown are verified. Retain this exploratory
+older point; it cannot clear a gate. The corrected main
 driver has a different binary hash, so do not mix rows or disable the binary
 identity check to resume it as the same experiment.
 
@@ -48,8 +49,9 @@ identity and verification limits.
 Qwen2.5 0.5B draft and 1.5B target Q4_K_M weights persist in
 `/workspaces/.tokenomics-model-cache`, outside the clean Actions checkout.
 Every test verifies their SHA256 hashes; missing files are downloaded there.
-The authorized scope is Linux tests only. Stop after testing and shutdown;
-do not proceed to timing, pilots, training or project development.
+The earlier authorization was Linux tests only; the continuation above now
+authorizes development, timing and bounded pilots. Training remains outside
+the project specification.
 
 ## Running and monitoring tests
 

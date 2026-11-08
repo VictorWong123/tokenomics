@@ -19,7 +19,10 @@ feasibility experiments and contributes explicit cache-state management inside
 the inference loop. It does not select a cost-aware controller from fabricated
 or synthetic speedups. The two feasibility questions remain unresolved: trained
 correctness now passes in Codespaces, but only a preliminary performance screen
-has completed. A repeated development pilot is running separately.
+has completed. A bounded repeated development pilot paused after 11/108
+blocks, with all 110 exact-ID checks passing and actual Shutdown confirmed.
+Every observed drafting-policy cell lost to target-only; the incomplete,
+unbalanced prefix cannot establish a full-suite estimate or feasibility gate.
 
 | Environment | Actual execution | Feasibility evidence |
 |---|---|---|

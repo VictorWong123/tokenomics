@@ -66,6 +66,9 @@ def workload():
         "Unsupported fixed candidate",
     )
     candidate = "qwen25-05-15-q4" if selected == "all" else selected
+    drafter = os.environ.get("TOKENOMICS_EXPERIMENT_DRAFTER", "model")
+    lifecycle.require(drafter in ("model", "ngram"), "Unsupported fixed drafter")
+    point = candidate + ("-ngram" if drafter == "ngram" else "")
     owner = lifecycle.current()
     expected = lifecycle.expected_runner()
     root = lifecycle.ownership(owner)
@@ -157,6 +160,8 @@ def workload():
         )
         if phase == "pilot" and selected != "all":
             args += ["--candidate", candidate]
+        if drafter == "ngram":
+            args += ["--ngram-only"]
         with open(
             results / f"pipeline-{owner['run_id']}-{owner['attempt']}.txt", "x"
         ) as log:
@@ -183,12 +188,12 @@ def workload():
             code in expected_states and status["state"] == expected_states[code],
             "Experiment did not satisfy its result contract",
         )
-        timing = results / candidate / "timing"
+        timing = results / point / "timing"
         rows = read_jsonl(timing / "requests.jsonl")
         checks = read_jsonl(timing / "correctness.jsonl")
         lifecycle.require(
-            len(rows) == 21
-            and len(checks) == 21
+            len(rows) == (18 if drafter == "ngram" else 21)
+            and len(checks) == len(rows)
             and all(c.get("ok") is True for c in checks),
             "Invalid timing evidence",
         )
@@ -199,29 +204,32 @@ def workload():
             catalog = json.loads((workspace / "configs/models-v1.json").read_text())
             pair = next(c for c in catalog["candidates"] if c["id"] == candidate)
             target = CACHE / catalog["models"][pair["target"]]["file"]
-            draft = CACHE / catalog["models"][pair["draft"]]["file"]
             validation = results / "checkpoint-validation"
             with open(results / "checkpoint-validation.txt", "x") as log:
-                subprocess.run(
-                    [
-                        "timeout",
-                        "--signal=TERM",
-                        "--kill-after=15s",
-                        "1800s",
-                        str(workspace / ".venv/bin/python"),
-                        "-m",
-                        "bench.replay",
-                        "--exe",
-                        str(workspace / "build-cpu/tokenomics"),
-                        "--target",
-                        str(target),
+                replay_args = [
+                    "timeout",
+                    "--signal=TERM",
+                    "--kill-after=15s",
+                    "1800s",
+                    str(workspace / ".venv/bin/python"),
+                    "-m",
+                    "bench.replay",
+                    "--exe",
+                    str(workspace / "build-cpu/tokenomics"),
+                    "--target",
+                    str(target),
+                    "--pilot-dir",
+                    str(timing),
+                    "--out",
+                    str(validation),
+                ]
+                if drafter == "model":
+                    replay_args += [
                         "--draft",
-                        str(draft),
-                        "--pilot-dir",
-                        str(timing),
-                        "--out",
-                        str(validation),
-                    ],
+                        str(CACHE / catalog["models"][pair["draft"]]["file"]),
+                    ]
+                subprocess.run(
+                    replay_args,
                     cwd=workspace,
                     env=env,
                     timeout=1830,
@@ -250,6 +258,7 @@ def workload():
             **owner,
             "workload": "development-" + phase,
             "candidate": candidate if phase == "timing" else selected,
+            "drafter": drafter,
             "hostname": socket.gethostname(),
             "runner_id": expected["id"],
             "state": status["state"],
@@ -279,8 +288,8 @@ def workload():
                 list(results.glob("*/pilot-a/blocks/*/complete.json"))
             )
             for label, path in (
-                ("pilot_a", results / candidate / "pilot-a/analysis/summary.json"),
-                ("pilot_b", results / candidate / "pilot-b/decision.json"),
+                ("pilot_a", results / point / "pilot-a/analysis/summary.json"),
+                ("pilot_b", results / point / "pilot-b/decision.json"),
             ):
                 if path.exists():
                     report[label] = json.loads(path.read_text())

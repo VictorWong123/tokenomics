@@ -22,9 +22,15 @@ The original duration screen estimated 54.95 hours for full Pilot A. Separating
 fixed prefill/load/warm-up from decode gives approximately 19.72 hours. Both are
 rough extrapolations, not measured full-run duration. Run
 [42454095789](https://github.com/VictorWong123/tokenomics/actions/runs/42454095789)
-is executing a bounded resumable pilot at source
-`87c7811ed5fe24024f50782a1307ecbcef52bdee`. It must retain passing blocks and
-shut down before another invocation; incomplete pilots cannot clear a gate.
+paused successfully after 11/108 complete blocks at source
+`87c7811ed5fe24024f50782a1307ecbcef52bdee`. Its 110 exact-ID checks passed;
+the ZIP, inner archive and all 636 members were hash-verified. Hosted finalize
+confirmed actual Shutdown. Across the 11 observed prompt/cap cells, every
+drafting configuration lost to target-only (even the best observed ratio was
+0.708). This is an unbalanced partial run, with no full-suite estimate,
+confidence interval, tuning choice or feasibility decision. Newer replay and
+warm-up protocols require a fresh point. See the retained raw aggregates in
+`results/verification/codespace-partial-20261108`.
 
 Cloud development at that revision passes 330 differential fixture cases,
 25 additional minimal-logging/checkpoint comparisons, all four Release and

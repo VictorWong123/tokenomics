@@ -103,6 +103,21 @@ Offline tests: `python3 -m unittest discover -s scripts/codespaces -p 'test_*.py
 
 ## Reusing the remote computer for authorized long tasks
 
+The authorized project continuation uses `codespace-experiment.yml` for fixed
+development timing or resumable pilots. `drafter=model` loads the selected pair;
+`drafter=ngram` uses upstream ngram-simple on that candidate's target without
+downloading/loading a draft model. Timing uses three development prompts, cap
+64 and one repetition: 21 requests for model drafting, 18 for ngram. The latter
+includes target and all five fixed caps; fixed8 is its existing variable-length
+lookup comparator. Both paths additionally validate original-state checkpoint
+replay. Neither screen alone clears Q1/Q2. Keep full pilot/held-out decisions
+separate. Example after a checked `main` push:
+
+```bash
+gh workflow run codespace-experiment.yml --repo VictorWong123/tokenomics --ref main \
+  -f phase=timing -f candidate=qwen25-05-3-q4 -f drafter=ngram
+```
+
 For a future approved roughly three-hour task, a Cloud author may change the
 trusted self-hosted workload step and its checked-in helper/result allowlist to
 that task's fixed command and explicit expected output paths. Keep the hosted

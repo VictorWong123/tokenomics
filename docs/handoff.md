@@ -18,9 +18,14 @@ Trained timing run 42452778183 passed nine comparisons and confirmed Shutdown.
 Its three-prompt, one-repeat screen favored target-only: fixed4/target throughput
 ratio 0.501; confidence/target 0.533. These are preliminary observations, not
 Q1/Q2 decisions. The bounded repeated pilot is run 42454095789 at exact source
-`87c7811ed5fe24024f50782a1307ecbcef52bdee`. Its eventual artifacts and shutdown
-must be checked. Preserve that source on resume; do not combine new-code rows
-with its frozen run. Details and retained evidence are in `feasibility.md`.
+`87c7811ed5fe24024f50782a1307ecbcef52bdee`. It paused successfully after 11/108
+blocks, preserving 110 passing exact-ID checks. Artifact ZIP, inner archive and
+all 636 members were hash-verified; hosted finalize confirmed actual Shutdown.
+Every measured drafting-policy cell was slower than its ordinary reference.
+This incomplete, unbalanced prefix has no full-suite estimate or gate decision.
+The raw aggregates and provenance are in
+`results/verification/codespace-partial-20261108`. Preserve the source on resume;
+do not combine different binaries/protocols.
 
 That pilot is preserved as `experiments/pilot-87c7811` for reproducibility.
 Current Pilot B schema 3 restores original target KV and identical prepared
@@ -67,7 +72,7 @@ configuration but unexecuted. The full runtime project remains incomplete.
 
 Evidence-based wording now: “Building a portable C++ speculative-decoding
 runtime with checked KV rollback and lazy synchronization; validated with
-330 transformer fixture cases and a 272-comparison trained-Qwen Linux gate.”
+378 transformer fixture cases and a 272-comparison trained-Qwen Linux gate.”
 Do not claim acceleration from the current unfavorable timing screen.
 
 ## Earlier completed Codespace setup

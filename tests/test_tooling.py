@@ -248,35 +248,68 @@ class ToolingTests(unittest.TestCase):
                     return run_all.subprocess.CompletedProcess(command, 0)
                 return real_run(command, *positional, **kwargs)
 
-            with patch.object(run_all, "ROOT", root), patch.object(
-                run_all, "download", return_value=fixture
-            ) as download, patch.object(
-                run_all,
-                "investigate",
-                side_effect=AssertionError("must not run Pilot B"),
-            ), patch.object(
-                run_all.subprocess, "run", side_effect=child_run
-            ):
-                # Only skip the recursive ctest call; execute the real tokenizer
-                # and the full-cap timing screen through the fixture engine.
-                self.assertEqual(run_all.pipeline(args), 10)
-                self.assertEqual(
-                    download.call_args.args[1:],
-                    (args.model_dir, args.model_dir / "models.lock.json"),
-                )
-            self.assertEqual(
-                json.loads((args.run_dir / "status.json").read_text())["state"],
-                "timing_complete",
-            )
-            self.assertEqual(
-                len(
-                    (args.run_dir / "fixture/timing/requests.jsonl")
-                    .read_text()
-                    .splitlines()
-                ),
-                21,
-            )
-            self.assertFalse((args.run_dir / "fixture/pilot-a").exists())
+            for ngram in (False, True):
+                with self.subTest(ngram=ngram):
+                    args.ngram_only = ngram
+                    args.run_dir = root / ("ngram" if ngram else "model")
+                    with patch.object(run_all, "ROOT", root), patch.object(
+                        run_all, "download", return_value=fixture
+                    ) as download, patch.object(
+                        run_all,
+                        "investigate",
+                        side_effect=AssertionError("must not run Pilot B"),
+                    ), patch.object(
+                        run_all.subprocess, "run", side_effect=child_run
+                    ):
+                        # Skip only recursive ctest; run the actual tokenizer
+                        # and screen with and without the draft model.
+                        self.assertEqual(run_all.pipeline(args), 10)
+                        self.assertEqual(download.call_count, 1 if ngram else 2)
+                        self.assertEqual(
+                            download.call_args.args[1:],
+                            (args.model_dir, args.model_dir / "models.lock.json"),
+                        )
+                    point = "fixture-ngram" if ngram else "fixture"
+                    timing = args.run_dir / point / "timing"
+                    manifest = json.loads((timing / "run_manifest.json").read_text())
+                    frozen = manifest["frozen"]
+                    self.assertEqual(
+                        frozen["draft_sha256"], None if ngram else sha256(fixture)
+                    )
+                    self.assertEqual(
+                        json.loads((args.run_dir / "status.json").read_text())["state"],
+                        "timing_complete",
+                    )
+                    self.assertEqual(
+                        len((timing / "requests.jsonl").read_text().splitlines()),
+                        18 if ngram else 21,
+                    )
+                    self.assertFalse((args.run_dir / point / "pilot-a").exists())
+                    if ngram:
+                        # Exercise the same snapshot validation invoked remotely,
+                        # including the automatic no-draft ngram selection.
+                        real_run(
+                            [
+                                str(pathlib.Path(os.sys.executable)),
+                                "-m",
+                                "bench.replay",
+                                "--exe",
+                                str(binary),
+                                "--target",
+                                str(fixture),
+                                "--pilot-dir",
+                                str(timing),
+                                "--out",
+                                str(root / "replay"),
+                            ],
+                            check=True,
+                            stdout=run_all.subprocess.DEVNULL,
+                        )
+                        decision = json.loads(
+                            (root / "replay/decision.json").read_text()
+                        )
+                        self.assertEqual(decision["schema_version"], 3)
+                        self.assertIn("ngram", decision["dynamic_baseline"])
 
     def test_model_gate_rejects_divergence_and_stop_differences(self):
         from scripts.check_models import compare, variants

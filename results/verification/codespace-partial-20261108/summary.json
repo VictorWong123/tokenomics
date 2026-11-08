@@ -1,0 +1,90 @@
+{
+  "artifact_id": 13609408452,
+  "artifact_zip_sha256": "54bbd5f1c8ffbb560f699ef7acedcb5dd50f976b9152d19309d52b55b1169baa",
+  "completed_blocks": 11,
+  "descriptive_ratios": {
+    "acceptance": {
+      "max_ratio": 0.6025943270056301,
+      "median_observed_cell_ratio": 0.5492124941643736,
+      "min_ratio": 0.5348977369867036,
+      "observed_cells": 11
+    },
+    "confidence": {
+      "max_ratio": 0.6909044600207687,
+      "median_observed_cell_ratio": 0.6064869651210909,
+      "min_ratio": 0.532896963767242,
+      "observed_cells": 11
+    },
+    "fixed1": {
+      "max_ratio": 0.6777751971501251,
+      "median_observed_cell_ratio": 0.6493968327130641,
+      "min_ratio": 0.6141450368268268,
+      "observed_cells": 11
+    },
+    "fixed2": {
+      "max_ratio": 0.7076545832204734,
+      "median_observed_cell_ratio": 0.613675549349726,
+      "min_ratio": 0.5085902599794062,
+      "observed_cells": 11
+    },
+    "fixed4": {
+      "max_ratio": 0.6066483821384171,
+      "median_observed_cell_ratio": 0.5194343757224423,
+      "min_ratio": 0.38217927509597893,
+      "observed_cells": 11
+    },
+    "fixed6": {
+      "max_ratio": 0.5261332457920935,
+      "median_observed_cell_ratio": 0.42636681064422494,
+      "min_ratio": 0.29231769237059696,
+      "observed_cells": 11
+    },
+    "fixed8": {
+      "max_ratio": 0.48391183964077117,
+      "median_observed_cell_ratio": 0.3835482677138965,
+      "min_ratio": 0.23408205928131776,
+      "observed_cells": 11
+    },
+    "resident": {
+      "max_ratio": 1.0365648618345213,
+      "median_observed_cell_ratio": 1.007060261010572,
+      "min_ratio": 0.9656771929447611,
+      "observed_cells": 11
+    },
+    "target": {
+      "max_ratio": 1.0,
+      "median_observed_cell_ratio": 1.0,
+      "min_ratio": 1.0,
+      "observed_cells": 11
+    },
+    "upstream-style": {
+      "max_ratio": 0.49221069555789604,
+      "median_observed_cell_ratio": 0.41321760102020466,
+      "min_ratio": 0.3014198368707473,
+      "observed_cells": 11
+    }
+  },
+  "exact_id_checks": 110,
+  "inner_archive_sha256": "1036f0db8f743ad00953ef61f9c80c505a624755b23f7d92261f7f21363378fa",
+  "limitation": "Incomplete, unbalanced prefix of the frozen block order. Cell medians use only available repetitions; no full-suite estimate, uncertainty interval, tuning choice or feasibility decision. Later driver/protocol changes require a fresh point.",
+  "observed_prompt_ids": [
+    "development-code-03",
+    "development-code-04",
+    "development-qa-00",
+    "development-qa-01",
+    "development-qa-02",
+    "development-qa-04",
+    "development-qa-05",
+    "development-summary-00",
+    "development-summary-01"
+  ],
+  "planned_blocks": 108,
+  "q1_supported": null,
+  "q2_supported": null,
+  "run_id": "42454095789",
+  "schema_version": 1,
+  "shutdown_confirmed": true,
+  "source_sha": "87c7811ed5fe24024f50782a1307ecbcef52bdee",
+  "state": "paused",
+  "verified_members": 636
+}

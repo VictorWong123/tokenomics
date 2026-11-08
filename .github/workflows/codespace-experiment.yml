@@ -13,6 +13,11 @@ on:
         type: choice
         options: [all, qwen25-05-15-q4, qwen25-05-3-q4]
         default: all
+      drafter:
+        description: Fixed drafting mechanism
+        type: choice
+        options: [model, ngram]
+        default: model
 
 permissions:
   contents: read
@@ -64,6 +69,7 @@ jobs:
           TOKENOMICS_RUNNER_ID: ${{ vars.TOKENOMICS_RUNNER_ID }}
           TOKENOMICS_EXPERIMENT_PHASE: ${{ inputs.phase }}
           TOKENOMICS_EXPERIMENT_CANDIDATE: ${{ inputs.candidate }}
+          TOKENOMICS_EXPERIMENT_DRAFTER: ${{ inputs.drafter }}
         run: /usr/bin/python3 scripts/experiment_workload.py
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
