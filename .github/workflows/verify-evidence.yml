@@ -1,0 +1,41 @@
+name: Verify frozen experiment evidence
+
+on:
+  workflow_run:
+    workflows: [Codespace development experiments]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: tokenomics-evidence-verification
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.repository == 'VictorWong123/tokenomics' && (github.event_name == 'workflow_dispatch' || contains(fromJSON('[42466570831,42474834521]'), github.event.workflow_run.id))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Test archive validation and verify completed frozen runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m venv "$RUNNER_TEMP/evidence-venv"
+          "$RUNNER_TEMP/evidence-venv/bin/pip" install --disable-pip-version-check numpy==2.3.5
+          "$RUNNER_TEMP/evidence-venv/bin/python" -m unittest discover -s tests -p test_verify_evidence.py
+          "$RUNNER_TEMP/evidence-venv/bin/python" scripts/verify_experiment_evidence.py --out "$RUNNER_TEMP/verified-evidence"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: verified-frozen-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/verified-evidence/*.json
+          retention-days: 30
+          if-no-files-found: warn
