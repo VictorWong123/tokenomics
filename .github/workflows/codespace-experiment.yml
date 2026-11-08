@@ -1,0 +1,86 @@
+name: Codespace development timing
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tokenomics-dedicated-codespace
+  cancel-in-progress: false
+
+jobs:
+  initialize:
+    if: github.repository == 'VictorWong123/tokenomics'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      claimed: ${{ steps.lifecycle.outputs.claimed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - id: lifecycle
+        name: Start dedicated runner with exact ownership
+        env:
+          GH_TOKEN: ${{ secrets.CODESPACES_TOKEN }}
+          TOKENOMICS_CODESPACE: ${{ vars.TOKENOMICS_CODESPACE }}
+          TOKENOMICS_RUNNER_NAME: ${{ vars.TOKENOMICS_RUNNER_NAME }}
+          TOKENOMICS_RUNNER_ID: ${{ vars.TOKENOMICS_RUNNER_ID }}
+        run: python3 scripts/codespaces/controller.py initialize
+
+  workload:
+    needs: initialize
+    if: needs.initialize.outputs.claimed == 'true'
+    runs-on: [self-hosted, linux, x64, tokenomics-codespace-long-tasks]
+    timeout-minutes: 210
+    outputs:
+      summary: ${{ steps.fixtures.outputs.summary }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          clean: true
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+      - id: fixtures
+        name: Run fixed development timing screen
+        env:
+          TOKENOMICS_RUNNER_NAME: ${{ vars.TOKENOMICS_RUNNER_NAME }}
+          TOKENOMICS_RUNNER_ID: ${{ vars.TOKENOMICS_RUNNER_ID }}
+        run: /usr/bin/python3 scripts/experiment_workload.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: tokenomics-development-timing-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/tokenomics-experiment-${{ github.run_id }}-${{ github.run_attempt }}/evidence.tar.gz
+            ${{ runner.temp }}/tokenomics-experiment-${{ github.run_id }}-${{ github.run_attempt }}/report.json
+          retention-days: 30
+          if-no-files-found: error
+
+  finalize:
+    needs: [initialize, workload]
+    if: ${{ always() && needs.initialize.outputs.claimed == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      shutdown_confirmed: ${{ steps.lifecycle.outputs.shutdown_confirmed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - id: lifecycle
+        name: Verify ownership, stop runner and confirm actual Shutdown
+        env:
+          GH_TOKEN: ${{ secrets.CODESPACES_TOKEN }}
+          TOKENOMICS_CODESPACE: ${{ vars.TOKENOMICS_CODESPACE }}
+          TOKENOMICS_RUNNER_NAME: ${{ vars.TOKENOMICS_RUNNER_NAME }}
+          TOKENOMICS_RUNNER_ID: ${{ vars.TOKENOMICS_RUNNER_ID }}
+          WORKLOAD_SUMMARY: ${{ needs.workload.outputs.summary }}
+        run: python3 scripts/codespaces/controller.py finalize
+

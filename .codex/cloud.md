@@ -4,6 +4,16 @@ Canonical source is `main`. Fresh Cloud tasks should fetch and inspect
 `origin/main`, preserving dirty or unpublished work. `work` retains the earlier
 setup baseline.
 
+## Project continuation (8 November 2026)
+
+The user has now explicitly requested completion of the remaining project,
+including optimization and Codespace execution. This supersedes the earlier
+test-only stopping point below. Preserve the existing lifecycle and credential
+boundaries. `codespace-experiment.yml` adds a manual, fixed development timing
+screen; it uses the same dedicated resource and global concurrency group. It
+does not repeat the completed 272-comparison gate. Timing is development data,
+not held-out evaluation or a controller feasibility decision.
+
 ## Verified Linux test route
 
 [Run 42420516268](https://github.com/VictorWong123/tokenomics/actions/runs/42420516268),
