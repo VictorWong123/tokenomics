@@ -92,6 +92,15 @@ prompts. `confirmation` is a fixed workflow phase; preserve its exact source
 on resume. Its driver/model/settings must match the fit point. Tests cover a
 complete 108-request fixture grid and reject partial grids or validation retuning.
 
+The targeted confirmation is active as run **42466570831**, frozen at
+`af8b4044133ecef0de8751216248278a2fdb8ebd`. Its first invocation has a
+6,600-second measurement allowance plus setup. Inspect its final artifact and
+actual Shutdown; if paused, rerun **all jobs of that run**, preserving its SHA:
+`gh run rerun 42466570831 --repo VictorWong123/tokenomics`.
+Do not dispatch a newer main and combine its records. Only all 54 blocks/162
+passing records permit confirmation analysis. A positive targeted result still
+does not complete the full Pilot A/B, cost-aware or held-out requirements.
+
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;

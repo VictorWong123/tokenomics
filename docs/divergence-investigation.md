@@ -4,8 +4,10 @@ The original trained-model correctness gate failed. The consistent-CPU-kernel
 fix and test deadline correction are now verified by a complete Linux run:
 all 272 exact-token comparisons and all 14 diagnostics passed in
 [42420516268](https://github.com/VictorWong123/tokenomics/actions/runs/42420516268).
-No feasibility or speedup claim is supported. The authorized scope ends after
-Linux testing and shutdown; do not continue to performance or controller work.
+That earlier verification did not establish feasibility or speedup. Its original
+test-only authorization ended after shutdown. The user's 8 November request
+renews project completion and measurement work; current scope and later results
+are recorded in `docs/handoff.md` and `docs/feasibility.md`.
 
 Codespace run [42403427793](https://github.com/VictorWong123/tokenomics/actions/runs/42403427793)
 used source `54b4252cb4f2642156eaf7d4be71a1f945cc77c4`, two CPU threads,
@@ -148,4 +150,6 @@ for the supported generation widths removed it in the complete unchanged
 matrix. The later failures were test deadlines, not observed token mismatches;
 the 7,200-second subprocess allowance let the two-core integration test finish.
 See [handoff](handoff.md) for artifact identity and verification limits. No
-performance experiment or project continuation followed the successful tests.
+performance experiment or project continuation had followed at that earlier
+handoff. The subsequent 8 November investigation is documented separately in
+`docs/feasibility.md`.
