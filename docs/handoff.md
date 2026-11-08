@@ -22,6 +22,10 @@ Current checkpoint:
   startup before inference; attempt2 uses the unchanged owned lifecycle.
   Its verified trained proof remains required before the prepared 54-record
   paired profile/logging study. Freeze that proof digest; never bypass it.
+- A separately named `controller-packed` extension is prepared and locally
+  checked, with fresh calibration and the unchanged development split/parameters.
+  It remains locked by its pending gate digest and has no trained result yet.
+  Run it only after the native gate and paired component study justify that point.
 - Full 90-prompt held-out model evaluation is unexecuted; its guarded entry point
   and supplemental analysis are implemented/tested. The older CPU point suggests
   roughly 119 hours for 6300 conditions, not a same-day default experiment.

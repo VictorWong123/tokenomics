@@ -7,7 +7,7 @@ on:
       phase:
         description: Fixed development experiment
         type: choice
-        options: [timing, pilot, confirmation, kernel, controller, profiles]
+        options: [timing, pilot, confirmation, kernel, controller, controller-packed, profiles]
         default: timing
       candidate:
         description: Fixed model candidate (all applies to full pilot)

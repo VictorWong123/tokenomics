@@ -461,3 +461,21 @@ First verify the native gate and paired CPU component study. Launch a new packed
 controller measurement only if those results justify it; a prepared command is
 not an executed result. This extension changes orchestration/provenance rather
 than the C++ scoring, cache ownership or upstream acceptance implementation.
+
+The prepared entry point is explicit:
+
+```bash
+.venv/bin/python scripts/controller_study.py \
+  --cpu-profile packed --model-dir /path/to/model-cache \
+  --run-dir results/local/packed-controller --budget-seconds 6600
+# Agent-controlled trained execution, only after the frozen prerequisites pass:
+gh workflow run codespace-experiment.yml --ref main \
+  -f phase=controller-packed -f candidate=qwen25-05-3-q4 -f drafter=ngram
+```
+
+`configs/controller-packed-study-v1.json` is a separate versioned protocol. Its
+pending gate digest intentionally prevents execution until the canonical trained
+proof is retained and hashed. The local two-profile fixture checks include a new
+packed calibration, all three controller variants, both correctness mechanisms,
+logging and independent reconstruction. Changed proof, binary, target or CPU
+profile is rejected. These fixture timings are never trained performance data.

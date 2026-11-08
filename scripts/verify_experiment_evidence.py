@@ -33,6 +33,8 @@ FOLDERS = {
     42503429351: "codespace-packed-controller-20261108",
 }
 
+CONTROLLER_PROFILES = {42492089188: "guarded"}
+
 
 def require(condition, message):
     if not condition:
@@ -417,7 +419,7 @@ def retain(evidence, receipt_path):
                 shutil.copy2(source, target)
     canonical = root / (
         f"verification-attempt-{receipt['attempt']}-paused.json"
-        if run_id == 42492089188 and receipt["state"] == "paused"
+        if run_id in CONTROLLER_PROFILES and receipt["state"] == "paused"
         else "verification.json"
     )
     if canonical.exists():
@@ -479,14 +481,22 @@ def verify_run(run_id, out, publish=False):
         if run_id == 42466570831:
             require(state in ("paused", "confirmation_complete"), "Confirmation failed")
             checked = verify_confirmation(evidence, state)
-        elif run_id == 42492089188:
+        elif run_id in CONTROLLER_PROFILES:
             from scripts.verify_controller_evidence import check, check_partial
 
             require(
                 state in ("paused", "controller_study_complete"),
                 "Controller study failed",
             )
-            checked = check_partial(evidence) if state == "paused" else check(evidence)
+            checked = (
+                check_partial(evidence, source=EXPECTED[run_id])
+                if state == "paused"
+                else check(
+                    evidence,
+                    source=EXPECTED[run_id],
+                    cpu_profile=CONTROLLER_PROFILES[run_id],
+                )
+            )
         elif state == "profile_comparison_complete":
             from scripts.verify_profile_evidence import check
 

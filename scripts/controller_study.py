@@ -23,6 +23,11 @@ from bench.run import run, RunPaused
 from analysis.controller import report, plot_traces
 from scripts.download_models import download
 from scripts.diagnose_models import build_configuration
+from bench.cpu_profile import (
+    study_configuration,
+    profile_matches,
+    verified_packed_gate,
+)
 
 
 def correctness_gate(exe, target, draft, prompts, cfg, out, drafter):
@@ -222,17 +227,45 @@ def execute_study(
     return rows, result, logging
 
 
-def pipeline(out, model_dir, budget_seconds=6600):
+def pipeline(out, model_dir, budget_seconds=6600, *, cpu_profile="guarded"):
+    cfg = study_configuration(ROOT, cpu_profile)
+    proof = verified_packed_gate(ROOT, cfg) if cpu_profile == "packed" else None
     atomic_json(out / "environment.json", hardware())
-    cfg = json.loads((ROOT / "configs/controller-study-v1.json").read_text())
     exe = ROOT / "build-cpu/tokenomics"
+    if proof is not None:
+        from scripts.check_kernel_profile import command
+
+        python = Path(sys.executable)
+        command(
+            [
+                python.with_name("cmake"),
+                "-S",
+                ROOT,
+                "-B",
+                ROOT / "build-cpu",
+                "-DTOKENOMICS_CPU_BATCH_INVARIANT=OFF",
+                "-DTOKENOMICS_CPU_PACKED_VERIFY=ON",
+            ],
+            120,
+        )
+        command([python.with_name("cmake"), "--build", ROOT / "build-cpu", "-j2"], 1200)
+        command(
+            [
+                python.with_name("ctest"),
+                "--test-dir",
+                ROOT / "build-cpu",
+                "--output-on-failure",
+            ],
+            600,
+        )
+        if sha256(exe) != proof["binary_sha256"]:
+            raise RuntimeError(
+                "Packed controller executable differs from the trained gate"
+            )
     build = build_configuration(exe)
-    if (
-        build["values"].get("TOKENOMICS_CPU_BATCH_INVARIANT") != "ON"
-        or build["values"].get("TOKENOMICS_CPU_PACKED_VERIFY") != "OFF"
-    ):
+    if not profile_matches(build, cpu_profile):
         raise RuntimeError(
-            "First controller study requires the default guarded CPU profile"
+            "Controller study execution profile differs from its protocol"
         )
     atomic_json(
         out / "controller-build.json",
@@ -246,6 +279,8 @@ def pipeline(out, model_dir, budget_seconds=6600):
     small_target = download("qwen25-15", model_dir, lock)
     draft = download("qwen25-05", model_dir, lock)
     target = download(cfg["target_model"], model_dir, lock)
+    if proof is not None and sha256(target) != proof["screen_target_sha256"]:
+        raise RuntimeError("Packed controller target differs from the trained gate")
     print("TOKENOMICS_CONTROLLER_STAGE trained-correctness", flush=True)
     fit_prompts = [p for p in prompts if p["id"] in cfg["fit_prompt_ids"]]
     gates = [
@@ -297,12 +332,22 @@ if __name__ == "__main__":
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--model-dir", type=Path, required=True)
     parser.add_argument("--budget-seconds", type=float, default=6600)
+    parser.add_argument(
+        "--cpu-profile", choices=("guarded", "packed"), default="guarded"
+    )
     args = parser.parse_args()
     if args.budget_seconds <= 0:
         parser.error("budget must be positive")
     args.run_dir.mkdir(parents=True, exist_ok=True)
     try:
-        sys.exit(pipeline(args.run_dir, args.model_dir, args.budget_seconds))
+        sys.exit(
+            pipeline(
+                args.run_dir,
+                args.model_dir,
+                args.budget_seconds,
+                cpu_profile=args.cpu_profile,
+            )
+        )
     except Exception as exc:
         atomic_json(
             args.run_dir / "status.json",

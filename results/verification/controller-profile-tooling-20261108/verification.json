@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-11-08T19:14:38.866410+00:00",
+  "scope": "Codex Cloud synthetic transformer orchestration/provenance tests for separately calibrated packed controller; no new trained-model or held-out measurement.",
+  "source": {
+    "revision": "0b475d92fbd7927faf717b8abc9fa07b79121f1a",
+    "owned_source_sha256": "3cac10817a6abffe46784b4496707c482ac7a8330d0f45ee2e96677241afee2c"
+  },
+  "inference_source_unchanged_since": "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c",
+  "packed_profile_tests": 5,
+  "guarded_regression_tests": 3,
+  "archive_retention_tests": 7,
+  "passed": true,
+  "actual_packed_fixture": {
+    "fit_records": 6,
+    "validation_records": 14,
+    "logging_records": 16,
+    "focused_correctness_records": 56
+  },
+  "trained_packed_controller_measured": false,
+  "proof_fixture_warning": "The test prerequisite with 272 comparisons is an explicitly synthetic harness stand-in, never a trained gate receipt.",
+  "packed_binary_sha256": "02eb1bfbd4aa50bb6c997d5ff7552fb0cc2ff5b4abe3838c01c45b9df2e23503",
+  "guarded_binary_sha256": "1e513715f17677f25bc0cbddaba7a6cf14ed48c6ce7ad4c8399a1e4fa6d88c2b",
+  "pending_protocol_sha256": "6d9a65f3954d96901285eb0b4c058efcf032683c2f25a72adfc0bd5f01c9b019",
+  "evidence": {
+    "packed-controller-tests.txt": "f1ef0d417afd19af0723c76a70ab1e40606e2af16a5b108a852cf887b197ecd8",
+    "guarded-regression.txt": "6eb5b19d5b5555331af0dcfc9946445dd3088bd41f933e0702a7667d0f75b5d6",
+    "tooling-ctest.txt": "6191b6a623b42d7bb6986f9ab36454d6cbb0c356ea8fbf74091145408a6d2933",
+    "partial-retention.txt": "5708639037b175cdad599586a38a24aceec4301a8a7de9887a78f9602b9a70b3"
+  }
+}

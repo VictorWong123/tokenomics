@@ -172,6 +172,43 @@ class PartialControllerRetention(unittest.TestCase):
                 retain(evidence, path)
                 self.assertEqual((retained / "verification.json").read_bytes(), final)
 
+    def test_partial_second_controller_profile_remains_attempt_specific(self):
+        from unittest.mock import patch
+        from scripts import verify_experiment_evidence as verifier
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            evidence = root / "evidence"
+            evidence.mkdir()
+            (evidence / "status.json").write_text('{"state":"paused"}\n')
+            path = root / "receipt.json"
+            path.write_text(
+                json.dumps(
+                    dict(
+                        run_id=999,
+                        attempt=1,
+                        source_sha="a" * 40,
+                        state="paused",
+                        zip_sha256="b" * 64,
+                        archive_sha256="c" * 64,
+                        exact_comparisons=7,
+                        shutdown_confirmed=True,
+                        independent_output_checks=True,
+                    )
+                )
+            )
+            with patch.object(verifier, "ROOT", root), patch.dict(
+                verifier.EXPECTED, {999: "a" * 40}
+            ), patch.dict(
+                verifier.FOLDERS, {999: "fixture-packed-controller"}
+            ), patch.dict(
+                verifier.CONTROLLER_PROFILES, {999: "packed"}
+            ):
+                verifier.retain(evidence, path)
+            retained = root / "results/verification/fixture-packed-controller"
+            self.assertTrue((retained / "verification-attempt-1-paused.json").is_file())
+            self.assertFalse((retained / "verification.json").exists())
+
 
 class HostedLifecycleArtifact(unittest.TestCase):
     def test_only_bounded_digest_checked_finalizer_json_is_read(self):

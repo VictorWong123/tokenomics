@@ -9,6 +9,7 @@ from analysis.controller import report, verify
 from bench.common import ROOT, read_jsonl, sha256
 from bench.controller import calibrate
 from scripts.check_models import compare, check_cycles
+from bench.cpu_profile import study_configuration, profile_matches, verified_packed_gate
 
 SOURCE = "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c"
 RUN = 42492089188
@@ -34,9 +35,10 @@ def equal(a, b):
     return type(a) is type(b) and a == b
 
 
-def check(evidence, *, source=SOURCE, synthetic_fixture=False):
+def check(evidence, *, source=SOURCE, synthetic_fixture=False, cpu_profile="guarded"):
     """No inference. Synthetic acceptance is explicit and only used by tests."""
-    cfg = json.loads((ROOT / "configs/controller-study-v1.json").read_text())
+    cfg = study_configuration(ROOT, cpu_profile)
+    proof = verified_packed_gate(ROOT, cfg) if cpu_profile == "packed" else None
     status = json.loads((evidence / "status.json").read_text())
     if status["state"] != "controller_study_complete":
         raise ValueError("Controller study is incomplete")
@@ -49,13 +51,16 @@ def check(evidence, *, source=SOURCE, synthetic_fixture=False):
     if prior != json.loads((evidence / "prior.json").read_text()):
         raise ValueError("Recomputed controller calibration differs")
     build = json.loads((evidence / "controller-build.json").read_text())
-    if (
-        build["binary_sha256"]
-        != prior["provenance"]["operating_point"]["binary_sha256"]
-        or build["configuration"]["values"]["TOKENOMICS_CPU_BATCH_INVARIANT"] != "ON"
-        or build["configuration"]["values"]["TOKENOMICS_CPU_PACKED_VERIFY"] != "OFF"
+    if build["binary_sha256"] != prior["provenance"]["operating_point"][
+        "binary_sha256"
+    ] or not profile_matches(build["configuration"], cpu_profile):
+        raise ValueError("Controller study changed its execution profile")
+    if proof is not None and (
+        build["binary_sha256"] != proof["binary_sha256"]
+        or prior["provenance"]["operating_point"]["target_sha256"]
+        != proof["screen_target_sha256"]
     ):
-        raise ValueError("Controller study changed its guarded execution profile")
+        raise ValueError("Controller differs from its verified trained packed gate")
     checked = {}
     for name in ("fit", "validation", "logging"):
         rows, manifest = verify(evidence / name)

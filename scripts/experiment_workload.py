@@ -61,7 +61,15 @@ def workload():
     phase = os.environ.get("TOKENOMICS_EXPERIMENT_PHASE", "timing")
     lifecycle.require(
         phase
-        in ("timing", "pilot", "confirmation", "kernel", "controller", "profiles"),
+        in (
+            "timing",
+            "pilot",
+            "confirmation",
+            "kernel",
+            "controller",
+            "controller-packed",
+            "profiles",
+        ),
         "Unsupported fixed experiment",
     )
     selected = os.environ.get("TOKENOMICS_EXPERIMENT_CANDIDATE", "all")
@@ -73,7 +81,8 @@ def workload():
     drafter = os.environ.get("TOKENOMICS_EXPERIMENT_DRAFTER", "model")
     lifecycle.require(drafter in ("model", "ngram"), "Unsupported fixed drafter")
     lifecycle.require(
-        phase not in ("confirmation", "kernel", "controller", "profiles")
+        phase
+        not in ("confirmation", "kernel", "controller", "controller-packed", "profiles")
         or (selected == "qwen25-05-3-q4" and drafter == "ngram"),
         "Confirmation/kernel/controller/profile experiments require the 3B target and ngram drafter",
     )
@@ -95,7 +104,7 @@ def workload():
         == owner["sha"],
         "Checkout identity mismatch",
     )
-    if phase in ("pilot", "confirmation", "controller"):
+    if phase in ("pilot", "confirmation", "controller", "controller-packed"):
         # Retain only experiment measurements across owned stop/start cycles.
         # Lifecycle leases, runner configuration and credentials stay elsewhere.
         store = Path("/workspaces/.tokenomics-experiment-cache")
@@ -203,7 +212,7 @@ def workload():
                 "--run-dir",
                 str(results),
             ]
-        elif phase == "controller":
+        elif phase in ("controller", "controller-packed"):
             args = [
                 "timeout",
                 "--signal=TERM",
@@ -218,6 +227,8 @@ def workload():
                 "--budget-seconds",
                 "6600",
             ]
+            if phase == "controller-packed":
+                args += ["--cpu-profile", "packed"]
         with open(
             results / f"pipeline-{owner['run_id']}-{owner['attempt']}.txt", "x"
         ) as log:
@@ -234,6 +245,7 @@ def workload():
             "confirmation": {0: "confirmation_complete", 11: "paused"},
             "kernel": {0: "kernel_profile_passed"},
             "controller": {0: "controller_study_complete", 11: "paused"},
+            "controller-packed": {0: "controller_study_complete", 11: "paused"},
             "profiles": {0: "profile_comparison_complete"},
             "timing": {10: "timing_complete"},
             "pilot": {
