@@ -1,0 +1,15 @@
+{
+  "source_job_id": 128734353929,
+  "source_job_url": "https://github.com/VictorWong123/tokenomics/actions/runs/42466570831/job/128734353929",
+  "retrieved_by": "Connected GitHub job-log API",
+  "controller_report": {
+    "attempt": "2",
+    "evidence_status": "No valid fixture summary; lifecycle cleanup only",
+    "fixture_evidence_valid": false,
+    "mode": "finalize",
+    "passed": true,
+    "run_id": "42466570831",
+    "sha": "af8b4044133ecef0de8751216248278a2fdb8ebd",
+    "shutdown_confirmed": true
+  }
+}
