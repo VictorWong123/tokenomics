@@ -1,0 +1,45 @@
+name: Retain verified frozen evidence
+
+on:
+  workflow_run:
+    workflows: [Verify frozen experiment evidence]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: tokenomics-evidence-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'VictorWong123/tokenomics' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Recheck and retain only the fixed verified archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m venv "$RUNNER_TEMP/evidence-venv"
+          "$RUNNER_TEMP/evidence-venv/bin/pip" install --disable-pip-version-check numpy==2.3.5
+          "$RUNNER_TEMP/evidence-venv/bin/python" -m unittest discover -s tests -p test_verify_evidence.py
+          "$RUNNER_TEMP/evidence-venv/bin/python" scripts/verify_experiment_evidence.py --out "$RUNNER_TEMP/verified-evidence" --publish
+          git add -- results/verification
+          "$RUNNER_TEMP/evidence-venv/bin/python" scripts/check_staged.py
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Retain verified frozen experiment data [skip ci]'
+            gh auth setup-git
+            git push origin HEAD:main
+          fi
