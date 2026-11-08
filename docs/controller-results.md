@@ -125,14 +125,16 @@ cannot compensate for rejected rows. High acceptance alone is not the objective.
 If verification cost stayed fixed, removing all other measured generation time
 would improve throughput by only about **0.0083%** (`generation_ms / verify_ms`).
 This timing-based bound applies to the observed serial CPU execution; it does not
-prove the native kernels are optimal. It explains why the next optimization
-changes native execution rather than further reducing policy bookkeeping.
+prove the native kernels are optimal. It motivated a separate native execution
+experiment.
 
-The next experiment targets native target execution: a separately gated,
-row-consistent packed CPU profile. Its ordinary target baseline must receive
-that same optimization. A paired study compares both profiles, exact output
-IDs, warm latency, decode rate, logging and memory. It cannot manufacture a
-policy gain by retaining a slower ordinary baseline. See [CPU profiles](cpu-profiles.md).
+A separately gated row-consistent packed CPU profile passes its own trained
+correctness checks, with the optimization applied to ordinary decoding too.
+The paired comparison then fails cross-profile equality at output index36:
+guarded ordinary/detailed/fixed8 match each other, and packed variants match
+each other, but the profiles choose different tokens. The full54-record timing
+grid is therefore unaccepted. Guarded remains the default, and the original
+failed point is retained. See [CPU profiles](cpu-profiles.md).
 
 ## Reproduce and inspect
 

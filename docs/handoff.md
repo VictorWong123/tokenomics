@@ -25,7 +25,7 @@ Current checkpoint:
   Binary ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f.
 - Both prepared profile protocols now pin canonical gate SHA
   cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad.
-  The 54-record paired study is queued as42519929357, exact source
+  The 54-record paired study ran as42519929357, exact source
   c834026c6bdddc4d219a25945befc318361e74fb, via lightweight tag
   tokenomics-profiles-20261108-c834026c6b. It is allowlisted for independent
   verification. It stopped on the first block: cross-profile token36 differs
@@ -52,6 +52,9 @@ rules and figures are in `docs/evaluation.md`. Follow actual artifact/finalizer
 status rather than inferring completion from an in-progress workload.
 
 ### Execution history
+
+The following entries are chronological snapshots. Their old queue states and
+next-step instructions are superseded by the current checkpoint above.
 
 The user requested completion of the broader project and clarified: develop
 and check in Codex Cloud, push checked stages to `main`, then execute trained

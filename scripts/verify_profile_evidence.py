@@ -165,8 +165,9 @@ def check(evidence, expected_source, *, synthetic_fixture=False):
 def check_diagnosis(evidence, expected_source):
     from bench.common import read_jsonl
     from bench.run import first_mismatch
-    from scripts.check_models import compare, check_cycles
+    from scripts.check_models import compare, check_cycles, validate_record
     from scripts.diagnose_models import probe_at
+    from types import SimpleNamespace
 
     result = json.loads((evidence / "diagnosis.json").read_text())
     spec = json.loads((ROOT / "configs/profile-diagnosis-v1.json").read_text())
@@ -181,6 +182,8 @@ def check_diagnosis(evidence, expected_source):
         or result["state"] != "profile_diagnosis_complete"
         or result["diagnostic_only"] is not True
         or result["performance_summary_produced"] is not False
+        or result["both_original_histories_reproduced"] is not True
+        or result["common_prefix_token_ids_equal"] is not True
     ):
         raise ValueError("Invalid diagnostic source/scope")
     frozen = json.loads((source / "profiles/run_manifest.json").read_text())["frozen"]
@@ -194,6 +197,29 @@ def check_diagnosis(evidence, expected_source):
             if not r.get("warmup")
         )
         records = read_jsonl(evidence / profile / "original-history.jsonl")
+        jobs = read_jsonl(evidence / profile / "original-history.jobs.jsonl")
+        original_jobs = read_jsonl(block / f"{cid}.jobs.jsonl")
+        original_rows = read_jsonl(block / f"{cid}.requests.jsonl")
+        if len(records) != len(jobs) or len(jobs) != len(original_jobs):
+            raise ValueError("Diagnostic warm-up/request count changed")
+        for job, original_job, record, original_row in zip(
+            jobs, original_jobs, records, original_rows
+        ):
+            allowed = dict(original_job)
+            if allowed.get("warmup"):
+                allowed["output_cap"] = allowed["max_tokens"]
+            else:
+                allowed.update(
+                    detailed=True,
+                    diagnostic_logits=True,
+                    capture_checkpoints=[36],
+                    checkpoint_namespace="profile-diagnosis",
+                )
+            if job != allowed or compare(original_row, record) is not None:
+                raise ValueError("Diagnostic original jobs or warm-up history changed")
+            validate_record(
+                SimpleNamespace(**frozen["config"], gpu_layers=0), job, record
+            )
         actual = [r for r in records if not r.get("warmup")]
         if len(actual) != 1 or compare(expected, actual[0]) is not None:
             raise ValueError("Diagnostic history does not reproduce retained IDs/stops")
@@ -220,6 +246,10 @@ def check_diagnosis(evidence, expected_source):
             probe_at(cycles, cid, row["repetition"], pos, prompt_id=row["prompt_id"])
             for pos in (35, 36)
         ]
+        if any(
+            p["top_id"] != row["token_ids"][p["output_index"]] for p in probes[profile]
+        ):
+            raise ValueError("Diagnostic top ID differs from emitted greedy token")
         rows[profile] = row
     mismatch = first_mismatch(rows["guarded"]["token_ids"], rows["packed"]["token_ids"])
     if (

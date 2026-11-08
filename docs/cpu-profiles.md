@@ -48,8 +48,9 @@ Current Cloud Release and address/undefined-sanitizer checks pass all six suites
 with leak detection and 906 differential cases, including quantized kernels,
 minimal/checkpoint comparisons and Unicode boundaries. The initial 468-case
 profile preflight is retained as an earlier checkpoint. These fixture results
-establish no language-model speedup. The trained gate now passes independent verification; keep the profile
-experimental until the paired throughput/latency/memory result is complete.
+establish no language-model speedup. The trained gate passes independent
+verification; the paired study later fails cross-profile token equality.
+The profile remains experimental and guarded remains the default.
 
 ## Trained validation and comparison
 
@@ -190,12 +191,12 @@ ratios and stage costs into a temporary directory and compares them with the
 archived summary. A modified aggregate is rejected even when token checks pass.
 This audit has no plotting dependency and never modifies raw evidence.
 
-The fixed paired study is now queued as [run42519929357](https://github.com/VictorWong123/tokenomics/actions/runs/42519929357),
+The fixed paired study ran as [run42519929357](https://github.com/VictorWong123/tokenomics/actions/runs/42519929357),
 source `c834026c6bdddc4d219a25945befc318361e74fb`, using the explicit checked-source
 tag `tokenomics-profiles-20261108-c834026c6b`. The trained proof digest is
 `cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad`.
-Results remain pending; the gate's single-repetition screen does not measure a
-paired CPU-profile gain.
+It stopped on the output divergence below; the gate's single-repetition screen
+does not measure a paired CPU-profile gain.
 
 ## Cross-profile comparison closed on output divergence
 

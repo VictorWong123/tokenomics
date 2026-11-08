@@ -29,9 +29,11 @@ is 0.9846, with 95% interval [0.9721, 1.0019]. The controller has now completed 
 1.2048× cap8 ngram, 0.9943× the frozen fixed1 baseline and 0.9709× ordinary
 decoding. Its 1.67 µs/cycle decision/update cost is small; native verification
 dominates. The [dedicated result](controller-results.md) reports uncertainty,
-work counts, overhead and ablations. The separate packed CPU profile is
-undergoing fresh trained revalidation; the earlier cancelled run supplies no pass. The older partial development pilot remains
-exploratory and is not combined with the confirmation.
+work counts, overhead and ablations. The separate packed CPU profile passes its
+within-profile trained gate, but the paired comparison fails cross-profile greedy
+equality at output index36. No CPU-profile speedup is accepted; guarded remains
+the default. The older partial development pilot remains exploratory and is not
+combined with the confirmation.
 
 | Environment | Actual execution | Feasibility evidence |
 |---|---|---|
@@ -322,9 +324,10 @@ verification on actual Metal hardware.
 RSS is the process lifetime peak from `getrusage`, including load and warm-up.
 It is not per-request allocation, GPU VRAM or energy. No reduction in memory,
 energy or dollar cost follows merely from lower generation time. Detailed cycle
-records are buffered. Minimal mode now avoids retaining cycle records while
-still collecting timers, so a true instrumentation-cost ablation remains
-necessary before final performance claims.
+records are buffered. Minimal mode avoids retaining cycle records while still
+collecting timers. The completed controller study separately measures detailed
+versus minimal logging on two development prompts; its interval is consistent
+with a small effect and supplies no practical aggregate gain.
 
 ## Reproducibility and next decision
 

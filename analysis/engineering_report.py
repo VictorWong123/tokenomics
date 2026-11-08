@@ -11,7 +11,7 @@ from scripts.demo_controller import recorded_directory
 from scripts.verify_controller_evidence import check, equal
 
 
-def generate(out, profile_receipt=None, preview_dir=None):
+def generate(out, profile_receipt=None, preview_dir=None, diagnosis_receipt=None):
     raw = recorded_directory()
     canonical = raw.parent / "verification.json"
     receipt = json.loads(canonical.read_text())
@@ -23,6 +23,9 @@ def generate(out, profile_receipt=None, preview_dir=None):
     costs = result["stage_costs"]["cost-aware"]
     controller = costs["controller_totals"]
     profile = None
+    diagnosis = None
+    if profile_receipt is not None and diagnosis_receipt is not None:
+        raise ValueError("Choose a completed CPU comparison or a diagnostic receipt")
     if profile_receipt is not None:
         from scripts.verify_profile_evidence import check as check_profiles
 
@@ -42,6 +45,26 @@ def generate(out, profile_receipt=None, preview_dir=None):
                 "CPU comparison receipt differs from regenerated measurements"
             )
         profile = regenerated["paired_profile"]
+    if diagnosis_receipt is not None:
+        from scripts.verify_profile_evidence import check_diagnosis
+
+        proof = json.loads(diagnosis_receipt.read_text())
+        if (
+            proof["state"] != "profile_diagnosis_complete"
+            or not proof["independent_output_checks"]
+            or not proof["shutdown_confirmed"]
+            or proof["performance_summary_produced"] is not False
+        ):
+            raise ValueError(
+                "An independently verified diagnostic with Shutdown is required"
+            )
+        point = diagnosis_receipt.parent / f"attempt-{proof['attempt']}"
+        regenerated = check_diagnosis(point, proof["source_sha"])
+        if any(not equal(value, proof[key]) for key, value in regenerated.items()):
+            raise ValueError(
+                "Diagnostic receipt differs from original-history measurements"
+            )
+        diagnosis = regenerated
 
     import matplotlib
 
@@ -309,7 +332,22 @@ def generate(out, profile_receipt=None, preview_dir=None):
 
     fig = page(4, "Reproduce, interpret and extend")
     y = heading(fig, "Native CPU optimization", 0.877)
-    if profile is None:
+    if diagnosis is not None:
+        guarded = diagnosis["target_probes"]["guarded"][1]
+        packed = diagnosis["target_probes"]["packed"][1]
+        y = paragraph(
+            fig,
+            "The experimental packed CPU path passes its within-profile 272-comparison trained gate, "
+            "but the paired comparison fails cross-profile equality at output index 36. Both original "
+            "128-token ordinary-decoding histories are reproduced with the same executable/model hashes. "
+            f"Guarded selects token {guarded['top_id']} (top-two margin {guarded['margin']:.6f}); "
+            f"packed selects {packed['top_id']} (margin {packed['margin']:.6f}) after 36 identical tokens. "
+            "No cross-profile speedup is accepted. Guarded remains the default; this diagnosis does not "
+            "isolate the responsible arithmetic operator.",
+            y,
+            size=9.5,
+        )
+    elif profile is None:
         y = paragraph(
             fig,
             "The verification bottleneck motivates a separate row-consistent packed CPU profile. "
@@ -343,7 +381,7 @@ def generate(out, profile_receipt=None, preview_dir=None):
         "cd tokenomics && bash scripts/bootstrap.sh cpu\n"
         ".venv/bin/python scripts/demo_controller.py --max-cycles 12\n"
         ".venv/bin/python -m analysis.engineering_report --out results/local/report\n"
-        "# Include a separately verified CPU study with --profile-receipt PATH, if available.",
+        "# Add --diagnosis-receipt PATH to include the checked CPU numerical diagnosis.",
         y,
         size=8.5,
         width=110,
@@ -422,6 +460,12 @@ def generate(out, profile_receipt=None, preview_dir=None):
             controller_receipt_sha256=sha256(canonical),
             profile_receipt_sha256=sha256(profile_receipt) if profile_receipt else None,
             profile_receipt_path=str(profile_receipt) if profile_receipt else None,
+            diagnosis_receipt_sha256=(
+                sha256(diagnosis_receipt) if diagnosis_receipt else None
+            ),
+            diagnosis_receipt_path=(
+                str(diagnosis_receipt) if diagnosis_receipt else None
+            ),
             figure_sha256={
                 str(path.relative_to(ROOT)): sha256(path)
                 for path in (
@@ -441,5 +485,10 @@ if __name__ == "__main__":
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--profile-receipt", type=Path)
     p.add_argument("--preview-dir", type=Path)
+    p.add_argument("--diagnosis-receipt", type=Path)
     args = p.parse_args()
-    print(generate(args.out, args.profile_receipt, args.preview_dir))
+    print(
+        generate(
+            args.out, args.profile_receipt, args.preview_dir, args.diagnosis_receipt
+        )
+    )
