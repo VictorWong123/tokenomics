@@ -17,8 +17,8 @@
   "context": 2048,
   "batch": 512,
   "threads": 2,
-  "trained_gate": "results/verification/codespace-packed-20261108/verification.json",
-  "trained_gate_sha256": "pending-trained-gate",
+  "trained_gate": "results/verification/codespace-packed-controller-20261108/verification.json",
+  "trained_gate_sha256": "cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad",
   "configurations": [
     {
       "id": "target",

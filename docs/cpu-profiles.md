@@ -48,8 +48,8 @@ Current Cloud Release and address/undefined-sanitizer checks pass all six suites
 with leak detection and 906 differential cases, including quantized kernels,
 minimal/checkpoint comparisons and Unicode boundaries. The initial 468-case
 profile preflight is retained as an earlier checkpoint. These fixture results
-establish no language-model speedup. The separate trained gate is currently running; keep the profile
-experimental until its correctness, memory and throughput evidence is checked.
+establish no language-model speedup. The trained gate now passes independent verification; keep the profile
+experimental until the paired throughput/latency/memory result is complete.
 
 ## Trained validation and comparison
 
@@ -118,10 +118,9 @@ analysis pairs complete blocks and reports prompt-bootstrap uncertainty,
 cross-profile exact IDs/stops, logging cost, memory and within-profile draft
 ratios. It does not use a slower profile as the algorithm's ordinary baseline.
 
-Execution remains locked by `trained_gate_sha256: pending-trained-gate` until
-the current executable passes the separate trained gate, artifact checks and
-actual Shutdown confirmation. Then freeze that exact proof digest and retain
-the same packed executable/target hashes. All actual records are checked again
+Execution requires a frozen `trained_gate_sha256` for a complete independently
+verified gate and actual Shutdown. That prerequisite is now retained and pinned;
+the paired study must still retain the exact packed executable/target hashes. All actual records are checked again
 against immutable blocks and raw totals before summarizing. The previous
 cancelled run supplies no passing gate or performance evidence.
 
@@ -153,12 +152,16 @@ packed-profile speedup. The final comparisons must still use the same target,
 exact output IDs, natural token counts, complete costs and measured memory.
 
 
-The controller-compatible packed trained gate is active as run42503429351,
-source `708993c603c89efcb75867d851292022b4960210`, after controller study
-42492089188 attempt2 completed. Its first attempt failed before inference during
-startup; the unchanged owned lifecycle succeeded on retry. Attempt2 remains a
-separate experiment and does not change the completed controller study's guarded
-binary or calibration.
+The controller-compatible packed trained gate completes as run42503429351,
+source `708993c603c89efcb75867d851292022b4960210`, attempt2. Independent checks
+validate 272 trained comparisons, 14 full-generation diagnosis records, 18 screen
+requests and 66 original-state replay actions, plus all166 payload files and the
+execution manifest. The lifecycle artifact confirms actual Shutdown. Its
+[canonical proof](../results/verification/codespace-packed-controller-20261108/verification.json)
+binds binary `ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f`.
+Peak lifetime RSS is 3.41 GiB. Frozen-1/ordinary is 0.9913 in the preliminary
+three-prompt, cap64, one-repeat screen; larger caps lose. This is no ordinary
+acceleration claim, paired profile comparison or full feasibility result.
 
 
 The paired analysis also reports warm-completion speedup intervals, formed from

@@ -22,7 +22,7 @@ See [the technical report](report.md) for interpretation and
 | Fixed baseline selected on development only | Implemented; validation/held-out paths reject retuning and incomplete grids |
 | Timing, RSS, minimal/detailed logging | Implemented with documented boundaries. The controller logging grid is complete; paired CPU profile measurement remains gated |
 | Stock executable | Optional unmodified diagnostic builds and stopping-semantic investigation exist; no equivalent-endpoint stock performance claim |
-| CPU performance optimization | Buffer reuse is implemented. Row-consistent packed verification is experimental; the controller-compatible build passes Cloud Release/sanitizers and 906 differential cases. Trained revalidation is running separately after the completed controller study. Rejected alternatives and raw diagnostics are retained |
+| CPU performance optimization | Buffer reuse is implemented. Row-consistent packed verification is experimental; the controller-compatible build passes Cloud Release/sanitizers and 906 differential cases. Trained packed revalidation passes 272 comparisons, 14 diagnosis checks and 66 replay actions; the controlled paired performance study is next. Rejected alternatives and raw diagnostics are retained |
 | Final held-out result, controller figures and resume claim | Bounded trained study/figures/demo complete: 1.2048× cap8, 0.9943× frozen fixed1, 0.9709× ordinary decoding, 1.67 µs/cycle policy cost. Full held-out evaluation remains incomplete; no ordinary-decoding gain, research novelty or M3 execution is claimed |
 | Reproducible documentation and evidence | Build/CLI/runtime/experiment/lifecycle docs, raw artifacts, verification receipts and decision records are maintained alongside code |
 

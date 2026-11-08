@@ -20,8 +20,9 @@ and 0.9709Ã— ordinary target-only decoding. Decision/update cost averages 1.67 Â
 per cycle. These bounded results establish no ordinary-decoding acceleration.
 See the [controller result and figures](docs/controller-results.md) and
 [four-page engineering report](results/verification/engineering-report-20261108/tokenomics-engineering-report.pdf).
-A separate packed CPU profile is undergoing trained revalidation before its
-paired benchmark. Full Pilot A/B, 90-prompt held-out evaluation and Metal
+The separate packed CPU profile passes the 272-comparison trained gate,
+14 full-generation diagnosis checks and 66 original-state replay actions; its
+paired performance comparison is next. Full Pilot A/B, 90-prompt held-out evaluation and Metal
 execution remain incomplete. See [the handoff](docs/handoff.md) and
 [feasibility](docs/feasibility.md).
 

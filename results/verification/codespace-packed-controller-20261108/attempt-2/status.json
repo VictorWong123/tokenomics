@@ -1,0 +1,14 @@
+{
+  "checked_comparisons": 272,
+  "checkpoint_validation": {
+    "groups": 3,
+    "protocol": "host-owned original target KV snapshots; shared prepared draft KV per prefix",
+    "state": "passed"
+  },
+  "message": "Experimental packed CPU profile passed the trained gate and development screen; no full feasibility/controller result.",
+  "peak_rss_bytes": 3662598144,
+  "schema_version": 1,
+  "stage": "checkpoint-validation",
+  "state": "kernel_profile_passed",
+  "timing_records": 18
+}

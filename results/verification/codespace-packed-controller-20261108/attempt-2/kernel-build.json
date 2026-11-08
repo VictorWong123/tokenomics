@@ -1,0 +1,25 @@
+{
+  "binary_sha256": "ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f",
+  "configuration": {
+    "cache_available": true,
+    "values": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "GGML_AVX": "ON",
+      "GGML_AVX2": "ON",
+      "GGML_BLAS": "OFF",
+      "GGML_CPU_REPACK": "ON",
+      "GGML_CUDA": "OFF",
+      "GGML_F16C": "ON",
+      "GGML_FMA": "ON",
+      "GGML_LLAMAFILE": "OFF",
+      "GGML_METAL": "OFF",
+      "GGML_NATIVE": "OFF",
+      "TOKENOMICS_CPU_BATCH_INVARIANT": "OFF",
+      "TOKENOMICS_CPU_PACKED_VERIFY": "ON"
+    }
+  },
+  "generated_source_sha256": {
+    "tokenomics-repack.cpp": "061d22c5f901ee238fc14a649c07705897f2a4660a984870d948a8fa57862d64",
+    "tokenomics-tiled.cpp": "29eb6d6805be81da81e1af7ecd79b5081e0b968c7fb222b2bf0fc845be6c0220"
+  }
+}

@@ -18,14 +18,23 @@ Current checkpoint:
   0.9943 [0.9853,1.0023]; controller/cap8 1.2048 [1.1271,1.2868]. No practical
   ordinary-decoding gain. Policy decision/update averages 1.67 µs/cycle;
   verification consumes 99.992% of generation. See controller-results.md.
-- Packed gate 42503429351 is retrying exact source708993c. Attempt1 failed
-  startup before inference; attempt2 uses the unchanged owned lifecycle.
-  Its verified trained proof remains required before the prepared 54-record
-  paired profile/logging study. Freeze that proof digest; never bypass it.
-- A separately named `controller-packed` extension is prepared and locally
-  checked, with fresh calibration and the unchanged development split/parameters.
-  It remains locked by its pending gate digest and has no trained result yet.
-  Run it only after the native gate and paired component study justify that point.
+- Packed gate42503429351 attempt2, source708993c, is complete and independently
+  verified: 272 comparisons, 14 diagnosis records, 18 screen requests and 66
+  original-state replay actions. All166 payload files plus the manifest are
+  retained. Finalizer128849625747 and the small lifecycle artifact prove Shutdown.
+  Binary ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f.
+- Both prepared profile protocols now pin canonical gate SHA
+  cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad.
+  Start the 54-record paired study from checked main using an explicit lightweight
+  tokenomics-profiles-* tag. Register its actual run ID/source in the verifier.
+  Do not claim CPU acceleration from the single-repetition gate screen.
+- The separately named controller-packed extension is locally checked and now
+  has a frozen prerequisite. It has no trained performance result yet. Use fresh
+  calibration; run it only if the paired component result justifies that point.
+- Cloud shell API GH_TOKEN expired20:06 (401); Git transport and connected GitHub
+  tools still work, as do public read-only API calls. The status monitor exited
+  because of auth, not an inference failure. Use the documented explicit tag route
+  for controlled new studies; do not copy the lifecycle secret into Cloud.
 - Full 90-prompt held-out model evaluation is unexecuted; its guarded entry point
   and supplemental analysis are implemented/tested. The older CPU point suggests
   roughly 119 hours for 6300 conditions, not a same-day default experiment.

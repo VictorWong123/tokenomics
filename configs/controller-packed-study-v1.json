@@ -53,5 +53,5 @@
   "scope": "Separate packed CPU operating point using new measured calibration and an equally optimized ordinary baseline. Same development split and controller parameters as the guarded study; no full held-out claim.",
   "cpu_profile": "packed",
   "trained_gate": "results/verification/codespace-packed-controller-20261108/verification.json",
-  "trained_gate_sha256": "pending-trained-gate"
+  "trained_gate_sha256": "cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad"
 }

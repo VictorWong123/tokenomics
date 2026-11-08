@@ -1,0 +1,76 @@
+{
+  "binary": "ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f",
+  "code": {
+    "owned_source_sha256": "bae5eb7c58866e8b181f80a5d716c1a52565155e7b8980d61a9bb7b0e61406a5",
+    "revision": "708993c603c89efcb75867d851292022b4960210"
+  },
+  "config": {
+    "batch": 512,
+    "bootstrap_samples": 10000,
+    "configurations": [
+      {
+        "id": "target",
+        "policy": "target"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed1",
+        "k": 1,
+        "policy": "fixed"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed2",
+        "k": 2,
+        "policy": "fixed"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed4",
+        "k": 4,
+        "policy": "fixed"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed6",
+        "k": 6,
+        "policy": "fixed"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed8",
+        "k": 8,
+        "policy": "fixed"
+      }
+    ],
+    "context": 2048,
+    "gate_confidence_lower": 1.0,
+    "gate_min_speedup": 1.05,
+    "invalid_run_reasons": [
+      "process_failure",
+      "missing_or_malformed_record",
+      "token_mismatch",
+      "documented_external_interruption"
+    ],
+    "memory_headroom_fraction": 0.2,
+    "output_caps": [
+      64
+    ],
+    "phase": "pilot",
+    "practical_margin": 0.05,
+    "primary_metric": "geomean_prompt_cap_median_throughput_ratio",
+    "prompt_ids": "pilot18",
+    "repetitions": 1,
+    "schema_version": 1,
+    "seed": 20261107,
+    "split": "development",
+    "threads": 2,
+    "warmup_prompt": "Warm-up: continue briefly.",
+    "warmup_tokens": 16
+  },
+  "draft": null,
+  "drafter": "ngram",
+  "gpu_layers": 0,
+  "pilot": "d0f08aa9c541b2c6d4a020f22afc29d0e77fa2628010b254dbb01549165a8823",
+  "target": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d"
+}
