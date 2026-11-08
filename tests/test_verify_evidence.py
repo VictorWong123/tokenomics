@@ -8,7 +8,7 @@ import unittest
 import zipfile
 
 from bench.common import sha256
-from scripts.verify_experiment_evidence import unpack
+from scripts.verify_experiment_evidence import unpack, retain
 
 
 class FrozenArchiveTests(unittest.TestCase):
@@ -72,3 +72,31 @@ class FrozenArchiveTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, error):
                     unpack(archive, sha256(archive), out)
                 self.assertFalse((out / "evidence/status.json").exists())
+
+    def test_retained_bytes_and_canonical_receipt_are_immutable(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            evidence = root / "evidence"
+            evidence.mkdir()
+            (evidence / "status.json").write_text('{"state":"confirmation_complete"}\n')
+            receipt = {
+                "run_id": 42466570831, "attempt": 2, "source_sha": "a" * 40,
+                "state": "confirmation_complete", "zip_sha256": "b" * 64,
+                "archive_sha256": "c" * 64, "exact_comparisons": 162,
+                "shutdown_confirmed": True, "independent_output_checks": True,
+                "verifier_sha256": "first",
+            }
+            path = root / "receipt.json"
+            path.write_text(json.dumps(receipt))
+            with patch("scripts.verify_experiment_evidence.ROOT", root):
+                retain(evidence, path)
+                canonical = root / "results/verification/codespace-confirmation-20261108/verification.json"
+                original = canonical.read_bytes()
+                path.write_text(json.dumps({**receipt, "verifier_sha256": "later"}))
+                retain(evidence, path)
+                self.assertEqual(path.read_bytes(), original)
+                self.assertEqual(canonical.read_bytes(), original)
+                (evidence / "status.json").write_text("changed")
+                with self.assertRaisesRegex(ValueError, "immutable"):
+                    retain(evidence, path)
