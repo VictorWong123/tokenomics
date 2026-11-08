@@ -118,9 +118,13 @@ not change that tested implementation.
   while the separate model summary proves the tests passed.
 
 The model summary, initialization/finalization reports, run/job metadata and
-artifact metadata were checked from Codex Cloud. The artifact ZIP was not
-independently downloaded in Cloud. Reuse the completed evidence; no setup rerun
-is needed.
+artifact metadata were checked from Codex Cloud. The artifact has now also been
+downloaded: ZIP, inner archive and all 32 manifest members match their recorded
+hashes. All 272 candidate identities/settings, exact IDs/stops and cycle/cache
+accounting were independently rechecked. The full small raw archive is retained
+in `results/verification/codespace-gate-20261108`. Its old schema-1 diagnosis
+does not validate current original-KV replay. Reuse the completed evidence;
+no setup rerun is needed.
 
 ## Future Linux tests
 

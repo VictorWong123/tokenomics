@@ -1,0 +1,17 @@
+{
+  "artifact_id": 13596331570,
+  "artifact_zip_sha256": "7a91126e3627b34d1bf4a4e08e88e5abb568462f474ed94442e2d4c73f9564d5",
+  "checks": [
+    "all manifest SHA-256 and byte counts",
+    "all candidate identity and settings",
+    "all 272 emitted/prompt ID and stop comparisons",
+    "all candidate cycle commit and final cache accounting"
+  ],
+  "compared_requests": 272,
+  "inner_archive_sha256": "d20a9dff6ba877b1f3d540279a947eabee55d55364dc4dcf53ea21ae54e16235",
+  "limitation": "Historical trained correctness gate, not timing or new-driver checkpoint validation. Its schema-1 fresh-prefix diagnosis predates all-row and original-budget fixes and cannot clear current Pilot B.",
+  "run_id": 42420516268,
+  "schema_version": 1,
+  "source_sha": "d1bb6fb778695515614d21cf78959f63f544db7b",
+  "verified_members": 32
+}

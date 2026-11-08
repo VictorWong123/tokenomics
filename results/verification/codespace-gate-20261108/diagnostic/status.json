@@ -1,0 +1,216 @@
+{
+  "correctness_supported": false,
+  "full_comparisons": [
+    {
+      "configuration_id": "resident",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 0
+    },
+    {
+      "configuration_id": "resident",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 1
+    },
+    {
+      "configuration_id": "retain-fixed1",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 0
+    },
+    {
+      "configuration_id": "retain-fixed1",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 1
+    },
+    {
+      "configuration_id": "retain-fixed4",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 0
+    },
+    {
+      "configuration_id": "retain-fixed4",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 1
+    },
+    {
+      "configuration_id": "retain-fixed6",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 0
+    },
+    {
+      "configuration_id": "retain-fixed6",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 1
+    },
+    {
+      "configuration_id": "upstream-fixed1",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 0
+    },
+    {
+      "configuration_id": "upstream-fixed1",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 1
+    },
+    {
+      "configuration_id": "upstream-fixed4",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 0
+    },
+    {
+      "configuration_id": "upstream-fixed4",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 1
+    },
+    {
+      "configuration_id": "upstream-fixed6",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 0
+    },
+    {
+      "configuration_id": "upstream-fixed6",
+      "mismatch": null,
+      "prompt_id": "development-qa-00",
+      "repetition": 1
+    }
+  ],
+  "limitation": "Controlled fresh-prefix probes distinguish batch shape from history, but do not alone prove the cause of retained-cache differences. No performance claim.",
+  "reference_reset_equal": true,
+  "replay_probes": [
+    {
+      "canonical_token": 421,
+      "checkpoint": 8,
+      "configuration_id": "prefix8-action0",
+      "first_token": 421,
+      "probe": {
+        "actual_drafts": 0,
+        "context_tokens": 50,
+        "cycle_begin": 0,
+        "margin": 0.17768287658691406,
+        "output_index": 0,
+        "row": 0,
+        "second_id": 4152,
+        "second_logit": 29.79664421081543,
+        "target_cached": 50,
+        "top_id": 421,
+        "top_logit": 29.974327087402344
+      },
+      "probe_matches_emitted": true
+    },
+    {
+      "canonical_token": 421,
+      "checkpoint": 8,
+      "configuration_id": "prefix8-action4",
+      "first_token": 421,
+      "probe": {
+        "actual_drafts": 4,
+        "context_tokens": 50,
+        "cycle_begin": 0,
+        "margin": 0.17768287658691406,
+        "output_index": 0,
+        "row": 0,
+        "second_id": 4152,
+        "second_logit": 29.79664421081543,
+        "target_cached": 50,
+        "top_id": 421,
+        "top_logit": 29.974327087402344
+      },
+      "probe_matches_emitted": true
+    },
+    {
+      "canonical_token": 421,
+      "checkpoint": 8,
+      "configuration_id": "prefix8-action6",
+      "first_token": 421,
+      "probe": {
+        "actual_drafts": 6,
+        "context_tokens": 50,
+        "cycle_begin": 0,
+        "margin": 0.17768287658691406,
+        "output_index": 0,
+        "row": 0,
+        "second_id": 4152,
+        "second_logit": 29.79664421081543,
+        "target_cached": 50,
+        "top_id": 421,
+        "top_logit": 29.974327087402344
+      },
+      "probe_matches_emitted": true
+    },
+    {
+      "canonical_token": 16417,
+      "checkpoint": 29,
+      "configuration_id": "prefix29-action0",
+      "first_token": 16417,
+      "probe": {
+        "actual_drafts": 0,
+        "context_tokens": 71,
+        "cycle_begin": 0,
+        "margin": 0.06870841979980469,
+        "output_index": 0,
+        "row": 0,
+        "second_id": 2415,
+        "second_logit": 25.151124954223633,
+        "target_cached": 71,
+        "top_id": 16417,
+        "top_logit": 25.219833374023438
+      },
+      "probe_matches_emitted": true
+    },
+    {
+      "canonical_token": 16417,
+      "checkpoint": 29,
+      "configuration_id": "prefix29-action4",
+      "first_token": 16417,
+      "probe": {
+        "actual_drafts": 4,
+        "context_tokens": 71,
+        "cycle_begin": 0,
+        "margin": 0.06870841979980469,
+        "output_index": 0,
+        "row": 0,
+        "second_id": 2415,
+        "second_logit": 25.151124954223633,
+        "target_cached": 73,
+        "top_id": 16417,
+        "top_logit": 25.219833374023438
+      },
+      "probe_matches_emitted": true
+    },
+    {
+      "canonical_token": 16417,
+      "checkpoint": 29,
+      "configuration_id": "prefix29-action6",
+      "first_token": 16417,
+      "probe": {
+        "actual_drafts": 6,
+        "context_tokens": 71,
+        "cycle_begin": 0,
+        "margin": 0.06870841979980469,
+        "output_index": 0,
+        "row": 0,
+        "second_id": 2415,
+        "second_logit": 25.151124954223633,
+        "target_cached": 73,
+        "top_id": 16417,
+        "top_logit": 25.219833374023438
+      },
+      "probe_matches_emitted": true
+    }
+  ],
+  "schema_version": 1,
+  "state": "diagnostic_complete",
+  "synthetic_fixture": false
+}
