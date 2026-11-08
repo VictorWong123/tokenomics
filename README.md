@@ -8,13 +8,16 @@ prepared draft state instead of repeatedly reconstructing the combined prefix.
 CPU is the initial reference. macOS Metal is supported by configuration;
 CUDA is optional. Linux cloud, Codespaces and Mac results are separate.
 
-**Status: in progress.** Linux CPU synthetic-transformer correctness and the
-resumable artifact pipeline pass. Codespaces has also passed the complete
-272-comparison trained-Qwen correctness gate. A larger-target screen also passes
-21 exact comparisons and 66 original-KV snapshot action checks. Development performance experiments
-are in progress; neither feasibility question has a final answer. No cost-aware
-controller, held-out speedup or Mac execution is claimed. See
-[the handoff](docs/handoff.md) and [feasibility](docs/feasibility.md).
+**Status: in progress.** Cloud Release and sanitizer checks pass, including
+468 differential fixture cases. Codespaces passed the 272-comparison trained
+correctness gate and trained original-KV replay checks. A completed nine-prompt
+confirmation passes all 162 exact comparisons, but its frozen cap1 throughput
+ratio is 0.9846 [0.9721, 1.0019] to target-only and fails the 5% practical-gain
+criterion. The opt-in packed CPU profile is undergoing separate trained checks.
+Full Pilot A/B, cost-aware scheduling, held-out evaluation and Metal execution
+remain incomplete. See [the handoff](docs/handoff.md),
+[feasibility](docs/feasibility.md) and the
+[verified raw confirmation](results/verification/codespace-confirmation-20261108).
 
 ## Build and check
 
