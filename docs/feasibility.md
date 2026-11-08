@@ -3,8 +3,11 @@
 Q1 (repeatable benefit over target-only): **not established**. The completed
 frozen-action confirmation does not clear the practical margin.
 Q2 (predictable preferable action): **unresolved**.
-Recommendation: evaluate the opt-in packed CPU implementation as a new operating
-point. The guarded-profile results do not justify a full cycle controller;
+Recommendation: keep guarded CPU as the reference; investigate a backend with
+useful batched-verification savings before a new performance study. The packed
+profile passes its within-profile gate but fails the strict cross-profile token
+comparison. Original-history logits reproduce that discrepancy; no packed
+speedup is accepted. The guarded-profile results do not justify a full cycle controller;
 full Pilot A/B and held-out requirements remain incomplete. The user explicitly
 authorized the experimental controller anyway. Its completed, independently
 verified six-prompt development study is documented in
@@ -101,9 +104,10 @@ canonical verification receipt and lifecycle evidence alongside them.
 This rejects a practical-gain claim for the frozen action on this validation
 point. It is not a completed 18-prompt Pilot A, a Q2 decision, an all-cap or
 all-platform impossibility result, a controller experiment or held-out evidence.
-The separate packed CPU profile must pass its trained gate before performance
-assessment. Its first startup attempt failed before inference; the unchanged
-source/lifecycle succeeded on retry.
+The separate packed CPU profile later passes its trained gate, then fails
+cross-profile greedy equality in the paired comparison. The independently
+checked original-history diagnosis and its reporting limitation are documented
+in [CPU profiles](cpu-profiles.md).
 
 ## Historical foundation and access blockers (7 November 2026)
 

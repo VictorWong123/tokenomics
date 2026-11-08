@@ -1,0 +1,106 @@
+{
+  "archive_sha256": "208a7fe8254eb1b839c22242a8b5e733028062e474b7d03854c1e48cee5dfd2f",
+  "artifact_id": 13634936420,
+  "attempt": 1,
+  "automation_state": "failed_after_diagnostic_completed",
+  "binary_sha256": {
+    "guarded": "3b640fc90cca7b88cf02dc5fdde86c7c4f517dfa090e0ab7258bc09da8263d09",
+    "packed": "ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f"
+  },
+  "diagnostic_only": true,
+  "exact_comparisons": 2,
+  "exact_original_history_reproductions": 2,
+  "first_mismatch": {
+    "actual": 882,
+    "position": 36,
+    "reference": 323
+  },
+  "full_feasibility_cleared": false,
+  "independent_output_checks": true,
+  "performance_summary_produced": false,
+  "report_json_present": false,
+  "report_reconstructed_from_manifest": true,
+  "reporting_error": "UnboundLocalError: timing rows referenced by diagnostic report writer",
+  "run_id": 42523392101,
+  "schema_version": 1,
+  "screen_target_sha256": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d",
+  "shutdown_artifact_id": 13634108802,
+  "shutdown_artifact_sha256": "840c4c91a6b3956e2916022747f4af88f389566b7d5f76d9be41cb833d6b3f14",
+  "shutdown_confirmed": true,
+  "shutdown_controller_report": {
+    "attempt": "1",
+    "evidence_status": "No valid fixture summary; lifecycle cleanup only",
+    "fixture_evidence_valid": false,
+    "mode": "finalize",
+    "passed": true,
+    "run_id": "42523392101",
+    "sha": "45ba7d6aabda5fd4fc0416a8abb0b8440737c6f8",
+    "shutdown_confirmed": true
+  },
+  "shutdown_evidence_origin": "GitHub lifecycle artifact 13634108802",
+  "shutdown_source_job_id": 128865017149,
+  "source_sha": "45ba7d6aabda5fd4fc0416a8abb0b8440737c6f8",
+  "state": "profile_diagnosis_complete",
+  "target_probes": {
+    "guarded": [
+      {
+        "actual_drafts": 0,
+        "context_tokens": 130,
+        "cycle_begin": 35,
+        "margin": 7.9309234619140625,
+        "output_index": 35,
+        "row": 0,
+        "second_id": 448,
+        "second_logit": 25.447265625,
+        "target_cached": 130,
+        "top_id": 11,
+        "top_logit": 33.37818908691406
+      },
+      {
+        "actual_drafts": 0,
+        "context_tokens": 131,
+        "cycle_begin": 36,
+        "margin": 0.2449798583984375,
+        "output_index": 36,
+        "row": 0,
+        "second_id": 882,
+        "second_logit": 27.37804412841797,
+        "target_cached": 131,
+        "top_id": 323,
+        "top_logit": 27.623023986816406
+      }
+    ],
+    "packed": [
+      {
+        "actual_drafts": 0,
+        "context_tokens": 130,
+        "cycle_begin": 35,
+        "margin": 7.608516693115234,
+        "output_index": 35,
+        "row": 0,
+        "second_id": 448,
+        "second_logit": 25.59307861328125,
+        "target_cached": 130,
+        "top_id": 11,
+        "top_logit": 33.201595306396484
+      },
+      {
+        "actual_drafts": 0,
+        "context_tokens": 131,
+        "cycle_begin": 36,
+        "margin": 0.03129768371582031,
+        "output_index": 36,
+        "row": 0,
+        "second_id": 323,
+        "second_logit": 27.40778160095215,
+        "target_cached": 131,
+        "top_id": 882,
+        "top_logit": 27.43907928466797
+      }
+    ]
+  },
+  "verified_files": 11,
+  "verifier_sha256": "b617ef1b107e43a69bb49dcaf8c7824acac7271010b9d44f3889775c8b893797",
+  "workflow_conclusion": "failure",
+  "zip_sha256": "9e2c2ca3da3960ff710695908246079531d2d71dcba796b6b86b38c3bf3a5af7"
+}

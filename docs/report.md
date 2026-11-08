@@ -32,7 +32,10 @@ dominates. The [dedicated result](controller-results.md) reports uncertainty,
 work counts, overhead and ablations. The separate packed CPU profile passes its
 within-profile trained gate, but the paired comparison fails cross-profile greedy
 equality at output index36. No CPU-profile speedup is accepted; guarded remains
-the default. The older partial development pilot remains exploratory and is not
+the default. A subsequent original-history diagnosis reproduces both full
+outputs and shows reversed top-two ordinary target logits at that index. Its
+workflow report failed after inference; the original archive and actual Shutdown
+are independently verified with that failure recorded. The older partial development pilot remains exploratory and is not
 combined with the confirmation.
 
 | Environment | Actual execution | Feasibility evidence |

@@ -7,6 +7,54 @@ from types import SimpleNamespace
 from bench.common import read_jsonl, atomic_json
 from scripts.check_models import execute
 from scripts.profile_diagnosis import diagnose
+from bench.common import ROOT
+from scripts.verify_profile_evidence import check_diagnosis
+
+
+class RetainedProfileDiagnosis(unittest.TestCase):
+    source = (
+        ROOT / "results/verification/codespace-profile-diagnosis-20261108/attempt-1"
+    )
+    revision = "45ba7d6aabda5fd4fc0416a8abb0b8440737c6f8"
+
+    def test_real_histories_and_report_failure_are_kept_distinct(self):
+        result = check_diagnosis(self.source, self.revision)
+        self.assertEqual(result["exact_original_history_reproductions"], 2)
+        self.assertFalse(result["performance_summary_produced"])
+        self.assertEqual(result["target_probes"]["guarded"][1]["top_id"], 323)
+        self.assertEqual(result["target_probes"]["packed"][1]["top_id"], 882)
+        receipt = json.loads((self.source.parent / "verification.json").read_text())
+        self.assertEqual(receipt["workflow_conclusion"], "failure")
+        self.assertEqual(
+            receipt["automation_state"], "failed_after_diagnostic_completed"
+        )
+        self.assertFalse(receipt["report_json_present"])
+        self.assertTrue(receipt["shutdown_confirmed"])
+
+    def test_changed_original_job_and_self_reported_top_id_are_rejected(self):
+        import shutil
+
+        for variant, message in (("job", "original jobs"), ("probe", "emitted greedy")):
+            with self.subTest(variant=variant), tempfile.TemporaryDirectory() as tmp:
+                out = Path(tmp) / "changed"
+                shutil.copytree(self.source, out)
+                if variant == "job":
+                    path = out / "packed/original-history.jobs.jsonl"
+                    rows = read_jsonl(path)
+                    rows[-1]["max_tokens"] -= 1
+                else:
+                    path = out / "packed/original-history.cycles.jsonl"
+                    rows = read_jsonl(path)
+                    for cycle in rows:
+                        for probe in cycle.get("diagnostic_logits", []):
+                            if not cycle.get("warmup") and probe["output_index"] == 36:
+                                probe["top_id"] = 323
+                    summary = json.loads((out / "diagnosis.json").read_text())
+                    summary["probes"]["packed"][1]["top_id"] = 323
+                    atomic_json(out / "diagnosis.json", summary)
+                path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+                with self.assertRaisesRegex(ValueError, message):
+                    check_diagnosis(out, self.revision)
 
 
 class ProfileDiagnosis(unittest.TestCase):

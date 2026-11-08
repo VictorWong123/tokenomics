@@ -10,35 +10,43 @@ Current checkpoint:
   including 906 differential fixture cases. Automatic pure-policy CI also passes.
 - Controller trained gates pass 28 model-drafter and 28 ngram records, covering
   every action. Raw IDs/stops/cache accounting are independently checked.
-- Study 42492089188 attempt2 completes all 36 blocks / 252 exact validation
+- Study 42492089188 attempt 2 completes all 36 blocks / 252 exact validation
   records and 16 logging records. Both attempts have actual Shutdown proof.
-  All 1587 payload files plus the manifest pass audit; the first25 blocks, fit and prior are
-  byte-identical after resume. Canonical proof and raw attempt2 are retained.
+  All 1587 payload files plus the manifest pass audit; the first 25 blocks, fit and prior are
+  byte-identical after resume. Canonical proof and raw attempt 2 are retained.
 - Controller/target throughput is 0.9709 [0.9607,0.9810]; controller/fixed1
   0.9943 [0.9853,1.0023]; controller/cap8 1.2048 [1.1271,1.2868]. No practical
   ordinary-decoding gain. Policy decision/update averages 1.67 µs/cycle;
   verification consumes 99.992% of generation. See controller-results.md.
-- Packed gate42503429351 attempt2, source708993c, is complete and independently
+- Packed gate 42503429351 attempt 2, source 708993c, is complete and independently
   verified: 272 comparisons, 14 diagnosis records, 18 screen requests and 66
-  original-state replay actions. All166 payload files plus the manifest are
-  retained. Finalizer128849625747 and the small lifecycle artifact prove Shutdown.
+  original-state replay actions. All 166 payload files plus the manifest are
+  retained. Finalizer 128849625747 and the small lifecycle artifact prove Shutdown.
   Binary ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f.
 - Both prepared profile protocols now pin canonical gate SHA
   cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad.
-  The 54-record paired study ran as42519929357, exact source
+  The 54-record paired study ran as 42519929357, exact source
   c834026c6bdddc4d219a25945befc318361e74fb, via lightweight tag
   tokenomics-profiles-20261108-c834026c6b. It is allowlisted for independent
-  verification. It stopped on the first block: cross-profile token36 differs
-  (guarded323/packed882); all variants agree within their own profile. All36
+  verification. It stopped on the first block: cross-profile token 36 differs
+  (guarded 323 / packed 882); all variants agree within their own profile. All 36
   payload files and actual Shutdown are checked. No cross-profile performance
-  summary is accepted. The original-history logit diagnosis is the next stage.
+  summary is accepted.
+- Diagnosis 42523392101 reproduces both full 128-token ordinary histories and
+  warm-ups at the original exact executable/model hashes. At token 36, the top
+  two logits reverse: guarded 323 / 882 (gap 0.244980), packed 882 / 323 (gap 0.031298).
+  All 11 payload files and the manifest pass independent audit. The subprocess
+  completed before a report-writer bug failed the workflow; the receipt records
+  that failure and missing report explicitly. Finalizer 128865017149 confirms
+  actual Shutdown. The writer is fixed and tested; no model rerun is needed.
 - The separately named controller-packed extension is locally checked and now
   has a frozen prerequisite. It has no trained performance result yet. Use fresh
   calibration; run it only if the paired component result justifies that point.
-- Cloud shell API GH_TOKEN expired20:06 (401); Git transport and connected GitHub
-  tools still work, as do public read-only API calls. The status monitor exited
-  because of auth, not an inference failure. Use the documented explicit tag route
-  for controlled new studies; do not copy the lifecycle secret into Cloud.
+- The shell GH_TOKEN returned401 at20:06; Git transport, connected GitHub tools
+  and environment-authenticated Python HTTP requests still work. The latter
+  successfully dispatched the diagnosis without copying a credential. The old
+  monitor exited because of auth, not an inference failure. No Cloud reconnection
+  is needed; do not copy the lifecycle secret into Cloud.
 - Full 90-prompt held-out model evaluation is unexecuted; its guarded entry point
   and supplemental analysis are implemented/tested. The older CPU point suggests
   roughly 119 hours for 6300 conditions, not a same-day default experiment.
@@ -51,302 +59,8 @@ The detailed design/API/commands are in `docs/controller-design.md`; full-grid
 rules and figures are in `docs/evaluation.md`. Follow actual artifact/finalizer
 status rather than inferring completion from an in-progress workload.
 
-### Execution history
+## Earlier decisions
 
-The following entries are chronological snapshots. Their old queue states and
-next-step instructions are superseded by the current checkpoint above.
-
-The user requested completion of the broader project and clarified: develop
-and check in Codex Cloud, push checked stages to `main`, then execute trained
-tests and measurements in Codespaces. This supersedes the earlier test-only
-scope recorded below.
-
-`87c7811` reuses C++ proposal/batch storage, reserves bounded outputs and avoids
-retaining discarded minimal logs. It also prevents held-out baseline retuning,
-rejects incomplete/duplicate measurement grids, and adds hash-checked resumable
-pilot groups plus the fixed experiment lifecycle. Cloud Release/sanitizer tests
-pass, including leak detection; the fixture suite now has 330 cases plus 25
-minimal/checkpoint comparisons. All 168 fixture requests pass exact IDs.
-
-Trained timing run 42452778183 passed nine comparisons and confirmed Shutdown.
-Its three-prompt, one-repeat screen favored target-only: fixed4/target throughput
-ratio 0.501; confidence/target 0.533. These are preliminary observations, not
-Q1/Q2 decisions. The bounded repeated pilot is run 42454095789 at exact source
-`87c7811ed5fe24024f50782a1307ecbcef52bdee`. It paused successfully after 11/108
-blocks, preserving 110 passing exact-ID checks. Artifact ZIP, inner archive and
-all 636 members were hash-verified; hosted finalize confirmed actual Shutdown.
-Every measured drafting-policy cell was slower than its ordinary reference.
-This incomplete, unbalanced prefix has no full-suite estimate or gate decision.
-The raw aggregates and provenance are in
-`results/verification/codespace-partial-20261108`. Preserve the source on resume;
-do not combine different binaries/protocols.
-
-That pilot is preserved as `experiments/pilot-87c7811` for reproducibility.
-Current Pilot B schema 3 restores original target KV and identical prepared
-draft KV from memory-bounded, within-process checkpoints. It includes the
-dynamic baseline and rejects a different binary/model/execution setting.
-Older points remain exploratory; freeze a new checkpoint-capable driver for
-confirmation. The optional stock diagnostic and clean-submodule build check
-also pass in Cloud.
-
-The latest CLI also repairs incomplete UTF-8 display text instead of crashing
-JSON serialization. Eighteen byte-boundary cases preserve exact IDs across
-target/fixed/script modes; Release and targeted sanitizer checks pass. This
-changes the driver binary, so do not mix its measurements with the frozen
-`87c7811` pilot or bypass replay's binary check. Retain the older run as
-exploratory evidence; freeze the corrected driver for future confirmation.
-
-Diagnostic schema 2 also covers every committed replay row and the original
-remaining budget. A row-0 match no longer hides a row-1 divergence, and rows
-after divergence are marked as having a different history. The Cloud fixture
-diagnostic passes 14 full comparisons and checks 20 replay rows; its
-`correctness_supported` remains false, as diagnosis is not the trained gate.
-
-The saved-state implementation passes 378 C++ differential cases, plus the
-25 minimal/checkpoint and 18 Unicode cases. First-row logits match the original
-trace exactly across all fixed caps after long-prefix state restoration.
-All four sanitizer suites passed with leak detection, and the extended-prefix
-runtime check passed separately. The fixture Pilot B checks 264 canonical
-action outputs across 12 checkpoint groups. Normal performance conditions
-cannot request snapshots or diagnostic logits. This is fixture evidence;
-trained-state validation is part of the next Codespace timing screen.
-
-Current warm-up uses a frozen short prompt, and budget estimation separates
-fixed request costs from actual-token decode cost. The larger candidate can
-now be screened with 5 GiB available and must still pass the measured 20%
-headroom requirement. Select it with `candidate=qwen25-05-3-q4`; no new machine
-or lifecycle credential route is introduced.
-
-The experiment workflow now supports fixed `drafter=ngram` timing/pilot work
-without downloading or loading a draft model. Cloud integration checks execute
-its 18-request cap sweep and original-state replay. A period-nine transformer
-fixture forces real lookup proposals at every cap, with rejected proposals,
-fallback/re-entry and resets; the suite now reports 390 differential cases.
-Release and extended sanitizer runtime checks pass with leak detection. These
-new 12 comparisons are fixture evidence, not a trained-model result. Relevant
-paper/source comparisons are recorded in `docs/related-work.md`.
-
-Run 42461309986 at `1f945147` completes the 0.5B→3B model screen: all 21
-comparisons and 66 original-state checkpoint actions pass. All 173 artifact
-members are hash-verified; the rechecked raw data and analysis are retained in
-`results/verification/codespace-3b-20261108`. Every fixed cap loses; the best
-screen ratio is fixed1 at 0.768 (confidence 0.682). Peak screen RSS is 2.75 GiB.
-Hosted finalization confirms actual Shutdown. Three fit-only prompts cannot
-clear Q1/Q2; the full-pilot duration extrapolation is 29.67 hours.
-
-Run 42461982414 attempt 2 completes the cheaper ngram screen at `6a4eea1`:
-18 exact comparisons plus 66 original-state action checks pass; all 134 archive
-members are verified and actual Shutdown confirmed. Fixed1 is near-neutral at
-1.0113; every larger cap loses. Attempt 1 failed startup before inference;
-the unchanged owned lifecycle succeeded on retry. Raw data are in
-`results/verification/codespace-ngram-20261108`. The fit evidence freezes fixed1
-for a targeted nine-prompt development confirmation (128/512 caps, three
-repetitions, target/fixed1/fixed8). This does not clear full Q1/Q2 or use held-out
-prompts. `confirmation` is a fixed workflow phase; preserve its exact source
-on resume. Its driver/model/settings must match the fit point. Tests cover a
-complete 108-request fixture grid and reject partial grids or validation retuning.
-
-The targeted confirmation completed as run **42466570831**, attempt 2, at
-`af8b4044133ecef0de8751216248278a2fdb8ebd`: all 54 blocks/162 exact comparisons
-pass. Attempt 1's 32 blocks were resumed at the same source. The frozen cap1
-ratio is 0.9846, 95% interval [0.9721, 1.0019]; cap8 is 0.7727.
-The 5% practical-gain criterion is false. Do not retune or relabel this as full
-Pilot A/B, a controller result or held-out evaluation.
-All 927 members, block hashes, output/cycle/cache checks and regenerated
-statistics pass independent hosted verification. Actual Shutdown is confirmed.
-The complete raw archive is retained under
-`results/verification/codespace-confirmation-20261108/attempt-2`.
-
-The optional packed CPU profile is independent of that frozen confirmation.
-Cloud Release and ASan/UBSan suites pass for both profiles; the expanded fixture
-suite has 468 differential cases, 30 minimal/checkpoint comparisons and 18
-Unicode cases. Enable it only with
-`-DTOKENOMICS_CPU_BATCH_INVARIANT=OFF -DTOKENOMICS_CPU_PACKED_VERIFY=ON`.
-It applies four pinned repack substitutions to generated source, retaining
-one-row quantization/GEMV through nine verification rows and the guard for
-non-packed types. The default is unchanged. Controlled toy measurements and
-the rejected all-tiled alternative are retained in
-`results/verification/kernel-study-20261108`; neither establishes a trained gain.
-After confirmation has finished or its exact-source resume has priority,
-the separate trained profile check is:
-`gh workflow run codespace-experiment.yml --ref main -f phase=kernel -f candidate=qwen25-05-3-q4 -f drafter=ngram`.
-It keeps the unchanged 272-comparison gate, measures RSS, runs the 18-request
-ngram screen and validates original-state checkpoints. Do not mix this binary
-with earlier fit/confirmation measurements or promote it before trained checks.
-The `kernel` phase was cancelled as **42474834521**, attempt 2, at
-`63265d36939f802abb73b88962d96862c6c9169c`. Attempt 1 failed startup before
-inference; startup succeeded on retry. The user then required the controller to work in
-Codex Cloud before any more Codespaces execution. Workload cancellation and actual
-Shutdown were confirmed by finalizer job 128753544517. No trained packed-profile
-pass follows; do not resume that older run before the controller requirement.
-An additional 128 KiB cache-chunk study passes its strict fixture tests but
-does not improve verification, so it is rejected; see
-`results/verification/cache-study-20261108`.
-
-The Codex Cloud shell attachment recovered after the workspace context refreshed;
-the project files remained intact. Development has resumed there. Codespaces
-was stopped after cancellation; development continues in Codex Cloud. A paired CPU/logging benchmark was
-preserved on backup branch `codex/paired-cpu-profile` and in the named stash.
-It is now integrated and locally tested with the current controller runner; the source includes `analysis/profile_comparison.py`,
-`scripts/compare_cpu_profiles.py`, `configs/cpu-profile-screen-v1.json`, the
-per-configuration executable extension in `bench/run.py`, and their tests.
-Its gate-proof SHA is deliberately pending. Keep actual execution locked until the trained
-packed-profile evidence is verified; retain the same binary/target hashes.
-Hosted preflight run 42485374155 passes both CPU builds and their suites for
-that prepared source. The Codex Cloud version also checks generated-token
-counts explicitly and documents the optional per-condition executable map.
-The hosted `verify-evidence.yml` independently checks the two frozen runs.
-Its read-only job precedes a short `publish-evidence.yml` job that rechecks
-and stages only verified raw data, with the repository staging guard.
-The documentation index is `docs/requirements.md`; environment roles and CPU
-dispatch details are in `docs/environments.md` and `docs/cpu-profiles.md`.
-
-The dedicated controller design was committed as `d02a4c6` before implementation.
-The user explicitly requested experimental completion despite failed feasibility
-and asked not to run Codespaces until the controller works locally. Pure C++
-EWMA scheduling, transition charging, hold/margin, probes, ablations, reset,
-strict configuration and runtime telemetry are now implemented. Release tests
-and ASan/UBSan/leak-detected C++ integration pass; the full six-suite sanitizer
-run passed in 366.35 s. Calibration and the bounded study are tested end-to-end
-with generated fixtures, including byte-stable resume and tamper rejection.
-See `docs/controller-design.md` and `configs/controller-study-v1.json` for the
-complete policy contract and predeclared trained protocol. Trained controller
-study **42492089188** is active at exact checked source
-`e98c0fa84a2c2ff52df198f19eae6ce72d51c83c`; initialize job 128766464003
-succeeded, workload job 128766659255 is executing. It starts only after local
-checks pass. Measurements and actual finalizer Shutdown confirmation are pending;
-no controller speedup is claimed. The independent artifact checker reconstructs
-priors/statistics and verifies raw output/accounting without inference.
-
-Still required: quantify actual controller/instrumentation/probe overhead;
-freeze development priors and baselines; run held-out evaluation/ablations;
-finish the measured report/demo. Stock-executable stopping differs from the
-driver; an executed synthetic diagnostic confirms this difference. Mac/Metal is supported by
-configuration but unexecuted. The full runtime project remains incomplete.
-
-Earlier pre-controller wording (historical): “Building a portable C++ speculative-decoding
-runtime with checked KV rollback and lazy synchronization; validated with
-468 transformer fixture cases and a 272-comparison trained-Qwen Linux gate.”
-Do not claim acceleration from the current unfavorable timing screen.
-
-## Earlier completed Codespace setup
-
-The requested Codespace setup and Linux test repair are verified. Canonical
-source is `main`; PRs [#4](https://github.com/VictorWong123/tokenomics/pull/4) and
-[#8](https://github.com/VictorWong123/tokenomics/pull/8) are merged. Do not resume
-the earlier project continuation, timing, pilots, controller work or training
-without a new instruction. The continuation above supplies that new instruction.
-
-## Completed verification
-
-[Run 42420516268](https://github.com/VictorWong123/tokenomics/actions/runs/42420516268),
-attempt 1, completed successfully at test source
-`d1bb6fb778695515614d21cf78959f63f544db7b` (source tree
-`bf3bf3d7189ff8ac729b38c99f8b2139e847c754`). Later documentation-only commits do
-not change that tested implementation.
-
-- Hosted initialize succeeded and claimed the intended Codespace.
-- The workload ran on self-hosted runner 22,
-  `tokenomics-codespace-long-tasks`, in Codespaces.
-- Both trained Qwen2.5 Q4_K_M model hashes matched; all 14 diagnostics and all
-  272 exact-token comparisons passed. Reset references matched. Observed coverage
-  included zero/partial/full acceptance, catch-up, switching, budget and context
-  stops.
-- Artifact `tokenomics-model-check-42420516268-1` (ID 13596331570) uploaded.
-  Its GitHub ZIP digest is
-  `7a91126e3627b34d1bf4a4e08e88e5abb568462f474ed94442e2d4c73f9564d5`;
-  the workload's inner archive SHA256 is
-  `d20a9dff6ba877b1f3d540279a947eabee55d55364dc4dcf53ea21ae54e16235`.
-  Artifact retention ends 2026-11-11; the run logs retain the compact reports.
-- Hosted finalize succeeded and explicitly confirmed actual Codespace Shutdown.
-  Its `fixture_evidence_valid: false` is expected: it performs lifecycle cleanup,
-  while the separate model summary proves the tests passed.
-
-The model summary, initialization/finalization reports, run/job metadata and
-artifact metadata were checked from Codex Cloud. The artifact has now also been
-downloaded: ZIP, inner archive and all 32 manifest members match their recorded
-hashes. All 272 candidate identities/settings, exact IDs/stops and cycle/cache
-accounting were independently rechecked. The full small raw archive is retained
-in `results/verification/codespace-gate-20261108`. Its old schema-1 diagnosis
-does not validate current original-KV replay. Reuse the completed evidence;
-no setup rerun is needed.
-
-## Future Linux tests
-
-Use a trusted `main` push or the fixed **Run workflow** button on
-[Codespace Linux verification](https://github.com/VictorWong123/tokenomics/actions/workflows/codespace-fixtures.yml).
-Markdown-only pushes are ignored. The dedicated existing resource is
-`tokenomics-long-tasks-jwgxp7j7xvqfq76w`; the old Codespace is not used.
-Cloud access is through Actions initialize/workload/finalize.
-See [Cloud route](../.codex/cloud.md) for monitoring and credential boundaries.
-
-Qwen2.5 0.5B draft and 1.5B target weights persist at
-`/workspaces/.tokenomics-model-cache`, outside checkout cleanup, and are
-SHA-verified before tests. Missing weights are downloaded automatically. Neither
-the user's computer nor a local model server is needed.
-
-Failed tests or lifecycle stages create/update a deduplicated GitHub issue
-containing the run, source, available failing case and shutdown result. Only a
-short hosted reporting job has issue-write permission. Earlier timeout runs
-proved this reporting path. Resolved issues [#6](https://github.com/VictorWong123/tokenomics/issues/6)
-and [#7](https://github.com/VictorWong123/tokenomics/issues/7) retain the failures
-and the successful resolution. Issue #3 concerns later work and remains open.
-
-The repaired CPU configuration uses consistent kernels for supported generation
-widths and tiled larger prefills. The fixed test permits 7,200 seconds per
-candidate subprocess within the unchanged 9,000-second child and 210-minute job
-limits. All original 272 comparisons, model hashes, 2,048-token context and
-exact-token rules remain. See [investigation](divergence-investigation.md) and
-[test contract](model-correctness.md).
-
-This establishes the bounded Linux test route and its trained-model checks.
-Performance, Mac execution, stochastic sampling and completion of the broader
-research project were not established by that verification.
-
-
-Current controller-compatible packed CPU checks pass a fresh Release build and
-ASan/UBSan/leak detection: six suites, 906 differential fixture cases. Raw check
-receipts and generated-source hashes are retained under
-`results/verification/controller-packed-local-20261108`. The paired profile
-study remains locked by its pending trained-proof hash. The recorded-controller
-demo checks a completed study's priors and raw logging grid without inference;
-its default trained archive is unavailable until the active study is complete.
-
-
-Full held-out execution and supplementary analysis are now implemented and
-fixture-tested (`scripts/evaluate_controller.py`, `analysis/controller_details.py`).
-Real full evaluation requires all 90 held-out prompts, caps128/512 and at least
-five repeats; the development prior fixes the baseline and operating point.
-The old confirmation's whole-process costs extrapolate to roughly 119 hours for
-that seven-condition matrix, so no shortened/bounded run is claimed as full.
-Planned controller pauses have independently checked complete blocks and
-attempt-specific partial receipts; they do not freeze the final canonical result
-or permit incomplete-grid performance summaries. Resume the current exact-source
-controller study before starting the separate packed trained gate.
-
-
-Controller study 42492089188 attempt1 paused successfully after 25/36 validation
-blocks (175 records). The full 18-record fit and calibration are retained;
-selected fixed baseline is fixed1. Both trained controller gates pass 28 records,
-all actions 0/1/2/4/6/8, and the model path synchronizes 40 tokens. Independent
-checks verify ZIP SHA256
-`4b8f47ca4969cc76d631749865f4255c69603d8d39becd58cb7f5e497323e9a3`,
-all 1078 members, immutable blocks, IDs/stops/cache counts and reconstructed prior.
-Finalizer job 128797327277 confirms actual Shutdown. Raw attempt1, an explicit
-partial receipt and attempt-specific lifecycle proof are retained in
-`results/verification/codespace-controller-20261108`. No partial-grid aggregate
-speedup is claimed. Rerun the same workflow run (all jobs) to resume e98c0fa,
-finish 11 remaining blocks and the logging grid, before the packed experiment.
-
-
-Controller attempt2 is active at the original e98c0fa source: initialize job
-128799069336 succeeds and workload 128799270902 is running. It resumes the
-25 saved blocks and preserves the measured calibration/fixed1 baseline.
-Packed trained gate **42503429351** is queued at source
-`708993c603c89efcb75867d851292022b4960210`; the global Codespace concurrency
-waits for the controller attempt to finish. The new gate includes the same
-controller-compatible C++ code and the hosted lifecycle-report artifact.
-No trained packed-profile performance is claimed before its checks finish.
-The verifier's explicit run/source allowlist includes that point, and its
-kernel check now validates the selected point's exact source rather than the
-older cancelled run. The paired profile proof hash remains pending.
+The [engineering history](engineering-history.md) preserves earlier setup,
+implementation, experiment and recovery notes. Use this handoff for current
+status; historical queue states are not instructions to restart old work.

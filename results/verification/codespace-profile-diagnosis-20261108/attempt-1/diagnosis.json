@@ -1,0 +1,81 @@
+{
+  "binary_sha256": {
+    "guarded": "3b640fc90cca7b88cf02dc5fdde86c7c4f517dfa090e0ab7258bc09da8263d09",
+    "packed": "ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f"
+  },
+  "both_original_histories_reproduced": true,
+  "common_prefix_token_ids_equal": true,
+  "diagnostic_only": true,
+  "first_mismatch": {
+    "actual": 882,
+    "position": 36,
+    "reference": 323
+  },
+  "limitation": "Different CPU arithmetic/configuration can change greedy choices. Original incremental histories and excluded warm-up are reproduced. This does not isolate the responsible operator or establish a speedup.",
+  "performance_summary_produced": false,
+  "probes": {
+    "guarded": [
+      {
+        "actual_drafts": 0,
+        "context_tokens": 130,
+        "cycle_begin": 35,
+        "margin": 7.9309234619140625,
+        "output_index": 35,
+        "row": 0,
+        "second_id": 448,
+        "second_logit": 25.447265625,
+        "target_cached": 130,
+        "top_id": 11,
+        "top_logit": 33.37818908691406
+      },
+      {
+        "actual_drafts": 0,
+        "context_tokens": 131,
+        "cycle_begin": 36,
+        "margin": 0.2449798583984375,
+        "output_index": 36,
+        "row": 0,
+        "second_id": 882,
+        "second_logit": 27.37804412841797,
+        "target_cached": 131,
+        "top_id": 323,
+        "top_logit": 27.623023986816406
+      }
+    ],
+    "packed": [
+      {
+        "actual_drafts": 0,
+        "context_tokens": 130,
+        "cycle_begin": 35,
+        "margin": 7.608516693115234,
+        "output_index": 35,
+        "row": 0,
+        "second_id": 448,
+        "second_logit": 25.59307861328125,
+        "target_cached": 130,
+        "top_id": 11,
+        "top_logit": 33.201595306396484
+      },
+      {
+        "actual_drafts": 0,
+        "context_tokens": 131,
+        "cycle_begin": 36,
+        "margin": 0.03129768371582031,
+        "output_index": 36,
+        "row": 0,
+        "second_id": 323,
+        "second_logit": 27.40778160095215,
+        "target_cached": 131,
+        "top_id": 882,
+        "top_logit": 27.43907928466797
+      }
+    ]
+  },
+  "schema_version": 1,
+  "source": {
+    "owned_source_sha256": "7a12d0557b07592aed7abadc53675436df38ce56514bff0d5da8af6edf80c7c6",
+    "revision": "45ba7d6aabda5fd4fc0416a8abb0b8440737c6f8"
+  },
+  "state": "profile_diagnosis_complete",
+  "target_sha256": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d"
+}

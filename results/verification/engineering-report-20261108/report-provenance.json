@@ -1,12 +1,14 @@
 {
   "controller_receipt_sha256": "7033c827679173a1c409fc553126be281fd22ca8981f3fbd96deb55b47a0632f",
+  "diagnosis_receipt_path": "results/verification/codespace-profile-diagnosis-20261108/verification.json",
+  "diagnosis_receipt_sha256": "9cc2ef5d08adad930798a0b06f1baedc7a871a6797bf51c157ee8c30ea29f6bb",
   "figure_sha256": {
     "results/verification/codespace-controller-20261108/attempt-2/logging/analysis/development-summary-03-trajectory.png": "f212ffba5d78425c566282f48b56c4f5bcce0a5367521b0c6dd578824eec51de",
     "results/verification/codespace-controller-20261108/attempt-2/validation/analysis/controller-comparison.png": "4c84a399276e436ea00c2ed8ff91d7c240783f05c552e76a46352861516753df"
   },
-  "generator_sha256": "ab6ae9506974862b91aaaf036894e0b189b86e6eaddeb638a872c532373574e1",
+  "generator_sha256": "e7a62a7f008c5c127a26fa9435c0bd9769271387b4ae42f5644e5e6425d7b74f",
   "pages": 4,
-  "pdf_sha256": "12a7d03cd94191ed6a1145fa02ed90a3432b2691724893546bf8e51304b472a3",
+  "pdf_sha256": "035af35e9546367f3e29146e6ba15c2ec8038677d52c0cc6e9301af23c53787a",
   "profile_receipt_path": null,
   "profile_receipt_sha256": null,
   "schema_version": 1,

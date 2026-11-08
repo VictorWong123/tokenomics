@@ -71,6 +71,23 @@ def measurement_directory(phase, results, point):
     )
 
 
+def diagnostic_report(results):
+    """A diagnostic has no timing grid or benchmark environment file."""
+    diagnosis = json.loads((results / "diagnosis.json").read_text())
+    lifecycle.require(
+        diagnosis["state"] == "profile_diagnosis_complete"
+        and diagnosis["diagnostic_only"] is True
+        and diagnosis["both_original_histories_reproduced"] is True
+        and diagnosis["performance_summary_produced"] is False,
+        "Invalid profile diagnosis report",
+    )
+    return {
+        "profile_diagnosis": diagnosis,
+        "diagnostic_only": True,
+        "performance_summary_produced": False,
+    }
+
+
 def workload():
     phase = os.environ.get("TOKENOMICS_EXPERIMENT_PHASE", "timing")
     lifecycle.require(
@@ -407,7 +424,9 @@ def workload():
             "archive_sha256": digest,
             "status": status,
         }
-        if status["state"] != "failed":
+        if status["state"] != "failed" and phase == "profile-diagnosis":
+            report.update(diagnostic_report(results))
+        elif status["state"] != "failed":
             report["measurements"] = [
                 {
                     k: r[k]

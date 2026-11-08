@@ -8,6 +8,27 @@ from scripts.experiment_workload import pack
 
 
 class ExperimentEvidenceTests(unittest.TestCase):
+    def test_diagnostic_report_needs_no_timing_rows_or_environment_file(self):
+        from scripts.experiment_workload import diagnostic_report
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            diagnosis = dict(
+                state="profile_diagnosis_complete",
+                diagnostic_only=True,
+                both_original_histories_reproduced=True,
+                performance_summary_produced=False,
+            )
+            (root / "diagnosis.json").write_text(json.dumps(diagnosis))
+            result = diagnostic_report(root)
+            self.assertEqual(result["profile_diagnosis"], diagnosis)
+            self.assertNotIn("measurements", result)
+            self.assertNotIn("environment", result)
+            diagnosis["performance_summary_produced"] = True
+            (root / "diagnosis.json").write_text(json.dumps(diagnosis))
+            with self.assertRaisesRegex(RuntimeError, "Invalid profile diagnosis"):
+                diagnostic_report(root)
+
     def test_packed_controller_reads_its_validation_grid_and_diagnostics_have_none(
         self,
     ):

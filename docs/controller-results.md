@@ -9,7 +9,7 @@ This operating point does not establish an acceleration over ordinary decoding.
 ## Scope and provenance
 
 - Source: `e98c0fa84a2c2ff52df198f19eae6ce72d51c83c`.
-- Run 42492089188, attempts 1/2. Attempt1 preserves 25 complete blocks; attempt2
+- Run 42492089188, attempts 1/2. Attempt1 preserves 25 complete blocks; attempt 2
   finishes the same frozen grid. All 25 earlier block receipts/raw files, the
   prior and fit measurements are byte-identical after resume.
 - CPU: the dedicated Linux Codespace, AMD EPYC 7763, two logical CPUs
@@ -130,9 +130,9 @@ experiment.
 
 A separately gated row-consistent packed CPU profile passes its own trained
 correctness checks, with the optimization applied to ordinary decoding too.
-The paired comparison then fails cross-profile equality at output index36:
+The paired comparison then fails cross-profile equality at output index 36:
 guarded ordinary/detailed/fixed8 match each other, and packed variants match
-each other, but the profiles choose different tokens. The full54-record timing
+each other, but the profiles choose different tokens. The full 54-record timing
 grid is therefore unaccepted. Guarded remains the default, and the original
 failed point is retained. See [CPU profiles](cpu-profiles.md).
 
@@ -147,7 +147,7 @@ Read-only [hosted re-verification](https://github.com/VictorWong123/tokenomics/a
 also passes against the retained evidence, independently reconstructing the prior
 and summary. It starts no inference or Codespace.
 
-- [Raw attempt2](../results/verification/codespace-controller-20261108/attempt-2).
+- [Raw attempt 2](../results/verification/codespace-controller-20261108/attempt-2).
 - [Audited primary table and figures](../results/verification/codespace-controller-20261108/derived).
 - [Category, memory, acceptance/cost and regression figures](../results/verification/codespace-controller-20261108/derived/details).
 - [Byte-stable resume check](../results/verification/codespace-controller-20261108/derived/resume-verification.json).
@@ -170,3 +170,28 @@ measurements remain unexecuted. These are bounded development engineering
 results. No universal acceleration, model-quality, energy, dollar-cost or research
 novelty claim follows. The controller remains a reusable C++ implementation with
 explained behavior and a measured operating-point limitation.
+
+## Next engineering direction
+
+Keep guarded CPU as the reproducible reference. The packed experiment changes
+ordinary greedy output and cannot supply the planned exact-output speedup claim.
+A future native execution change needs both its within-profile speculative gate
+and the declared comparison contract; a numerical tolerance or different output
+contract must be designed and evaluated separately, before looking at timing.
+
+Before investing in a new full controller study, measure original-state action
+costs on a backend with useful batched verification savings. Keep the optimized
+ordinary decoder as the baseline, then calibrate fresh priors on the designated
+fit prompts. More aggressive EWMA tuning alone is not supported by the current
+ablations or the measured verification bottleneck. The full held-out workload
+remains reserved for a frozen operating point; no development prompts should
+be relabeled as held-out evidence.
+
+## Two-sentence project description
+
+Implemented a C++20 speculative-decoding runtime with retained KV caches, checked rollback, lazy draft synchronization and a six-action cost-aware controller with allocation-free decision/update paths.
+Verified 252 trained-model development comparisons and measured 20.5% higher throughput than cap8 ngram drafting at 1.67 µs of controller work per cycle, while remaining 2.9% below ordinary decoding.
+
+These figures describe the bounded Linux CPU development study above. The full
+research evaluation remains in progress; the named baseline and development
+scope belong with any public performance claim.

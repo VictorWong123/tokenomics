@@ -153,10 +153,10 @@ packed-profile speedup. The final comparisons must still use the same target,
 exact output IDs, natural token counts, complete costs and measured memory.
 
 
-The controller-compatible packed trained gate completes as run42503429351,
-source `708993c603c89efcb75867d851292022b4960210`, attempt2. Independent checks
+The controller-compatible packed trained gate completes as run 42503429351,
+source `708993c603c89efcb75867d851292022b4960210`, attempt 2. Independent checks
 validate 272 trained comparisons, 14 full-generation diagnosis records, 18 screen
-requests and 66 original-state replay actions, plus all166 payload files and the
+requests and 66 original-state replay actions, plus all 166 payload files and the
 execution manifest. The lifecycle artifact confirms actual Shutdown. Its
 [canonical proof](../results/verification/codespace-packed-controller-20261108/verification.json)
 binds binary `ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f`.
@@ -191,7 +191,7 @@ ratios and stage costs into a temporary directory and compares them with the
 archived summary. A modified aggregate is rejected even when token checks pass.
 This audit has no plotting dependency and never modifies raw evidence.
 
-The fixed paired study ran as [run42519929357](https://github.com/VictorWong123/tokenomics/actions/runs/42519929357),
+The fixed paired study ran as [run 42519929357](https://github.com/VictorWong123/tokenomics/actions/runs/42519929357),
 source `c834026c6bdddc4d219a25945befc318361e74fb`, using the explicit checked-source
 tag `tokenomics-profiles-20261108-c834026c6b`. The trained proof digest is
 `cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad`.
@@ -200,17 +200,28 @@ does not measure a paired CPU-profile gain.
 
 ## Cross-profile comparison closed on output divergence
 
-Run42519929357 completed the first six-condition block but failed the declared
-cross-profile token gate at output index36 on development-code-01, cap128.
+Run 42519929357 completed the first six-condition block but failed the declared
+cross-profile token gate at output index 36 on development-code-01, cap128.
 Guarded ordinary/detailed/fixed8 agree; packed ordinary/detailed/fixed8 agree.
 Guarded emits323 while packed emits882. Both exact executable hashes match the
 frozen source and the packed trained gate; this was not a binary mismatch.
-All36 payload files and actual Shutdown are independently verified in the
+All 36 payload files and actual Shutdown are independently verified in the
 [failed-point record](../results/verification/codespace-cpu-profiles-20261108).
 
-The full54-record grid did not complete. No cross-profile throughput estimate or
+The full 54-record grid did not complete. No cross-profile throughput estimate or
 confidence interval is accepted. The within-profile trained gate does not imply
 that two different CPU arithmetic profiles generate identical target sequences.
-The guarded profile remains the default. A separate original-history logit
-reproduction is prepared, with the same prompts, warm-up, caps, executable/model
-hashes and full128-token outputs; timings are diagnostic and excluded from claims.
+The guarded profile remains the default. A separate
+[original-history diagnosis](../results/verification/codespace-profile-diagnosis-20261108)
+reproduces both full 128-token outputs and warm-ups with the same executable/model
+hashes. At index 36, guarded ranks323 over882 by 0.244980 logit units; packed ranks
+882 over323 by 0.031298. Both inspected ordinary cycles have zero proposals.
+The common token prefix is identical; different CPU arithmetic/layout produces
+different target logits. This excludes the controller as the cause of this
+ordinary-decoding discrepancy, but does not isolate a responsible operator.
+
+The diagnosis subprocess completed before a workflow report-writer bug failed
+the job. The exact uploaded reportless archive is independently audited with
+its workflow failure, missing report and actual Shutdown recorded explicitly.
+All 11 payload files and the manifest are retained. The writer is fixed and
+regression-tested; no inference rerun or performance estimate is required.

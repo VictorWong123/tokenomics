@@ -343,7 +343,8 @@ def generate(out, profile_receipt=None, preview_dir=None, diagnosis_receipt=None
             f"Guarded selects token {guarded['top_id']} (top-two margin {guarded['margin']:.6f}); "
             f"packed selects {packed['top_id']} (margin {packed['margin']:.6f}) after 36 identical tokens. "
             "No cross-profile speedup is accepted. Guarded remains the default; this diagnosis does not "
-            "isolate the responsible arithmetic operator.",
+            "isolate the responsible arithmetic operator. The independently checked receipt explicitly "
+            "retains the workflow's post-inference reporting failure.",
             y,
             size=9.5,
         )

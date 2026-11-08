@@ -22,9 +22,12 @@ See the [controller result and figures](docs/controller-results.md) and
 [four-page engineering report](results/verification/engineering-report-20261108/tokenomics-engineering-report.pdf).
 The separate packed CPU profile passes the 272-comparison trained gate,
 14 full-generation diagnosis checks and 66 original-state replay actions; its
-paired comparison stopped on a cross-profile greedy-token difference at index36.
-Both profiles agree internally; an original-history logit diagnosis is being
-prepared. No cross-profile speedup is claimed. Full Pilot A/B, 90-prompt held-out evaluation and Metal
+paired comparison stopped on a cross-profile greedy-token difference at index 36.
+Both profiles agree internally. A checked original-history diagnosis reproduces
+both full 128-token outputs and shows reversed top-two ordinary target logits at
+the mismatch. Its workflow reporting failure is explicitly retained; the data
+and actual Shutdown pass independent audit. No cross-profile speedup is claimed.
+Full Pilot A/B, 90-prompt held-out evaluation and Metal
 execution remain incomplete. See [the handoff](docs/handoff.md) and
 [feasibility](docs/feasibility.md).
 

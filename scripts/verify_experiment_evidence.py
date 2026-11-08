@@ -39,6 +39,16 @@ FOLDERS = {
 
 CONTROLLER_PROFILES = {42492089188: "guarded"}
 
+# This immutable diagnostic finished inference, then the old report writer
+# referenced an unassigned timing-row variable. Retain the original archive and
+# its failed workflow outcome; do not rerun models or pretend report.json exists.
+REPORTLESS_DIAGNOSIS = {
+    "run_id": 42523392101,
+    "attempt": 1,
+    "artifact_id": 13634936420,
+    "zip_sha256": "9e2c2ca3da3960ff710695908246079531d2d71dcba796b6b86b38c3bf3a5af7",
+}
+
 
 def require(condition, message):
     if not condition:
@@ -58,13 +68,20 @@ def api(path, binary_out=None):
     return json.loads(result.stdout)
 
 
-def unpack(archive, expected_zip_sha, out):
+def unpack(archive, expected_zip_sha, out, *, reportless_owner=None):
     """Fail closed before extracting any untrusted archive path."""
     require(sha256(archive) == expected_zip_sha, "Artifact ZIP digest mismatch")
     with zipfile.ZipFile(archive) as zipped:
         require(
-            len(zipped.infolist()) == 2
-            and set(zipped.namelist()) == {"report.json", "evidence.tar.gz"},
+            (
+                len(zipped.infolist()) == 2
+                and set(zipped.namelist()) == {"report.json", "evidence.tar.gz"}
+                and reportless_owner is None
+            )
+            or (
+                reportless_owner is not None
+                and zipped.namelist() == ["evidence.tar.gz"]
+            ),
             "Unexpected ZIP members",
         )
         require(
@@ -74,10 +91,15 @@ def unpack(archive, expected_zip_sha, out):
             ),
             "Oversized ZIP member",
         )
-        report = json.loads(zipped.read("report.json"))
+        report = (
+            json.loads(zipped.read("report.json")) if reportless_owner is None else None
+        )
         packed = out / "evidence.tar.gz"
         packed.write_bytes(zipped.read("evidence.tar.gz"))
-    require(sha256(packed) == report["archive_sha256"], "Inner archive digest mismatch")
+    if report is not None:
+        require(
+            sha256(packed) == report["archive_sha256"], "Inner archive digest mismatch"
+        )
     evidence = out / "evidence"
     evidence.mkdir()
     with tarfile.open(packed) as tar:
@@ -112,6 +134,20 @@ def unpack(archive, expected_zip_sha, out):
                     digest.update(block)
             require(digest.hexdigest() == meta["sha256"], "Member digest mismatch")
         tar.extractall(evidence, filter="data")
+    if reportless_owner is not None:
+        status = json.loads((evidence / "status.json").read_text())
+        require(
+            status["state"] == "profile_diagnosis_complete"
+            and status["diagnostic_only"] is True
+            and status["performance_summary_produced"] is False,
+            "Reportless archive is not a completed diagnostic",
+        )
+        report = {
+            **reportless_owner,
+            "state": status["state"],
+            "archive_sha256": sha256(packed),
+            "report_reconstructed_from_manifest": True,
+        }
     for key in ("run_id", "attempt", "sha"):
         require(
             str(report[key]) == str(manifest[key]), "Archive/report ownership mismatch"
@@ -473,8 +509,23 @@ def verify_run(run_id, out, publish=False):
         root = Path(temp)
         archive = root / "artifact.zip"
         api(f"actions/artifacts/{artifact['id']}/zip", archive)
+        reportless_owner = None
+        if run_id == REPORTLESS_DIAGNOSIS["run_id"]:
+            require(
+                attempt == REPORTLESS_DIAGNOSIS["attempt"]
+                and artifact["id"] == REPORTLESS_DIAGNOSIS["artifact_id"]
+                and digest == "sha256:" + REPORTLESS_DIAGNOSIS["zip_sha256"]
+                and run["conclusion"] == "failure",
+                "Unknown reportless diagnostic attempt",
+            )
+            reportless_owner = dict(
+                run_id=run_id, attempt=attempt, sha=EXPECTED[run_id]
+            )
         report, manifest, evidence = unpack(
-            archive, digest.removeprefix("sha256:"), root
+            archive,
+            digest.removeprefix("sha256:"),
+            root,
+            reportless_owner=reportless_owner,
         )
         require(
             manifest["sha"] == EXPECTED[run_id]
@@ -613,6 +664,17 @@ def verify_run(run_id, out, publish=False):
             "verifier_sha256": sha256(Path(__file__)),
             "independent_output_checks": True,
             "full_feasibility_cleared": False,
+            **(
+                {
+                    "workflow_conclusion": run["conclusion"],
+                    "automation_state": "failed_after_diagnostic_completed",
+                    "report_json_present": False,
+                    "report_reconstructed_from_manifest": True,
+                    "reporting_error": "UnboundLocalError: timing rows referenced by diagnostic report writer",
+                }
+                if reportless_owner is not None
+                else {}
+            ),
             **lifecycle_proof,
             **checked,
         }

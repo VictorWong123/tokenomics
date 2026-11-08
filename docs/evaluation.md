@@ -104,11 +104,15 @@ its calibration/statistics again and uses hash-checked source figures. It is a
 bounded development checkpoint, not a full held-out research report.
 
 ```bash
-.venv/bin/python -m analysis.engineering_report --out results/local/report
+.venv/bin/python -m analysis.engineering_report --out results/local/report \
+  --diagnosis-receipt results/verification/codespace-profile-diagnosis-20261108/verification.json
 ```
 
 The retained provenance hashes the generator, PDF, source figures and canonical
 receipt. Two local generations produce byte-identical PDFs; the four rendered
-pages were visually inspected. A separately verified completed CPU comparison
+pages were visually inspected. The diagnostic option re-audits the original
+histories and records the CPU ranking reversal, with no performance estimate.
+Its source receipt explicitly preserves the post-inference workflow reporting
+failure. A separately verified completed CPU comparison
 can be included with `--profile-receipt PATH`; it is independently re-audited and
 its scope remains separate from the guarded controller result.

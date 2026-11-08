@@ -14,7 +14,11 @@ from scripts.verify_experiment_evidence import unpack, retain
 class FrozenArchiveTests(unittest.TestCase):
     def make_archive(self, root, variant="valid"):
         owner = {"run_id": "42466570831", "attempt": "2", "sha": "a" * 40}
-        payload = b'{"state":"paused"}\n'
+        payload = (
+            b'{"state":"profile_diagnosis_complete","diagnostic_only":true,"performance_summary_produced":false}\n'
+            if variant == "reportless"
+            else b'{"state":"paused"}\n'
+        )
         manifest = {
             **owner,
             "files": {
@@ -54,10 +58,36 @@ class FrozenArchiveTests(unittest.TestCase):
         archive = root / "artifact.zip"
         with zipfile.ZipFile(archive, "w") as zipped:
             zipped.write(packed, "evidence.tar.gz")
-            zipped.writestr(
-                "report.json", json.dumps({**owner, "archive_sha256": sha256(packed)})
-            )
+            if variant != "reportless":
+                zipped.writestr(
+                    "report.json",
+                    json.dumps({**owner, "archive_sha256": sha256(packed)}),
+                )
         return archive
+
+    def test_reportless_diagnostic_requires_explicit_owner_and_retains_scope(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive = self.make_archive(root, "reportless")
+            checked = root / "checked"
+            checked.mkdir()
+            with self.assertRaisesRegex(ValueError, "ZIP members"):
+                unpack(archive, sha256(archive), checked)
+            owner = dict(run_id="42466570831", attempt="2", sha="a" * 40)
+            report, _, _ = unpack(
+                archive, sha256(archive), checked, reportless_owner=owner
+            )
+            self.assertTrue(report["report_reconstructed_from_manifest"])
+            self.assertEqual(report["state"], "profile_diagnosis_complete")
+            wrong = root / "wrong"
+            wrong.mkdir()
+            with self.assertRaisesRegex(ValueError, "ownership"):
+                unpack(
+                    archive,
+                    sha256(archive),
+                    wrong,
+                    reportless_owner={**owner, "sha": "b" * 40},
+                )
 
     def test_valid_archive_and_outer_digest(self):
         with tempfile.TemporaryDirectory() as temp:
