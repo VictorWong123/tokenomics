@@ -171,3 +171,11 @@ then regenerates both endpoints into a separate temporary directory without
 rewriting source artifacts. A real two-executable generated-fixture grid checks
 54 records across all nine blocks and rejects an altered summary. That fixture
 check is not evidence of trained throughput or a passing trained profile gate.
+
+The paired report retains per-condition committed tokens, evaluated target rows,
+rejected proposals, generation/stage costs and verification milliseconds per row.
+It also checks whether compared conditions did identical work in each matched
+block. This separates a native execution improvement from changes in proposal
+or acceptance counts. These counters stay outside the primary timing-ratio
+calculation. The actual 54-record two-executable fixture audit and altered-summary
+rejection pass; see [tooling proof](../results/verification/paired-profile-tooling-20261108).

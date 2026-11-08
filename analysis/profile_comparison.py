@@ -116,6 +116,53 @@ def analyze(directory, out=None, *, plots=True):
             if (r["prompt_id"], r["output_cap"], r["configuration_id"]) == key
         )
     warm_comparisons = {f"{c}/{r}": paired_summary(warm_table, c, r) for c, r in PAIRS}
+    work_keys = ("cycles", "drafted", "accepted", "verified_rows", "synced_tokens")
+    work = {}
+    for cid in configs:
+        rs = [r for r in rows if r["configuration_id"] == cid]
+        totals = {
+            key: sum(r["execution"][key] for r in rs)
+            for key in work_keys
+            + (
+                "decision_ms",
+                "policy_update_ms",
+                "sync_ms",
+                "draft_ms",
+                "verify_ms",
+                "cache_ms",
+            )
+        }
+        output = sum(r["generated_tokens"] for r in rs)
+        generation = sum(r["generation_ms"] for r in rs)
+        work[cid] = {
+            **totals,
+            "output_tokens": output,
+            "generation_ms": generation,
+            "unaccepted_proposals": totals["drafted"] - totals["accepted"],
+            "target_rows_per_output_token": totals["verified_rows"] / output,
+            "verify_fraction_of_generation": totals["verify_ms"] / generation,
+            "verify_ms_per_target_row": totals["verify_ms"] / totals["verified_rows"],
+            "policy_fraction_of_generation": (
+                totals["decision_ms"] + totals["policy_update_ms"]
+            )
+            / generation,
+        }
+    by_block = {
+        (r["prompt_id"], r["output_cap"], r["repetition"], r["configuration_id"]): r
+        for r in rows
+    }
+    paired_work = {
+        f"{candidate}/{reference}": all(
+            all(
+                row["execution"][key]
+                == by_block[pid, cap, rep, reference]["execution"][key]
+                for key in work_keys
+            )
+            for (pid, cap, rep, cid), row in by_block.items()
+            if cid == candidate
+        )
+        for candidate, reference in PAIRS
+    }
     overhead = {}
     for profile, baseline in (("guarded", "target"), ("packed", "packed-target")):
         metric = comparisons[f"{profile}-detailed/{baseline}"]
@@ -132,6 +179,8 @@ def analyze(directory, out=None, *, plots=True):
         "comparisons": comparisons,
         "logging_overhead": overhead,
         "warm_latency_speedup_comparisons": warm_comparisons,
+        "stage_work": work,
+        "paired_work_identical": paired_work,
         "baseline_table": {
             cid: {
                 "geomean_median_tps": math.exp(

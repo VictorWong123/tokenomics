@@ -97,6 +97,19 @@ class ProfileComparisonTests(unittest.TestCase):
                                 "first_token_ms": 2,
                                 "load_ms": 1,
                                 "peak_rss_bytes": 1024,
+                                "execution": {
+                                    "cycles": 2,
+                                    "drafted": 1 if cid.endswith("fixed8") else 0,
+                                    "accepted": 0,
+                                    "verified_rows": 3 if cid.endswith("fixed8") else 2,
+                                    "synced_tokens": 0,
+                                    "decision_ms": 0.1,
+                                    "policy_update_ms": 0.1,
+                                    "sync_ms": 0,
+                                    "draft_ms": 0,
+                                    "verify_ms": costs[cid] - 0.3,
+                                    "cache_ms": 0.1,
+                                },
                                 "system_info": marker,
                                 "settings": {
                                     **{
@@ -132,6 +145,14 @@ class ProfileComparisonTests(unittest.TestCase):
             )
             self.assertAlmostEqual(
                 result["logging_overhead"]["guarded"]["decode_cost_fraction"], 0.02
+            )
+            self.assertEqual(result["stage_work"]["packed-target"]["output_tokens"], 18)
+            self.assertEqual(result["stage_work"]["packed-fixed8"]["verified_rows"], 27)
+            self.assertTrue(
+                result["paired_work_identical"]["packed-fixed8/guarded-fixed8"]
+            )
+            self.assertFalse(
+                result["paired_work_identical"]["packed-fixed8/packed-target"]
             )
             before = (directory / "analysis/summary.json").read_bytes()
             regenerated = analyze(

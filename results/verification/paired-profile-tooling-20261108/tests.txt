@@ -1,0 +1,14 @@
+profiles: 1/9 blocks complete (development-code-01-n128-r1)
+profiles: 2/9 blocks complete (development-summary-01-n128-r0)
+profiles: 3/9 blocks complete (development-summary-01-n128-r2)
+profiles: 4/9 blocks complete (development-qa-01-n128-r0)
+profiles: 5/9 blocks complete (development-code-01-n128-r0)
+profiles: 6/9 blocks complete (development-qa-01-n128-r2)
+profiles: 7/9 blocks complete (development-qa-01-n128-r1)
+profiles: 8/9 blocks complete (development-summary-01-n128-r1)
+profiles: 9/9 blocks complete (development-code-01-n128-r2)
+...
+----------------------------------------------------------------------
+Ran 3 tests in 1.695s
+
+OK

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-11-08T18:19:54.333463+00:00",
+  "scope": "Cloud actual two-executable synthetic transformer grid: 54 records / 9 blocks, paired work accounting and immutable artifact checker; no trained-model performance claim.",
+  "source": {
+    "revision": "d3d2dd5f816ddc3436829e13a530c2fb0508987c",
+    "owned_source_sha256": "a822afee00c21a6606c49ace059c2db92f73b57203839160a394769ad6790263"
+  },
+  "tests": 3,
+  "passed": true,
+  "guarded_binary_sha256": "1e513715f17677f25bc0cbddaba7a6cf14ed48c6ce7ad4c8399a1e4fa6d88c2b",
+  "packed_binary_sha256": "02eb1bfbd4aa50bb6c997d5ff7552fb0cc2ff5b4abe3838c01c45b9df2e23503",
+  "evidence": {
+    "tests.txt": "5fb4bc98de34c3ed1ca43343c7dde31bf6d4f6d9f280b4a71f128d84c43aa3d5"
+  }
+}
