@@ -60,7 +60,7 @@ def pack(results, destination, owner):
 def workload():
     phase = os.environ.get("TOKENOMICS_EXPERIMENT_PHASE", "timing")
     lifecycle.require(
-        phase in ("timing", "pilot", "confirmation", "kernel"),
+        phase in ("timing", "pilot", "confirmation", "kernel", "profiles"),
         "Unsupported fixed experiment",
     )
     selected = os.environ.get("TOKENOMICS_EXPERIMENT_CANDIDATE", "all")
@@ -72,9 +72,9 @@ def workload():
     drafter = os.environ.get("TOKENOMICS_EXPERIMENT_DRAFTER", "model")
     lifecycle.require(drafter in ("model", "ngram"), "Unsupported fixed drafter")
     lifecycle.require(
-        phase not in ("confirmation", "kernel")
+        phase not in ("confirmation", "kernel", "profiles")
         or (selected == "qwen25-05-3-q4" and drafter == "ngram"),
-        "Confirmation/kernel experiments require the 3B target and ngram drafter",
+        "Confirmation/kernel/profile experiments require the 3B target and ngram drafter",
     )
     point = candidate + ("-ngram" if drafter == "ngram" else "")
     owner = lifecycle.current()
@@ -185,14 +185,15 @@ def workload():
                 "--budget-seconds",
                 "6600",
             ]
-        elif phase == "kernel":
+        elif phase in ("kernel", "profiles"):
             args = [
                 "timeout",
                 "--signal=TERM",
                 "--kill-after=15s",
                 "9000s",
                 str(workspace / ".venv/bin/python"),
-                "scripts/check_kernel_profile.py",
+                ("scripts/check_kernel_profile.py" if phase == "kernel"
+                 else "scripts/compare_cpu_profiles.py"),
                 "--model-dir",
                 str(CACHE),
                 "--run-dir",
@@ -213,6 +214,7 @@ def workload():
         expected_states = {
             "confirmation": {0: "confirmation_complete", 11: "paused"},
             "kernel": {0: "kernel_profile_passed"},
+            "profiles": {0: "profile_comparison_complete"},
             "timing": {10: "timing_complete"},
             "pilot": {
                 11: "paused",
@@ -225,11 +227,10 @@ def workload():
             code in expected_states and status["state"] == expected_states[code],
             "Experiment did not satisfy its result contract",
         )
-        timing = (
-            results / "confirmation"
-            if phase == "confirmation"
-            else results / point / "timing"
-        )
+        if phase in ("confirmation", "profiles"):
+            timing = results / ("confirmation" if phase == "confirmation" else "profiles")
+        else:
+            timing = results / point / "timing"
         rows = read_jsonl(timing / "requests.jsonl")
         checks = read_jsonl(timing / "correctness.jsonl")
         lifecycle.require(
@@ -238,7 +239,7 @@ def workload():
                 and len(rows) <= 162
                 and (status["state"] != "confirmation_complete" or len(rows) == 162)
                 if phase == "confirmation"
-                else len(rows) == (18 if drafter == "ngram" else 21)
+                else len(rows) == (54 if phase == "profiles" else (18 if drafter == "ngram" else 21))
             )
             and len(checks) == len(rows)
             and all(c.get("ok") is True for c in checks),
@@ -343,6 +344,7 @@ def workload():
                 ("confirmation", results / "confirmation/analysis/summary.json"),
                 ("kernel_gate", results / "kernel-gate/status.json"),
                 ("kernel_screen", results / point / "analysis/measurements.json"),
+                ("cpu_profiles", results / "profiles/analysis/summary.json"),
             ):
                 if path.exists():
                     report[label] = json.loads(path.read_text())
@@ -358,6 +360,7 @@ def workload():
             "timing_complete",
             "confirmation_complete",
             "kernel_profile_passed",
+            "profile_comparison_complete",
             "paused",
             "proceed_controller_implementation",
             "narrow_or_investigate",
