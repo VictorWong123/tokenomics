@@ -1,5 +1,13 @@
 # Trained-model differential gate
 
+The fixed Codespace gate passed all 272 comparisons and all 14 diagnostic
+comparisons in [run 42420516268](https://github.com/VictorWong123/tokenomics/actions/runs/42420516268)
+on `main` source `d1bb6fb778695515614d21cf78959f63f544db7b`. Both expected
+Qwen model hashes matched, the artifact uploaded and actual Shutdown was
+confirmed separately. See [handoff](handoff.md) for the retained evidence.
+The current authorized workflow stops after Linux tests; do not start timing
+or project continuation automatically after a pass.
+
 Run this before interpreting model timings. It compares the ordinary target-only
 adapter, with no draft loaded, against resident target-only, fixed caps
 `{1,2,4,6,8}`, confidence, acceptance and scripted fallback/re-entry. Both cache
@@ -63,8 +71,8 @@ excluded. `TOKENOMICS_MODEL_SUMMARY` reports model-stage state; generic finalize
 cleanup reports confirmed shutdown separately, without a fixture-success line.
 Neither a successful archive upload nor shutdown proves the model gate passed.
 
-After this gate passes on trained models, measure the initial budget without
-starting a full pilot:
+The following timing command documents a separate research stage. It requires
+a new instruction and is not part of Codespace Linux verification:
 
 ```bash
 bash run.sh cpu --candidate qwen25-05-15-q4 --threads 2 --timing-only \
@@ -100,5 +108,6 @@ the pinned CPU tiled selector excludes the at-most-nine verification rows,
 while larger common prefills retain tiling. The pinned submodule is untouched;
 configuration fails if its expected selector changes. The executable records
 the profile in `system_info`. Vector dot kernels remain enabled.
-This is a correctness configuration, not a speedup claim. Remote
-validation of the change must be recorded before claiming the failure resolved.
+This is a correctness configuration, not a speedup claim. The completed remote
+verification linked above resolves the observed exact-token failure for this
+bounded matrix; it does not establish equivalence for every prompt or platform.

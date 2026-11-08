@@ -1,9 +1,11 @@
 # Trained-model divergence investigation
 
 The original trained-model correctness gate failed. The consistent-CPU-kernel
-fix is awaiting the full trained-model verification. No feasibility or speedup
-claim is supported. Do not continue to performance evaluation or controller
-selection until exact-token equivalence is resolved.
+fix and test deadline correction are now verified by a complete Linux run:
+all 272 exact-token comparisons and all 14 diagnostics passed in
+[42420516268](https://github.com/VictorWong123/tokenomics/actions/runs/42420516268).
+No feasibility or speedup claim is supported. The authorized scope ends after
+Linux testing and shutdown; do not continue to performance or controller work.
 
 Codespace run [42403427793](https://github.com/VictorWong123/tokenomics/actions/runs/42403427793)
 used source `54b4252cb4f2642156eaf7d4be71a1f945cc77c4`, two CPU threads,
@@ -56,7 +58,8 @@ ownership, existing resource selection and shutdown logic are unchanged.
 
 Local synthetic validation exercises this diagnostic path, including incorrect
 record matching and uncommitted-row exclusion. Synthetic agreement cannot resolve
-the trained-model failure. No root cause is established yet.
+the trained-model failure. This was the evidence available before the completed
+native diagnostic and correction recorded below.
 
 ## Cancelled diagnostic attempt
 
@@ -105,7 +108,7 @@ a mismatch. It then hit the 3,600-second candidate timeout during the repeated
 Shutdown was confirmed and the workflow automatically created issue #7.
 The follow-up restores tiled larger prefills while protecting all supported
 generation widths. Exact-token comparisons, all 272 cases, context size and
-deadlines are unchanged. Q4_K fixtures now exercise large-prefill/small-decode
+deadlines were unchanged in that follow-up. Q4_K fixtures now exercise large-prefill/small-decode
 transitions and exact first-row top-two logit equality across proposal caps.
 
 
@@ -115,3 +118,21 @@ the same 3,600-second candidate deadline. The fixed Linux integration-test
 budget is now 7,200 seconds per subprocess, inside the existing 9,000-second
 child and 210-minute job limits. This changes no cases, contexts, models,
 comparison rules or CPU profile. All 272 cases still have to finish.
+
+## Verified resolution
+
+Run 42420516268, attempt 1, on `main` source
+`d1bb6fb778695515614d21cf78959f63f544db7b` completed on dedicated Codespace
+runner 22. The 14 diagnostic comparisons had no mismatch, reference resets
+were equal, and the six fresh-prefix probes matched emitted tokens. The full
+trained-Qwen gate then passed 272/272 comparisons with the target/draft hashes
+listed above. Zero/partial/full acceptance, catch-up, switching, budget stops
+and context stops were observed. The artifact uploaded and the finalizer
+confirmed actual Shutdown. Issues #6 and #7 are closed with this evidence.
+
+The native mismatch depended on batch width; selecting consistent CPU kernels
+for the supported generation widths removed it in the complete unchanged
+matrix. The later failures were test deadlines, not observed token mismatches;
+the 7,200-second subprocess allowance let the two-core integration test finish.
+See [handoff](handoff.md) for artifact identity and verification limits. No
+performance experiment or project continuation followed the successful tests.

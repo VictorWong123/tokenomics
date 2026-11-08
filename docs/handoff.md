@@ -1,121 +1,69 @@
-# Review handoff (in progress)
+# Codespace Linux testing handoff
 
-## Current continuation status (2026-11-07)
+The requested Codespace setup and Linux test repair are verified. Canonical
+source is `main`; PRs [#4](https://github.com/VictorWong123/tokenomics/pull/4) and
+[#8](https://github.com/VictorWong123/tokenomics/pull/8) are merged. Do not resume
+the earlier project continuation, timing, pilots, controller work or training
+without a new instruction. Codespaces is used only for Linux tests.
 
-The implementation remains in progress. The verified dedicated two-core
-Codespace is `tokenomics-long-tasks-jwgxp7j7xvqfq76w`; use the trusted Actions
-route documented in `.codex/cloud.md`, not direct integration-token SSH/API
-access or a newly created resource. Run 42397563260 at work revision ff21ebc
-verified 24 fixture blocks / 168 synthetic records and actual shutdown.
+## Completed verification
 
-Trained Qwen2.5 0.5B/1.5B Q4_K_M downloads now work in that Codespace. The
-trained-model gate fails exact-token equality: run 42403427793 reproduced
-retain-fixed4/development-qa-00/repetition 0 at token 29, reference 16417 versus
-candidate 2415, then stopped and confirmed shutdown. Earlier run 42399562084
-retained partial mismatches before timeout. See `divergence-investigation.md`
-for hashes, evidence, limitations and the targeted diagnostic contract. Resolve
-this failure before performance pilots; no controller or speedup is established.
+[Run 42420516268](https://github.com/VictorWong123/tokenomics/actions/runs/42420516268),
+attempt 1, completed successfully at test source
+`d1bb6fb778695515614d21cf78959f63f544db7b` (source tree
+`bf3bf3d7189ff8ac729b38c99f8b2139e847c754`). Later documentation-only commits do
+not change that tested implementation.
 
-Draft PR #4 contains the model execution and diagnostic changes; work remains
-the verified setup baseline until reviewed/merged. Do not assume changes on a
-draft branch are on work. Exact-stock budget audit is separately retained in
-draft PR #5. Mac execution and final evaluation remain unverified.
+- Hosted initialize succeeded and claimed the intended Codespace.
+- The workload ran on self-hosted runner 22,
+  `tokenomics-codespace-long-tasks`, in Codespaces.
+- Both trained Qwen2.5 Q4_K_M model hashes matched; all 14 diagnostics and all
+  272 exact-token comparisons passed. Reset references matched. Observed coverage
+  included zero/partial/full acceptance, catch-up, switching, budget and context
+  stops.
+- Artifact `tokenomics-model-check-42420516268-1` (ID 13596331570) uploaded.
+  Its GitHub ZIP digest is
+  `7a91126e3627b34d1bf4a4e08e88e5abb568462f474ed94442e2d4c73f9564d5`;
+  the workload's inner archive SHA256 is
+  `d20a9dff6ba877b1f3d540279a947eabee55d55364dc4dcf53ea21ae54e16235`.
+  Artifact retention ends 2026-11-11; the run logs retain the compact reports.
+- Hosted finalize succeeded and explicitly confirmed actual Codespace Shutdown.
+  Its `fixture_evidence_valid: false` is expected: it performs lifecycle cleanup,
+  while the separate model summary proves the tests passed.
 
-The sections below retain the original cloud verification history; statements
-about unavailable model/Codespace access describe that earlier session only.
+The model summary, initialization/finalization reports, run/job metadata and
+artifact metadata were checked from Codex Cloud. The artifact ZIP was not
+independently downloaded in Cloud. Reuse the completed evidence; no setup rerun
+is needed.
 
-## Implemented
+## Future Linux tests
 
-C++20 driver pinned to llama.cpp, upstream greedy verifier and independent/lookup
-drafters, owned cache retention/rollback/lazy catch-up execution adapter,
-target-only and scripted fallback/re-entry, fixed caps, upstream confidence
-and proposed acceptance policies. No cost-aware scheduler is selected or
-implemented before feasibility evidence. The latter is an explicit remaining
-task, not an omission hidden behind a benchmark wrapper.
+Use a trusted `main` push or the fixed **Run workflow** button on
+[Codespace Linux verification](https://github.com/VictorWong123/tokenomics/actions/workflows/codespace-fixtures.yml).
+Markdown-only pushes are ignored. The dedicated existing resource is
+`tokenomics-long-tasks-jwgxp7j7xvqfq76w`; the old Codespace is not used.
+Cloud access is through Actions initialize/workload/finalize.
+See [Cloud route](../.codex/cloud.md) for monitoring and credential boundaries.
 
-Policy/commit unit tests and 183 differential synthetic-transformer cases cover
-zero/partial/full acceptance, correction/bonus, EOG, budget/context boundaries,
-request reset, changing k, fallback and synchronization. The runner persists
-balanced comparison blocks, checks exact IDs, freezes hashes/configurations and
-refuses incompatible resume. Q1 paired analysis and Q2 replay/prediction use
-separate prompt fit/validation. Original CC0 workload and experiment manifests
-are versioned. Devcontainer and optional Metal build/CI definitions are supplied.
+Qwen2.5 0.5B draft and 1.5B target weights persist at
+`/workspaces/.tokenomics-model-cache`, outside checkout cleanup, and are
+SHA-verified before tests. Missing weights are downloaded automatically. Neither
+the user's computer nor a local model server is needed.
 
-## Actually verified
+Failed tests or lifecycle stages create/update a deduplicated GitHub issue
+containing the run, source, available failing case and shutdown result. Only a
+short hosted reporting job has issue-write permission. Earlier timeout runs
+proved this reporting path. Resolved issues [#6](https://github.com/VictorWong123/tokenomics/issues/6)
+and [#7](https://github.com/VictorWong123/tokenomics/issues/7) retain the failures
+and the successful resolution. Issue #3 concerns later work and remains open.
 
-Linux **Codex Cloud**, not Codespaces: a fresh-venv bootstrap, Release CPU compilation, CTest, the
-fixture artifact/analysis workflow, same-command resume and resume-fingerprint
-rejection. Address/undefined-behavior sanitizer checks with leak detection also
-passed. Synthetic transformer tests are not trained-model correctness or
-feasibility results. No useful-model performance numbers exist yet.
+The repaired CPU configuration uses consistent kernels for supported generation
+widths and tiled larger prefills. The fixed test permits 7,200 seconds per
+candidate subprocess within the unchanged 9,000-second child and 210-minute job
+limits. All original 272 comparisons, model hashes, 2,048-token context and
+exact-token rules remain. See [investigation](divergence-investigation.md) and
+[test contract](model-correctness.md).
 
-Codespaces and the user's Mac have **not** run through this chat. The direct
-Codespace connection fails at the GitHub API allowlist. The Mac has no attached
-execution route. The devcontainer/Metal CI definitions are not reports of
-execution. See `feasibility.md` for hardware and exact observed blockers.
-
-An independent local Docker build of the devcontainer was attempted. The base
-image pull was denied at its registry CDN (`westcentralus.data.mcr.microsoft.com`).
-The container definition therefore remains unexecuted here; this is separate
-from the successfully exercised non-container Linux bootstrap.
-
-## Exact reproduction
-
-In Codespaces, fetch the pushed work branch (the default branch may still be
-the initial README):
-
-```bash
-git fetch origin work
-git switch work
-git pull --ff-only origin work
-bash run.sh cpu --fixtures-only --run-dir results/local/codespace-fixtures
-bash run.sh cpu --run-dir results/local/codespace-pilot
-```
-
-On macOS with Xcode Command Line Tools and Python 3.12+:
-
-```bash
-git clone --recurse-submodules --branch work https://github.com/VictorWong123/tokenomics.git
-cd tokenomics
-bash run.sh metal --fixtures-only --run-dir results/local/mac-fixtures
-bash run.sh metal --run-dir results/local/mac-metal-pilot
-```
-
-Record the exact same project revision, copy `models/models.lock.json` between
-machines, and keep each run directory separate. An identical command resumes
-completed blocks. `run.sh` bootstraps as well as runs; see README for direct
-commands once built. The model downloader reports blocked access instead of
-substituting weights. The script times a small batch before a long pilot.
-
-Regenerate example analysis without model downloads:
-
-```bash
-.venv/bin/python -m analysis.report results/example-fixtures --out results/local/example-analysis
-```
-
-## Remaining essential work
-
-1. Enable model access, inspect actual candidate memory/latency and run real
-   token-ID tests. Resolve any batch-induced first divergence exactly.
-2. Execute separate Q1/Q2 pilots on available Codespaces CPU and Mac Metal.
-   Examine noisy/ambiguous data before declaring either question answered.
-3. If supported, implement the cost-aware policy with development-only frozen
-   priors, exploration, hysteresis and fully charged fallback/catch-up. Otherwise
-   agree a justified narrower contribution or a concrete alternative.
-4. Validate exact stock-executable comparison, instrumentation overhead and
-   complete resource/swap/thermal observations on the selected machines.
-5. Freeze the selected contribution/baselines; run five-repeat 90-prompt held-out
-   evaluation and ablations. Report uncertainty, regressions and all failures.
-
-The supplied entry script stops at step 2's scientific decision. It does not
-claim that one unattended invocation can implement a controller justified by
-results that do not yet exist. The full runtime project is **not complete**.
-
-## Evidence-based résumé wording now
-
-“Building a portable C++ speculative-decoding runtime on pinned llama.cpp;
-implemented checked KV rollback, lazy draft synchronization and target-only
-re-entry, validated with 183 differential synthetic-transformer cases.”
-
-Use “in progress.” Do not add acceleration, M3 results, model-equivalence on
-trained weights, energy/cost savings, research novelty or publication claims.
+This establishes the bounded Linux test route and its trained-model checks.
+Performance, Mac execution, stochastic sampling and completion of the broader
+research project have not been established by this verification. Stop here.
