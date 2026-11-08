@@ -1,10 +1,39 @@
-# Feasibility decision — pending access and trained-model runs
+# Feasibility decision — development experiments in progress
 
 Q1 (repeatable benefit over target-only): **unresolved**.
 Q2 (predictable preferable action): **unresolved**.
-Recommendation: do not select a cost-aware controller from fixture timings.
+Recommendation: complete the bounded repeated investigation before selecting a
+controller. The first trained-model screen is unfavorable, with no repeated-run
+uncertainty estimate yet.
 
-## Actual execution
+## Current evidence (8 November 2026)
+
+Codespace run [42452778183](https://github.com/VictorWong123/tokenomics/actions/runs/42452778183)
+completed a nine-request trained-Qwen timing screen, passed every exact-ID and
+stop check, uploaded its artifact and confirmed actual Shutdown. The downloaded
+ZIP, inner archive and all 61 manifest members were hash-verified in Cloud.
+The dedicated two-CPU AMD EPYC 7763 host has about 7.8 GiB RAM and no swap.
+At cap 64 on three long development prompts (one per category), fixed4 achieved
+a geometric mean throughput ratio of 0.501 to target-only; confidence achieved
+0.533. One repetition and three prompts are insufficient to answer Q1/Q2.
+See `results/verification/codespace-timing-20261108` and `docs/report.md`.
+
+The original duration screen estimated 54.95 hours for full Pilot A. Separating
+fixed prefill/load/warm-up from decode gives approximately 19.72 hours. Both are
+rough extrapolations, not measured full-run duration. Run
+[42454095789](https://github.com/VictorWong123/tokenomics/actions/runs/42454095789)
+is executing a bounded resumable pilot at source
+`87c7811ed5fe24024f50782a1307ecbcef52bdee`. It must retain passing blocks and
+shut down before another invocation; incomplete pilots cannot clear a gate.
+
+Cloud development at that revision passes 330 differential fixture cases,
+25 additional minimal-logging/checkpoint comparisons, all four Release and
+sanitizer CTest suites (with leak detection), 24 lifecycle tests and the complete
+168-request fixture workflow. Trained-Qwen correctness was already established
+by the separate 272-comparison Codespace gate. The buffer-allocation changes
+are not claimed as a measured trained-model speedup.
+
+## Historical foundation and access blockers (7 November 2026)
 
 2026-11-07, Codex Cloud Linux x86_64; AMD EPYC 9V74, five exposed logical CPUs,
 cgroup CPU quota four cores, 16 GiB memory limit, no swap or GPU. GCC 14.2.0,
@@ -33,14 +62,15 @@ The configured cloud allowlist lacks Hugging Face. No trained weights or pilot
 measurements were produced. Domains need enabling in environment network
 settings; do not send credentials in chat.
 
-## Separate environments
+## Separate environments at the original handoff
 
 * **Codex Cloud Linux CPU:** source build, synthetic state/differential tests,
   resumable request/analysis pipeline executed.
 * **GitHub Codespaces:** user created `orange-space-giggle-gwpgvr4rvg7fgv9`.
   Direct `gh codespace ssh -c ...` fails before SSH at an `api.github.com`
   metadata request with Forbidden. Neither build nor model tests have run there
-  through this chat. Git repository fetch/push does work.
+  through the original chat. This historical route was replaced by the verified
+  dedicated Actions lifecycle; current execution is documented above.
 * **User's Mac:** no authorized shell/terminal connection is currently attached.
   Chip/RAM/power state have not been inspected. Metal configuration and commands
   are supplied, but no Metal execution or M3 result exists.

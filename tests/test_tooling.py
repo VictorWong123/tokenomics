@@ -12,6 +12,48 @@ from bench.replay import fit_validate
 
 
 class ToolingTests(unittest.TestCase):
+    def test_screen_cannot_trust_a_forged_passing_correctness_flag(self):
+        from analysis.timing_screen import report
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            cfg = {
+                "split": "development",
+                "repetitions": 1,
+                "output_caps": [1],
+                "configurations": [{"id": c} for c in ("fixed4", "target")],
+            }
+            atomic_json(
+                root / "run_manifest.json",
+                {
+                    "frozen": {
+                        "config": cfg,
+                        "prompts": [{"id": "development-qa-00"}],
+                        "code": {},
+                    }
+                },
+            )
+            atomic_json(root / "complete.json", {"records": 2})
+            rows = [
+                {
+                    "prompt_id": "development-qa-00",
+                    "output_cap": 1,
+                    "repetition": 0,
+                    "configuration_id": cid,
+                    "correctness": "pass",
+                    "token_ids": [token],
+                    "stop": "budget",
+                }
+                for cid, token in (("fixed4", 2), ("target", 1))
+            ]
+            (root / "requests.jsonl").write_text(
+                "".join(json.dumps(r) + "\n" for r in rows)
+            )
+            (root / "correctness.jsonl").write_text('{"ok": true}\n' * 2)
+            with self.assertRaisesRegex(ValueError, "output divergence"):
+                report(root, root / "analysis")
+            self.assertFalse((root / "analysis").exists())
+
     def test_frozen_analysis_rejects_missing_or_duplicate_cells_and_retuning(self):
         rows = [
             {

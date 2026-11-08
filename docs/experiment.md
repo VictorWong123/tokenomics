@@ -6,7 +6,10 @@ Policy code uses no Metal/CUDA APIs. Build and compare supported llama.cpp
 backends on each actual machine. Codespaces is an allocated Linux VM/container;
 its throughput is not a result for a typical desktop or a Mac. The current
 executed host is Codex Cloud, not Codespaces. Record cgroup CPU and memory
-limits in addition to exposed hardware. Mac tests must record chip, RAM,
+limits in addition to exposed hardware. The Codespace trained-model correctness
+route is now verified; development performance execution is a separate task.
+Develop/check changes in Cloud, push checked stages to main, then run the
+measurement workload in Codespaces. Mac tests must record chip, RAM,
 macOS, power/thermal state and Metal build. No NVIDIA GPU is required.
 
 Within every comparison: identical target file SHA-256, quantization, prompt
@@ -116,6 +119,22 @@ must be compared with request-only logging on development data before final
 performance claims. `getrusage` peak RSS is lifetime process memory, not VRAM.
 
 ## Next stage, deliberately locked
+
+Long development runs can pause at a complete comparison-block or checkpoint-
+group boundary using `--budget-seconds`. These pauses are planned scheduling,
+not failures or grounds to exclude observations. Keep the source SHA, binary,
+model hashes, prompts, order, and settings unchanged on resume. Replay groups
+carry content hashes, and prior incomplete attempts remain separate. The owned
+Codespace workflow persists measurements outside checkout/lifecycle cleanup,
+uploads evidence and confirms shutdown at the end of each invocation.
+
+Held-out report generation now requires the exact frozen measurement grid,
+including every repetition/configuration/cap/prompt, with no duplicates. It
+requires `selected_fixed` and `development_selection_sha256` in the frozen
+configuration. It honors that baseline even when another fixed action performs
+better on held-out data. The checked-in synthetic example explicitly declares
+its curated single repetition and retains the source-manifest fingerprint;
+it does not bypass completeness checks.
 
 The 90 held-out prompts and five-repetition protocol are versioned, but their
 configuration list stays empty until feasibility selects a contribution.

@@ -1,0 +1,37 @@
+{
+  "artifact_id": 13606887063,
+  "artifact_zip_sha256": "2fe581ef3568f25a27dc8ec12ef82e727526132d86d6d2f2297d5ebbd38df556",
+  "download_and_member_digests_verified": true,
+  "exact_id_checks": 9,
+  "geomean_ratios": {
+    "confidence": 0.5325028547023667,
+    "fixed4": 0.5005682707482527
+  },
+  "inner_archive_sha256": "a4c9b3ae6e7caeae36577caf5aa98735fa5dde551adf18a0f550b5369fb12660",
+  "limitation": "Neither estimate is a duration guarantee. Both extrapolate unmeasured configurations and EOS. Only the full repeated pilot can answer feasibility.",
+  "output_cap": 64,
+  "pilot_a_original_linear_estimate_hours": 54.94894771900005,
+  "pilot_a_separated_cost_estimate_hours": 19.72200861913334,
+  "prompts": 3,
+  "q1_supported": null,
+  "q2_supported": null,
+  "repetitions": 1,
+  "run_id": "42452778183",
+  "schema_version": 1,
+  "shutdown_confirmed": true,
+  "source_sha": "81c44cc8e731c89cc4fc357f295f70f111182b64",
+  "status": "preliminary development timing screen; not a feasibility decision",
+  "throughput_ratios_vs_target": {
+    "confidence": [
+      0.5631258276454822,
+      0.486420278008415,
+      0.5512501272898264
+    ],
+    "fixed4": [
+      0.5143589794929995,
+      0.4168825332017098,
+      0.584938124241262
+    ]
+  },
+  "verified_members": 61
+}

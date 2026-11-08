@@ -1,10 +1,46 @@
-# Codespace Linux testing handoff
+# Tokenomics continuation handoff
+
+## Current continuation (8 November 2026)
+
+The user requested completion of the broader project and clarified: develop
+and check in Codex Cloud, push checked stages to `main`, then execute trained
+tests and measurements in Codespaces. This supersedes the earlier test-only
+scope recorded below.
+
+`87c7811` reuses C++ proposal/batch storage, reserves bounded outputs and avoids
+retaining discarded minimal logs. It also prevents held-out baseline retuning,
+rejects incomplete/duplicate measurement grids, and adds hash-checked resumable
+pilot groups plus the fixed experiment lifecycle. Cloud Release/sanitizer tests
+pass, including leak detection; the fixture suite now has 330 cases plus 25
+minimal/checkpoint comparisons. All 168 fixture requests pass exact IDs.
+
+Trained timing run 42452778183 passed nine comparisons and confirmed Shutdown.
+Its three-prompt, one-repeat screen favored target-only: fixed4/target throughput
+ratio 0.501; confidence/target 0.533. These are preliminary observations, not
+Q1/Q2 decisions. The bounded repeated pilot is run 42454095789 at exact source
+`87c7811ed5fe24024f50782a1307ecbcef52bdee`. Its eventual artifacts and shutdown
+must be checked. Preserve that source on resume; do not combine new-code rows
+with its frozen run. Details and retained evidence are in `feasibility.md`.
+
+Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
+cost-aware or narrower controller; quantify instrumentation/probe overhead;
+freeze development priors and baselines; run held-out evaluation/ablations;
+finish the measured report/demo. Stock-executable stopping differs from the
+driver and needs a separately labeled diagnostic. Mac/Metal is supported by
+configuration but unexecuted. The full runtime project remains incomplete.
+
+Evidence-based wording now: “Building a portable C++ speculative-decoding
+runtime with checked KV rollback and lazy synchronization; validated with
+330 transformer fixture cases and a 272-comparison trained-Qwen Linux gate.”
+Do not claim acceleration from the current unfavorable timing screen.
+
+## Earlier completed Codespace setup
 
 The requested Codespace setup and Linux test repair are verified. Canonical
 source is `main`; PRs [#4](https://github.com/VictorWong123/tokenomics/pull/4) and
 [#8](https://github.com/VictorWong123/tokenomics/pull/8) are merged. Do not resume
 the earlier project continuation, timing, pilots, controller work or training
-without a new instruction. Codespaces is used only for Linux tests.
+without a new instruction. The continuation above supplies that new instruction.
 
 ## Completed verification
 
@@ -66,4 +102,4 @@ exact-token rules remain. See [investigation](divergence-investigation.md) and
 
 This establishes the bounded Linux test route and its trained-model checks.
 Performance, Mac execution, stochastic sampling and completion of the broader
-research project have not been established by this verification. Stop here.
+research project were not established by that verification.

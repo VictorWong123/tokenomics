@@ -1,0 +1,22 @@
+{
+  "geomean_ratios_vs_target": {
+    "confidence": 0.5325028547023668,
+    "fixed4": 0.5005682707482527,
+    "target": 1.0
+  },
+  "limitation": "No repeated-pilot decision or controller gain follows from this screen.",
+  "output_caps": [
+    64
+  ],
+  "prompts": 3,
+  "q1_supported": null,
+  "q2_supported": null,
+  "repetitions": 1,
+  "schema_version": 1,
+  "source": {
+    "owned_source_sha256": "a24a33b37532f17dbabde3c17b2b050e7aafc5f52d869dca37fd5ac30d17d40f",
+    "revision": "81c44cc8e731c89cc4fc357f295f70f111182b64"
+  },
+  "status": "development timing screen only",
+  "synthetic_fixture": false
+}

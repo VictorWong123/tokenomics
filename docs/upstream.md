@@ -45,6 +45,27 @@ reading this revision, not from assuming the project-plan pseudocode is an API.
 No submodule source changes are made. `src/runtime.cpp` owns request lifecycle,
 cache reconciliation, decisions, limits, timing and structured results.
 
+## Stopping-rule audit (8 November 2026)
+
+The pinned stock `speculative-simple.cpp` exits when `n_predict >
+params.n_predict`, not when the generated count reaches the cap. At the boundary,
+it can pass a zero `dp.n_max` to the generic drafter, where zero means no
+per-call cap. It also counts the whole verified block before checking EOG.
+Consequently its printed decoded-token count and elapsed time are not an exact
+budget/EOG comparator for this driver's committed IDs. The stock example also
+requires the prompt to fit one batch. Do not silently include its aggregate
+tokens/sec in the paired policy endpoint or call `cache=upstream` an executed
+stock baseline. A future stock-executable diagnostic must disclose these
+differences and retain natural emitted lengths; it cannot establish exact-ID
+equivalence by comparing decoded text alone.
+
+The owned adapter reuses proposal and target-batch allocations across cycles,
+reserves bounded output storage and avoids collecting discarded cycle logs in
+minimal mode. Prefix catch-up reuses its batch across chunks. These changes do
+not change upstream sampling, verification, tensor kernels, or cache positions.
+Per-request allocation/cleanup remains charged to warm completion latency;
+generation excludes buffer initialization before the first decode cycle.
+
 ## Related work and claim boundary
 
 Leviathan et al. (2023), Chen et al. (2023) establish speculative verification;

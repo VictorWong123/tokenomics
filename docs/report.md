@@ -1,6 +1,6 @@
 # Tokenomics: portable speculative-decoding runtime engineering
 
-Technical report, implementation checkpoint, 7 November 2026.
+Technical report, implementation checkpoint, 8 November 2026.
 This is an in-progress engineering result, not an acceleration or research
 novelty claim. The full feasibility and held-out evaluation remain unexecuted.
 
@@ -17,14 +17,14 @@ in the preferred action.
 Tokenomics preserves that ordering. The implemented C++ runtime supports the
 feasibility experiments and contributes explicit cache-state management inside
 the inference loop. It does not select a cost-aware controller from fabricated
-or synthetic speedups. The two feasibility questions are currently unresolved
-because trained-model downloads and external execution access are blocked in
-this chat's cloud environment.
+or synthetic speedups. The two feasibility questions remain unresolved: trained
+correctness now passes in Codespaces, but only a preliminary performance screen
+has completed. A repeated development pilot is running separately.
 
 | Environment | Actual execution | Feasibility evidence |
 |---|---|---|
 | Codex Cloud, Linux CPU | Release and sanitizer builds; synthetic-transformer correctness; resumable experiment and analysis | No trained-model evidence |
-| GitHub Codespaces | User-created machine identified; direct connection attempted | API request blocked before SSH; no execution claimed |
+| GitHub Codespaces, two CPUs | 272 trained-model comparisons; nine-request timing screen; owned Actions lifecycle and confirmed shutdown | Preliminary slowdown; full Q1/Q2 unresolved |
 | User's Mac, Metal | Commands and build configuration supplied | No attached execution route; hardware/RAM uninspected |
 
 The development host exposes an AMD EPYC 9V74 with five logical CPUs, but its
@@ -88,12 +88,58 @@ reproducible; test-only proposal corruption forces zero and partial acceptance
 without replacing upstream verification. Random weights exercise less uniform
 token sequences. Tests compare emitted IDs, not rendered text or random seeds.
 
-The current runtime suite passes 183 differential cases, covering zero/partial/
+The current runtime suite passes 330 differential cases, covering zero/partial/
 full acceptance, correction/bonus handling, EOG, changing draft caps, rollback,
 fallback, draft catch-up, re-entry, repeated-request reset, empty/short requests,
 output truncation and logical context boundaries. Unit tests separately cover
 commit counting and acceptance-policy bookkeeping. Address/undefined-behavior
 sanitizer testing with leak detection has passed on Linux.
+
+The suite now also exercises Q4_0 and Q4_K weights, large-prefill/small-decode
+kernel transitions, exact first-row top-two logit equality across draft caps,
+and 25 additional minimal-logging/checkpoint comparisons. The latest Cloud
+Release and address/undefined-sanitized builds both pass all four CTest suites;
+24 separate lifecycle tests also pass. See `results/verification/cloud-20261108`.
+
+Codespace run 42420516268 passed all 272 comparisons on trained Qwen2.5
+0.5B/1.5B Q4_K_M weights, following a documented batch-dependent arithmetic
+repair. Repacking, llamafile and BLAS are disabled in this CPU profile; tiled
+kernels are kept for larger prefills but excluded from verification widths up
+to nine rows. These are correctness constraints, not assumed optimizations.
+The pinned submodule remains unchanged; CMake builds a guarded copy of its
+tiled selector. See `docs/divergence-investigation.md` for failures and resolution.
+
+## Preliminary trained-model measurements
+
+Run 42452778183 used two logical CPUs on an AMD EPYC 7763 Codespace with
+approximately 7.8 GiB physical RAM and no swap. It tested three long development
+prompts, one per category, at cap 64 with one repetition. All nine comparisons
+passed exact prompt/output IDs and stopping checks. The archive was downloaded
+and all 61 members verified against its execution manifest; shutdown was
+confirmed. Source was `81c44cc8e731c89cc4fc357f295f70f111182b64`.
+
+| Configuration | QA decode tokens/s | Code decode tokens/s | Summary decode tokens/s | Geometric mean ratio to target |
+|---|---:|---:|---:|---:|
+| Target-only | 14.84 | 14.96 | 13.29 | 1.000 |
+| Fixed cap 4 | 6.19 | 7.70 | 7.77 | 0.501 |
+| Confidence cap 8 | 7.22 | 8.43 | 7.33 | 0.533 |
+
+This screen provides no repeated-run confidence interval, Q1 decision or Q2
+prediction result. It cannot establish that every configuration loses. On code
+and summary requests, acceptance reached roughly 67–75%, yet verification alone
+still exceeded target-only generation time. Drafting added approximately
+2.4–3.2 seconds per 64-token request. Decisions totaled about 0.01–0.02 ms per
+request, so their overhead is not the observed bottleneck. Peak lifetime RSS
+reached 1.22 GiB for target-only and 1.78 GiB with speculation. All observations,
+including the unfavorable ones, remain in the timing artifact.
+
+The original linear pilot estimator reported 54.95 hours. Treating fixed
+prefill/load/warm-up costs separately gives about 19.72 hours; neither is a
+duration guarantee because other configurations and EOS are unmeasured.
+The subsequent pilot uses a bounded invocation and preserves complete blocks
+for unchanged-source resume. No full-protocol completion is inferred from a
+timing screen. Compact raw records and hashes are retained under
+`results/verification/codespace-timing-20261108`.
 
 The Python suite checks deterministic balanced ordering, first-divergence
 reporting, fit/validation separation, prompt-clustered statistics, atomically
@@ -147,8 +193,8 @@ verification on actual Metal hardware.
 RSS is the process lifetime peak from `getrusage`, including load and warm-up.
 It is not per-request allocation, GPU VRAM or energy. No reduction in memory,
 energy or dollar cost follows merely from lower generation time. Detailed cycle
-records are buffered. The current minimal option omits serialization but still
-collects timers in memory, so a true instrumentation-cost ablation remains
+records are buffered. Minimal mode now avoids retaining cycle records while
+still collecting timers, so a true instrumentation-cost ablation remains
 necessary before final performance claims.
 
 ## Reproducibility and next decision

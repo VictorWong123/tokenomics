@@ -48,7 +48,7 @@ last cache reconciliation. JSON serialization is outside warm timing;
 whole-process wall time, including serialization, is retained by the Python runner.
 
 Cycle logs are buffered, then serialized after generation. Minimal mode omits
-cycle serialization but currently still collects timing records in memory;
+cycle storage and serialization but still takes stage timestamps;
 the logging ablation quantifies that narrower distinction. Do not describe it as
 a fully instrumentation-free build.
 
