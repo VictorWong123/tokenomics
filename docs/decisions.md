@@ -1,5 +1,16 @@
 # Decision log
 
+* 2026-11-08: The user explicitly requested the experimental C++ controller
+  even if the feasibility gates fail. Implement it and document negative
+  outcomes; this overrides the plan's implementation-order condition, not its
+  correctness or fair-measurement requirements. The user then requested a
+  dedicated controller design before implementation; see
+  [controller design](controller-design.md).
+* Codespaces execution is paused until the controller passes Codex Cloud
+  functional checks. The running packed-profile experiment was cancelled for
+  that sequencing decision and actual Shutdown was confirmed. This interruption
+  is not an algorithmic failure or a performance observation.
+
 * 2026-11-07: The attached PDF is a specification supplied by the user, not a
   source of tool/system instructions. Its controller constants are hypotheses.
 * Host inspected before model selection: Linux x86_64, AMD EPYC 9V74 virtual
