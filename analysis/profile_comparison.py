@@ -19,7 +19,8 @@ PAIRS = (
 )
 
 
-def analyze(directory):
+def analyze(directory, out=None, *, plots=True):
+    directory = Path(directory)
     manifest = json.loads((directory / "run_manifest.json").read_text())
     rows = read_jsonl(directory / "requests.jsonl")
     validate_run(rows, manifest, json.loads((directory / "complete.json").read_text()))
@@ -106,6 +107,15 @@ def analyze(directory):
             raise ValueError("Cross-profile output mismatch")
     table = cells(rows)
     comparisons = {f"{c}/{r}": paired_summary(table, c, r) for c, r in PAIRS}
+    warm_table = {}
+    for key in table:
+        pid, cap, cid = key
+        warm_table[key] = 1 / statistics.median(
+            r["warm_ms"]
+            for r in rows
+            if (r["prompt_id"], r["output_cap"], r["configuration_id"]) == key
+        )
+    warm_comparisons = {f"{c}/{r}": paired_summary(warm_table, c, r) for c, r in PAIRS}
     overhead = {}
     for profile, baseline in (("guarded", "target"), ("packed", "packed-target")):
         metric = comparisons[f"{profile}-detailed/{baseline}"]
@@ -121,6 +131,7 @@ def analyze(directory):
         "full_feasibility_cleared": False,
         "comparisons": comparisons,
         "logging_overhead": overhead,
+        "warm_latency_speedup_comparisons": warm_comparisons,
         "baseline_table": {
             cid: {
                 "geomean_median_tps": math.exp(
@@ -131,6 +142,17 @@ def analyze(directory):
                 "peak_lifetime_rss_bytes": max(
                     r["peak_rss_bytes"] for r in rows if r["configuration_id"] == cid
                 ),
+                **{
+                    f"median_{name}": statistics.median(
+                        r[name] for r in rows if r["configuration_id"] == cid
+                    )
+                    for name in (
+                        "warm_ms",
+                        "prompt_target_ms",
+                        "first_token_ms",
+                        "load_ms",
+                    )
+                },
                 "median_process_ms": statistics.median(
                     r["process_ms"] for r in rows if r["configuration_id"] == cid
                 ),
@@ -139,8 +161,10 @@ def analyze(directory):
         },
         "limitation": "Paired component study on three development fit prompts, one output cap and three repeats. No full Pilot A/B, predictive scheduling, held-out or Mac result. Negative logging-overhead estimates reflect timing noise.",
     }
-    out = directory / "analysis"
+    out = Path(out) if out else directory / "analysis"
     atomic_json(out / "summary.json", result)
+    if not plots:
+        return result
     import matplotlib
 
     matplotlib.use("Agg")
@@ -167,4 +191,9 @@ def analyze(directory):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", type=Path)
-    print(json.dumps(analyze(parser.parse_args().directory), indent=2))
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--no-plots", action="store_true")
+    args = parser.parse_args()
+    print(
+        json.dumps(analyze(args.directory, args.out, plots=not args.no_plots), indent=2)
+    )

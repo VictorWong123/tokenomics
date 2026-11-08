@@ -157,3 +157,17 @@ The controller-compatible packed trained gate is queued as run42503429351,
 source `708993c603c89efcb75867d851292022b4960210`, after controller study
 42492089188 attempt2. It remains a separate experiment and does not change
 that controller study's guarded binary or calibration.
+
+
+The paired analysis also reports warm-completion speedup intervals, formed from
+per-prompt median warm latency before prompt bootstrap, alongside its primary
+decode-throughput endpoint. The baseline table retains prompt-processing,
+first-commit and model-load times as separate fields. This matters because the
+older guarded confirmation averages 15.44 seconds of target prompt processing
+per request; a decoder-only number does not describe that full latency.
+
+Its artifact checker audits immutable raw records and the bound trained proof,
+then regenerates both endpoints into a separate temporary directory without
+rewriting source artifacts. A real two-executable generated-fixture grid checks
+54 records across all nine blocks and rejects an altered summary. That fixture
+check is not evidence of trained throughput or a passing trained profile gate.

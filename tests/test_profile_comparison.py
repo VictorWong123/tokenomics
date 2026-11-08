@@ -92,6 +92,10 @@ class ProfileComparisonTests(unittest.TestCase):
                                 "generated_tokens": 2,
                                 "generation_ms": costs[cid],
                                 "process_ms": costs[cid] + 10,
+                                "warm_ms": costs[cid] + 2,
+                                "prompt_target_ms": 1,
+                                "first_token_ms": 2,
+                                "load_ms": 1,
                                 "peak_rss_bytes": 1024,
                                 "system_info": marker,
                                 "settings": {
@@ -129,6 +133,18 @@ class ProfileComparisonTests(unittest.TestCase):
             self.assertAlmostEqual(
                 result["logging_overhead"]["guarded"]["decode_cost_fraction"], 0.02
             )
+            before = (directory / "analysis/summary.json").read_bytes()
+            regenerated = analyze(
+                directory, directory / "separate-analysis", plots=False
+            )
+            self.assertEqual(result, regenerated)
+            self.assertEqual((directory / "analysis/summary.json").read_bytes(), before)
+            self.assertGreater(
+                result["warm_latency_speedup_comparisons"]["packed-target/target"][
+                    "ratio"
+                ],
+                1,
+            )
             self.assertTrue(result["synthetic_fixture"])
             self.assertFalse(result["full_feasibility_cleared"])
             row = next(r for r in rows if r["configuration_id"] == "packed-target")
@@ -152,3 +168,78 @@ class ProfileComparisonTests(unittest.TestCase):
             write()
             with self.assertRaisesRegex(ValueError, "incomplete"):
                 analyze(directory)
+
+
+class ActualProfileEvidence(unittest.TestCase):
+    @unittest.skipUnless(
+        __import__("os").getenv("TOKENOMICS_PACKED_TEST_BINARY"),
+        "requires both compiled CPU profiles",
+    )
+    def test_audit_actual_two_binary_grid_and_reject_changed_summary(self):
+        import os
+        from bench.run import run
+        from bench.common import source_fingerprint
+        from scripts.verify_profile_evidence import check
+
+        guarded = Path(os.environ["TOKENOMICS_TEST_BINARY"]).resolve()
+        packed = Path(os.environ["TOKENOMICS_PACKED_TEST_BINARY"]).resolve()
+        model = guarded.parent / "fixtures/ngram-cycle.gguf"
+        cfg = json.loads((ROOT / "configs/cpu-profile-screen-v1.json").read_text())
+        prompts = [
+            dict(id=p, category=p.split("-")[1], split="development", prompt="a b")
+            for p in cfg["prompt_ids"]
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            # Synthetic harness stand-in, never a production trained-model proof.
+            proof = dict(
+                state="kernel_profile_passed",
+                exact_comparisons=272,
+                independent_output_checks=True,
+                shutdown_confirmed=True,
+                binary_sha256=sha256(packed),
+                screen_target_sha256=sha256(model),
+            )
+            atomic_json(root / "fixture-proof.json", proof)
+            cfg.update(
+                trained_gate="fixture-proof.json",
+                trained_gate_sha256=sha256(root / "fixture-proof.json"),
+                context=256,
+                batch=32,
+                threads=1,
+                warmup_tokens=2,
+            )
+            atomic_json(root / "configs/cpu-profile-screen-v1.json", cfg)
+            directory = root / "evidence/profiles"
+            run(
+                guarded,
+                model,
+                None,
+                prompts,
+                cfg,
+                directory,
+                identity={"synthetic_fixture": True},
+                executables={
+                    c["id"]: packed if c["kernel_profile"] == "packed" else guarded
+                    for c in cfg["configurations"]
+                },
+            )
+            analyze(directory)
+            with patch("scripts.verify_profile_evidence.ROOT", root):
+                receipt = check(
+                    root / "evidence",
+                    source_fingerprint()["revision"],
+                    synthetic_fixture=True,
+                )
+                self.assertEqual(receipt["exact_comparisons"], 54)
+                self.assertEqual(receipt["verified_blocks"], 9)
+                path = directory / "analysis/summary.json"
+                summary = json.loads(path.read_text())
+                summary["comparisons"]["packed-target/target"]["ratio"] += 0.1
+                atomic_json(path, summary)
+                with self.assertRaisesRegex(ValueError, "statistics differ"):
+                    check(
+                        root / "evidence",
+                        source_fingerprint()["revision"],
+                        synthetic_fixture=True,
+                    )
