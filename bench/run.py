@@ -68,8 +68,11 @@ def run(
     *,
     deadline=None,
     max_new_blocks=None,
+    executables=None,
 ):
     conf_ids = [c["id"] for c in config["configurations"]]
+    if executables is not None and set(executables) != set(conf_ids):
+        raise ValueError("Each configuration requires an explicit executable")
     if any(
         c.get(key)
         for c in config["configurations"]
@@ -114,6 +117,12 @@ def run(
         "identity": identity or {},
         "code": source_fingerprint(),
     }
+    if executables is not None:
+        settings["configuration_binary_sha256"] = {
+            cid: sha256(path) for cid, path in sorted(executables.items())
+        }
+        if settings["configuration_binary_sha256"]["target"] != settings["binary_sha256"]:
+            raise ValueError("The ordinary target executable must match --exe")
     manifest_path = out / "run_manifest.json"
     if manifest_path.exists():
         old = json.loads(manifest_path.read_text())
@@ -199,7 +208,7 @@ def run(
                 result_path = adir / f"{cid}.requests.jsonl"
                 cycles_path = adir / f"{cid}.cycles.jsonl"
                 args = [
-                    str(exe),
+                    str(executables[cid] if executables is not None else exe),
                     "--target",
                     str(target),
                     "--jobs",
