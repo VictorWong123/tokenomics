@@ -196,3 +196,20 @@ tag `tokenomics-profiles-20261108-c834026c6b`. The trained proof digest is
 `cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad`.
 Results remain pending; the gate's single-repetition screen does not measure a
 paired CPU-profile gain.
+
+## Cross-profile comparison closed on output divergence
+
+Run42519929357 completed the first six-condition block but failed the declared
+cross-profile token gate at output index36 on development-code-01, cap128.
+Guarded ordinary/detailed/fixed8 agree; packed ordinary/detailed/fixed8 agree.
+Guarded emits323 while packed emits882. Both exact executable hashes match the
+frozen source and the packed trained gate; this was not a binary mismatch.
+All36 payload files and actual Shutdown are independently verified in the
+[failed-point record](../results/verification/codespace-cpu-profiles-20261108).
+
+The full54-record grid did not complete. No cross-profile throughput estimate or
+confidence interval is accepted. The within-profile trained gate does not imply
+that two different CPU arithmetic profiles generate identical target sequences.
+The guarded profile remains the default. A separate original-history logit
+reproduction is prepared, with the same prompts, warm-up, caps, executable/model
+hashes and full128-token outputs; timings are diagnostic and excluded from claims.

@@ -57,6 +57,20 @@ def pack(results, destination, owner):
     return sha256(destination)
 
 
+def measurement_directory(phase, results, point):
+    if phase in ("controller", "controller-packed"):
+        return results / "validation"
+    if phase == "profiles":
+        return results / "profiles"
+    if phase == "confirmation":
+        return results / "confirmation"
+    if phase in ("timing", "kernel", "pilot"):
+        return results / point / "timing"
+    raise ValueError(
+        "Diagnostic stages do not have a performance measurement directory"
+    )
+
+
 def workload():
     phase = os.environ.get("TOKENOMICS_EXPERIMENT_PHASE", "timing")
     lifecycle.require(
@@ -69,6 +83,7 @@ def workload():
             "controller",
             "controller-packed",
             "profiles",
+            "profile-diagnosis",
         ),
         "Unsupported fixed experiment",
     )
@@ -82,7 +97,14 @@ def workload():
     lifecycle.require(drafter in ("model", "ngram"), "Unsupported fixed drafter")
     lifecycle.require(
         phase
-        not in ("confirmation", "kernel", "controller", "controller-packed", "profiles")
+        not in (
+            "confirmation",
+            "kernel",
+            "controller",
+            "controller-packed",
+            "profiles",
+            "profile-diagnosis",
+        )
         or (selected == "qwen25-05-3-q4" and drafter == "ngram"),
         "Confirmation/kernel/controller/profile experiments require the 3B target and ngram drafter",
     )
@@ -195,7 +217,7 @@ def workload():
                 "--budget-seconds",
                 "6600",
             ]
-        elif phase in ("kernel", "profiles"):
+        elif phase in ("kernel", "profiles", "profile-diagnosis"):
             args = [
                 "timeout",
                 "--signal=TERM",
@@ -203,9 +225,11 @@ def workload():
                 "9000s",
                 str(workspace / ".venv/bin/python"),
                 (
-                    "scripts/check_kernel_profile.py"
-                    if phase == "kernel"
-                    else "scripts/compare_cpu_profiles.py"
+                    {
+                        "kernel": "scripts/check_kernel_profile.py",
+                        "profiles": "scripts/compare_cpu_profiles.py",
+                        "profile-diagnosis": "scripts/profile_diagnosis.py",
+                    }[phase]
                 ),
                 "--model-dir",
                 str(CACHE),
@@ -247,6 +271,7 @@ def workload():
             "controller": {0: "controller_study_complete", 11: "paused"},
             "controller-packed": {0: "controller_study_complete", 11: "paused"},
             "profiles": {0: "profile_comparison_complete"},
+            "profile-diagnosis": {0: "profile_diagnosis_complete"},
             "timing": {10: "timing_complete"},
             "pilot": {
                 11: "paused",
@@ -259,61 +284,61 @@ def workload():
             code in expected_states and status["state"] == expected_states[code],
             "Experiment did not satisfy its result contract",
         )
-        timing = (
-            results / "profiles"
-            if phase == "profiles"
-            else (
-                results / "validation"
-                if phase == "controller"
-                else (
-                    results / "confirmation"
-                    if phase == "confirmation"
-                    else results / point / "timing"
-                )
-            )
-        )
-        if phase == "controller" and status["state"] == "paused":
-            rows = (
-                read_jsonl(timing / "requests.jsonl")
-                if (timing / "requests.jsonl").exists()
-                else []
-            )
-            checks = (
-                read_jsonl(timing / "correctness.jsonl")
-                if (timing / "correctness.jsonl").exists()
-                else []
+        if phase == "profile-diagnosis":
+            diagnosis = json.loads((results / "diagnosis.json").read_text())
+            lifecycle.require(
+                diagnosis["diagnostic_only"] is True
+                and diagnosis["both_original_histories_reproduced"] is True
+                and diagnosis["performance_summary_produced"] is False,
+                "Invalid profile diagnosis evidence",
             )
         else:
-            rows = read_jsonl(timing / "requests.jsonl")
-            checks = read_jsonl(timing / "correctness.jsonl")
-        lifecycle.require(
-            (
-                len(rows) % 3 == 0
-                and len(rows) <= 162
-                and (status["state"] != "confirmation_complete" or len(rows) == 162)
-                if phase == "confirmation"
-                else (
-                    (
-                        len(rows) % 7 == 0
-                        and len(rows) <= 252
-                        and (
-                            status["state"] != "controller_study_complete"
-                            or len(rows) == 252
+            timing = measurement_directory(phase, results, point)
+            if (
+                phase in ("controller", "controller-packed")
+                and status["state"] == "paused"
+            ):
+                rows = (
+                    read_jsonl(timing / "requests.jsonl")
+                    if (timing / "requests.jsonl").exists()
+                    else []
+                )
+                checks = (
+                    read_jsonl(timing / "correctness.jsonl")
+                    if (timing / "correctness.jsonl").exists()
+                    else []
+                )
+            else:
+                rows = read_jsonl(timing / "requests.jsonl")
+                checks = read_jsonl(timing / "correctness.jsonl")
+            lifecycle.require(
+                (
+                    len(rows) % 3 == 0
+                    and len(rows) <= 162
+                    and (status["state"] != "confirmation_complete" or len(rows) == 162)
+                    if phase == "confirmation"
+                    else (
+                        (
+                            len(rows) % 7 == 0
+                            and len(rows) <= 252
+                            and (
+                                status["state"] != "controller_study_complete"
+                                or len(rows) == 252
+                            )
+                        )
+                        if phase in ("controller", "controller-packed")
+                        else len(rows)
+                        == (
+                            54
+                            if phase == "profiles"
+                            else (18 if drafter == "ngram" else 21)
                         )
                     )
-                    if phase == "controller"
-                    else len(rows)
-                    == (
-                        54
-                        if phase == "profiles"
-                        else (18 if drafter == "ngram" else 21)
-                    )
                 )
+                and len(checks) == len(rows)
+                and all(c.get("ok") is True for c in checks),
+                "Invalid timing evidence",
             )
-            and len(checks) == len(rows)
-            and all(c.get("ok") is True for c in checks),
-            "Invalid timing evidence",
-        )
         if phase in ("timing", "kernel"):
             status["stage"] = "checkpoint-validation"
             atomic_json(results / "status.json", status)
@@ -416,6 +441,7 @@ def workload():
                 ("kernel_gate", results / "kernel-gate/status.json"),
                 ("kernel_screen", results / point / "analysis/measurements.json"),
                 ("cpu_profiles", results / "profiles/analysis/summary.json"),
+                ("profile_diagnosis", results / "diagnosis.json"),
             ):
                 if path.exists():
                     report[label] = json.loads(path.read_text())
@@ -433,6 +459,7 @@ def workload():
             "kernel_profile_passed",
             "controller_study_complete",
             "profile_comparison_complete",
+            "profile_diagnosis_complete",
             "paused",
             "proceed_controller_implementation",
             "narrow_or_investigate",

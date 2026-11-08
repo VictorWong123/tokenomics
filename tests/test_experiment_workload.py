@@ -8,6 +8,22 @@ from scripts.experiment_workload import pack
 
 
 class ExperimentEvidenceTests(unittest.TestCase):
+    def test_packed_controller_reads_its_validation_grid_and_diagnostics_have_none(
+        self,
+    ):
+        from scripts.experiment_workload import measurement_directory
+
+        root = Path("results")
+        self.assertEqual(
+            measurement_directory("controller-packed", root, "unused"),
+            root / "validation",
+        )
+        self.assertEqual(
+            measurement_directory("controller", root, "unused"), root / "validation"
+        )
+        with self.assertRaisesRegex(ValueError, "Diagnostic"):
+            measurement_directory("profile-diagnosis", root, "unused")
+
     def test_tagged_measurements_are_explicit_and_preflight_before_power_on(self):
         import yaml
         from bench.common import ROOT

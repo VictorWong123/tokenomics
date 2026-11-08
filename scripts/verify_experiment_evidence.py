@@ -419,11 +419,12 @@ def retain(evidence, receipt_path):
                 )
             else:
                 shutil.copy2(source, target)
-    canonical = root / (
-        f"verification-attempt-{receipt['attempt']}-paused.json"
-        if run_id in CONTROLLER_PROFILES and receipt["state"] == "paused"
-        else "verification.json"
-    )
+    if receipt["state"] == "failed":
+        canonical = root / f"failure-verification-attempt-{receipt['attempt']}.json"
+    elif run_id in CONTROLLER_PROFILES and receipt["state"] == "paused":
+        canonical = root / f"verification-attempt-{receipt['attempt']}-paused.json"
+    else:
+        canonical = root / "verification.json"
     if canonical.exists():
         previous = json.loads(canonical.read_text())
         for key in (
@@ -499,6 +500,10 @@ def verify_run(run_id, out, publish=False):
                     cpu_profile=CONTROLLER_PROFILES[run_id],
                 )
             )
+        elif run_id == 42519929357 and state == "failed":
+            from scripts.verify_profile_evidence import check_failure
+
+            checked = check_failure(evidence, EXPECTED[run_id])
         elif state == "profile_comparison_complete":
             from scripts.verify_profile_evidence import check
 

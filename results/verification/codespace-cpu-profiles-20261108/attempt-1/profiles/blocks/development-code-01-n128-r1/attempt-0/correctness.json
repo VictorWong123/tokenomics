@@ -1,0 +1,92 @@
+[
+  {
+    "attempt": 0,
+    "block_id": "development-code-01-n128-r1",
+    "configuration_id": "packed-target",
+    "first_mismatch": {
+      "actual": 882,
+      "position": 36,
+      "reference": 323
+    },
+    "ok": false,
+    "output_cap": 128,
+    "prompt_id": "development-code-01",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "profiles",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-code-01-n128-r1",
+    "configuration_id": "guarded-detailed",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-code-01",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "profiles",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-code-01-n128-r1",
+    "configuration_id": "guarded-fixed8",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-code-01",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "profiles",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-code-01-n128-r1",
+    "configuration_id": "packed-fixed8",
+    "first_mismatch": {
+      "actual": 882,
+      "position": 36,
+      "reference": 323
+    },
+    "ok": false,
+    "output_cap": 128,
+    "prompt_id": "development-code-01",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "profiles",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-code-01-n128-r1",
+    "configuration_id": "packed-detailed",
+    "first_mismatch": {
+      "actual": 882,
+      "position": 36,
+      "reference": 323
+    },
+    "ok": false,
+    "output_cap": 128,
+    "prompt_id": "development-code-01",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "profiles",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-code-01-n128-r1",
+    "configuration_id": "target",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-code-01",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "profiles",
+    "schema_version": 1
+  }
+]

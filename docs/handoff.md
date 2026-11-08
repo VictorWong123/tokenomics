@@ -28,7 +28,10 @@ Current checkpoint:
   The 54-record paired study is queued as42519929357, exact source
   c834026c6bdddc4d219a25945befc318361e74fb, via lightweight tag
   tokenomics-profiles-20261108-c834026c6b. It is allowlisted for independent
-  verification; no paired performance result is claimed before completion.
+  verification. It stopped on the first block: cross-profile token36 differs
+  (guarded323/packed882); all variants agree within their own profile. All36
+  payload files and actual Shutdown are checked. No cross-profile performance
+  summary is accepted. The original-history logit diagnosis is the next stage.
 - The separately named controller-packed extension is locally checked and now
   has a frozen prerequisite. It has no trained performance result yet. Use fresh
   calibration; run it only if the paired component result justifies that point.

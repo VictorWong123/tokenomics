@@ -1,0 +1,7 @@
+{
+  "error": "Experiment did not satisfy its result contract",
+  "error_type": "RuntimeError",
+  "message": "token_mismatch: performance gate closed; investigate first mismatch",
+  "schema_version": 1,
+  "state": "failed"
+}

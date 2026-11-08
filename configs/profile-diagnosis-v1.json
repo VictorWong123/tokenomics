@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "failure_receipt": "results/verification/codespace-cpu-profiles-20261108/failure-verification-attempt-1.json",
+  "failure_receipt_sha256": "fcf30b133cc895e1195b157e030c396cc1116575c9e2764b3d6bb54bc8c5bae4",
+  "expected_first_mismatch": {
+    "position": 36,
+    "reference": 323,
+    "actual": 882
+  },
+  "scope": "Reproduce exact failed-profile original histories and inspect target top-two logits; no timing or performance conclusion."
+}

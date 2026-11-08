@@ -1,0 +1,8 @@
+{
+  "evidence": {
+    "original-history-tests.txt": "d10df881b011b8e607710ab2f89708a67f0fdeccde27851f98b50bf7049f0bb3",
+    "tooling-ctest.txt": "84982ec742c01ce601f4c21cd43eb22c148c389a1a4ae053e23f3f25cbe5c8a2"
+  },
+  "passed": true,
+  "scope": "Local synthetic original-history/logit diagnostic harness and failed-output audit tests; not a trained numerical diagnosis or performance result."
+}
