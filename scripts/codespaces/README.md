@@ -118,6 +118,21 @@ gh workflow run codespace-experiment.yml --repo VictorWong123/tokenomics --ref m
   -f phase=timing -f candidate=qwen25-05-3-q4 -f drafter=ngram
 ```
 
+The fixed targeted repeat of the near-neutral ngram screen is:
+
+```bash
+gh workflow run codespace-experiment.yml --repo VictorWong123/tokenomics --ref main \
+  -f phase=confirmation -f candidate=qwen25-05-3-q4 -f drafter=ngram
+```
+
+This uses the frozen nine-prompt/two-cap/three-repeat configuration and selected
+cap1, with target and cap8 references. It checks the same trained binary, model
+and execution settings as the fit point. It pauses between complete blocks
+after the 6,600-second allowance and retains measurements by exact source SHA.
+Resume all jobs of that exact run to preserve the source; a newer `main` is a
+different experiment. A complete targeted confirmation is separate from the
+full feasibility and held-out gates. Hosted lifecycle jobs remain unchanged.
+
 For a future approved roughly three-hour task, a Cloud author may change the
 trusted self-hosted workload step and its checked-in helper/result allowlist to
 that task's fixed command and explicit expected output paths. Keep the hosted

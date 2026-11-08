@@ -131,6 +131,16 @@ performance claims. `getrusage` peak RSS is lifetime process memory, not VRAM.
 
 ## Next stage, deliberately locked
 
+The near-neutral ngram screen (ratio 1.0113, one repetition) motivates the
+predeclared targeted confirmation in `configs/ngram-confirmation-v1.json`.
+Fixed1 is frozen using the separate fit manifest/analysis hashes. Nine other
+development prompts (03–05 per category), both output caps and three repetitions
+compare target/fixed1/fixed8. Analysis uses the frozen challenger even if fixed8
+wins validation, clusters bootstrap resampling by prompt, and requires the full
+54-block/162-record grid. It records whether the chosen action exceeds 5% with
+a lower confidence limit above one; it never labels this subset as full Pilot
+A/B completion. Synthetic confirmation checks cannot support a practical gain.
+
 Long development runs can pause at a complete comparison-block or checkpoint-
 group boundary using `--budget-seconds`. These pauses are planned scheduling,
 not failures or grounds to exclude observations. Keep the source SHA, binary,

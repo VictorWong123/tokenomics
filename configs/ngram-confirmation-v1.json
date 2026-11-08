@@ -1,0 +1,62 @@
+{
+  "batch": 512,
+  "bootstrap_samples": 10000,
+  "configurations": [
+    {
+      "id": "target",
+      "policy": "target"
+    },
+    {
+      "drafter": "ngram",
+      "id": "fixed1",
+      "k": 1,
+      "policy": "fixed"
+    },
+    {
+      "drafter": "ngram",
+      "id": "fixed8",
+      "k": 8,
+      "policy": "fixed"
+    }
+  ],
+  "context": 2048,
+  "fit_analysis": "results/verification/codespace-ngram-20261108/analysis/measurements.json",
+  "fit_analysis_sha256": "26d43519735ce70c8dd92906749737396a472339943f82be0cdb22a787c4f9e3",
+  "fit_manifest": "results/verification/codespace-ngram-20261108/qwen25-05-3-q4-ngram/timing/run_manifest.json",
+  "fit_manifest_sha256": "bd147fef27985bdf5f0800428a59bcf3f0b7f1d8dd6fc60fe595c2c4caffc276",
+  "gate_confidence_lower": 1.0,
+  "gate_min_speedup": 1.05,
+  "invalid_run_reasons": [
+    "process_failure",
+    "missing_or_malformed_record",
+    "token_mismatch",
+    "documented_external_interruption"
+  ],
+  "memory_headroom_fraction": 0.2,
+  "output_caps": [
+    128,
+    512
+  ],
+  "phase": "targeted_confirmation",
+  "practical_margin": 0.05,
+  "primary_metric": "geomean_prompt_cap_median_throughput_ratio",
+  "prompt_ids": [
+    "development-qa-03",
+    "development-qa-04",
+    "development-qa-05",
+    "development-code-03",
+    "development-code-04",
+    "development-code-05",
+    "development-summary-03",
+    "development-summary-04",
+    "development-summary-05"
+  ],
+  "repetitions": 3,
+  "schema_version": 1,
+  "seed": 20261108,
+  "selected_fixed": "fixed1",
+  "split": "development",
+  "threads": 2,
+  "warmup_prompt": "Warm-up: continue briefly.",
+  "warmup_tokens": 16
+}

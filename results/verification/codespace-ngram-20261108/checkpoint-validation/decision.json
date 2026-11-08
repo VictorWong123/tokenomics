@@ -1,0 +1,8 @@
+{
+  "dynamic_baseline": "upstream variable-length ngram lookup, cap 8 (overlaps fixed8)",
+  "q2_supported": false,
+  "schema_version": 3,
+  "state_protocol": "host-owned original target KV snapshots; shared prepared draft KV per prefix",
+  "status": "insufficient common-prefix checkpoints",
+  "transition_sync_ms": []
+}

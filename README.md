@@ -92,6 +92,7 @@ gh workflow run codespace-experiment.yml --ref main -f phase=timing
 # Screen the larger memory-safe candidate and validate checkpoint replay:
 gh workflow run codespace-experiment.yml --ref main -f phase=timing -f candidate=qwen25-05-3-q4
 gh workflow run codespace-experiment.yml --ref main -f phase=timing -f candidate=qwen25-05-3-q4 -f drafter=ngram
+gh workflow run codespace-experiment.yml --ref main -f phase=confirmation -f candidate=qwen25-05-3-q4 -f drafter=ngram
 gh workflow run codespace-experiment.yml --ref main -f phase=pilot
 ```
 

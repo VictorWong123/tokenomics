@@ -1,0 +1,15 @@
+{
+  "assumption": "Fixed load/prefill/warm-up/serialization cost per request plus measured decode cost per actual token, assuming full output caps. Unmeasured configurations, prompt lengths, EOS, caches and shared CPU can change duration in either direction.",
+  "estimated_decode_seconds": 30718.68971976,
+  "estimated_fixed_seconds": 13385.234384423988,
+  "estimated_full_pilot_seconds": 44103.924104183985,
+  "sample_execution_seconds": 542.4714535659997,
+  "sample_generated_tokens": 1152,
+  "sample_generation_seconds": 170.65938733200002,
+  "sample_prompt_ids": [
+    "development-qa-01",
+    "development-code-01",
+    "development-summary-01"
+  ],
+  "sample_wall_seconds": 544.342227046
+}

@@ -1,0 +1,26 @@
+{
+  "artifact_id": 13610968953,
+  "artifact_zip_sha256": "68698b1afbef9bf0548b70a318f04d306b0cbf23eed504d2dce35a8597d1e223",
+  "attempt": 2,
+  "geomean_ratios_vs_target": {
+    "fixed1": 1.0112752456899692,
+    "fixed2": 0.9429435336885561,
+    "fixed4": 0.9204553666006907,
+    "fixed6": 0.8402381925398165,
+    "fixed8": 0.7820878471079677,
+    "target": 1.0
+  },
+  "inner_archive_sha256": "c32f25e7270da54d8b709cc89027ad3df9b7f549049336bd1023de5eeffec112",
+  "limitation": "Three development fit prompts, cap64, one repetition. Near-neutral shortest-cap result is ambiguous and requires repeated validation; full feasibility gates remain unresolved. Attempt1 failed startup before inference; attempt2 succeeded.",
+  "maximum_checkpoint_payload_bytes": 62617240,
+  "q1_supported": null,
+  "q2_supported": null,
+  "run_id": 42461982414,
+  "schema_version": 1,
+  "screen_exact_comparisons": 18,
+  "shutdown_confirmed": true,
+  "snapshot_action_checks": 66,
+  "snapshot_trace_captures": 3,
+  "source_sha": "6a4eea153b001c4897c0346ec09e063b11779e26",
+  "verified_members": 134
+}

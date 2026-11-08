@@ -14,6 +14,13 @@ file hash and cycle/cache count. Maximum checkpoint state payload is
 83,503,856 bytes. This supports correctness of the new saved-state path on
 these trained weights; it does not establish a predictable scheduling gain.
 
+`snapshot-setup.json` derives setup counters from the original rows. Median
+snapshot restoration is 1.09 ms (QA), 1.21 ms (code), and 5.36 ms (summary).
+Each of the two prefixes per group prepares draft KV once; preparation takes
+1.57–18.39 seconds depending on prefix. Every action then restores the same
+prepared state. These are measured diagnostic costs nested in request timers,
+not a before/after throughput experiment or deployable controller overhead.
+
 There are three development fit prompts, one cap (64) and one repetition.
 `checkpoint-validation/decision.json` explicitly reports insufficient
 checkpoints. No Q1/Q2 decision, frozen baseline selection, controller result or

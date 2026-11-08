@@ -80,6 +80,18 @@ screen ratio is fixed1 at 0.768 (confidence 0.682). Peak screen RSS is 2.75 GiB.
 Hosted finalization confirms actual Shutdown. Three fit-only prompts cannot
 clear Q1/Q2; the full-pilot duration extrapolation is 29.67 hours.
 
+Run 42461982414 attempt 2 completes the cheaper ngram screen at `6a4eea1`:
+18 exact comparisons plus 66 original-state action checks pass; all 134 archive
+members are verified and actual Shutdown confirmed. Fixed1 is near-neutral at
+1.0113; every larger cap loses. Attempt 1 failed startup before inference;
+the unchanged owned lifecycle succeeded on retry. Raw data are in
+`results/verification/codespace-ngram-20261108`. The fit evidence freezes fixed1
+for a targeted nine-prompt development confirmation (128/512 caps, three
+repetitions, target/fixed1/fixed8). This does not clear full Q1/Q2 or use held-out
+prompts. `confirmation` is a fixed workflow phase; preserve its exact source
+on resume. Its driver/model/settings must match the fit point. Tests cover a
+complete 108-request fixture grid and reject partial grids or validation retuning.
+
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;

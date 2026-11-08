@@ -27,6 +27,16 @@ Older replays cannot clear that gate. Use a fresh Pilot A with the corrected,
 checkpoint-capable driver; do not mix versions or disable binary/model/settings
 identity checks. Timing screens now also exercise checkpoint correctness.
 
+The 3B screens pass at `1f945147` (model) and `6a4eea1` (ngram), with identical
+driver/target hashes. Both independently verified raw archives and actual
+Shutdown reports are retained in `results/verification`. Model drafting loses;
+ngram fixed1 is near-neutral at 1.0113. The fixed `confirmation` workflow phase
+freezes that choice from its hashed fit evidence and tests nine distinct dev
+prompts, two caps and three repeats against target/cap8. It pauses after 6,600
+seconds and persists complete blocks by source SHA. Resume all jobs at its exact
+source; do not dispatch a changed main and merge rows. This targeted follow-up
+does not clear full Pilot A/B, Q2 or held-out gates. No lifecycle boundary changes.
+
 Main additionally fixes incomplete-UTF-8 display serialization. The older
 `87c7811` invocation paused at 11/108 complete blocks with 110 passing checks;
 its artifact hashes and actual Shutdown are verified. Retain this exploratory

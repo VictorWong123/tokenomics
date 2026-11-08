@@ -59,7 +59,9 @@ def pack(results, destination, owner):
 
 def workload():
     phase = os.environ.get("TOKENOMICS_EXPERIMENT_PHASE", "timing")
-    lifecycle.require(phase in ("timing", "pilot"), "Unsupported fixed experiment")
+    lifecycle.require(
+        phase in ("timing", "pilot", "confirmation"), "Unsupported fixed experiment"
+    )
     selected = os.environ.get("TOKENOMICS_EXPERIMENT_CANDIDATE", "all")
     lifecycle.require(
         selected in ("all", "qwen25-05-15-q4", "qwen25-05-3-q4"),
@@ -68,6 +70,11 @@ def workload():
     candidate = "qwen25-05-15-q4" if selected == "all" else selected
     drafter = os.environ.get("TOKENOMICS_EXPERIMENT_DRAFTER", "model")
     lifecycle.require(drafter in ("model", "ngram"), "Unsupported fixed drafter")
+    lifecycle.require(
+        phase != "confirmation"
+        or (selected == "qwen25-05-3-q4" and drafter == "ngram"),
+        "Confirmation is frozen to the 3B target and ngram drafter",
+    )
     point = candidate + ("-ngram" if drafter == "ngram" else "")
     owner = lifecycle.current()
     expected = lifecycle.expected_runner()
@@ -86,7 +93,7 @@ def workload():
         == owner["sha"],
         "Checkout identity mismatch",
     )
-    if phase == "pilot":
+    if phase in ("pilot", "confirmation"):
         # Retain only experiment measurements across owned stop/start cycles.
         # Lifecycle leases, runner configuration and credentials stay elsewhere.
         store = Path("/workspaces/.tokenomics-experiment-cache")
@@ -162,6 +169,21 @@ def workload():
             args += ["--candidate", candidate]
         if drafter == "ngram":
             args += ["--ngram-only"]
+        if phase == "confirmation":
+            args = [
+                "timeout",
+                "--signal=TERM",
+                "--kill-after=15s",
+                "9000s",
+                str(workspace / ".venv/bin/python"),
+                "scripts/confirm_ngram.py",
+                "--model-dir",
+                str(CACHE),
+                "--run-dir",
+                str(results),
+                "--budget-seconds",
+                "6600",
+            ]
         with open(
             results / f"pipeline-{owner['run_id']}-{owner['attempt']}.txt", "x"
         ) as log:
@@ -175,24 +197,38 @@ def workload():
             ).returncode
         status = json.loads((results / "status.json").read_text())
         expected_states = (
-            {10: "timing_complete"}
-            if phase == "timing"
-            else {
-                11: "paused",
-                20: "proceed_controller_implementation",
-                21: "narrow_or_investigate",
-                22: "scope_decision_required",
-            }
+            {0: "confirmation_complete", 11: "paused"}
+            if phase == "confirmation"
+            else (
+                {10: "timing_complete"}
+                if phase == "timing"
+                else {
+                    11: "paused",
+                    20: "proceed_controller_implementation",
+                    21: "narrow_or_investigate",
+                    22: "scope_decision_required",
+                }
+            )
         )
         lifecycle.require(
             code in expected_states and status["state"] == expected_states[code],
             "Experiment did not satisfy its result contract",
         )
-        timing = results / point / "timing"
+        timing = (
+            results / "confirmation"
+            if phase == "confirmation"
+            else results / point / "timing"
+        )
         rows = read_jsonl(timing / "requests.jsonl")
         checks = read_jsonl(timing / "correctness.jsonl")
         lifecycle.require(
-            len(rows) == (18 if drafter == "ngram" else 21)
+            (
+                len(rows) % 3 == 0
+                and len(rows) <= 162
+                and (status["state"] != "confirmation_complete" or len(rows) == 162)
+                if phase == "confirmation"
+                else len(rows) == (18 if drafter == "ngram" else 21)
+            )
             and len(checks) == len(rows)
             and all(c.get("ok") is True for c in checks),
             "Invalid timing evidence",
@@ -287,9 +323,13 @@ def workload():
             report["completed_pilot_blocks"] = len(
                 list(results.glob("*/pilot-a/blocks/*/complete.json"))
             )
+            report["completed_confirmation_blocks"] = len(
+                list(results.glob("confirmation/blocks/*/complete.json"))
+            )
             for label, path in (
                 ("pilot_a", results / point / "pilot-a/analysis/summary.json"),
                 ("pilot_b", results / point / "pilot-b/decision.json"),
+                ("confirmation", results / "confirmation/analysis/summary.json"),
             ):
                 if path.exists():
                     report[label] = json.loads(path.read_text())
@@ -303,6 +343,7 @@ def workload():
         if status["state"]
         in (
             "timing_complete",
+            "confirmation_complete",
             "paused",
             "proceed_controller_implementation",
             "narrow_or_investigate",

@@ -200,6 +200,26 @@ produce a complete performance block. The end-to-end fixture workflow has run
 Fixture timing is retained only to exercise artifact generation; it cannot
 answer whether useful language-model speculation helps.
 
+The cheaper ngram screen in run 42461982414 attempt 2 uses the identical 3B
+target hash, binary and execution settings, without a draft model. All 18
+comparisons and 66 snapshot action checks pass. All 134 artifact members were
+hash-verified and actual Shutdown confirmed. Geometric mean ratios to the
+within-run ordinary reference are fixed1 **1.0113**, fixed2 **0.9429**, fixed4
+**0.9205**, fixed6 **0.8402**, fixed8 **0.7821**. The shortest cap makes actual
+proposals, accepting 5/6, 14/14 and 14/18 across the three prompts. Peak RSS is
+2.18 GiB. Its 1.1% aggregate estimate is below the 5% practical margin, with no
+repeat uncertainty estimate; larger caps lose. The full ngram Pilot A duration
+extrapolation is 12.25 CPU hours.
+
+This ambiguous point motivates a frozen targeted confirmation on nine other
+development prompts, caps 128/512 and three repetitions. It selects fixed1
+only from the separate fit screen and compares target/fixed1/fixed8; the
+analysis cannot retune the challenger on validation. Completion requires all
+54 blocks/162 measurements. Bounded invocations retain partial data and cannot
+analyze it as complete. This is a targeted follow-up, not full Pilot A/B or a
+held-out controller result. Raw fit evidence is in
+`results/verification/codespace-ngram-20261108`.
+
 ## Experiment design and timing
 
 Candidate selection begins with Qwen2.5 0.5B/1.5B Q4_K_M as an initial pair,

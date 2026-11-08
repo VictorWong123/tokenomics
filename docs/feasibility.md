@@ -2,9 +2,9 @@
 
 Q1 (repeatable benefit over target-only): **unresolved**.
 Q2 (predictable preferable action): **unresolved**.
-Recommendation: complete the bounded repeated investigation before selecting a
-controller. The first trained-model screen is unfavorable, with no repeated-run
-uncertainty estimate yet.
+Recommendation: complete the frozen targeted ngram confirmation before selecting
+a controller. Both independent-model screens are unfavorable; the cheaper
+ngram shortest cap is near-neutral and needs repeated validation.
 
 ## Current evidence (8 November 2026)
 
@@ -54,6 +54,26 @@ and cache/commit accounting were independently checked. Snapshot payload peaks
 at 83,503,856 bytes. Three fit prompts are insufficient for Q2 validation.
 Hosted finalize confirms actual Shutdown. Raw evidence and regenerated figures
 are in `results/verification/codespace-3b-20261108`.
+
+The cheaper mechanism was measured in
+[42461982414, attempt 2](https://github.com/VictorWong123/tokenomics/actions/runs/42461982414/attempts/2).
+All 18 exact comparisons, three captures and 66 snapshot action checks pass;
+all 134 archive members were hash-verified and actual Shutdown confirmed.
+Ngram fixed1 reaches a geometric mean ratio of **1.0113** to target-only;
+fixed2/4/6/8 reach 0.9429/0.9205/0.8402/0.7821. Actual fixed1 proposals and
+accepted counts are 6/5 (QA), 14/14 (code), 18/14 (summary). Peak RSS is
+2.18 GiB. Attempt 1 failed startup before inference; the unchanged lifecycle
+succeeded on retry. Raw records are in `results/verification/codespace-ngram-20261108`.
+
+The 1.1% shortest-cap point is below the frozen 5% practical margin and cannot
+distinguish useful benefit from noise. The predeclared next check freezes that
+action from these three fit prompts and uses nine distinct development prompts,
+caps 128/512 and three repetitions against ordinary target and variable-length
+ngram cap8. `configs/ngram-confirmation-v1.json` hashes the fit evidence;
+`scripts/confirm_ngram.py` rejects drift, retuning and partial-grid analysis.
+It uses bounded resumable invocations. This targeted confirmation does not
+replace the full Pilot A/B or held-out protocol and cannot itself unlock a
+cycle controller. The full ngram Pilot A extrapolation is 12.25 CPU hours.
 
 ## Historical foundation and access blockers (7 November 2026)
 

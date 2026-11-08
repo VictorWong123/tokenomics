@@ -1,0 +1,19 @@
+Internal ctest changing into directory: /workspaces/.tokenomics-actions-runner/_work/tokenomics/tokenomics/build-cpu
+Test project /workspaces/.tokenomics-actions-runner/_work/tokenomics/tokenomics/build-cpu
+    Start 1: core
+1/4 Test #1: core .............................   Passed    0.00 sec
+    Start 2: fixtures
+2/4 Test #2: fixtures .........................   Passed    0.29 sec
+    Start 3: runtime
+3/4 Test #3: runtime ..........................   Passed    2.36 sec
+    Start 4: tooling
+4/4 Test #4: tooling ..........................   Passed    2.41 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   5.07 sec
+timing: 1/3 blocks complete (development-qa-01-n64-r0)
+timing: 2/3 blocks complete (development-code-01-n64-r0)
+timing: 3/3 blocks complete (development-summary-01-n64-r0)
+Estimated complete Pilot A: 12.25 hours for qwen25-05-3-q4. Results persist after each configuration; identical reruns resume complete blocks.
+timing_complete: Development timing screen completed. Full Pilot A/B and feasibility decisions were not run.

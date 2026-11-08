@@ -1,0 +1,69 @@
+{
+  "groups": [
+    {
+      "checkpoint": 32,
+      "max_restore_ms": 2.542566,
+      "median_restore_ms": 1.2084155,
+      "min_restore_ms": 1.07135,
+      "one_time_draft_preparation_ms": [
+        {
+          "checkpoint_id": "development-code-01:32",
+          "prompt_draft_ms": 2631.794353,
+          "state_save_ms": 0.781778
+        },
+        {
+          "checkpoint_id": "development-code-01:24",
+          "prompt_draft_ms": 2372.394835,
+          "state_save_ms": 0.474334
+        }
+      ],
+      "prompt_id": "development-code-01",
+      "restores": 22,
+      "target_capture_save_ms": 9.726792
+    },
+    {
+      "checkpoint": 32,
+      "max_restore_ms": 1.665608,
+      "median_restore_ms": 1.0935365,
+      "min_restore_ms": 0.705877,
+      "one_time_draft_preparation_ms": [
+        {
+          "checkpoint_id": "development-qa-01:32",
+          "prompt_draft_ms": 1700.296113,
+          "state_save_ms": 0.981231
+        },
+        {
+          "checkpoint_id": "development-qa-01:24",
+          "prompt_draft_ms": 1568.125669,
+          "state_save_ms": 0.383316
+        }
+      ],
+      "prompt_id": "development-qa-01",
+      "restores": 22,
+      "target_capture_save_ms": 6.100605
+    },
+    {
+      "checkpoint": 32,
+      "max_restore_ms": 8.39302,
+      "median_restore_ms": 5.356656500000001,
+      "min_restore_ms": 3.823515,
+      "one_time_draft_preparation_ms": [
+        {
+          "checkpoint_id": "development-summary-01:32",
+          "prompt_draft_ms": 18389.169514,
+          "state_save_ms": 11.885862
+        },
+        {
+          "checkpoint_id": "development-summary-01:24",
+          "prompt_draft_ms": 18315.977269,
+          "state_save_ms": 8.865133
+        }
+      ],
+      "prompt_id": "development-summary-01",
+      "restores": 22,
+      "target_capture_save_ms": 46.996399
+    }
+  ],
+  "limitation": "Actual diagnostic setup costs only, nested inside prompt/generation request timers. No before/after runtime speedup, normal decode throughput benefit or scheduling gain is inferred. Preparation occurs once for each of the two checkpoint prefixes per group.",
+  "schema_version": 1
+}

@@ -1,0 +1,10 @@
+{
+  "attempt": "2",
+  "evidence_status": "No valid fixture summary; lifecycle cleanup only",
+  "fixture_evidence_valid": false,
+  "mode": "finalize",
+  "passed": true,
+  "run_id": "42461982414",
+  "sha": "6a4eea153b001c4897c0346ec09e063b11779e26",
+  "shutdown_confirmed": true
+}
