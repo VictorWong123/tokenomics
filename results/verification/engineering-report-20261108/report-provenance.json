@@ -1,0 +1,15 @@
+{
+  "controller_receipt_sha256": "7033c827679173a1c409fc553126be281fd22ca8981f3fbd96deb55b47a0632f",
+  "figure_sha256": {
+    "results/verification/codespace-controller-20261108/attempt-2/logging/analysis/development-summary-03-trajectory.png": "f212ffba5d78425c566282f48b56c4f5bcce0a5367521b0c6dd578824eec51de",
+    "results/verification/codespace-controller-20261108/attempt-2/validation/analysis/controller-comparison.png": "4c84a399276e436ea00c2ed8ff91d7c240783f05c552e76a46352861516753df"
+  },
+  "generator_sha256": "ab6ae9506974862b91aaaf036894e0b189b86e6eaddeb638a872c532373574e1",
+  "pages": 4,
+  "pdf_sha256": "12a7d03cd94191ed6a1145fa02ed90a3432b2691724893546bf8e51304b472a3",
+  "profile_receipt_path": null,
+  "profile_receipt_sha256": null,
+  "schema_version": 1,
+  "scope": "Four-page bounded development engineering checkpoint, not full held-out research completion.",
+  "source_inference_sha": "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c"
+}

@@ -12,7 +12,7 @@ Current checkpoint:
   every action. Raw IDs/stops/cache accounting are independently checked.
 - Study 42492089188 attempt2 completes all 36 blocks / 252 exact validation
   records and 16 logging records. Both attempts have actual Shutdown proof.
-  All 1587 final members pass audit; the first25 blocks, fit and prior are
+  All 1587 payload files plus the manifest pass audit; the first25 blocks, fit and prior are
   byte-identical after resume. Canonical proof and raw attempt2 are retained.
 - Controller/target throughput is 0.9709 [0.9607,0.9810]; controller/fixed1
   0.9943 [0.9853,1.0023]; controller/cap8 1.2048 [1.1271,1.2868]. No practical

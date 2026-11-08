@@ -44,11 +44,11 @@ and quantization layout, not greedy sampling or upstream acceptance/verification
 It is not a custom GPU kernel. The current trained candidates are dense Qwen;
 MoE and other backend/model combinations have not been validated by this work.
 
-Cloud Release and address/undefined-sanitizer suites pass with leak detection,
-including 468 differential cases, 30 additional minimal/checkpoint comparisons
-and 18 Unicode cases. Hosted preflight also passes both CPU profiles for the
-prepared paired benchmark. These fixture results establish no language-model
-speedup. The separate trained gate is currently running; keep the profile
+Current Cloud Release and address/undefined-sanitizer checks pass all six suites
+with leak detection and 906 differential cases, including quantized kernels,
+minimal/checkpoint comparisons and Unicode boundaries. The initial 468-case
+profile preflight is retained as an earlier checkpoint. These fixture results
+establish no language-model speedup. The separate trained gate is currently running; keep the profile
 experimental until its correctness, memory and throughput evidence is checked.
 
 ## Trained validation and comparison

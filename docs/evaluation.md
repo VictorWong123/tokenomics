@@ -94,3 +94,21 @@ requests identified separately from original minimal timing histories. No qualit
 energy, dollar-cost, full-precision equivalence or cross-hardware improvement
 follows from a throughput ratio. The retained raw records and analysis explain
 where execution time and regressions actually arise.
+
+## Four-page engineering checkpoint
+
+The [PDF report](../results/verification/engineering-report-20261108/tokenomics-engineering-report.pdf)
+condenses implementation, controller design, correctness, measured comparisons,
+reproducibility and limitations. It reads the checked trained archive, audits
+its calibration/statistics again and uses hash-checked source figures. It is a
+bounded development checkpoint, not a full held-out research report.
+
+```bash
+.venv/bin/python -m analysis.engineering_report --out results/local/report
+```
+
+The retained provenance hashes the generator, PDF, source figures and canonical
+receipt. Two local generations produce byte-identical PDFs; the four rendered
+pages were visually inspected. A separately verified completed CPU comparison
+can be included with `--profile-receipt PATH`; it is independently re-audited and
+its scope remains separate from the guarded controller result.

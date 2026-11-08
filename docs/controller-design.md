@@ -384,7 +384,7 @@ checks above passed. Attempt1 paused after 25/36 blocks; attempt2 completed all
 252 validation records and 16 separate logging records. Earlier raw blocks,
 fit measurements and prior are byte-identical after resume. Both trained
 correctness mechanisms pass 28 records each and exercise all six actions; the
-model gate observes 40 synchronized draft tokens. All 1587 final archive members
+model gate observes 40 synchronized draft tokens. All 1587 payload files plus the final execution manifest
 and raw block/calibration checks pass independent verification. Finalizer job
 128815104360 confirms actual Shutdown. The canonical final receipt is separate
 from attempt1's partial receipt.

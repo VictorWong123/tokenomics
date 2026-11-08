@@ -139,7 +139,7 @@ policy gain by retaining a slower ordinary baseline. See [CPU profiles](cpu-prof
 The [canonical receipt](../results/verification/codespace-controller-20261108/verification.json)
 records artifact ZIP/inner archive hashes, source/model/binary identity,
 regenerated statistics and actual Shutdown from finalizer job 128815104360.
-All 1587 archive members and raw block/IDs/stops/cache checks pass independent
+All 1587 payload files plus the execution manifest and raw block/IDs/stops/cache checks pass independent
 verification. The hosted job's success alone was not used as shutdown proof.
 Read-only [hosted re-verification](https://github.com/VictorWong123/tokenomics/actions/runs/42509187514)
 also passes against the retained evidence, independently reconstructing the prior

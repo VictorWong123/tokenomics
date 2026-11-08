@@ -1,6 +1,8 @@
 # Tokenomics: portable speculative-decoding runtime engineering
 
 Technical report, implementation checkpoint, 8 November 2026.
+The [four-page engineering PDF](../results/verification/engineering-report-20261108/tokenomics-engineering-report.pdf)
+provides a concise, verified checkpoint; this document retains the fuller technical history.
 This is an in-progress engineering result, not an acceleration or research
 novelty claim. The full feasibility and held-out evaluation remain incomplete.
 
@@ -110,9 +112,12 @@ sanitizer testing with leak detection has passed on Linux.
 
 The suite now also exercises Q4_0 and Q4_K weights, large-prefill/small-decode
 kernel transitions, exact first-row top-two logit equality across draft caps,
-and 30 additional minimal-logging/checkpoint comparisons. The latest Cloud
-Release and address/undefined-sanitized builds both pass all four CTest suites;
-24 separate lifecycle tests also pass. See `results/verification/cloud-20261108`.
+and 30 additional minimal-logging/checkpoint comparisons. Current guarded and
+packed Cloud Release and ASan/UBSan/leak checks pass all six CTest suites,
+including the independent controller and strict JSON tests. See
+`results/verification/controller-local-20261108` and
+`results/verification/controller-packed-local-20261108`. The earlier four-suite
+and 24-lifecycle-test checkpoint remains in `results/verification/cloud-20261108`.
 
 Additional C++ work provides bounded, within-process target KV snapshots for
 common-prefix replay. Actions restore the original target history rather than
@@ -351,7 +356,7 @@ started only after those local checks. Both trained correctness mechanisms pass
 28 records. Frozen development priors select fixed1 from complete requests.
 All 252 bounded validation records and 16 separate logging records pass exact
 IDs/stops/cache accounting. Both attempts have confirmed actual Shutdown;
-all 1587 final artifact members pass independent hash and semantic verification.
+all 1587 payload files and the execution manifest pass independent verification.
 The resumed raw prefix, fit and prior remain byte-identical.
 
 Cost-aware/target throughput is 0.9709 [0.9607,0.9810]; cost-aware/fixed1 is

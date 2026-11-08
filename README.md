@@ -18,7 +18,8 @@ six development prompts, two output caps and three repetitions. Cost-aware
 throughput is 1.2048× cap8 ngram, 0.9943× the development-frozen fixed1 baseline,
 and 0.9709× ordinary target-only decoding. Decision/update cost averages 1.67 µs
 per cycle. These bounded results establish no ordinary-decoding acceleration.
-See the [controller result and figures](docs/controller-results.md).
+See the [controller result and figures](docs/controller-results.md) and
+[four-page engineering report](results/verification/engineering-report-20261108/tokenomics-engineering-report.pdf).
 A separate packed CPU profile is undergoing trained revalidation before its
 paired benchmark. Full Pilot A/B, 90-prompt held-out evaluation and Metal
 execution remain incomplete. See [the handoff](docs/handoff.md) and
