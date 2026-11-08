@@ -269,3 +269,17 @@ Planned controller pauses have independently checked complete blocks and
 attempt-specific partial receipts; they do not freeze the final canonical result
 or permit incomplete-grid performance summaries. Resume the current exact-source
 controller study before starting the separate packed trained gate.
+
+
+Controller study 42492089188 attempt1 paused successfully after 25/36 validation
+blocks (175 records). The full 18-record fit and calibration are retained;
+selected fixed baseline is fixed1. Both trained controller gates pass 28 records,
+all actions0/1/2/4/6/8, and the model path synchronizes 40 tokens. Independent
+checks verify ZIP SHA256
+`4b8f47ca4969cc76d631749865f4255c69603d8d39becd58cb7f5e497323e9a3`,
+all 1078 members, immutable blocks, IDs/stops/cache counts and reconstructed prior.
+Finalizer job128797327277 confirms actual Shutdown. Raw attempt1, an explicit
+partial receipt and attempt-specific lifecycle proof are retained in
+`results/verification/codespace-controller-20261108`. No partial-grid aggregate
+speedup is claimed. Rerun the same workflow run (all jobs) to resume e98c0fa,
+finish 11 remaining blocks and the logging grid, before the packed experiment.

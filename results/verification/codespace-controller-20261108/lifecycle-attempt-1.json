@@ -1,0 +1,16 @@
+{
+  "source_job_id": 128797327277,
+  "source_run_id": 42492089188,
+  "source_attempt": 1,
+  "source": "connected GitHub job-log API",
+  "controller_report": {
+    "attempt": "1",
+    "evidence_status": "No valid fixture summary; lifecycle cleanup only",
+    "fixture_evidence_valid": false,
+    "mode": "finalize",
+    "passed": true,
+    "run_id": "42492089188",
+    "sha": "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c",
+    "shutdown_confirmed": true
+  }
+}

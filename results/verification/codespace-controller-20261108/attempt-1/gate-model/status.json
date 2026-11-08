@@ -1,0 +1,20 @@
+{
+  "actions_observed": [
+    0,
+    1,
+    2,
+    4,
+    6,
+    8
+  ],
+  "binary_sha256": "3b640fc90cca7b88cf02dc5fdde86c7c4f517dfa090e0ab7258bc09da8263d09",
+  "comparisons": 28,
+  "correctness_only": true,
+  "draft_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+  "drafter": "model",
+  "records": 28,
+  "state": "passed",
+  "synced_tokens": 40,
+  "synthetic_priors": true,
+  "target_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e"
+}

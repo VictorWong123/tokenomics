@@ -378,8 +378,14 @@ the handoff and requirements matrix as each checked stage is committed.
 
 The first controller-focused trained run is 42492089188, exact source
 `e98c0fa84a2c2ff52df198f19eae6ce72d51c83c`. It started only after the Cloud
-checks above passed. Measurements and finalizer Shutdown confirmation are
-pending; no controller speedup is claimed while the run is in progress.
+checks above passed. Attempt1 reached its planned pause after 25/36 complete
+validation blocks: 175 exact records, plus all 18 fit records. Both trained
+correctness mechanisms pass 28 records each and exercise all six actions; the
+model gate observes 40 synchronized draft tokens. All 1078 archive members and
+raw block/calibration checks pass independent verification, and finalizer job
+128797327277 confirms actual Shutdown. The partial receipt remains separate
+from a final result. Resume the same run/source for the remaining 11 blocks and
+logging comparison; no unfinished-grid performance estimate is claimed.
 
 The read-only evidence verifier hashes the outer ZIP, inner archive and every
 member, then checks immutable block records, exact output IDs/stops, budgets,

@@ -1,0 +1,25 @@
+{
+  "archive_sha256": "031c5b4834f78e924decfa8315049b3fa7f545476ad5b244e925eed8d6b92d75",
+  "artifact_id": 13626455419,
+  "attempt": 1,
+  "controller_gate_records": 56,
+  "exact_comparisons": 193,
+  "full_feasibility_cleared": false,
+  "independent_output_checks": true,
+  "limitation": "Complete retained blocks only; no unfinished-grid performance estimate.",
+  "partial": true,
+  "run_id": 42492089188,
+  "schema_version": 1,
+  "shutdown_confirmed": true,
+  "shutdown_evidence_origin": "results/verification/codespace-controller-20261108/lifecycle-attempt-1.json",
+  "shutdown_source_job_id": 128797327277,
+  "source_sha": "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c",
+  "state": "paused",
+  "verified_files": 1078,
+  "verified_records_by_stage": {
+    "fit": 18,
+    "validation": 175
+  },
+  "verifier_sha256": "b20a3392692f3764af6835b62197f72a06954729611d1a191d930f15f9d45ffc",
+  "zip_sha256": "4b8f47ca4969cc76d631749865f4255c69603d8d39becd58cb7f5e497323e9a3"
+}

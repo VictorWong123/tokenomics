@@ -1,0 +1,21 @@
+{
+  "binary_sha256": "3b640fc90cca7b88cf02dc5fdde86c7c4f517dfa090e0ab7258bc09da8263d09",
+  "configuration": {
+    "cache_available": true,
+    "values": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "GGML_AVX": "ON",
+      "GGML_AVX2": "ON",
+      "GGML_BLAS": "OFF",
+      "GGML_CPU_REPACK": "OFF",
+      "GGML_CUDA": "OFF",
+      "GGML_F16C": "ON",
+      "GGML_FMA": "ON",
+      "GGML_LLAMAFILE": "OFF",
+      "GGML_METAL": "OFF",
+      "GGML_NATIVE": "OFF",
+      "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+      "TOKENOMICS_CPU_PACKED_VERIFY": "OFF"
+    }
+  }
+}

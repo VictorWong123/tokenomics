@@ -15,7 +15,10 @@ correctness gate and trained original-KV replay checks. A completed nine-prompt
 confirmation passes all 162 exact comparisons, but its frozen cap1 throughput
 ratio is 0.9846 [0.9721, 1.0019] to target-only and fails the 5% practical-gain
 criterion. The experimental cost-aware controller passes local integration and
-sanitizer checks; trained controller measurements are pending. The opt-in packed
+sanitizer checks and 56 focused trained correctness records, covering all six
+actions. Its bounded timing study paused after 25/36 complete blocks (175 exact
+validation records); it is resuming at the same source. Complete timing
+comparisons remain pending. The opt-in packed
 CPU run was cancelled to prioritize the controller. Full Pilot A/B, held-out
 evaluation and Metal execution remain incomplete. See [the handoff](docs/handoff.md),
 [feasibility](docs/feasibility.md) and the

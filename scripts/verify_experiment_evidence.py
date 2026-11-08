@@ -190,7 +190,7 @@ def verify_grid(directory, complete_required, expected_source):
     return rows, frozen, len(groups)
 
 
-def verify_kernel(evidence):
+def verify_kernel(evidence, expected_source):
     gate = evidence / "kernel-gate"
     status = json.loads((gate / "status.json").read_text())
     require(
@@ -225,7 +225,7 @@ def verify_kernel(evidence):
         "Full-generation diagnosis mismatch",
     )
     point = evidence / "qwen25-05-3-q4-ngram/timing"
-    rows, frozen, _ = verify_grid(point, True, EXPECTED[42474834521])
+    rows, frozen, _ = verify_grid(point, True, expected_source)
     require(
         len(rows) == 18 and frozen["identity"]["synthetic_fixture"] is False,
         "Incomplete trained screen",
@@ -445,7 +445,7 @@ def verify_run(run_id, out, publish=False):
             checked = check_partial(evidence) if state == "paused" else check(evidence)
         else:
             require(state == "kernel_profile_passed", "Experimental CPU profile failed")
-            checked = verify_kernel(evidence)
+            checked = verify_kernel(evidence, EXPECTED[run_id])
         jobs = api(f"actions/runs/{run_id}/jobs?per_page=100")["jobs"]
         finalizers = [
             j for j in jobs if j["name"] == "finalize" and j["conclusion"] == "success"
@@ -470,7 +470,10 @@ def verify_run(run_id, out, publish=False):
             # when a hosted job's read token cannot download another job's logs.
             # Never infer Shutdown merely from a successful inference workload.
             folder = FOLDERS[run_id]
-            retained = ROOT / "results/verification" / folder / "lifecycle.json"
+            retained_root = ROOT / "results/verification" / folder
+            retained = retained_root / f"lifecycle-attempt-{attempt}.json"
+            if not retained.exists():
+                retained = retained_root / "lifecycle.json"
             require(
                 retained.is_file(),
                 "Lifecycle log unavailable; retained API report required",
