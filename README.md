@@ -7,10 +7,11 @@ CPU is the initial reference. macOS Metal is supported by configuration;
 CUDA is optional. Linux cloud, Codespaces and Mac results are separate.
 
 **Status: in progress.** Linux CPU synthetic-transformer correctness and the
-resumable artifact pipeline run here. Trained-model downloads are currently
-network-blocked. Neither feasibility question has a real-model answer. No
-cost-aware controller, held-out speedup, Mac execution or Codespaces execution
-is claimed. See [the handoff](docs/handoff.md) and [feasibility](docs/feasibility.md).
+resumable artifact pipeline pass. Codespaces has also passed the complete
+272-comparison trained-Qwen correctness gate. Development performance experiments
+are in progress; neither feasibility question has a final answer. No cost-aware
+controller, held-out speedup or Mac execution is claimed. See
+[the handoff](docs/handoff.md) and [feasibility](docs/feasibility.md).
 
 ## Build and check
 
@@ -65,6 +66,28 @@ complete comparison block is committed atomically. An incomplete/failed block
 gets a new retained attempt; slow runs are not excluded. Code, binary, model, prompt
 or configuration changes require a new run directory. Raw local results and
 models are ignored by Git.
+
+`--budget-seconds 6600` pauses a long pilot at complete comparison-block or
+checkpoint-group boundaries (exit 11). An unchanged rerun resumes saved work;
+the deadline is an execution allowance, not a change to the frozen experiment.
+It reserves the largest observed group duration before starting another group;
+an unusually slow first/new group can still reach the outer execution timeout.
+
+Develop and run portable checks in Codex Cloud, then push checked stages to
+`main`. Use the existing Codespace only to execute trained-model tests and
+measurements through its owned Actions lifecycle:
+
+```bash
+gh workflow run codespace-experiment.yml --ref main -f phase=timing
+gh workflow run codespace-experiment.yml --ref main -f phase=pilot
+```
+
+The fixed pilot investigates the versioned candidates and cheaper ngram mode.
+Each invocation retains partial evidence and shuts down the same dedicated
+Codespace. Pilot data persists under `/workspaces/.tokenomics-experiment-cache/`
+by source SHA; rerun that exact SHA to resume. Code changes require a fresh run.
+Artifacts are retained for 30 days. This is development data, not held-out
+evaluation. Full controller implementation remains conditional on both gates.
 
 The workflow deliberately stops at the scientific decision. Exit 20 means Q1
 and Q2 support proceeding with controller implementation; 21 means speculation

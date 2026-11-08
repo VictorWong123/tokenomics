@@ -7,11 +7,55 @@ import json
 import math
 from bench.run import balanced_blocks, first_mismatch
 from bench.common import atomic_json, sha256
-from analysis.report import cells, paired_summary, summarize
+from analysis.report import cells, paired_summary, summarize, validate_run
 from bench.replay import fit_validate
 
 
 class ToolingTests(unittest.TestCase):
+    def test_frozen_analysis_rejects_missing_or_duplicate_cells_and_retuning(self):
+        rows = [
+            {
+                "prompt_id": "heldout-qa-00",
+                "output_cap": 128,
+                "configuration_id": c,
+                "repetition": rep,
+                "correctness": "pass",
+                "generated_tokens": 10,
+                "generation_ms": duration,
+                "category": "qa",
+                "warm_ms": duration,
+                "load_ms": 1,
+                "peak_rss_bytes": 1024,
+            }
+            for c, duration in (("target", 100), ("fixed2", 200), ("fixed8", 50))
+            for rep in range(2)
+        ]
+        cfg = {
+            "split": "heldout",
+            "output_caps": [128],
+            "repetitions": 2,
+            "configurations": [{"id": c} for c in ("target", "fixed2", "fixed8")],
+            "selected_fixed": "fixed2",
+            "development_selection_sha256": "a" * 64,
+        }
+        manifest = {
+            "frozen": {
+                "config": cfg,
+                "prompts": [{"id": "heldout-qa-00", "split": "heldout"}],
+            }
+        }
+        fixed = validate_run(rows, manifest, {"records": 6})
+        self.assertEqual(fixed, "fixed2")
+        self.assertEqual(
+            summarize(rows, samples=50, frozen_fixed=fixed)["selected_fixed"], "fixed2"
+        )
+        for broken in (rows[:-1], rows + [rows[0]], rows[:-1] + [rows[0]]):
+            with self.assertRaises(ValueError):
+                validate_run(broken, manifest, {"records": len(broken)})
+        del cfg["selected_fixed"]
+        with self.assertRaisesRegex(ValueError, "frozen development"):
+            validate_run(rows, manifest, {"records": 6})
+
     def test_model_gate_streams_and_stops_on_first_failure(self):
         import subprocess
         import sys
@@ -327,6 +371,45 @@ class ToolingTests(unittest.TestCase):
         )
         self.assertEqual(sum(r["pilot"] for r in rows), 18)
         self.assertEqual(len({r["sha256"] for r in rows}), 130)
+
+    @unittest.skipUnless(
+        os.getenv("TOKENOMICS_TEST_BINARY"),
+        "CMake supplies runtime binary for integration",
+    )
+    def test_planned_pause_resumes_complete_blocks_without_rerunning(self):
+        from bench.run import run, RunPaused
+
+        exe = pathlib.Path(os.environ["TOKENOMICS_TEST_BINARY"])
+        model = exe.parent / "fixtures/target.gguf"
+        cfg = {
+            "output_caps": [8],
+            "repetitions": 1,
+            "seed": 5,
+            "context": 64,
+            "batch": 32,
+            "threads": 1,
+            "warmup_tokens": 2,
+            "configurations": [
+                {"id": "target", "policy": "target"},
+                {"id": "fixed2", "policy": "fixed", "k": 2},
+            ],
+        }
+        prompts = [
+            {"id": f"development-qa-{i:02d}", "category": "qa", "prompt": "a"}
+            for i in range(2)
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp)
+            with self.assertRaises(RunPaused):
+                run(exe, model, model, prompts, cfg, out, max_new_blocks=1)
+            done = next(out.glob("blocks/*/complete.json"))
+            original = done.read_bytes(), done.stat().st_mtime_ns
+            self.assertFalse((out / "complete.json").exists())
+            self.assertEqual(len((out / "requests.jsonl").read_text().splitlines()), 2)
+            rows = run(exe, model, model, prompts, cfg, out)
+            self.assertEqual(len(rows), 4)
+            self.assertEqual((done.read_bytes(), done.stat().st_mtime_ns), original)
+            self.assertEqual(len(list(out.glob("blocks/*/attempt-*"))), 2)
 
     @unittest.skipUnless(
         os.getenv("TOKENOMICS_TEST_BINARY"),

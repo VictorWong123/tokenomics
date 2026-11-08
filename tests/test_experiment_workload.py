@@ -20,7 +20,9 @@ class ExperimentEvidenceTests(unittest.TestCase):
             with tarfile.open(archive) as tar:
                 manifest = json.load(tar.extractfile("execution-manifest.json"))
                 self.assertEqual(set(manifest["files"]), {"status.json"})
-                self.assertEqual(manifest["files"]["status.json"]["bytes"], status.stat().st_size)
+                self.assertEqual(
+                    manifest["files"]["status.json"]["bytes"], status.stat().st_size
+                )
             (results / "weights.gguf").write_text("excluded")
             with self.assertRaises(RuntimeError):
                 pack(results, archive, {})

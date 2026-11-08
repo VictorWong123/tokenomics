@@ -23,7 +23,7 @@ from bench.common import (
     available_memory,
     sha256,
 )
-from bench.run import run
+from bench.run import run, RunPaused
 from bench.replay import investigate
 from analysis.report import write_report
 from scripts.download_models import download
@@ -47,6 +47,11 @@ def decision_state(decisions):
 
 
 def pipeline(a):
+    deadline = (
+        time.monotonic() + a.budget_seconds
+        if getattr(a, "budget_seconds", None) is not None
+        else None
+    )
     out = a.run_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
     exe = (ROOT / a.build_dir / "tokenomics").resolve()
@@ -236,6 +241,7 @@ def pipeline(a):
             pair_dir / "timing",
             gpu_layers,
             pair_identity,
+            deadline=deadline,
         )
         elapsed = time.monotonic() - start
         measured_execution = sum(r["process_ms"] for r in sample) / 1000
@@ -300,6 +306,7 @@ def pipeline(a):
             pair_dir / "pilot-a",
             gpu_layers,
             pair_identity,
+            deadline=deadline,
         )
         summary = write_report(pair_dir / "pilot-a", pair_dir / "pilot-a/analysis")
         q2 = investigate(
@@ -310,6 +317,7 @@ def pipeline(a):
             pair_dir / "pilot-b",
             cfg,
             gpu_layers,
+            deadline=deadline,
         )
         decision = {
             "candidate": candidate["id"],
@@ -365,10 +373,19 @@ def pipeline(a):
             ngdir,
             gpu_layers,
             {**identity, "candidate": "ngram-simple", "target_sha256": sha256(target)},
+            deadline=deadline,
         )
         ns = write_report(ngdir, ngdir / "analysis")
         nq = investigate(
-            exe, target, None, ngdir, out / "ngram-replay", ng, gpu_layers, "ngram"
+            exe,
+            target,
+            None,
+            ngdir,
+            out / "ngram-replay",
+            ng,
+            gpu_layers,
+            "ngram",
+            deadline=deadline,
         )
         decisions.append(
             {
@@ -404,6 +421,11 @@ if __name__ == "__main__":
     )
     p.add_argument("--max-hours", type=float)
     p.add_argument(
+        "--budget-seconds",
+        type=float,
+        help="Pause full Pilot A at a complete block boundary; resume unchanged (exit 11)",
+    )
+    p.add_argument(
         "--timing-only",
         action="store_true",
         help="Stop after the first resource-safe candidate timing screen (exit 10); no full pilot",
@@ -416,6 +438,9 @@ if __name__ == "__main__":
         a.build_dir = pathlib.Path("build-" + a.backend)
     try:
         sys.exit(pipeline(a))
+    except RunPaused as ex:
+        save_status(a.run_dir, "paused", message=str(ex))
+        sys.exit(11)
     except KeyboardInterrupt:
         save_status(
             a.run_dir,

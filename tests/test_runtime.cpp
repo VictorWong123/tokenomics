@@ -110,11 +110,20 @@ int main(int argc, char **argv) {
         for (int k : {1, 2, 4, 6, 8}) {
             probe_request.mode = "fixed";
             probe_request.k = k;
-            auto probe = e.generate(probe_request).cycles.at(0).logits.at(0);
+            auto detailed = e.generate(probe_request);
+            auto probe = detailed.cycles.at(0).logits.at(0);
             CHECK(probe.top_id == reference_probe.top_id);
             CHECK(probe.second_id == reference_probe.second_id);
             CHECK(probe.top_logit == reference_probe.top_logit);
             CHECK(probe.second_logit == reference_probe.second_logit);
+            auto minimal_request = probe_request;
+            minimal_request.detailed = false;
+            minimal_request.diagnostic_logits = false;
+            auto minimal = e.generate(minimal_request);
+            CHECK(minimal.cycles.empty());
+            CHECK(minimal.tokens == detailed.tokens && minimal.stop == detailed.stop);
+            CHECK(minimal.final_target_cached == detailed.final_target_cached);
+            CHECK(minimal.final_draft_cached == detailed.final_draft_cached);
         }
         Request empty;
         empty.prompt = "";

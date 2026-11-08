@@ -18,6 +18,20 @@ from bench.common import (
 )
 
 
+class RunPaused(RuntimeError):
+    """A planned pause at a comparison-block boundary, not an invalid run."""
+
+
+def save_rows(out, requests, correctness):
+    for name, rows in (
+        ("requests.jsonl", requests),
+        ("correctness.jsonl", correctness),
+    ):
+        tmp = out / (name + ".tmp")
+        tmp.write_text("".join(json.dumps(x) + "\n" for x in rows))
+        tmp.replace(out / name)
+
+
 def balanced_blocks(prompts, caps, repetitions, configs, seed):
     rng = random.Random(seed)
     blocks = [(p, cap, r) for p in prompts for cap in caps for r in range(repetitions)]
@@ -42,7 +56,19 @@ def first_mismatch(a, b):
     return None
 
 
-def run(exe, target, draft, prompts, config, out, gpu_layers=0, identity=None):
+def run(
+    exe,
+    target,
+    draft,
+    prompts,
+    config,
+    out,
+    gpu_layers=0,
+    identity=None,
+    *,
+    deadline=None,
+    max_new_blocks=None,
+):
     conf_ids = [c["id"] for c in config["configurations"]]
     prompt_ids = [p["id"] for p in prompts]
     if (
@@ -92,6 +118,8 @@ def run(exe, target, draft, prompts, config, out, gpu_layers=0, identity=None):
     requests = []
     correctness = []
     total = len(prompts) * len(config["output_caps"]) * config["repetitions"]
+    new_blocks = 0
+    longest_block = 0.0
     for index, (prompt, cap, rep, order) in enumerate(
         balanced_blocks(
             prompts,
@@ -115,6 +143,14 @@ def run(exe, target, draft, prompts, config, out, gpu_layers=0, identity=None):
             requests.extend(records)
             correctness.extend(complete["correctness"])
             continue
+        if (max_new_blocks is not None and new_blocks >= max_new_blocks) or (
+            deadline is not None and time.monotonic() + 1.25 * longest_block >= deadline
+        ):
+            save_rows(out, requests, correctness)
+            raise RunPaused(
+                f"{index}/{total} complete blocks retained; resume unchanged"
+            )
+        block_start = time.monotonic()
         bdir.mkdir(parents=True, exist_ok=True)
         attempt = len(list(bdir.glob("attempt-*")))
         adir = bdir / f"attempt-{attempt}"
@@ -265,14 +301,10 @@ def run(exe, target, draft, prompts, config, out, gpu_layers=0, identity=None):
             )
             raise
         print(f"{out.name}: {index+1}/{total} blocks complete ({block_id})", flush=True)
+        new_blocks += 1
+        longest_block = max(longest_block, time.monotonic() - block_start)
     # Derived concatenations: immutable per-attempt raw records remain the source.
-    for name, rows in [
-        ("requests.jsonl", requests),
-        ("correctness.jsonl", correctness),
-    ]:
-        tmp = out / (name + ".tmp")
-        tmp.write_text("".join(json.dumps(x) + "\n" for x in rows))
-        tmp.replace(out / name)
+    save_rows(out, requests, correctness)
     atomic_json(
         out / "complete.json",
         {

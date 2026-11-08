@@ -70,14 +70,20 @@ def select_fixed(table, ids=None):
     )
 
 
-def summarize(rows, samples=10000):
+def summarize(rows, samples=10000, frozen_fixed=None):
     table = cells(rows)
     configs = sorted({k[2] for k in table})
-    fixed = select_fixed(table)
+    fixed = frozen_fixed if frozen_fixed is not None else select_fixed(table)
+    if fixed not in configs or not fixed.startswith("fixed"):
+        raise ValueError("frozen fixed baseline is absent or invalid")
     output = {
         "schema_version": 1,
         "selected_fixed": fixed,
-        "selection_rule": "maximum geometric mean prompt/cap median decode throughput on development only",
+        "selection_rule": (
+            "fixed baseline frozen on separate development data"
+            if frozen_fixed is not None
+            else "maximum geometric mean prompt/cap median decode throughput on development only"
+        ),
         "comparisons": {},
         "baseline_table": {},
         "categories": {},
@@ -106,7 +112,7 @@ def summarize(rows, samples=10000):
     ids = sorted({r["prompt_id"] for r in rows})
     fit = {p for p in ids if int(p.rsplit("-", 1)[1]) % 6 < 3}
     validation = set(ids) - fit
-    if fit and validation:
+    if frozen_fixed is None and fit and validation:
         fit_fixed = select_fixed(table, fit)
         output["q1_validation"] = {
             "fit_selected_fixed": fit_fixed,
@@ -121,6 +127,41 @@ def summarize(rows, samples=10000):
     return output
 
 
+def validate_run(rows, manifest, complete):
+    """Require the exact frozen Cartesian product before estimating performance."""
+    frozen = manifest["frozen"]
+    cfg = frozen["config"]
+    expected = {
+        (p["id"], cap, c["id"], rep)
+        for p in frozen["prompts"]
+        for cap in cfg["output_caps"]
+        for c in cfg["configurations"]
+        for rep in range(cfg["repetitions"])
+    }
+    actual = [
+        (r["prompt_id"], r["output_cap"], r["configuration_id"], r["repetition"])
+        for r in rows
+    ]
+    if (
+        not expected
+        or len(actual) != len(set(actual))
+        or set(actual) != expected
+        or complete.get("records") != len(actual)
+    ):
+        raise ValueError("incomplete, duplicate or unexpected frozen measurement cells")
+    if cfg.get("split") == "heldout":
+        if not cfg.get("selected_fixed") or not cfg.get("development_selection_sha256"):
+            raise ValueError(
+                "held-out analysis requires a frozen development baseline selection"
+            )
+        if any(p.get("split") != "heldout" for p in frozen["prompts"]):
+            raise ValueError("mixed development/evaluation prompts")
+        return cfg["selected_fixed"]
+    if any(p.get("split", "development") != "development" for p in frozen["prompts"]):
+        raise ValueError("evaluation data cannot select a development baseline")
+    return None
+
+
 def write_report(run_dir, out):
     run_dir = pathlib.Path(run_dir)
     out = pathlib.Path(out)
@@ -128,8 +169,11 @@ def write_report(run_dir, out):
     if not (run_dir / "complete.json").exists():
         raise ValueError("run incomplete: no performance report")
     rows = read_jsonl(run_dir / "requests.jsonl")
-    result = summarize(rows)
     manifest = json.loads((run_dir / "run_manifest.json").read_text())
+    complete = json.loads((run_dir / "complete.json").read_text())
+    frozen_fixed = validate_run(rows, manifest, complete)
+    result = summarize(rows, frozen_fixed=frozen_fixed)
+    result["phase"] = manifest["frozen"]["config"].get("phase", "pilot")
     result["hardware"] = manifest["hardware_start"]
     result["synthetic_fixture"] = (
         manifest["frozen"].get("identity", {}).get("synthetic_fixture", False)

@@ -14,6 +14,12 @@ def curate(source, out):
     manifest = json.loads((source / "run_manifest.json").read_text())
     if not manifest["frozen"].get("identity", {}).get("synthetic_fixture"):
         raise ValueError("only fixture observations are allowed as the default example")
+    manifest["curation"] = {
+        "source_manifest_sha256": sha256(source / "run_manifest.json"),
+        "retained_repetitions": [0],
+        "source_repetitions": manifest["frozen"]["config"]["repetitions"],
+    }
+    manifest["frozen"]["config"]["repetitions"] = 1
     out.mkdir(parents=True, exist_ok=True)
     rows = [r for r in read_jsonl(source / "requests.jsonl") if r["repetition"] == 0]
     cycles = []

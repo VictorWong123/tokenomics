@@ -1,4 +1,12 @@
 {
+  "curation": {
+    "note": "Historical example manifest described the original two repetitions; retained observations contain repetition zero only.",
+    "retained_repetitions": [
+      0
+    ],
+    "source_manifest_sha256": "099f7d3bce68449d0369378683827f5814bc29f400a60011139c0399bb215b80",
+    "source_repetitions": 2
+  },
   "frozen": {
     "binary_sha256": "e909858cf5505b27e04eab2c4906e18e4ec7b1d6cdda2b498ad36b7a9f5c3282",
     "code": {
@@ -65,7 +73,7 @@
       "practical_margin": 0.05,
       "primary_metric": "geomean_prompt_cap_median_throughput_ratio",
       "prompt_ids": "pilot18",
-      "repetitions": 2,
+      "repetitions": 1,
       "schema_version": 1,
       "seed": 20261107,
       "split": "development",

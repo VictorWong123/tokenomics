@@ -9,10 +9,15 @@ setup baseline.
 The user has now explicitly requested completion of the remaining project,
 including optimization and Codespace execution. This supersedes the earlier
 test-only stopping point below. Preserve the existing lifecycle and credential
-boundaries. `codespace-experiment.yml` adds a manual, fixed development timing
-screen; it uses the same dedicated resource and global concurrency group. It
-does not repeat the completed 272-comparison gate. Timing is development data,
-not held-out evaluation or a controller feasibility decision.
+boundaries. Develop and check changes in Codex Cloud, push checked stages to
+`main`, then use Codespaces for trained-model tests and measurements.
+`codespace-experiment.yml` adds manual fixed `timing` and resumable `pilot`
+tasks on the same dedicated resource and global concurrency group. Experiments
+do not repeat the completed 272-comparison gate. Partial pilots are retained by
+source SHA outside checkout cleanup; dispatch that exact SHA again to resume.
+The worker pauses between complete blocks/checkpoint groups before its budget,
+uploads bounded evidence and always finalizes. Timing/pilots use development
+prompts; held-out evaluation and controller implementation remain gated.
 
 ## Verified Linux test route
 

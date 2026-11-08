@@ -11,9 +11,10 @@ import random
 import statistics
 import subprocess
 import math
+import time
 import numpy as np
 from bench.common import atomic_json, read_jsonl, sha256, source_fingerprint
-from bench.run import first_mismatch
+from bench.run import first_mismatch, RunPaused
 
 
 def run_jobs(exe, target, draft, jobs, directory, cfg, gpu_layers):
@@ -25,6 +26,12 @@ def run_jobs(exe, target, draft, jobs, directory, cfg, gpu_layers):
     jobpath.write_text(encoded)
     done = directory / "complete.json"
     if done.exists():
+        complete = json.loads(done.read_text())
+        for name in ("requests.jsonl", "cycles.jsonl"):
+            if complete.get("sha256", {}).get(name) != sha256(directory / name):
+                raise RuntimeError(
+                    "completed replay artifact changed or predates integrity checks"
+                )
         return read_jsonl(directory / "requests.jsonl"), read_jsonl(
             directory / "cycles.jsonl"
         )
@@ -67,11 +74,31 @@ def run_jobs(exe, target, draft, jobs, directory, cfg, gpu_layers):
         raise RuntimeError("incomplete replay records")
     for name, values in (("requests.jsonl", rows), ("cycles.jsonl", cycles)):
         (directory / name).write_text("".join(json.dumps(x) + "\n" for x in values))
-    atomic_json(done, {"jobs": len(jobs), "attempt": attempt})
+    atomic_json(
+        done,
+        {
+            "jobs": len(jobs),
+            "attempt": attempt,
+            "sha256": {
+                n: sha256(directory / n) for n in ("requests.jsonl", "cycles.jsonl")
+            },
+        },
+    )
     return rows, cycles
 
 
-def investigate(exe, target, draft, pilot_dir, out, cfg, gpu_layers=0, drafter="model"):
+def investigate(
+    exe,
+    target,
+    draft,
+    pilot_dir,
+    out,
+    cfg,
+    gpu_layers=0,
+    drafter="model",
+    *,
+    deadline=None,
+):
     out = pathlib.Path(out)
     out.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((pathlib.Path(pilot_dir) / "run_manifest.json").read_text())
@@ -103,6 +130,23 @@ def investigate(exe, target, draft, pilot_dir, out, cfg, gpu_layers=0, drafter="
     rng = random.Random(cfg["seed"] + 1)
     measurements = []
     transitions = []
+    longest_group = 0.0
+
+    def replay(jobs, directory):
+        nonlocal longest_group
+        if (
+            deadline is not None
+            and not (directory / "complete.json").exists()
+            and time.monotonic() + 1.25 * longest_group >= deadline
+        ):
+            raise RunPaused(
+                "Pilot B paused between checkpoint groups; resume unchanged"
+            )
+        start = time.monotonic()
+        result = run_jobs(exe, target, draft, jobs, directory, cfg, gpu_layers)
+        longest_group = max(longest_group, time.monotonic() - start)
+        return result
+
     for pid, ref in sorted(refs.items()):
         tokens = ref["token_ids"]
         prompt_ids = ref["prompt_ids"]
@@ -148,7 +192,14 @@ def investigate(exe, target, draft, pilot_dir, out, cfg, gpu_layers=0, drafter="
             )
         if not jobs:
             continue
-        rr, cc = run_jobs(exe, target, draft, jobs, out / pid, cfg, gpu_layers)
+        rr, cc = [], []
+        for cp in checkpoints:
+            r, c = replay(
+                [j for j in jobs if j["checkpoint"] == cp],
+                out / pid / f"checkpoint-{cp}",
+            )
+            rr.extend(r)
+            cc.extend(c)
         for r in rr:
             cp = r["checkpoint"] - (8 if r["configuration_id"] == "signal" else 0)
             expect = tokens[cp : cp + len(r["token_ids"])]
@@ -204,9 +255,7 @@ def investigate(exe, target, draft, pilot_dir, out, cfg, gpu_layers=0, drafter="
                 "max_tokens": 64,
                 "k": 4,
             }
-            tr, tc = run_jobs(
-                exe, target, draft, [job], out / pid / "transition", cfg, gpu_layers
-            )
+            tr, tc = replay([job], out / pid / "transition")
             mismatch = first_mismatch(
                 tokens[: len(tr[0]["token_ids"])], tr[0]["token_ids"]
             )

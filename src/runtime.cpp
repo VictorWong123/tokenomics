@@ -70,9 +70,13 @@ static void trim(llama_context *c, int n) {
 }
 static void decode(llama_context *ctx, const std::vector<int> &ids, int start, int count, int pos,
                    int batch_size) {
+    if (count == 0)
+        return;
+    common_batch b(ctx);
+    b.tokens.reserve(std::min(batch_size, count));
     for (int offset = 0; offset < count;) {
         const int len = std::min(batch_size, count - offset);
-        common_batch b(ctx);
+        b.clear();
         for (int i = 0; i < len; ++i)
             b.add(ids[start + offset + i], pos + offset + i, 0, i == len - 1);
         require(llama_process(ctx, LLAMA_PROCESS_TYPE_DECODE, b.get()) == 0,
@@ -237,6 +241,11 @@ Result Engine::generate(const Request &r) {
     std::vector<int> prefix(out.prompt_ids.begin(), out.prompt_ids.end() - 1);
     int pending = out.prompt_ids.back();
     int n = int(prefix.size());
+    const int capacity = std::min(r.max_tokens, context_limit - n);
+    prefix.reserve(prefix.size() + capacity);
+    out.tokens.reserve(capacity);
+    if (r.detailed)
+        out.cycles.reserve(capacity);
     auto t = Clock::now();
     decode(tgt, prefix, 0, n, 0, e.cfg.batch);
     out.prompt_target_ms = elapsed(t);
@@ -250,11 +259,18 @@ Result Engine::generate(const Request &r) {
     }
     if (spec)
         common_speculative_begin(spec.get(), 0, prefix);
+    // Reuse the bounded proposal and verification buffers across all cycles.
+    // common_batch::clear preserves its allocation at the pinned revision.
+    common_batch batch(tgt);
+    batch.tokens.reserve(9);
+    std::vector<int> proposed;
+    proposed.reserve(8);
     const auto gen_start = Clock::now();
     int previous = -1;
+    int cycle_count = 0;
     while (int(out.tokens.size()) < r.max_tokens && n < context_limit) {
         Cycle c;
-        c.cycle = int(out.cycles.size());
+        c.cycle = cycle_count++;
         c.context = n + 1;
         const int remaining = r.max_tokens - int(out.tokens.size());
         const auto cycle_start = Clock::now();
@@ -266,7 +282,7 @@ Result Engine::generate(const Request &r) {
         previous = c.action;
         c.decision_ms = elapsed(t);
         const int cap = draft_budget(c.action, remaining, context_limit - n);
-        std::vector<int> proposed;
+        proposed.clear();
         if (cap > 0) {
             if (use_model) {
                 t = Clock::now();
@@ -305,7 +321,7 @@ Result Engine::generate(const Request &r) {
             }
         }
         c.actual = int(proposed.size());
-        common_batch batch(tgt);
+        batch.clear();
         batch.add(pending, n, 0, true);
         for (size_t i = 0; i < proposed.size(); ++i)
             batch.add(proposed[i], n + 1 + i, 0, true);
@@ -369,12 +385,13 @@ Result Engine::generate(const Request &r) {
         c.wall_ms = elapsed(cycle_start); // include policy-update work in the diagnostic cycle
         if (out.tokens.size() == plan.tokens.size())
             out.first_token_ms = elapsed(begin);
-        out.cycles.push_back(c); // buffered; serialization occurs after generation
+        if (r.detailed)
+            out.cycles.push_back(std::move(c)); // serialize after generation
         if (plan.eog) {
             out.stop = "eog";
             break;
         }
-        if (r.max_cycles > 0 && int(out.cycles.size()) >= r.max_cycles) {
+        if (r.max_cycles > 0 && cycle_count >= r.max_cycles) {
             out.stop = "checkpoint";
             break;
         }
@@ -389,8 +406,6 @@ Result Engine::generate(const Request &r) {
     for (int id : out.tokens)
         if (!llama_vocab_is_eog(vocab, id))
             out.text += common_token_to_piece(vocab, id);
-    if (!r.detailed)
-        out.cycles.clear();
     return out;
 }
 } // namespace tokenomics
