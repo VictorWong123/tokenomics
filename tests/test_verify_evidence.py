@@ -17,13 +17,25 @@ class FrozenArchiveTests(unittest.TestCase):
         payload = b'{"state":"paused"}\n'
         manifest = {
             **owner,
-            "files": {"status.json": {"sha256": hashlib.sha256(payload).hexdigest(), "bytes": len(payload)}},
+            "files": {
+                "status.json": {
+                    "sha256": hashlib.sha256(payload).hexdigest(),
+                    "bytes": len(payload),
+                }
+            },
         }
         packed = root / "source.tar.gz"
         with tarfile.open(packed, "w:gz") as tar:
             entry = tarfile.TarInfo("status.json")
             entry.size = len(payload)
-            tar.addfile(entry, io.BytesIO(payload if variant != "tampered" else payload.replace(b"paused", b"failed")))
+            tar.addfile(
+                entry,
+                io.BytesIO(
+                    payload
+                    if variant != "tampered"
+                    else payload.replace(b"paused", b"failed")
+                ),
+            )
             if variant == "duplicate":
                 tar.addfile(entry, io.BytesIO(payload))
             if variant == "unsafe":
@@ -42,7 +54,9 @@ class FrozenArchiveTests(unittest.TestCase):
         archive = root / "artifact.zip"
         with zipfile.ZipFile(archive, "w") as zipped:
             zipped.write(packed, "evidence.tar.gz")
-            zipped.writestr("report.json", json.dumps({**owner, "archive_sha256": sha256(packed)}))
+            zipped.writestr(
+                "report.json", json.dumps({**owner, "archive_sha256": sha256(packed)})
+            )
         return archive
 
     def test_valid_archive_and_outer_digest(self):
@@ -53,7 +67,9 @@ class FrozenArchiveTests(unittest.TestCase):
             out.mkdir()
             report, manifest, evidence = unpack(archive, sha256(archive), out)
             self.assertEqual(report["run_id"], manifest["run_id"])
-            self.assertEqual((evidence / "status.json").read_text(), '{"state":"paused"}\n')
+            self.assertEqual(
+                (evidence / "status.json").read_text(), '{"state":"paused"}\n'
+            )
             with self.assertRaisesRegex(ValueError, "ZIP digest"):
                 unpack(archive, "0" * 64, out)
 
@@ -75,23 +91,32 @@ class FrozenArchiveTests(unittest.TestCase):
 
     def test_retained_bytes_and_canonical_receipt_are_immutable(self):
         from unittest.mock import patch
+
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             evidence = root / "evidence"
             evidence.mkdir()
             (evidence / "status.json").write_text('{"state":"confirmation_complete"}\n')
             receipt = {
-                "run_id": 42466570831, "attempt": 2, "source_sha": "a" * 40,
-                "state": "confirmation_complete", "zip_sha256": "b" * 64,
-                "archive_sha256": "c" * 64, "exact_comparisons": 162,
-                "shutdown_confirmed": True, "independent_output_checks": True,
+                "run_id": 42466570831,
+                "attempt": 2,
+                "source_sha": "a" * 40,
+                "state": "confirmation_complete",
+                "zip_sha256": "b" * 64,
+                "archive_sha256": "c" * 64,
+                "exact_comparisons": 162,
+                "shutdown_confirmed": True,
+                "independent_output_checks": True,
                 "verifier_sha256": "first",
             }
             path = root / "receipt.json"
             path.write_text(json.dumps(receipt))
             with patch("scripts.verify_experiment_evidence.ROOT", root):
                 retain(evidence, path)
-                canonical = root / "results/verification/codespace-confirmation-20261108/verification.json"
+                canonical = (
+                    root
+                    / "results/verification/codespace-confirmation-20261108/verification.json"
+                )
                 original = canonical.read_bytes()
                 path.write_text(json.dumps({**receipt, "verifier_sha256": "later"}))
                 retain(evidence, path)

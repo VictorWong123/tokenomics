@@ -49,7 +49,10 @@ def unpack(archive, expected_zip_sha, out):
             "Unexpected ZIP members",
         )
         require(
-            all(not z.is_dir() and z.file_size <= 64 * 1024**2 for z in zipped.infolist()),
+            all(
+                not z.is_dir() and z.file_size <= 64 * 1024**2
+                for z in zipped.infolist()
+            ),
             "Oversized ZIP member",
         )
         report = json.loads(zipped.read("report.json"))
@@ -61,7 +64,10 @@ def unpack(archive, expected_zip_sha, out):
     with tarfile.open(packed) as tar:
         members = tar.getmembers()
         names = [m.name for m in members]
-        require(len(names) == len(set(names)) and len(names) <= 100000, "Duplicate/excess archive members")
+        require(
+            len(names) == len(set(names)) and len(names) <= 100000,
+            "Duplicate/excess archive members",
+        )
         require(sum(m.size for m in members) <= 512 * 1024**2, "Oversized evidence")
         for member in members:
             path = PurePosixPath(member.name)
@@ -74,7 +80,10 @@ def unpack(archive, expected_zip_sha, out):
                 "Unsafe evidence member",
             )
         manifest = json.load(tar.extractfile("execution-manifest.json"))
-        require(set(manifest["files"]) == set(names) - {"execution-manifest.json"}, "Manifest member set mismatch")
+        require(
+            set(manifest["files"]) == set(names) - {"execution-manifest.json"},
+            "Manifest member set mismatch",
+        )
         for name, meta in manifest["files"].items():
             member = tar.getmember(name)
             require(member.size == meta["bytes"], "Member size mismatch")
@@ -85,7 +94,9 @@ def unpack(archive, expected_zip_sha, out):
             require(digest.hexdigest() == meta["sha256"], "Member digest mismatch")
         tar.extractall(evidence, filter="data")
     for key in ("run_id", "attempt", "sha"):
-        require(str(report[key]) == str(manifest[key]), "Archive/report ownership mismatch")
+        require(
+            str(report[key]) == str(manifest[key]), "Archive/report ownership mismatch"
+        )
     return report, manifest, evidence
 
 
@@ -96,7 +107,10 @@ def verify_grid(directory, complete_required, expected_source):
     require(frozen["code"]["revision"] == expected_source, "Measurement source changed")
     rows = read_jsonl(directory / "requests.jsonl")
     checks = read_jsonl(directory / "correctness.jsonl")
-    require(len(checks) == len(rows) and all(c["ok"] for c in checks), "Non-passing correctness evidence")
+    require(
+        len(checks) == len(rows) and all(c["ok"] for c in checks),
+        "Non-passing correctness evidence",
+    )
     expected = {
         (p["id"], cap, c["id"], rep)
         for p in frozen["prompts"]
@@ -104,8 +118,14 @@ def verify_grid(directory, complete_required, expected_source):
         for c in cfg["configurations"]
         for rep in range(cfg["repetitions"])
     }
-    keys = [(r["prompt_id"], r["output_cap"], r["configuration_id"], r["repetition"]) for r in rows]
-    require(len(keys) == len(set(keys)) and set(keys) <= expected, "Unexpected/duplicate grid record")
+    keys = [
+        (r["prompt_id"], r["output_cap"], r["configuration_id"], r["repetition"])
+        for r in rows
+    ]
+    require(
+        len(keys) == len(set(keys)) and set(keys) <= expected,
+        "Unexpected/duplicate grid record",
+    )
     require(not complete_required or set(keys) == expected, "Incomplete required grid")
     configurations = {c["id"]: c for c in cfg["configurations"]}
     groups = {}
@@ -114,38 +134,75 @@ def verify_grid(directory, complete_required, expected_source):
         for key in ("policy", "k", "cache", "drafter", "confidence", "detailed"):
             if key in conf:
                 require(row["settings"][key] == conf[key], "Condition setting changed")
-        require(row["settings"]["max_tokens"] == row["output_cap"], "Output budget changed")
-        require(row["correctness"] == "pass" and row["generated_tokens"] == len(row["token_ids"]), "Invalid request count/status")
-        require(row["peak_rss_bytes"] > 0 and row["generation_ms"] > 0, "Invalid resource/timing measurement")
+        require(
+            row["settings"]["max_tokens"] == row["output_cap"], "Output budget changed"
+        )
+        require(
+            row["correctness"] == "pass"
+            and row["generated_tokens"] == len(row["token_ids"]),
+            "Invalid request count/status",
+        )
+        require(
+            row["peak_rss_bytes"] > 0 and row["generation_ms"] > 0,
+            "Invalid resource/timing measurement",
+        )
         for key in ("context", "batch", "threads"):
             require(row["settings"][key] == cfg[key], "Execution setting changed")
-        require(row["settings"]["gpu_layers"] == frozen["gpu_layers"], "Offload changed")
-        cycles = [c for c in read_jsonl(directory / row["source_cycles"]) if not c.get("warmup")]
+        require(
+            row["settings"]["gpu_layers"] == frozen["gpu_layers"], "Offload changed"
+        )
+        cycles = [
+            c
+            for c in read_jsonl(directory / row["source_cycles"])
+            if not c.get("warmup")
+        ]
         check_cycles([row], cycles)
-        groups.setdefault((row["prompt_id"], row["output_cap"], row["repetition"]), []).append(row)
+        groups.setdefault(
+            (row["prompt_id"], row["output_cap"], row["repetition"]), []
+        ).append(row)
     for group in groups.values():
-        require({r["configuration_id"] for r in group} == {c["id"] for c in cfg["configurations"]}, "Partial comparison block")
+        require(
+            {r["configuration_id"] for r in group}
+            == {c["id"] for c in cfg["configurations"]},
+            "Partial comparison block",
+        )
         reference = next(r for r in group if r["configuration_id"] == "target")
-        require(all(compare(reference, r) is None for r in group), "Greedy output mismatch")
+        require(
+            all(compare(reference, r) is None for r in group), "Greedy output mismatch"
+        )
     markers = list((directory / "blocks").glob("*/complete.json"))
     require(len(markers) == len(groups), "Incomplete block markers")
     for marker in markers:
         data = json.loads(marker.read_text())
         for name, digest in data["sha256"].items():
-            require(sha256(marker.parent / name) == digest, "Completed block digest mismatch")
+            require(
+                sha256(marker.parent / name) == digest,
+                "Completed block digest mismatch",
+            )
     return rows, frozen, len(groups)
 
 
 def verify_kernel(evidence):
     gate = evidence / "kernel-gate"
     status = json.loads((gate / "status.json").read_text())
-    require(status["state"] == "passed" and status["synthetic_fixture"] is False, "Trained gate not passed")
-    refs = read_jsonl(gate / "reference.jsonl") + read_jsonl(gate / "boundary-reference.jsonl")
+    require(
+        status["state"] == "passed" and status["synthetic_fixture"] is False,
+        "Trained gate not passed",
+    )
+    refs = read_jsonl(gate / "reference.jsonl") + read_jsonl(
+        gate / "boundary-reference.jsonl"
+    )
     reference = {r["prompt_id"]: r for r in refs}
     candidates = read_jsonl(gate / "candidate.jsonl")
     checks = read_jsonl(gate / "correctness.jsonl")
-    require(len(candidates) == len(checks) == 272 and all(c["ok"] for c in checks), "Incomplete 272-comparison gate")
-    require(all(compare(reference[r["prompt_id"]], r) is None for r in candidates), "Trained greedy mismatch")
+    require(
+        len(candidates) == len(checks) == 272 and all(c["ok"] for c in checks),
+        "Incomplete 272-comparison gate",
+    )
+    require(
+        all(compare(reference[r["prompt_id"]], r) is None for r in candidates),
+        "Trained greedy mismatch",
+    )
     require(all(r["peak_rss_bytes"] > 0 for r in candidates), "Missing measured RSS")
     check_cycles(candidates, read_jsonl(gate / "candidate.cycles.jsonl"))
     diagnosis = evidence / "kernel-diagnostic"
@@ -161,13 +218,22 @@ def verify_kernel(evidence):
     )
     point = evidence / "qwen25-05-3-q4-ngram/timing"
     rows, frozen, _ = verify_grid(point, True, EXPECTED[42474834521])
-    require(len(rows) == 18 and frozen["identity"]["synthetic_fixture"] is False, "Incomplete trained screen")
+    require(
+        len(rows) == 18 and frozen["identity"]["synthetic_fixture"] is False,
+        "Incomplete trained screen",
+    )
     marker = "TOKENOMICS_CPU_PACKED_VERIFY=ON"
-    require(all(marker in r["system_info"] for r in candidates + full + rows), "Wrong CPU profile")
+    require(
+        all(marker in r["system_info"] for r in candidates + full + rows),
+        "Wrong CPU profile",
+    )
     build = json.loads((evidence / "kernel-build.json").read_text())
     require(build["binary_sha256"] == frozen["binary_sha256"], "Screen binary changed")
     gate_manifest = json.loads((gate / "manifest.json").read_text())
-    require(gate_manifest["binary_sha256"] == frozen["binary_sha256"], "Trained gate binary changed")
+    require(
+        gate_manifest["binary_sha256"] == frozen["binary_sha256"],
+        "Trained gate binary changed",
+    )
     fit_cfg = json.loads((ROOT / "configs/ngram-confirmation-v1.json").read_text())
     fit = json.loads((ROOT / fit_cfg["fit_manifest"]).read_text())["frozen"]
     require(frozen["target_sha256"] == fit["target_sha256"], "Screen target changed")
@@ -192,15 +258,25 @@ def verify_kernel(evidence):
             ref = canonical[row["prompt_id"]]
             cp = row["checkpoint"]
             if row["configuration_id"] == "capture":
-                require(row["prompt_ids"] == ref["prompt_ids"] and row["token_ids"] == ref["token_ids"][:cp], "Capture differs from original history")
-                require(row["checkpoint_ids"] == [f"{row['prompt_id']}:{cp-8}", f"{row['prompt_id']}:{cp}"], "Wrong saved checkpoints")
+                require(
+                    row["prompt_ids"] == ref["prompt_ids"]
+                    and row["token_ids"] == ref["token_ids"][:cp],
+                    "Capture differs from original history",
+                )
+                require(
+                    row["checkpoint_ids"]
+                    == [f"{row['prompt_id']}:{cp-8}", f"{row['prompt_id']}:{cp}"],
+                    "Wrong saved checkpoints",
+                )
                 captures += 1
             else:
                 cp -= 8 if row["configuration_id"] == "signal" else 0
                 require(
                     row["prompt_ids"] == ref["prompt_ids"] + ref["token_ids"][:cp]
-                    and row["token_ids"] == ref["token_ids"][cp:cp + len(row["token_ids"])]
-                    and row["settings"]["resume_checkpoint"] == f"{row['prompt_id']}:{cp}",
+                    and row["token_ids"]
+                    == ref["token_ids"][cp : cp + len(row["token_ids"])]
+                    and row["settings"]["resume_checkpoint"]
+                    == f"{row['prompt_id']}:{cp}",
                     "Action did not restore/continue the original checkpoint",
                 )
                 actions += 1
@@ -219,24 +295,52 @@ def verify_kernel(evidence):
 
 
 def verify_confirmation(evidence, state):
-    rows, frozen, blocks = verify_grid(evidence / "confirmation", state == "confirmation_complete", EXPECTED[42466570831])
+    rows, frozen, blocks = verify_grid(
+        evidence / "confirmation",
+        state == "confirmation_complete",
+        EXPECTED[42466570831],
+    )
     cfg = json.loads((ROOT / "configs/ngram-confirmation-v1.json").read_text())
     fit = json.loads((ROOT / cfg["fit_manifest"]).read_text())["frozen"]
-    require(frozen["config"] == cfg and frozen["identity"]["synthetic_fixture"] is False, "Confirmation configuration changed")
-    require(frozen["binary_sha256"] == fit["binary_sha256"] and frozen["target_sha256"] == fit["target_sha256"], "Frozen fit identity changed")
+    require(
+        frozen["config"] == cfg and frozen["identity"]["synthetic_fixture"] is False,
+        "Confirmation configuration changed",
+    )
+    require(
+        frozen["binary_sha256"] == fit["binary_sha256"]
+        and frozen["target_sha256"] == fit["target_sha256"],
+        "Frozen fit identity changed",
+    )
     result = {"exact_comparisons": len(rows), "verified_blocks": blocks}
     if state == "confirmation_complete":
         from analysis.report import summarize
+
         derived = summarize(rows, frozen_fixed=cfg["selected_fixed"])
-        archived = json.loads((evidence / "confirmation/analysis/summary.json").read_text())
-        require(len(rows) == 162 and blocks == 54 and archived["full_feasibility_cleared"] is False, "Incorrect completion claim")
+        archived = json.loads(
+            (evidence / "confirmation/analysis/summary.json").read_text()
+        )
+        require(
+            len(rows) == 162
+            and blocks == 54
+            and archived["full_feasibility_cleared"] is False,
+            "Incorrect completion claim",
+        )
         for name, metric in derived["comparisons"].items():
             other = archived["comparisons"][name]
-            require(math.isclose(metric["ratio"], other["ratio"], rel_tol=1e-12), "Derived ratio mismatch")
-            require(len(other["ci95"]) == 2 and all(math.isclose(a, b, rel_tol=1e-12) for a, b in zip(metric["ci95"], other["ci95"])), "Derived interval mismatch")
+            require(
+                math.isclose(metric["ratio"], other["ratio"], rel_tol=1e-12),
+                "Derived ratio mismatch",
+            )
+            require(
+                len(other["ci95"]) == 2
+                and all(
+                    math.isclose(a, b, rel_tol=1e-12)
+                    for a, b in zip(metric["ci95"], other["ci95"])
+                ),
+                "Derived interval mismatch",
+            )
         result["confirmation"] = archived
     return result
-
 
 
 def retain(evidence, receipt_path):
@@ -244,7 +348,11 @@ def retain(evidence, receipt_path):
     receipt = json.loads(receipt_path.read_text())
     run_id = receipt["run_id"]
     require(run_id in EXPECTED, "Unknown retained run")
-    folder = "codespace-confirmation-20261108" if run_id == 42466570831 else "codespace-packed-20261108"
+    folder = (
+        "codespace-confirmation-20261108"
+        if run_id == 42466570831
+        else "codespace-packed-20261108"
+    )
     root = ROOT / "results/verification" / folder
     destination = root / f"attempt-{receipt['attempt']}"
     destination.mkdir(parents=True, exist_ok=True)
@@ -254,19 +362,33 @@ def retain(evidence, receipt_path):
             target = destination / source.relative_to(evidence)
             target.parent.mkdir(parents=True, exist_ok=True)
             if target.exists():
-                require(sha256(target) == sha256(source), "Retained raw bytes are immutable")
+                require(
+                    sha256(target) == sha256(source), "Retained raw bytes are immutable"
+                )
             else:
                 shutil.copy2(source, target)
     canonical = root / "verification.json"
     if canonical.exists():
         previous = json.loads(canonical.read_text())
-        for key in ("run_id", "attempt", "source_sha", "state", "zip_sha256",
-                    "archive_sha256", "exact_comparisons", "shutdown_confirmed"):
+        for key in (
+            "run_id",
+            "attempt",
+            "source_sha",
+            "state",
+            "zip_sha256",
+            "archive_sha256",
+            "exact_comparisons",
+            "shutdown_confirmed",
+        ):
             require(previous[key] == receipt[key], "Canonical point changed")
-        require(previous["independent_output_checks"] is True, "Unverified canonical receipt")
+        require(
+            previous["independent_output_checks"] is True,
+            "Unverified canonical receipt",
+        )
     else:
         shutil.copy2(receipt_path, canonical)
     receipt_path.write_bytes(canonical.read_bytes())
+
 
 def verify_run(run_id, out, publish=False):
     run = api(f"actions/runs/{run_id}")
@@ -287,7 +409,9 @@ def verify_run(run_id, out, publish=False):
         root = Path(temp)
         archive = root / "artifact.zip"
         api(f"actions/artifacts/{artifact['id']}/zip", archive)
-        report, manifest, evidence = unpack(archive, digest.removeprefix("sha256:"), root)
+        report, manifest, evidence = unpack(
+            archive, digest.removeprefix("sha256:"), root
+        )
         require(
             manifest["sha"] == EXPECTED[run_id]
             and str(manifest["run_id"]) == str(run_id)
@@ -302,25 +426,43 @@ def verify_run(run_id, out, publish=False):
             require(state == "kernel_profile_passed", "Experimental CPU profile failed")
             checked = verify_kernel(evidence)
         jobs = api(f"actions/runs/{run_id}/jobs?per_page=100")["jobs"]
-        finalizers = [j for j in jobs if j["name"] == "finalize" and j["conclusion"] == "success"]
+        finalizers = [
+            j for j in jobs if j["name"] == "finalize" and j["conclusion"] == "success"
+        ]
         require(len(finalizers) == 1, "Missing successful finalizer")
         log_result = subprocess.run(
             ["gh", "api", f"repos/{REPO}/actions/jobs/{finalizers[0]['id']}/logs"],
-            check=False, capture_output=True, text=True, timeout=120,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=120,
         )
         shutdown_origin = "direct GitHub job-log API"
         if log_result.returncode == 0:
-            markers = [json.loads(m.group(1)) for line in log_result.stdout.splitlines()
-                       if (m := re.search(r"TOKENOMICS_CONTROLLER_REPORT (\{.*\})", line))]
+            markers = [
+                json.loads(m.group(1))
+                for line in log_result.stdout.splitlines()
+                if (m := re.search(r"TOKENOMICS_CONTROLLER_REPORT (\{.*\})", line))
+            ]
         else:
             # The connected GitHub reader can retain the exact controller report
             # when a hosted job's read token cannot download another job's logs.
             # Never infer Shutdown merely from a successful inference workload.
-            folder = "codespace-confirmation-20261108" if run_id == 42466570831 else "codespace-packed-20261108"
+            folder = (
+                "codespace-confirmation-20261108"
+                if run_id == 42466570831
+                else "codespace-packed-20261108"
+            )
             retained = ROOT / "results/verification" / folder / "lifecycle.json"
-            require(retained.is_file(), "Lifecycle log unavailable; retained API report required")
+            require(
+                retained.is_file(),
+                "Lifecycle log unavailable; retained API report required",
+            )
             lifecycle = json.loads(retained.read_text())
-            require(lifecycle["source_job_id"] == finalizers[0]["id"], "Wrong retained finalizer")
+            require(
+                lifecycle["source_job_id"] == finalizers[0]["id"],
+                "Wrong retained finalizer",
+            )
             markers = [lifecycle["controller_report"]]
             shutdown_origin = str(retained.relative_to(ROOT))
             print("TOKENOMICS_RETAINED_LIFECYCLE " + shutdown_origin, flush=True)
@@ -334,28 +476,49 @@ def verify_run(run_id, out, publish=False):
             "Actual Shutdown/ownership not confirmed",
         )
         receipt = {
-            "schema_version": 1, "state": state, "run_id": run_id, "attempt": attempt,
-            "source_sha": EXPECTED[run_id], "artifact_id": artifact["id"],
-            "zip_sha256": digest.removeprefix("sha256:"), "archive_sha256": report["archive_sha256"],
-            "verified_files": len(manifest["files"]), "shutdown_confirmed": True,
-            "shutdown_evidence_origin": shutdown_origin, "shutdown_source_job_id": finalizers[0]["id"],
+            "schema_version": 1,
+            "state": state,
+            "run_id": run_id,
+            "attempt": attempt,
+            "source_sha": EXPECTED[run_id],
+            "artifact_id": artifact["id"],
+            "zip_sha256": digest.removeprefix("sha256:"),
+            "archive_sha256": report["archive_sha256"],
+            "verified_files": len(manifest["files"]),
+            "shutdown_confirmed": True,
+            "shutdown_evidence_origin": shutdown_origin,
+            "shutdown_source_job_id": finalizers[0]["id"],
             "verifier_sha256": sha256(Path(__file__)),
-            "independent_output_checks": True, "full_feasibility_cleared": False,
+            "independent_output_checks": True,
+            "full_feasibility_cleared": False,
             **checked,
         }
         path = out / f"{run_id}.json"
         atomic_json(path, receipt)
         if publish:
             retain(evidence, path)
-        print("TOKENOMICS_VERIFIED_DOCUMENT " + json.dumps({
-            "run_id": run_id, "sha256": sha256(path), "content": path.read_text(),
-        }, sort_keys=True), flush=True)
+        print(
+            "TOKENOMICS_VERIFIED_DOCUMENT "
+            + json.dumps(
+                {
+                    "run_id": run_id,
+                    "sha256": sha256(path),
+                    "content": path.read_text(),
+                },
+                sort_keys=True,
+            ),
+            flush=True,
+        )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--publish", action="store_true", help="Copy verified bytes under results/verification; never start inference")
+    parser.add_argument(
+        "--publish",
+        action="store_true",
+        help="Copy verified bytes under results/verification; never start inference",
+    )
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     for run_id in EXPECTED:
