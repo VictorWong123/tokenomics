@@ -27,7 +27,7 @@ unbalanced prefix cannot establish a full-suite estimate or feasibility gate.
 | Environment | Actual execution | Feasibility evidence |
 |---|---|---|
 | Codex Cloud, Linux CPU | Release and sanitizer builds; synthetic-transformer correctness; resumable experiment and analysis | No trained-model evidence |
-| GitHub Codespaces, two CPUs | 272 trained-model comparisons; nine-request timing screen; owned Actions lifecycle and confirmed shutdown | Preliminary slowdown; full Q1/Q2 unresolved |
+| GitHub Codespaces, two CPUs | 272 trained-model comparisons; two timing screens; 66 original-KV replay checks; owned Actions lifecycle and confirmed shutdown | Preliminary slowdown; full Q1/Q2 unresolved |
 | User's Mac, Metal | Commands and build configuration supplied | No attached execution route; hardware/RAM uninspected |
 
 The development host exposes an AMD EPYC 9V74 with five logical CPUs, but its
@@ -94,7 +94,7 @@ reproducible; test-only proposal corruption forces zero and partial acceptance
 without replacing upstream verification. Random weights exercise less uniform
 token sequences. Tests compare emitted IDs, not rendered text or random seeds.
 
-The current runtime suite passes 378 differential cases, covering zero/partial/
+The current runtime suite passes 390 differential cases, covering zero/partial/
 full acceptance, correction/bonus handling, EOG, changing draft caps, rollback,
 fallback, draft catch-up, re-entry, repeated-request reset, empty/short requests,
 output truncation and logical context boundaries. Unit tests separately cover
@@ -116,7 +116,11 @@ as diagnostics, and those requests are prohibited from performance summaries.
 Fixture checks cover 12 groups and 264 canonical continuations, plus exact
 first-row logit equality after restoring long-prefix quantized state.
 See `results/verification/kv-checkpoints-20261108`. Trained-model validation of
-this extension remains separate from the earlier trained gate.
+this extension remains separate from the earlier trained gate. The larger-target
+screen below now also validates 66 canonical actions from three trained-model
+checkpoints. A period-nine fixture additionally forces ngram proposals at every
+cap and tests corruption, fallback/re-entry and reset without a draft model;
+Release and extended sanitizer checks pass with leak detection.
 
 Codespace run 42420516268 passed all 272 comparisons on trained Qwen2.5
 0.5B/1.5B Q4_K_M weights, following a documented batch-dependent arithmetic
@@ -157,6 +161,28 @@ The subsequent pilot uses a bounded invocation and preserves complete blocks
 for unchanged-source resume. No full-protocol completion is inferred from a
 timing screen. Compact raw records and hashes are retained under
 `results/verification/codespace-timing-20261108`.
+
+The second independent-model screen,
+[42461309986](https://github.com/VictorWong123/tokenomics/actions/runs/42461309986),
+uses the 0.5B draft and 3B Q4_K_M target at source `1f945147`. The same three
+development prompts, cap 64 and one repetition compare the complete fixed-cap
+sweep and pinned confidence stop. All 21 ID/stop checks pass; all 173 archive
+members were independently hash-verified. Geometric mean ratios to target-only
+are fixed1 **0.768**, fixed2 **0.723**, fixed4 **0.587**, fixed6 **0.476**,
+fixed8 **0.439**, confidence **0.682**. Every observed drafting cell loses.
+Peak RSS is 2.75 GiB, below the memory screen; this is not a repeated Q1 result.
+The separately extrapolated full Pilot A duration is 29.67 hours; unmeasured
+prompts/configurations, EOS and shared-CPU conditions can change that estimate.
+
+The same run validates the new original-KV snapshot path on trained weights:
+three source captures and 66 canonical action checks pass, including dynamic
+stopping and the historical signal. All checkpoint file hashes, token prefixes,
+continuations and cache/commit accounting were independently rechecked. Maximum
+snapshot payload is 83,503,856 bytes. Setup/capture/restore remain diagnostic
+costs, excluded from action scores. Three fit prompts cannot support the Q2
+fit/validation procedure; its decision explicitly says insufficient checkpoints.
+Hosted finalize confirms actual Shutdown. Full raw evidence, reproducible
+analysis and provenance are retained in `results/verification/codespace-3b-20261108`.
 
 The Python suite checks deterministic balanced ordering, first-divergence
 reporting, fit/validation separation, prompt-clustered statistics, atomically

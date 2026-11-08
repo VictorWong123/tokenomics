@@ -10,7 +10,8 @@ CUDA is optional. Linux cloud, Codespaces and Mac results are separate.
 
 **Status: in progress.** Linux CPU synthetic-transformer correctness and the
 resumable artifact pipeline pass. Codespaces has also passed the complete
-272-comparison trained-Qwen correctness gate. Development performance experiments
+272-comparison trained-Qwen correctness gate. A larger-target screen also passes
+21 exact comparisons and 66 original-KV snapshot action checks. Development performance experiments
 are in progress; neither feasibility question has a final answer. No cost-aware
 controller, held-out speedup or Mac execution is claimed. See
 [the handoff](docs/handoff.md) and [feasibility](docs/feasibility.md).
@@ -22,7 +23,7 @@ curl. macOS needs Xcode Command Line Tools (`xcode-select --install`) and Python
 3.12+ (for example `brew install python@3.12`). No NVIDIA GPU is required.
 
 ```bash
-git clone --recurse-submodules --branch work https://github.com/VictorWong123/tokenomics.git
+git clone --recurse-submodules --branch main https://github.com/VictorWong123/tokenomics.git
 cd tokenomics
 bash scripts/bootstrap.sh cpu              # Linux
 # bash scripts/bootstrap.sh metal          # macOS, Metal enabled
@@ -83,6 +84,7 @@ measurements through its owned Actions lifecycle:
 gh workflow run codespace-experiment.yml --ref main -f phase=timing
 # Screen the larger memory-safe candidate and validate checkpoint replay:
 gh workflow run codespace-experiment.yml --ref main -f phase=timing -f candidate=qwen25-05-3-q4
+gh workflow run codespace-experiment.yml --ref main -f phase=timing -f candidate=qwen25-05-3-q4 -f drafter=ngram
 gh workflow run codespace-experiment.yml --ref main -f phase=pilot
 ```
 

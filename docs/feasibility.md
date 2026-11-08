@@ -39,6 +39,22 @@ sanitizer CTest suites (with leak detection), 24 lifecycle tests and the complet
 by the separate 272-comparison Codespace gate. The buffer-allocation changes
 are not claimed as a measured trained-model speedup.
 
+The larger 0.5B→3B Q4_K_M pair also fits the measured memory screen (peak
+2.75 GiB) but loses at every fixed cap in
+[run 42461309986](https://github.com/VictorWong123/tokenomics/actions/runs/42461309986).
+All 21 exact comparisons pass. The strongest fixed-cap geometric mean ratio is
+fixed1 at 0.768; confidence is 0.682. This remains a three-prompt, cap-64,
+one-repeat screen. It does not clear either feasibility gate. The rough full
+Pilot A extrapolation is 29.67 hours on this CPU.
+
+That run additionally validates original-state snapshots on trained weights:
+three captures and 66 canonical action checks pass. The ZIP, inner archive and
+all 173 members were verified; checkpoint hashes, exact prefixes/continuations
+and cache/commit accounting were independently checked. Snapshot payload peaks
+at 83,503,856 bytes. Three fit prompts are insufficient for Q2 validation.
+Hosted finalize confirms actual Shutdown. Raw evidence and regenerated figures
+are in `results/verification/codespace-3b-20261108`.
+
 ## Historical foundation and access blockers (7 November 2026)
 
 2026-11-07, Codex Cloud Linux x86_64; AMD EPYC 9V74, five exposed logical CPUs,

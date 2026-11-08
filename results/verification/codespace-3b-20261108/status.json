@@ -1,0 +1,14 @@
+{
+  "candidate": "qwen25-05-3-q4",
+  "checkpoint_validation": {
+    "groups": 3,
+    "protocol": "host-owned original target KV snapshots; shared prepared draft KV per prefix",
+    "state": "passed"
+  },
+  "estimated_full_pilot_seconds": 106808.27658346287,
+  "message": "Development timing screen completed. Full Pilot A/B and feasibility decisions were not run.",
+  "peak_rss_bytes": 2947448832,
+  "schema_version": 1,
+  "stage": "checkpoint-validation",
+  "state": "timing_complete"
+}

@@ -1,0 +1,114 @@
+{
+  "attempt": 0,
+  "correctness": [
+    {
+      "attempt": 0,
+      "block_id": "development-summary-01-n64-r0",
+      "configuration_id": "fixed8",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-01-n64-r0",
+      "configuration_id": "fixed2",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-01-n64-r0",
+      "configuration_id": "fixed1",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-01-n64-r0",
+      "configuration_id": "target",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-01-n64-r0",
+      "configuration_id": "fixed4",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-01-n64-r0",
+      "configuration_id": "fixed6",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-01-n64-r0",
+      "configuration_id": "confidence",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    }
+  ],
+  "records": [
+    "attempt-0/fixed8.json",
+    "attempt-0/fixed2.json",
+    "attempt-0/fixed1.json",
+    "attempt-0/target.json",
+    "attempt-0/fixed4.json",
+    "attempt-0/fixed6.json",
+    "attempt-0/confidence.json"
+  ],
+  "sha256": {
+    "attempt-0/confidence.json": "bef9de5a5b016d13242b15b7b57de07f7e4a73f917819ca83790f6ac3dba7773",
+    "attempt-0/fixed1.json": "14eeda8cef6312df2d3db7adce16d7a7b29b528fb5e62d56a4e844a49ef74ca8",
+    "attempt-0/fixed2.json": "2514d9c43f203f270ef324bd4c6c50bec71a9325b61defe153d7375320705106",
+    "attempt-0/fixed4.json": "39e32dbbcc73af0ee5f3bd08a42ba1ac22fcd5aa44a4d1c37f382d0c51c3c7c4",
+    "attempt-0/fixed6.json": "98af51422f13da55ad36abba5c35e21325adcd2abf62274aeaf84512fd9b977e",
+    "attempt-0/fixed8.json": "60d4ad34e6d2a58386add4961fca11adad9dea8bcbb91826b7c45b114851f8b8",
+    "attempt-0/target.json": "a4c0e3541675c0c7bd324902f0ef42c29728cba6d2e4710eb14e202671f626de"
+  }
+}

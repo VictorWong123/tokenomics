@@ -1,0 +1,26 @@
+{
+  "artifact_id": 13610462626,
+  "artifact_zip_sha256": "cc055e487dcada37c3adea37ed9ff75f16a8ac7971359bb10242c0392ada7ad6",
+  "geomean_ratios_vs_target": {
+    "confidence": 0.681765482084607,
+    "fixed1": 0.7683245156457074,
+    "fixed2": 0.7232362468319878,
+    "fixed4": 0.5865379648937237,
+    "fixed6": 0.4757324355696524,
+    "fixed8": 0.4386315681042088,
+    "target": 1.0
+  },
+  "inner_archive_sha256": "20150c032cbce15584d8847a7f2e7e63371785655a5ee24095c5609a2b9f39bf",
+  "limitation": "Three development fit prompts, cap64, one repetition. Snapshot correctness validation passed, but the screen and insufficient-checkpoint diagnostic cannot clear the repeated feasibility gates.",
+  "maximum_checkpoint_payload_bytes": 83503856,
+  "q1_supported": null,
+  "q2_supported": null,
+  "run_id": 42461309986,
+  "schema_version": 1,
+  "screen_exact_comparisons": 21,
+  "shutdown_confirmed": true,
+  "snapshot_action_checks": 66,
+  "snapshot_trace_captures": 3,
+  "source_sha": "1f9451474a64a49ce7ca328731cfa1bbc1a3d497",
+  "verified_members": 173
+}

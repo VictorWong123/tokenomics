@@ -1,0 +1,18 @@
+{
+  "dynamic_baseline": "pinned upstream confidence, cap 8",
+  "q2_supported": false,
+  "schema_version": 3,
+  "state_protocol": "host-owned original target KV snapshots; shared prepared draft KV per prefix",
+  "status": "insufficient common-prefix checkpoints",
+  "transition_sync_ms": [
+    353.410203,
+    391.919555,
+    386.236351,
+    352.121368,
+    346.872683,
+    346.194688,
+    402.041295,
+    414.715726,
+    523.866834
+  ]
+}

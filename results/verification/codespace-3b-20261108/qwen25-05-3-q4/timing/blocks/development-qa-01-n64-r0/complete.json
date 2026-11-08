@@ -1,0 +1,114 @@
+{
+  "attempt": 0,
+  "correctness": [
+    {
+      "attempt": 0,
+      "block_id": "development-qa-01-n64-r0",
+      "configuration_id": "fixed6",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-qa-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-qa-01-n64-r0",
+      "configuration_id": "confidence",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-qa-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-qa-01-n64-r0",
+      "configuration_id": "fixed8",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-qa-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-qa-01-n64-r0",
+      "configuration_id": "fixed2",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-qa-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-qa-01-n64-r0",
+      "configuration_id": "fixed1",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-qa-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-qa-01-n64-r0",
+      "configuration_id": "target",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-qa-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-qa-01-n64-r0",
+      "configuration_id": "fixed4",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-qa-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    }
+  ],
+  "records": [
+    "attempt-0/fixed6.json",
+    "attempt-0/confidence.json",
+    "attempt-0/fixed8.json",
+    "attempt-0/fixed2.json",
+    "attempt-0/fixed1.json",
+    "attempt-0/target.json",
+    "attempt-0/fixed4.json"
+  ],
+  "sha256": {
+    "attempt-0/confidence.json": "a82b4e466b18966b88e0fb839b845de933afd50398f6208371d687580cb8b6ee",
+    "attempt-0/fixed1.json": "8dcc5b685fe2f98ffc75af90b2f7e251d70a7288a9a822770085f0f3df225503",
+    "attempt-0/fixed2.json": "25311d13f35626965dd66ae488d13a72fdb1ddd1119d6c954d0f86c6af327f53",
+    "attempt-0/fixed4.json": "7e36a284e2c99f65a45fa1022dc1687c5dd2696ddaa635a8260e030a343d56cb",
+    "attempt-0/fixed6.json": "88fef549024287199a849956e6579d36b21cfc18b9acddb4a155c05c9fbd776c",
+    "attempt-0/fixed8.json": "2588dc38f5a5a88c6fce7b2e9e05ecd32eb8d1a5ee1e14f0eeaaa82493bab753",
+    "attempt-0/target.json": "ced12b4c62aae442a5be28238c60d8292b26700e20acc0a7f1bcdee36aefa9c5"
+  }
+}

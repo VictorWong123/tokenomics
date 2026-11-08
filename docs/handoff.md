@@ -72,6 +72,14 @@ Release and extended sanitizer runtime checks pass with leak detection. These
 new 12 comparisons are fixture evidence, not a trained-model result. Relevant
 paper/source comparisons are recorded in `docs/related-work.md`.
 
+Run 42461309986 at `1f945147` completes the 0.5B→3B model screen: all 21
+comparisons and 66 original-state checkpoint actions pass. All 173 artifact
+members are hash-verified; the rechecked raw data and analysis are retained in
+`results/verification/codespace-3b-20261108`. Every fixed cap loses; the best
+screen ratio is fixed1 at 0.768 (confidence 0.682). Peak screen RSS is 2.75 GiB.
+Hosted finalization confirms actual Shutdown. Three fit-only prompts cannot
+clear Q1/Q2; the full-pilot duration extrapolation is 29.67 hours.
+
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;
