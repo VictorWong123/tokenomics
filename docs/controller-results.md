@@ -52,6 +52,8 @@ The acceptance comparison is statistically positive but below the proposed 5%
 practical aggregate criterion. Beating cap8 does not imply beating the tuned
 fixed baseline or ordinary decoding.
 
+![Complete development throughput ratios and charged generation stages](../results/verification/codespace-controller-20261108/derived/controller-comparison.png)
+
 | Condition | Decode tokens/s¹ | Median warm completion ms | Peak lifetime RSS GiB |
 |---|---:|---:|---:|
 | Ordinary target | 7.673 | 19981.8 | 2.17 |
@@ -98,6 +100,12 @@ charged execution time, **not incremental probe overhead**: they also commit
 necessary output. The matched no-probe comparison is the appropriate overhead
 ablation. Ngram has no separate draft-model catch-up cost; the model correctness
 gate establishes that path without claiming model-drafter performance.
+
+![Fresh worst-regression request: actions, probes, throughput, prediction and acceptance](../results/verification/codespace-controller-20261108/attempt-2/logging/analysis/development-summary-03-trajectory.png)
+
+This is the declared worst-regression prompt, measured again with detailed
+logging. It illustrates actual decisions; it is not the original minimal timing
+history. The separate median-prompt trajectory is retained alongside it.
 
 ## Why further wrapper tuning is insufficient
 
