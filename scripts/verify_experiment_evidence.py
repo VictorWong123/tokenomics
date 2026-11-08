@@ -6,6 +6,7 @@ import json
 import math
 from pathlib import Path, PurePosixPath
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -237,7 +238,37 @@ def verify_confirmation(evidence, state):
     return result
 
 
-def verify_run(run_id, out):
+
+def retain(evidence, receipt_path):
+    """Retain verified bytes per attempt; preserve the first canonical receipt."""
+    receipt = json.loads(receipt_path.read_text())
+    run_id = receipt["run_id"]
+    require(run_id in EXPECTED, "Unknown retained run")
+    folder = "codespace-confirmation-20261108" if run_id == 42466570831 else "codespace-packed-20261108"
+    root = ROOT / "results/verification" / folder
+    destination = root / f"attempt-{receipt['attempt']}"
+    destination.mkdir(parents=True, exist_ok=True)
+    for source in sorted(evidence.rglob("*")):
+        require(not source.is_symlink(), "Unsafe retained symlink")
+        if source.is_file():
+            target = destination / source.relative_to(evidence)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if target.exists():
+                require(sha256(target) == sha256(source), "Retained raw bytes are immutable")
+            else:
+                shutil.copy2(source, target)
+    canonical = root / "verification.json"
+    if canonical.exists():
+        previous = json.loads(canonical.read_text())
+        for key in ("run_id", "attempt", "source_sha", "state", "zip_sha256",
+                    "archive_sha256", "exact_comparisons", "shutdown_confirmed"):
+            require(previous[key] == receipt[key], "Canonical point changed")
+        require(previous["independent_output_checks"] is True, "Unverified canonical receipt")
+    else:
+        shutil.copy2(receipt_path, canonical)
+    receipt_path.write_bytes(canonical.read_bytes())
+
+def verify_run(run_id, out, publish=False):
     run = api(f"actions/runs/{run_id}")
     require(run["head_sha"] == EXPECTED[run_id], "Unexpected source SHA")
     if run["status"] != "completed":
@@ -314,6 +345,8 @@ def verify_run(run_id, out):
         }
         path = out / f"{run_id}.json"
         atomic_json(path, receipt)
+        if publish:
+            retain(evidence, path)
         print("TOKENOMICS_VERIFIED_DOCUMENT " + json.dumps({
             "run_id": run_id, "sha256": sha256(path), "content": path.read_text(),
         }, sort_keys=True), flush=True)
@@ -322,7 +355,8 @@ def verify_run(run_id, out):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--publish", action="store_true", help="Copy verified bytes under results/verification; never start inference")
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     for run_id in EXPECTED:
-        verify_run(run_id, args.out)
+        verify_run(run_id, args.out, args.publish)
