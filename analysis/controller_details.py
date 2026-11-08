@@ -6,7 +6,7 @@ import json
 import statistics
 from pathlib import Path
 from analysis.controller import verify
-from analysis.report import cells, paired_summary
+from analysis.report import cells, paired_summary, draw_interval
 from bench.common import atomic_json, sha256
 
 
@@ -82,6 +82,21 @@ def generate(directory, *, fit=None, out=None):
         for key in ("binary_sha256", "target_sha256", "draft_sha256", "gpu_layers"):
             if fit_manifest["frozen"][key] != manifest["frozen"][key]:
                 raise ValueError("Fit curves use a different operating point")
+        prior = next(
+            c["controller"] for c in cfg["configurations"] if c["id"] == "cost-aware"
+        )
+        if (
+            fit_manifest["frozen"]["config"].get("split") != "development"
+            or any(
+                fit_manifest["frozen"]["config"][k] != cfg[k]
+                for k in ("context", "batch", "threads")
+            )
+            or {p["id"] for p in fit_manifest["frozen"]["prompts"]}
+            != set(prior["provenance"]["fit_prompt_ids"])
+        ):
+            raise ValueError(
+                "Fit curves differ from the controller calibration data/settings"
+            )
         result["fit_requests_sha256"] = sha256(fit / "requests.jsonl")
         result["fit_curves"] = {}
         for action in (1, 2, 4, 6, 8):
@@ -164,15 +179,7 @@ def plot(rows, result, table, out):
     ]
     for i, cid in enumerate(candidates):
         metric = paired_summary(table, cid, result["selected_fixed"])
-        axes[1].errorbar(
-            metric["ratio"],
-            i,
-            xerr=[
-                [metric["ratio"] - metric["ci95"][0]],
-                [metric["ci95"][1] - metric["ratio"]],
-            ],
-            fmt="o",
-        )
+        draw_interval(axes[1], metric["ratio"], i, metric["ci95"])
     axes[1].set_yticks(range(len(candidates)), candidates)
     axes[1].axvline(1, color="gray", linestyle="--")
     axes[1].set_xlabel("Throughput / frozen fixed; prompt-bootstrap 95% interval")

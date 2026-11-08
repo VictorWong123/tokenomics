@@ -5,7 +5,13 @@ import json
 import math
 import statistics
 from pathlib import Path
-from analysis.report import cells, paired_summary, summarize, validate_run
+from analysis.report import (
+    cells,
+    paired_summary,
+    summarize,
+    validate_run,
+    draw_interval,
+)
 from bench.common import atomic_json, read_jsonl, sha256
 from bench.controller import point_from_frozen, validate_binding
 
@@ -325,15 +331,7 @@ def plot(result, out):
     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
     for i, cid in enumerate(labels):
         metric = result["comparisons"][cid + "/target"]
-        axes[0].errorbar(
-            metric["ratio"],
-            i,
-            xerr=[
-                [metric["ratio"] - metric["ci95"][0]],
-                [metric["ci95"][1] - metric["ratio"]],
-            ],
-            fmt="o",
-        )
+        draw_interval(axes[0], metric["ratio"], i, metric["ci95"])
     axes[0].set_yticks(range(len(labels)), labels)
     axes[0].axvline(1, color="gray", linestyle="--")
     axes[0].set_xlabel("Decode throughput / ordinary target (prompt bootstrap)")

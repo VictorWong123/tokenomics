@@ -1,0 +1,5 @@
+policy	Check arithmetic, transitions, reset and strict configuration	2026-11-08T15:55:01.0457677Z 1/3 Test #1: core .............................   Passed    0.00 sec
+policy	Check arithmetic, transitions, reset and strict configuration	2026-11-08T15:55:01.0538479Z 2/3 Test #2: controller .......................   Passed    0.00 sec
+policy	Check arithmetic, transitions, reset and strict configuration	2026-11-08T15:55:01.0559525Z 3/3 Test #3: controller_io ....................   Passed    0.00 sec
+policy	Check arithmetic, transitions, reset and strict configuration	2026-11-08T15:55:01.0562234Z 100% tests passed, 0 tests failed out of 3
+policy	Check arithmetic, transitions, reset and strict configuration	2026-11-08T15:55:01.0563136Z Total Test time (real) =   0.06 sec

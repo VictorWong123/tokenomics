@@ -11,6 +11,20 @@ import numpy as np
 from bench.common import atomic_json, read_jsonl
 
 
+def draw_interval(ax, value, position, interval, *, color="#356b9a"):
+    """Draw percentile bounds directly: they need not bracket the point exactly.
+
+    NumPy/bootstrap and scalar reductions can differ by one ULP for a
+    degenerate distribution; translating bounds into signed xerr can fail.
+    Never clamp or change the reported statistics to make a plot render.
+    """
+    low, high = interval
+    if not all(math.isfinite(v) for v in (value, low, high)) or low > high:
+        raise ValueError("Invalid plotted interval")
+    ax.hlines(position, low, high, color=color, linewidth=1.5)
+    ax.plot(value, position, "o", color=color)
+
+
 def diagnostic_request(row):
     settings = row.get("settings", {})
     return any(

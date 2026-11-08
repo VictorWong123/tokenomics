@@ -1,0 +1,16 @@
+{
+  "checks_sha256": "3a9cfbdfe7d1710e55fc6a6512a0d27c80debd31e1852b36ee84527e95521ca3",
+  "conclusion": "success",
+  "job_id": 128781899937,
+  "log_sha256": "02398f9aaccb86ea8f832415b03c27ece4a62b9c368c8215ffaa1660d709b2c1",
+  "run_id": 42497169017,
+  "schema_version": 1,
+  "scope": "Hosted independent C++ policy/configuration CI; no inference models or Codespaces",
+  "source_sha": "b745bdae21c5d752f10151f1d3996539d6fd7161",
+  "tests": [
+    "core",
+    "controller",
+    "controller_io"
+  ],
+  "url": "https://github.com/VictorWong123/tokenomics/actions/runs/42497169017"
+}

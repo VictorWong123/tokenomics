@@ -43,3 +43,11 @@
 * User requested a one-script workflow and staged commits/pushes. Feasibility
   and correctness gates must be machine-readable and resumable; ambiguous or
   negative evidence cannot silently trigger a different project.
+
+* Percentile intervals are drawn from their reported lower/upper bounds directly.
+  A one-ULP difference between scalar and bootstrap reductions can otherwise make
+  a degenerate interval fail a signed-error plotting API. Regression tests retain
+  the statistics unchanged and verify rendering; fixture figures were inspected.
+* Hosted policy-contract CI run 42497169017 passes core/controller/strict-JSON
+  tests at source `b745bdae21c5d752f10151f1d3996539d6fd7161` without models or
+  Codespaces. It supplements, rather than replaces, inference and sanitizer gates.

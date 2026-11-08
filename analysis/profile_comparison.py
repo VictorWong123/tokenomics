@@ -7,7 +7,7 @@ from pathlib import Path
 import statistics
 
 from bench.common import atomic_json, read_jsonl
-from analysis.report import cells, paired_summary, validate_run
+from analysis.report import cells, paired_summary, validate_run, draw_interval
 
 PAIRS = (
     ("packed-target", "target"),
@@ -148,12 +148,11 @@ def analyze(directory):
 
     labels = list(comparisons)
     values = [comparisons[k]["ratio"] for k in labels]
-    errors = [
-        [max(0, comparisons[k]["ratio"] - comparisons[k]["ci95"][0]) for k in labels],
-        [max(0, comparisons[k]["ci95"][1] - comparisons[k]["ratio"]) for k in labels],
-    ]
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.barh(labels, values, xerr=errors)
+    ax.barh(labels, values)
+    for i, label in enumerate(labels):
+        metric = comparisons[label]
+        draw_interval(ax, metric["ratio"], i, metric["ci95"], color="black")
     ax.axvline(1, color="black", linestyle="--")
     ax.set(
         xlabel="Paired throughput ratio (prompt-clustered 95% interval)",
