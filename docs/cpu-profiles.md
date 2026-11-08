@@ -132,7 +132,7 @@ The retained three-prompt ngram timing screen (64 output tokens each, source
 `6a4eea153b001c4897c0346ec09e063b11779e26`) isolates the earlier guarded CPU
 point. Its [stage costs](../results/verification/codespace-ngram-20261108/analysis/stage-costs.json)
 show the following actual work. These are historical fit-screen measurements,
-not the pending controller study or a held-out result.
+not the completed controller study or a held-out result.
 
 | Condition | Output tokens | Cycles | Proposed drafts | Accepted drafts | Target rows evaluated | Verification / measured cycle wall |
 |---|---:|---:|---:|---:|---:|---:|
@@ -153,10 +153,12 @@ packed-profile speedup. The final comparisons must still use the same target,
 exact output IDs, natural token counts, complete costs and measured memory.
 
 
-The controller-compatible packed trained gate is queued as run42503429351,
+The controller-compatible packed trained gate is active as run42503429351,
 source `708993c603c89efcb75867d851292022b4960210`, after controller study
-42492089188 attempt2. It remains a separate experiment and does not change
-that controller study's guarded binary or calibration.
+42492089188 attempt2 completed. Its first attempt failed before inference during
+startup; the unchanged owned lifecycle succeeded on retry. Attempt2 remains a
+separate experiment and does not change the completed controller study's guarded
+binary or calibration.
 
 
 The paired analysis also reports warm-completion speedup intervals, formed from

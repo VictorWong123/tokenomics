@@ -12,8 +12,9 @@ This operating point does not establish an acceleration over ordinary decoding.
 - Run 42492089188, attempts 1/2. Attempt1 preserves 25 complete blocks; attempt2
   finishes the same frozen grid. All 25 earlier block receipts/raw files, the
   prior and fit measurements are byte-identical after resume.
-- CPU: the dedicated Linux Codespace, AMD EPYC 7763, two logical CPUs on one
-  physical core, two inference threads, 7.8 GiB RAM, no swap/GPU.
+- CPU: the dedicated Linux Codespace, AMD EPYC 7763, two logical CPUs
+  (VM-reported topology: one core with two threads), two inference threads,
+  7.8 GiB RAM, no swap/GPU. This is not a guarantee of exclusive physical CPU.
 - Target: Qwen2.5-3B-Instruct Q4_K_M, ngram-simple drafting, retained-cache
   operating point, context 2048, batch 512, greedy/F16 KV.
 - Fit: three designated development prompts, cap 64; original-state action
