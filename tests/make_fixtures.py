@@ -52,6 +52,7 @@ def create(
     quantized=False,
     k_quantized=False,
     unicode_cycle=False,
+    ngram_cycle=False,
 ):
     rng = np.random.default_rng(seed)
     width = 256 if quantized or k_quantized else 32
@@ -90,15 +91,20 @@ def create(
         emb = np.ones((n, width), np.float32)
         out = np.zeros((n, width), np.float32)
         out[winner] = 1
-    if unicode_cycle:
-        # A three-state output cycle emits the UTF-8 bytes E2 82 AC (Euro).
-        # Budgets one/two truncate a code point; budget three completes it.
+    if unicode_cycle or ngram_cycle:
+        # Three UTF-8 bytes exercise truncated code points. The longer ASCII
+        # cycle makes ngram lookup find enough following tokens to draft eight.
         emb.fill(0)
         emb[:, 0] = 1
         out.fill(0)
-        for i, token in enumerate((3 + 0xE2, 3 + 0x82, 3 + 0xAC)):
+        cycle = (
+            (3 + 0xE2, 3 + 0x82, 3 + 0xAC)
+            if unicode_cycle
+            else tuple(3 + ord(c) for c in "abcdefghi")
+        )
+        for i, token in enumerate(cycle):
             emb[token] = 0
-            emb[token, (i + 1) % 3] = 1
+            emb[token, (i + 1) % len(cycle)] = 1
             out[token, i] = 1
 
     def tensor(name, value):
@@ -152,3 +158,4 @@ if __name__ == "__main__":
     create(a.out / "quantized.gguf", 259, random=True, quantized=True)
     create(a.out / "quantized-k.gguf", 259, random=True, k_quantized=True)
     create(a.out / "utf8-cycle.gguf", 259, unicode_cycle=True)
+    create(a.out / "ngram-cycle.gguf", 259, ngram_cycle=True)

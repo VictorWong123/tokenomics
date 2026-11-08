@@ -94,8 +94,10 @@ normalization. The PDF's two-success acceptance rule is a project-proposed
 comparator, not claimed as a published algorithm. An online cost controller
 would optimize committed tokens per completed wall time, including catch-up,
 instead of acceptance alone. Neither scheduling nor draft-cache reuse is claimed
-novel. The PDF's 2026 references have not been independently verified through
-the restricted network; no novelty or conference-readiness claim relies on them.
+novel. The cited 2026 source records and relevant method/evaluation sections
+have now been inspected through the connected web tool. The comparison and
+source-specific limitations are in [related work](related-work.md); no novelty
+or conference-readiness claim follows from this reading.
 
 Sources (replace the path after the pin to inspect any file above):
 https://github.com/ggml-org/llama.cpp/tree/fd27b2034905f8dadd8bd6d2cc44595f4929d391

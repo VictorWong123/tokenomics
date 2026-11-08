@@ -156,7 +156,7 @@ trace inside each checkpoint group and restores its original KV bytes for all
 actions, rather than freshly prefilling the combined prefix. Diagnostic warm-up
 uses at most 16 input tokens; the source trace and draft preparation then warm
 the actual models before action timing. Older replay versions cannot clear the
-strengthened gate. The active `87c7811` pilot supplies exploratory older-point
+strengthened gate. The paused `87c7811` pilot supplies exploratory older-point
 observations. A corrected, checkpoint-capable binary requires a fresh Pilot A.
 The standalone replay command verifies identical
 binary/model hashes and execution settings, so an analysis update can consume

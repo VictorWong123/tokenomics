@@ -63,6 +63,15 @@ now be screened with 5 GiB available and must still pass the measured 20%
 headroom requirement. Select it with `candidate=qwen25-05-3-q4`; no new machine
 or lifecycle credential route is introduced.
 
+The experiment workflow now supports fixed `drafter=ngram` timing/pilot work
+without downloading or loading a draft model. Cloud integration checks execute
+its 18-request cap sweep and original-state replay. A period-nine transformer
+fixture forces real lookup proposals at every cap, with rejected proposals,
+fallback/re-entry and resets; the suite now reports 390 differential cases.
+Release and extended sanitizer runtime checks pass with leak detection. These
+new 12 comparisons are fixture evidence, not a trained-model result. Relevant
+paper/source comparisons are recorded in `docs/related-work.md`.
+
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;
@@ -72,7 +81,7 @@ configuration but unexecuted. The full runtime project remains incomplete.
 
 Evidence-based wording now: “Building a portable C++ speculative-decoding
 runtime with checked KV rollback and lazy synchronization; validated with
-378 transformer fixture cases and a 272-comparison trained-Qwen Linux gate.”
+390 transformer fixture cases and a 272-comparison trained-Qwen Linux gate.”
 Do not claim acceleration from the current unfavorable timing screen.
 
 ## Earlier completed Codespace setup

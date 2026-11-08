@@ -1,0 +1,35 @@
+{
+  "checks": {
+    "asan_ubsan_runtime": "fixtures/runtime 2/2 pass, 94.82 seconds, ASAN_OPTIONS=detect_leaks=1",
+    "release_ctest": "4/4 pass, 4.19 seconds; strengthened runtime recheck 2/2 pass, 2.16 seconds"
+  },
+  "coverage": [
+    "nonempty proposals at every supported cap",
+    "correct greedy IDs and stop",
+    "zero/partial/full acceptance",
+    "scripted fallback and re-entry",
+    "request reset",
+    "no draft KV or model synchronization"
+  ],
+  "draft_model_loaded": false,
+  "forced_history_period": 9,
+  "limitation": "Controlled transformer state/correctness checks only. No trained-model acceptance, timing or feasibility result.",
+  "new_ngram_comparisons": 12,
+  "schema_version": 1,
+  "sha256": {
+    "build-asan/tokenomics": "89f8cf4f8bb2441a1d50f426e37574140a4ff0bc35e2ac6c2b1ab1d1f5979e5a",
+    "build-cpu/fixtures/ngram-cycle.gguf": "fd5b73bfe9c544471d83d38044c055db6f8de4f762f5625ffe22c2475f095c53",
+    "build-cpu/tokenomics": "c29f03211f3a4b95bb23730e0bfeb3bd0ad678ef89b14521d905a101195bf093",
+    "src/runtime.cpp": "9517cbd8a8e1cc23c353442d61e4f66c2a05abb0a1c2afac3de2276043d29dbb",
+    "tests/make_fixtures.py": "8e2214f8cca7c36a91058fae1ae6643ed9b0a014eb2193860417080fe57530d6",
+    "tests/test_runtime.cpp": "995935070a861b22fc2d07fe1444e3bce2c313c52c74b8b35f6f01562d488593"
+  },
+  "state": "passed",
+  "synthetic_fixture": true,
+  "total_differential_fixture_cases": 390,
+  "upstream_ngram": {
+    "min_hits": 1,
+    "size_m": 8,
+    "size_n": 3
+  }
+}
