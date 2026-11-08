@@ -1,0 +1,35 @@
+name: Portable profile preflight
+
+on:
+  push:
+    branches: [codex/paired-cpu-profile]
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+      - name: Review source staging and test both CPU profiles
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TOKENOMICS_BUILD_JOBS: '2'
+        run: |
+          gh auth setup-git
+          git fetch origin main
+          profile_branch_sha="$(git rev-parse HEAD)"
+          profile_base_sha="$(git merge-base HEAD origin/main)"
+          git reset --soft "$profile_base_sha"
+          python3 scripts/check_staged.py
+          git reset --soft "$profile_branch_sha"
+          bash scripts/bootstrap.sh cpu
+          .venv/bin/cmake -S . -B build-cpu -DTOKENOMICS_CPU_BATCH_INVARIANT=OFF -DTOKENOMICS_CPU_PACKED_VERIFY=ON
+          .venv/bin/cmake --build build-cpu -j2
+          .venv/bin/ctest --test-dir build-cpu --output-on-failure
