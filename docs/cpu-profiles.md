@@ -189,3 +189,10 @@ The packed-gate verifier also independently regenerates its preliminary timing
 ratios and stage costs into a temporary directory and compares them with the
 archived summary. A modified aggregate is rejected even when token checks pass.
 This audit has no plotting dependency and never modifies raw evidence.
+
+The fixed paired study is now queued as [run42519929357](https://github.com/VictorWong123/tokenomics/actions/runs/42519929357),
+source `c834026c6bdddc4d219a25945befc318361e74fb`, using the explicit checked-source
+tag `tokenomics-profiles-20261108-c834026c6b`. The trained proof digest is
+`cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad`.
+Results remain pending; the gate's single-repetition screen does not measure a
+paired CPU-profile gain.

@@ -25,9 +25,10 @@ Current checkpoint:
   Binary ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f.
 - Both prepared profile protocols now pin canonical gate SHA
   cac71c63a37ba0775c314314b67837cedd4d42588619b117e6b263a648bde0ad.
-  Start the 54-record paired study from checked main using an explicit lightweight
-  tokenomics-profiles-* tag. Register its actual run ID/source in the verifier.
-  Do not claim CPU acceleration from the single-repetition gate screen.
+  The 54-record paired study is queued as42519929357, exact source
+  c834026c6bdddc4d219a25945befc318361e74fb, via lightweight tag
+  tokenomics-profiles-20261108-c834026c6b. It is allowlisted for independent
+  verification; no paired performance result is claimed before completion.
 - The separately named controller-packed extension is locally checked and now
   has a frozen prerequisite. It has no trained performance result yet. Use fresh
   calibration; run it only if the paired component result justifies that point.

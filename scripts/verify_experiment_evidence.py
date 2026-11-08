@@ -23,6 +23,7 @@ EXPECTED = {
     42474834521: "63265d36939f802abb73b88962d96862c6c9169c",
     42492089188: "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c",
     42503429351: "708993c603c89efcb75867d851292022b4960210",
+    42519929357: "c834026c6bdddc4d219a25945befc318361e74fb",
 }
 
 
@@ -31,6 +32,7 @@ FOLDERS = {
     42474834521: "codespace-packed-20261108",
     42492089188: "codespace-controller-20261108",
     42503429351: "codespace-packed-controller-20261108",
+    42519929357: "codespace-cpu-profiles-20261108",
 }
 
 CONTROLLER_PROFILES = {42492089188: "guarded"}
