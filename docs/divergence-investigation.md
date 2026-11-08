@@ -121,6 +121,19 @@ comparison rules or CPU profile. All 272 cases still have to finish.
 
 ## Verified resolution
 
+The current diagnostic schema is 2. It preserves the original remaining token
+budget at each fresh-prefix checkpoint, verifies exact prefix IDs and summarizes
+every committed row, rather than row 0 alone. Each row records whether all
+preceding emitted tokens still match the canonical continuation; a matching
+later token after divergence is not evidence of recovery at the same history.
+The earlier schema-1 fresh-prefix summaries only covered their first row.
+Their limitation does not invalidate the separate full 272-token-comparison
+gate, and fresh-prefill probes still do not reproduce the original KV history.
+Cloud regressions include first-row agreement followed by a row-1 mismatch.
+A controlled execution checks 14 full comparisons and 20 committed replay rows
+across six jobs; checkpoint 29 retains three output tokens of the original 32.
+See `results/verification/cloud-20261108/all-row-diagnostic.json`.
+
 Run 42420516268, attempt 1, on `main` source
 `d1bb6fb778695515614d21cf78959f63f544db7b` completed on dedicated Codespace
 runner 22. The 14 diagnostic comparisons had no mismatch, reference resets

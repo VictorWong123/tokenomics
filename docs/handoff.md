@@ -36,6 +36,12 @@ changes the driver binary, so do not mix its measurements with the frozen
 `87c7811` pilot or bypass replay's binary check. Retain the older run as
 exploratory evidence; freeze the corrected driver for future confirmation.
 
+Diagnostic schema 2 also covers every committed replay row and the original
+remaining budget. A row-0 match no longer hides a row-1 divergence, and rows
+after divergence are marked as having a different history. The Cloud fixture
+diagnostic passes 14 full comparisons and checks 20 replay rows; its
+`correctness_supported` remains false, as diagnosis is not the trained gate.
+
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;

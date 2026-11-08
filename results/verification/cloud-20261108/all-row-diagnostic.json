@@ -1,0 +1,14 @@
+{
+  "canonical_matches": true,
+  "checkpoint29_remaining_budget": 3,
+  "committed_rows_checked": 20,
+  "correctness_supported": false,
+  "execution_environment": "Codex Cloud Linux CPU",
+  "full_comparisons": 14,
+  "limitation": "Controlled fixture diagnosis; does not establish trained-model correctness or isolate the cause of cache-history numerical differences.",
+  "mismatches": 0,
+  "probe_matches_emitted": true,
+  "replay_cases": 6,
+  "schema_version": 2,
+  "synthetic_fixture": true
+}

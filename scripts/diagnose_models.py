@@ -16,6 +16,7 @@ from bench.common import (
     source_fingerprint,
 )
 from scripts.check_models import check_cycles, compare, execute
+from bench.run import first_mismatch
 
 
 def build_configuration(binary):
@@ -77,6 +78,48 @@ def probe_at(
     return matches[0]
 
 
+def replay_summary(reference, row, cycles):
+    """Inspect every committed row; a matching first row is insufficient."""
+    checkpoint = row["checkpoint"]
+    prefix = reference["prompt_ids"] + reference["token_ids"][:checkpoint]
+    if first_mismatch(prefix, row["prompt_ids"]) is not None:
+        raise RuntimeError("replay prefix differs from canonical token IDs")
+    emitted = row["token_ids"]
+    if not emitted:
+        raise RuntimeError("replay has no committed tokens")
+    canonical = reference["token_ids"][checkpoint : checkpoint + len(emitted)]
+    probes = []
+    canonical_prefix = True
+    for index, token in enumerate(emitted):
+        probe = probe_at(
+            cycles, row["configuration_id"], row["repetition"], index, row["prompt_id"]
+        )
+        expected = canonical[index] if index < len(canonical) else None
+        probes.append(
+            {
+                "output_index": index,
+                "canonical_prefix": canonical_prefix,
+                "canonical_token": expected,
+                "emitted_token": token,
+                "matches_canonical": token == expected,
+                "probe_matches_emitted": probe["top_id"] == token,
+                "probe": probe,
+            }
+        )
+        canonical_prefix = canonical_prefix and token == expected
+    return {
+        "configuration_id": row["configuration_id"],
+        "checkpoint": checkpoint,
+        "first_token": emitted[0],
+        "canonical_token": canonical[0] if canonical else None,
+        "probe": probes[0]["probe"],
+        "committed_rows": probes,
+        "probe_matches_emitted": all(p["probe_matches_emitted"] for p in probes),
+        "matches_canonical_continuation": first_mismatch(canonical, emitted) is None,
+        "first_mismatch": first_mismatch(canonical, emitted),
+    }
+
+
 def diagnose(target, draft, out, binary=None, threads=2, synthetic_fixture=False):
     out = Path(out).resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -100,7 +143,7 @@ def diagnose(target, draft, out, binary=None, threads=2, synthetic_fixture=False
         atomic_json(
             out / "manifest.json",
             {
-                "schema_version": 1,
+                "schema_version": 2,
                 "purpose": "diagnosis only; no timing interpretation",
                 "synthetic_fixture": synthetic_fixture,
                 "source": source_fingerprint(),
@@ -206,7 +249,7 @@ def diagnose(target, draft, out, binary=None, threads=2, synthetic_fixture=False
                         "configuration_id": f"prefix{checkpoint}-action{k}",
                         "policy": "target" if k == 0 else "fixed",
                         "k": k or 4,
-                        "max_tokens": 8,
+                        "max_tokens": base["max_tokens"] - checkpoint,
                         "max_cycles": 1,
                         "repetition": 0,
                         "checkpoint": checkpoint,
@@ -216,22 +259,9 @@ def diagnose(target, draft, out, binary=None, threads=2, synthetic_fixture=False
         replay = execute(a, "replay", replay_jobs, True) if replay_jobs else []
         replay_cycles = read_jsonl(out / "replay.cycles.jsonl") if replay_jobs else []
         check_cycles(replay, replay_cycles)
-        probes = []
-        for row in replay:
-            checkpoint = row["checkpoint"]
-            probe = probe_at(replay_cycles, row["configuration_id"], 0, 0)
-            probes.append(
-                {
-                    "configuration_id": row["configuration_id"],
-                    "checkpoint": checkpoint,
-                    "first_token": row["token_ids"][0],
-                    "canonical_token": reference[0]["token_ids"][checkpoint],
-                    "probe_matches_emitted": probe["top_id"] == row["token_ids"][0],
-                    "probe": probe,
-                }
-            )
+        probes = [replay_summary(reference[0], row, replay_cycles) for row in replay]
         result = {
-            "schema_version": 1,
+            "schema_version": 2,
             "state": "diagnostic_complete",
             "synthetic_fixture": synthetic_fixture,
             "correctness_supported": False,
@@ -246,7 +276,7 @@ def diagnose(target, draft, out, binary=None, threads=2, synthetic_fixture=False
         atomic_json(
             out / "status.json",
             {
-                "schema_version": 1,
+                "schema_version": 2,
                 "state": "failed",
                 "error_type": type(exc).__name__,
                 "error": str(exc),
