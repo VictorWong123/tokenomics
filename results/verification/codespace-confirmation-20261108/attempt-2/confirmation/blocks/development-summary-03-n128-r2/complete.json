@@ -1,0 +1,54 @@
+{
+  "attempt": 0,
+  "correctness": [
+    {
+      "attempt": 0,
+      "block_id": "development-summary-03-n128-r2",
+      "configuration_id": "target",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-summary-03",
+      "prompt_mismatch": null,
+      "repetition": 2,
+      "run_id": "confirmation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-03-n128-r2",
+      "configuration_id": "fixed1",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-summary-03",
+      "prompt_mismatch": null,
+      "repetition": 2,
+      "run_id": "confirmation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-03-n128-r2",
+      "configuration_id": "fixed8",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-summary-03",
+      "prompt_mismatch": null,
+      "repetition": 2,
+      "run_id": "confirmation",
+      "schema_version": 1
+    }
+  ],
+  "records": [
+    "attempt-0/target.json",
+    "attempt-0/fixed1.json",
+    "attempt-0/fixed8.json"
+  ],
+  "sha256": {
+    "attempt-0/fixed1.json": "105cbdccdaeda937ed8b74dd2bb5e644fa2d2f9f62d8be3a0a259c6245271cf5",
+    "attempt-0/fixed8.json": "61266a9c4b372dfc82117b1cad6771125c6f7eb675273d38407339f656ab8b30",
+    "attempt-0/target.json": "3b011517b5ddce665e4c6bdb3ffbb70dbb22298333aa2151f77055822f97ea87"
+  }
+}

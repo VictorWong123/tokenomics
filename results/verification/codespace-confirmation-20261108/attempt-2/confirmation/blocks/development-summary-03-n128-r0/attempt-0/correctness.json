@@ -1,0 +1,41 @@
+[
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n128-r0",
+    "configuration_id": "target",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 0,
+    "run_id": "confirmation",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n128-r0",
+    "configuration_id": "fixed1",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 0,
+    "run_id": "confirmation",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n128-r0",
+    "configuration_id": "fixed8",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 0,
+    "run_id": "confirmation",
+    "schema_version": 1
+  }
+]
