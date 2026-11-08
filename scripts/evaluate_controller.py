@@ -11,7 +11,8 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from analysis.controller import report
 from bench.common import ROOT, atomic_json, read_jsonl, sha256
-from bench.controller import configurations
+from bench.controller import configurations, validate_binding
+from bench.prompt_fit import check as check_prompt_fit
 from bench.run import run, RunPaused
 
 
@@ -93,6 +94,21 @@ def evaluate(
         synthetic_fixture=synthetic_fixture,
     )
     out.mkdir(parents=True, exist_ok=True)
+    point = prior["provenance"]["operating_point"]
+    validate_binding(
+        prior,
+        {
+            **point,
+            "binary_sha256": sha256(exe),
+            "target_sha256": sha256(target),
+            "draft_sha256": sha256(draft) if draft else None,
+            **{k: cfg[k] for k in ("context", "batch", "threads")},
+        },
+        synthetic_fixture=synthetic_fixture,
+    )
+    check_prompt_fit(
+        exe, target, selected, cfg, out / "prompt-fit", point["gpu_layers"]
+    )
     # run() hashes the executable/models and rejects an incompatible calibration
     # before launching any model work. Changed inputs cannot resume saved blocks.
     try:

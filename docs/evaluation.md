@@ -24,6 +24,9 @@ executable, weights, backend, context/batch/thread settings and retained cache
 mode. Changing these requires a new calibration, not editing its hashes.
 
 The evaluation entry point freezes the configuration before reading any result.
+A hash-checked tokenizer-only preflight checks every prompt plus the largest
+output cap against logical context capacity without generating held-out answers.
+An incompatible binary/model/calibration is rejected before that model load.
 It uses all 90 versioned held-out prompts, caps128/512 and at least five repeats.
 It obtains execution settings and baseline selection from the development prior;
 it cannot select a better fixed action from held-out outcomes. Every independent

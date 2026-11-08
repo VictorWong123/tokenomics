@@ -365,6 +365,17 @@ class StudyPipeline(unittest.TestCase):
             heldout_result = json.loads(
                 (out / "heldout/evaluation/analysis/summary.json").read_text()
             )
+            self.assertTrue((out / "heldout/prompt-fit/complete.json").exists())
+            from bench.prompt_fit import check as check_prompt_fit
+
+            with self.assertRaisesRegex(ValueError, "exceed context"):
+                check_prompt_fit(
+                    exe,
+                    model,
+                    eval_prompts,
+                    {**template, "output_caps": [512]},
+                    out / "oversize",
+                )
             self.assertTrue(heldout_result["heldout"])
             self.assertTrue(heldout_result["synthetic_fixture"])
             self.assertEqual(

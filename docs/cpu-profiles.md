@@ -124,3 +124,30 @@ actual Shutdown confirmation. Then freeze that exact proof digest and retain
 the same packed executable/target hashes. All actual records are checked again
 against immutable blocks and raw totals before summarizing. The previous
 cancelled run supplies no passing gate or performance evidence.
+
+
+## Measured bottleneck behind the optimization
+
+The retained three-prompt ngram timing screen (64 output tokens each, source
+`6a4eea153b001c4897c0346ec09e063b11779e26`) isolates the earlier guarded CPU
+point. Its [stage costs](../results/verification/codespace-ngram-20261108/analysis/stage-costs.json)
+show the following actual work. These are historical fit-screen measurements,
+not the pending controller study or a held-out result.
+
+| Condition | Output tokens | Cycles | Proposed drafts | Accepted drafts | Target rows evaluated | Verification / measured cycle wall |
+|---|---:|---:|---:|---:|---:|---:|
+| Ordinary target | 192 | 192 | 0 | 0 | 192 | 99.995% |
+| Ngram fixed1 | 192 | 159 | 38 | 33 | 197 | 99.993% |
+| Ngram fixed8 | 192 | 138 | 133 | 54 | 271 | 99.995% |
+
+Larger caps reduce target calls while increasing evaluated rows because more
+proposals are rejected. Lookup and wrapper bookkeeping are a tiny part of the
+measured cycle cost at this point. Improving those alone cannot explain a
+substantial throughput gain; verification batching/data layout and avoiding
+unprofitable proposals are the relevant bottlenecks. High acceptance among a
+small subset of attempted proposals is also different from overall token rate.
+
+This motivates the row-consistent packed-kernel study and the controller's
+charged fallback/probe measurements. It does not prove global optimality or a
+packed-profile speedup. The final comparisons must still use the same target,
+exact output IDs, natural token counts, complete costs and measured memory.
