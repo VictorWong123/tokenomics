@@ -24,6 +24,7 @@ EXPECTED = {
     42492089188: "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c",
     42503429351: "708993c603c89efcb75867d851292022b4960210",
     42519929357: "c834026c6bdddc4d219a25945befc318361e74fb",
+    42523392101: "45ba7d6aabda5fd4fc0416a8abb0b8440737c6f8",
 }
 
 
@@ -33,6 +34,7 @@ FOLDERS = {
     42492089188: "codespace-controller-20261108",
     42503429351: "codespace-packed-controller-20261108",
     42519929357: "codespace-cpu-profiles-20261108",
+    42523392101: "codespace-profile-diagnosis-20261108",
 }
 
 CONTROLLER_PROFILES = {42492089188: "guarded"}
@@ -500,6 +502,14 @@ def verify_run(run_id, out, publish=False):
                     cpu_profile=CONTROLLER_PROFILES[run_id],
                 )
             )
+        elif run_id == 42523392101:
+            from scripts.verify_profile_evidence import check_diagnosis
+
+            require(
+                state == "profile_diagnosis_complete",
+                "Profile diagnosis did not complete",
+            )
+            checked = check_diagnosis(evidence, EXPECTED[run_id])
         elif run_id == 42519929357 and state == "failed":
             from scripts.verify_profile_evidence import check_failure
 

@@ -160,3 +160,84 @@ def check(evidence, expected_source, *, synthetic_fixture=False):
         screen_target_sha256=frozen["target_sha256"],
         peak_rss_bytes=max(r["peak_rss_bytes"] for r in rows),
     )
+
+
+def check_diagnosis(evidence, expected_source):
+    from bench.common import read_jsonl
+    from bench.run import first_mismatch
+    from scripts.check_models import compare, check_cycles
+    from scripts.diagnose_models import probe_at
+
+    result = json.loads((evidence / "diagnosis.json").read_text())
+    spec = json.loads((ROOT / "configs/profile-diagnosis-v1.json").read_text())
+    receipt_path = ROOT / spec["failure_receipt"]
+    if sha256(receipt_path) != spec["failure_receipt_sha256"]:
+        raise ValueError("Diagnostic failure binding changed")
+    receipt = json.loads(receipt_path.read_text())
+    source = receipt_path.parent / f"attempt-{receipt['attempt']}"
+    original = check_failure(source, receipt["source_sha"])
+    if (
+        result["source"]["revision"] != expected_source
+        or result["state"] != "profile_diagnosis_complete"
+        or result["diagnostic_only"] is not True
+        or result["performance_summary_produced"] is not False
+    ):
+        raise ValueError("Invalid diagnostic source/scope")
+    frozen = json.loads((source / "profiles/run_manifest.json").read_text())["frozen"]
+    block = next((source / "profiles/blocks").glob("*/attempt-*/failure.json")).parent
+    rows = {}
+    probes = {}
+    for profile, cid in (("guarded", "target"), ("packed", "packed-target")):
+        expected = next(
+            r
+            for r in read_jsonl(block / f"{cid}.requests.jsonl")
+            if not r.get("warmup")
+        )
+        records = read_jsonl(evidence / profile / "original-history.jsonl")
+        actual = [r for r in records if not r.get("warmup")]
+        if len(actual) != 1 or compare(expected, actual[0]) is not None:
+            raise ValueError("Diagnostic history does not reproduce retained IDs/stops")
+        row = actual[0]
+        if (
+            not row["settings"]["diagnostic"]
+            or not row["settings"]["diagnostic_logits"]
+            or not row["settings"]["detailed"]
+            or any(
+                row["settings"][k] != expected["settings"][k]
+                for k in ("context", "batch", "threads", "gpu_layers")
+            )
+            or result["binary_sha256"][profile]
+            != frozen["configuration_binary_sha256"][cid]
+        ):
+            raise ValueError("Diagnostic execution identity changed")
+        cycles = [
+            c
+            for c in read_jsonl(evidence / profile / "original-history.cycles.jsonl")
+            if not c.get("warmup")
+        ]
+        check_cycles(actual, cycles)
+        probes[profile] = [
+            probe_at(cycles, cid, row["repetition"], pos, prompt_id=row["prompt_id"])
+            for pos in (35, 36)
+        ]
+        rows[profile] = row
+    mismatch = first_mismatch(rows["guarded"]["token_ids"], rows["packed"]["token_ids"])
+    if (
+        mismatch != spec["expected_first_mismatch"]
+        or mismatch != original["first_mismatch"]
+        or mismatch != result["first_mismatch"]
+        or not equal(probes, result["probes"])
+        or result["target_sha256"] != frozen["target_sha256"]
+        or rows["guarded"]["token_ids"][:36] != rows["packed"]["token_ids"][:36]
+    ):
+        raise ValueError("Diagnostic probes or mismatch differ from original evidence")
+    return dict(
+        exact_comparisons=2,
+        exact_original_history_reproductions=2,
+        diagnostic_only=True,
+        performance_summary_produced=False,
+        first_mismatch=mismatch,
+        target_probes=probes,
+        binary_sha256=result["binary_sha256"],
+        screen_target_sha256=result["target_sha256"],
+    )
