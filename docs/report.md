@@ -23,9 +23,12 @@ implementation; no trained performance priors or gains were fabricated.
 The two full feasibility questions remain unresolved. Trained correctness
 passes in Codespaces, and the completed frozen-action confirmation gives no
 support for a practical gain on the guarded CPU point: cap1/target throughput
-is 0.9846, with 95% interval [0.9721, 1.0019]. The separate packed CPU profile
-was interrupted to prioritize controller correctness; no trained packed-profile
-pass follows from that cancelled run. The older partial development pilot remains
+is 0.9846, with 95% interval [0.9721, 1.0019]. The controller has now completed its separate bounded development study:
+1.2048× cap8 ngram, 0.9943× the frozen fixed1 baseline and 0.9709× ordinary
+decoding. Its 1.67 µs/cycle decision/update cost is small; native verification
+dominates. The [dedicated result](controller-results.md) reports uncertainty,
+work counts, overhead and ablations. The separate packed CPU profile is
+undergoing fresh trained revalidation; the earlier cancelled run supplies no pass. The older partial development pilot remains
 exploratory and is not combined with the confirmation.
 
 | Environment | Actual execution | Feasibility evidence |
@@ -344,15 +347,22 @@ transformers; model calibration requires an actual catch-up episode and the
 ngram calibration has no draft-model synchronization charge.
 
 Trained controller study **42492089188**, source `e98c0fa84a2c2ff52df198f19eae6ce72d51c83c`,
-started only after those local checks. It first checks both trained mechanisms,
-then freezes new development priors and a full-request fixed comparator. The
-bounded validation is six distinct development prompts, caps64/128, three
-repetitions and seven conditions, plus separately selected detailed/logging
-requests. Measurements and actual shutdown are pending. This is not full Pilot
-A/B or the 90-prompt held-out protocol. The raw artifact checker reconstructs
-priors and statistics before any performance claim; unfavorable outcomes remain
-part of the report. Quantify probes, prediction error, fallback, catch-up, policy
-overhead and verification cost before selecting another optimization.
+started only after those local checks. Both trained correctness mechanisms pass
+28 records. Frozen development priors select fixed1 from complete requests.
+All 252 bounded validation records and 16 separate logging records pass exact
+IDs/stops/cache accounting. Both attempts have confirmed actual Shutdown;
+all 1587 final artifact members pass independent hash and semantic verification.
+The resumed raw prefix, fit and prior remain byte-identical.
+
+Cost-aware/target throughput is 0.9709 [0.9607,0.9810]; cost-aware/fixed1 is
+0.9943 [0.9853,1.0023]; cost-aware/cap8 is 1.2048 [1.1271,1.2868]. The bounded
+grid uses six distinct development prompts, caps64/128 and three repetitions;
+these prompt-bootstrap intervals do not constitute a full held-out result.
+Neither ablation shows a practical aggregate benefit. Policy work is 0.00114%
+of generation and the measured prediction error is 22.7%. Fallback supplies
+47.3% of tokens. A separate native CPU-profile experiment addresses the measured
+verification bottleneck, with an equally optimized ordinary baseline.
+See [the controller result](controller-results.md) for full tables and figures.
 
 Pinned-source findings and reference links are in `docs/upstream.md`. Detailed
 commands, blockers and current résumé wording are in `docs/handoff.md`.

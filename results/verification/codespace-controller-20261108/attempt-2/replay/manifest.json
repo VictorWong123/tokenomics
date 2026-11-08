@@ -1,0 +1,101 @@
+{
+  "binary": "3b640fc90cca7b88cf02dc5fdde86c7c4f517dfa090e0ab7258bc09da8263d09",
+  "code": {
+    "owned_source_sha256": "6cca121943b6ac88fea0e15b597638a17c87d328dc1cd50aadbd4f0f19760249",
+    "revision": "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c"
+  },
+  "config": {
+    "ablations": [
+      "no-fallback",
+      "no-probes"
+    ],
+    "batch": 512,
+    "bootstrap_samples": 10000,
+    "comparators": [
+      "target",
+      "development_frozen_fixed",
+      "dynamic",
+      "acceptance"
+    ],
+    "configurations": [
+      {
+        "id": "target",
+        "policy": "target"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed1",
+        "k": 1,
+        "policy": "fixed"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed2",
+        "k": 2,
+        "policy": "fixed"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed4",
+        "k": 4,
+        "policy": "fixed"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed6",
+        "k": 6,
+        "policy": "fixed"
+      },
+      {
+        "drafter": "ngram",
+        "id": "fixed8",
+        "k": 8,
+        "policy": "fixed"
+      }
+    ],
+    "context": 2048,
+    "detailed": false,
+    "drafter": "ngram",
+    "fit_output_caps": [
+      64
+    ],
+    "fit_prompt_ids": [
+      "development-qa-01",
+      "development-code-01",
+      "development-summary-01"
+    ],
+    "fit_repetitions": 1,
+    "output_caps": [
+      64
+    ],
+    "phase": "controller_fit",
+    "practical_margin": 0.05,
+    "primary_metric": "geomean_prompt_cap_median_decode_throughput_ratio",
+    "repetitions": 1,
+    "schema_version": 1,
+    "scope": "Six development validation prompts; no full Pilot A/B or held-out claims. All policy variants use measured priors from the same executable and fit replay. Target is selected from prior measured bottlenecks, not assumed to yield a gain.",
+    "seed": 20261108,
+    "split": "development",
+    "target_model": "qwen25-3",
+    "threads": 2,
+    "trace_selection": [
+      "median_improvement",
+      "worst_regression"
+    ],
+    "validation_prompt_ids": [
+      "development-qa-03",
+      "development-qa-04",
+      "development-code-03",
+      "development-code-04",
+      "development-summary-03",
+      "development-summary-04"
+    ],
+    "warmup_prompt": "Warm-up: continue briefly.",
+    "warmup_tokens": 16
+  },
+  "draft": null,
+  "drafter": "ngram",
+  "gpu_layers": 0,
+  "pilot": "edd9c1153089aa60bfa0e29e12dfee2b0417010083e6735ea492d4c30ed72523",
+  "target": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d"
+}

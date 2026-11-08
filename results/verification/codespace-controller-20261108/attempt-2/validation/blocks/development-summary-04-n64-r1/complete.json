@@ -1,0 +1,114 @@
+{
+  "attempt": 0,
+  "correctness": [
+    {
+      "attempt": 0,
+      "block_id": "development-summary-04-n64-r1",
+      "configuration_id": "target",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-04-n64-r1",
+      "configuration_id": "cost-aware",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-04-n64-r1",
+      "configuration_id": "dynamic",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-04-n64-r1",
+      "configuration_id": "fixed1",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-04-n64-r1",
+      "configuration_id": "no-probes",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-04-n64-r1",
+      "configuration_id": "no-fallback",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-04-n64-r1",
+      "configuration_id": "acceptance",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-summary-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    }
+  ],
+  "records": [
+    "attempt-0/target.json",
+    "attempt-0/cost-aware.json",
+    "attempt-0/dynamic.json",
+    "attempt-0/fixed1.json",
+    "attempt-0/no-probes.json",
+    "attempt-0/no-fallback.json",
+    "attempt-0/acceptance.json"
+  ],
+  "sha256": {
+    "attempt-0/acceptance.json": "4c3f62111be3eb5bd0e65b72bc998ed9a58c37d03e4fdb6d7570f2a877b40205",
+    "attempt-0/cost-aware.json": "8b38e7937aba03d9b469398c88b28c8b0644dd3f23fada48b879f8cbf9bf9fe2",
+    "attempt-0/dynamic.json": "e46cf5c1977475b1acd8e50213dfc9359f9b8c88722fe47b30f54b3ca3069269",
+    "attempt-0/fixed1.json": "1735981b9c9ec660f3d3b021a4918cac3529ea0fbcca6fab330ace60cfb8811c",
+    "attempt-0/no-fallback.json": "00ac94f7d24c71403abb528b916892fdbe90b1059133ad74c9eaab1afaad50cf",
+    "attempt-0/no-probes.json": "a78d738f09c6e4b60ef84859241cf25f023d98afd2172fcebfc6dbc3162301e4",
+    "attempt-0/target.json": "ead06d76c23d443a262caea822c8aef7cc3e9d701017b0c300a87eb97f573053"
+  }
+}

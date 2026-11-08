@@ -9,20 +9,20 @@ prepared draft state instead of repeatedly reconstructing the combined prefix.
 CPU is the initial reference. macOS Metal is supported by configuration;
 CUDA is optional. Linux cloud, Codespaces and Mac results are separate.
 
-**Status: in progress.** Cloud Release and sanitizer checks pass, including
-906 differential fixture cases. Codespaces passed the 272-comparison trained
-correctness gate and trained original-KV replay checks. A completed nine-prompt
-confirmation passes all 162 exact comparisons, but its frozen cap1 throughput
-ratio is 0.9846 [0.9721, 1.0019] to target-only and fails the 5% practical-gain
-criterion. The experimental cost-aware controller passes local integration and
-sanitizer checks and 56 focused trained correctness records, covering all six
-actions. Its bounded timing study paused after 25/36 complete blocks (175 exact
-validation records); it is resuming at the same source. Complete timing
-comparisons remain pending. The opt-in packed
-CPU run was cancelled to prioritize the controller. Full Pilot A/B, held-out
-evaluation and Metal execution remain incomplete. See [the handoff](docs/handoff.md),
-[feasibility](docs/feasibility.md) and the
-[verified raw confirmation](results/verification/codespace-confirmation-20261108).
+**Status: experimental controller implemented and measured.** Cloud Release and
+ASan/UBSan/leak checks pass six suites, including 906 differential fixture cases.
+Codespaces passes the original 272-comparison trained gate, original-KV replays
+and 56 focused controller correctness records across both drafting mechanisms.
+The completed controller comparison has 252 exact validation records across
+six development prompts, two output caps and three repetitions. Cost-aware
+throughput is 1.2048× cap8 ngram, 0.9943× the development-frozen fixed1 baseline,
+and 0.9709× ordinary target-only decoding. Decision/update cost averages 1.67 µs
+per cycle. These bounded results establish no ordinary-decoding acceleration.
+See the [controller result and figures](docs/controller-results.md).
+A separate packed CPU profile is undergoing trained revalidation before its
+paired benchmark. Full Pilot A/B, 90-prompt held-out evaluation and Metal
+execution remain incomplete. See [the handoff](docs/handoff.md) and
+[feasibility](docs/feasibility.md).
 
 The [requirements and documentation index](docs/requirements.md) distinguishes
 implemented behavior, measured evidence and remaining research work. See
@@ -63,6 +63,8 @@ Terminal state-transition demonstration:
 .venv/bin/python scripts/demo.py --build-dir build-cpu
 # Verify and replay the retained trained-model trace, with no inference/download:
 .venv/bin/python scripts/demo.py --recorded
+# Replay audited cost-aware decisions from the completed trained study:
+.venv/bin/python scripts/demo_controller.py --max-cycles 12
 ```
 
 The recorded demo shows scripted fallback, partial/full acceptance and lazy
@@ -70,7 +72,8 @@ catch-up from the passing trained gate. It verifies original artifact file
 hashes and the selected request against ordinary target IDs before display.
 It demonstrates scripted correctness mechanics. See the separate
 [controller design and use](docs/controller-design.md) for the implemented
-cost-aware policy, calibrated priors and planned trained comparison.
+cost-aware policy and calibration contract, and the
+[completed measured comparison](docs/controller-results.md).
 
 ## Real-model feasibility: one entry point
 

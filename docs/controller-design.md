@@ -1,6 +1,8 @@
 # Experimental cost-aware controller
 
-Design v1, 8 November 2026. **Implemented experimental C++ controller; trained measurements pending.**
+Design v1, 8 November 2026. **Implemented and measured experimental C++ controller.**
+See the [completed engineering result](controller-results.md) for scope, metrics
+and the ordinary-decoding comparison.
 
 The user explicitly chose to finish the experimental C++ controller despite the
 negative feasibility evidence, then requested a controller-specific design
@@ -378,14 +380,20 @@ the handoff and requirements matrix as each checked stage is committed.
 
 The first controller-focused trained run is 42492089188, exact source
 `e98c0fa84a2c2ff52df198f19eae6ce72d51c83c`. It started only after the Cloud
-checks above passed. Attempt1 reached its planned pause after 25/36 complete
-validation blocks: 175 exact records, plus all 18 fit records. Both trained
+checks above passed. Attempt1 paused after 25/36 blocks; attempt2 completed all
+252 validation records and 16 separate logging records. Earlier raw blocks,
+fit measurements and prior are byte-identical after resume. Both trained
 correctness mechanisms pass 28 records each and exercise all six actions; the
-model gate observes 40 synchronized draft tokens. All 1078 archive members and
-raw block/calibration checks pass independent verification, and finalizer job
-128797327277 confirms actual Shutdown. The partial receipt remains separate
-from a final result. Resume the same run/source for the remaining 11 blocks and
-logging comparison; no unfinished-grid performance estimate is claimed.
+model gate observes 40 synchronized draft tokens. All 1587 final archive members
+and raw block/calibration checks pass independent verification. Finalizer job
+128815104360 confirms actual Shutdown. The canonical final receipt is separate
+from attempt1's partial receipt.
+
+Cost-aware throughput is 0.9709× ordinary decoding [0.9607,0.9810],
+0.9943× the frozen fixed1 baseline [0.9853,1.0023], and 1.2048× cap8 ngram
+[1.1271,1.2868]. Decision/update cost averages 1.67 microseconds per cycle;
+verification dominates. See [results and interpretation](controller-results.md)
+for action counts, probes, ablations, prediction error, memory and limitations.
 
 The read-only evidence verifier hashes the outer ZIP, inner archive and every
 member, then checks immutable block records, exact output IDs/stops, budgets,
@@ -406,9 +414,8 @@ The read-only controller demonstration accepts a completed study directory:
 
 It verifies calibration and raw logging-grid outputs before printing selected
 actions, probes, actual proposals/acceptance, committed tokens, predicted/actual
-cycle cost, fallback and mandatory tails. It never starts inference. Once a
-completed trained archive is retained, omit `--run-dir` to replay its verified
-recorded trace. Synthetic fixture studies are labeled explicitly.
+cycle cost, fallback and mandatory tails. It never starts inference. Omit `--run-dir` to replay the retained, verified
+trained trace. Synthetic fixture studies are labeled explicitly.
 
 
 The complete held-out runner is `scripts/evaluate_controller.py`; its model

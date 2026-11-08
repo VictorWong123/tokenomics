@@ -1,0 +1,69 @@
+{
+  "attempt": 0,
+  "correctness": [
+    {
+      "attempt": 0,
+      "block_id": "development-summary-03-n128-r0",
+      "configuration_id": "cost-aware",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-summary-03",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "logging",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-03-n128-r0",
+      "configuration_id": "cost-aware-detailed",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-summary-03",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "logging",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-03-n128-r0",
+      "configuration_id": "target",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-summary-03",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "logging",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-summary-03-n128-r0",
+      "configuration_id": "fixed1",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-summary-03",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "logging",
+      "schema_version": 1
+    }
+  ],
+  "records": [
+    "attempt-0/cost-aware.json",
+    "attempt-0/cost-aware-detailed.json",
+    "attempt-0/target.json",
+    "attempt-0/fixed1.json"
+  ],
+  "sha256": {
+    "attempt-0/cost-aware-detailed.json": "e38bcbeee24f191441f227198d12e26cb5788926699782f81a192297e09bd93d",
+    "attempt-0/cost-aware.json": "2b9af2f5d3d08434374654923af616043c0e22e6d9983a4a919b91dac8ef1a36",
+    "attempt-0/fixed1.json": "950ae28c0fa2683bc1d607262c6659f512a4df9d615d1b195ac5dc0438193e4e",
+    "attempt-0/target.json": "313d6e41e429472bb6cae0592d8e5b3d7538487d00317e30125d2eacddca4ff1"
+  }
+}

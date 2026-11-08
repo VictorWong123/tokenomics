@@ -10,14 +10,18 @@ Current checkpoint:
   including 906 differential fixture cases. Automatic pure-policy CI also passes.
 - Controller trained gates pass 28 model-drafter and 28 ngram records, covering
   every action. Raw IDs/stops/cache accounting are independently checked.
-- Study 42492089188 attempt1 paused at 25/36 validation blocks, with 175 exact
-  records and all 18 calibration fit records retained. Actual Shutdown is proven.
-  Attempt2 is active at the same e98c0fa source and frozen fixed1 baseline,
-  finishing 11 blocks and the separate logging/trajectory grid. No incomplete-grid
-  throughput estimate is claimed.
-- Packed gate 42503429351 is queued at exact source 708993c, behind the current
-  controller attempt under global Codespace concurrency. Its successful trained
-  proof is required before the prepared 54-record paired profile/logging study.
+- Study 42492089188 attempt2 completes all 36 blocks / 252 exact validation
+  records and 16 logging records. Both attempts have actual Shutdown proof.
+  All 1587 final members pass audit; the first25 blocks, fit and prior are
+  byte-identical after resume. Canonical proof and raw attempt2 are retained.
+- Controller/target throughput is 0.9709 [0.9607,0.9810]; controller/fixed1
+  0.9943 [0.9853,1.0023]; controller/cap8 1.2048 [1.1271,1.2868]. No practical
+  ordinary-decoding gain. Policy decision/update averages 1.67 µs/cycle;
+  verification consumes 99.992% of generation. See controller-results.md.
+- Packed gate 42503429351 is retrying exact source708993c. Attempt1 failed
+  startup before inference; attempt2 uses the unchanged owned lifecycle.
+  Its verified trained proof remains required before the prepared 54-record
+  paired profile/logging study. Freeze that proof digest; never bypass it.
 - Full 90-prompt held-out model evaluation is unexecuted; its guarded entry point
   and supplemental analysis are implemented/tested. The older CPU point suggests
   roughly 119 hours for 6300 conditions, not a same-day default experiment.

@@ -1,0 +1,114 @@
+{
+  "attempt": 0,
+  "correctness": [
+    {
+      "attempt": 0,
+      "block_id": "development-code-04-n128-r1",
+      "configuration_id": "dynamic",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-code-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-04-n128-r1",
+      "configuration_id": "fixed1",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-code-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-04-n128-r1",
+      "configuration_id": "no-probes",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-code-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-04-n128-r1",
+      "configuration_id": "no-fallback",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-code-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-04-n128-r1",
+      "configuration_id": "acceptance",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-code-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-04-n128-r1",
+      "configuration_id": "target",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-code-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-04-n128-r1",
+      "configuration_id": "cost-aware",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 128,
+      "prompt_id": "development-code-04",
+      "prompt_mismatch": null,
+      "repetition": 1,
+      "run_id": "validation",
+      "schema_version": 1
+    }
+  ],
+  "records": [
+    "attempt-0/dynamic.json",
+    "attempt-0/fixed1.json",
+    "attempt-0/no-probes.json",
+    "attempt-0/no-fallback.json",
+    "attempt-0/acceptance.json",
+    "attempt-0/target.json",
+    "attempt-0/cost-aware.json"
+  ],
+  "sha256": {
+    "attempt-0/acceptance.json": "4df3343ea0543891261affb1601dcb2751116596a3ae7275701ae9d0be99c963",
+    "attempt-0/cost-aware.json": "933ff692927a2bdf53f13af6949fb9099b2aa63d001b487548afe5921b68df69",
+    "attempt-0/dynamic.json": "265f3dc0a3ccee759f1e797a44ece42b0aef49327a07b65a238826c05b3c1d39",
+    "attempt-0/fixed1.json": "1fba12e59f69b9a15e83aca01c18b9f76a8f0689f5eee6548beac6595f24306a",
+    "attempt-0/no-fallback.json": "83a969d86696b879071972215d6361627b00feba94dc1928cf7fc7405e8b34e7",
+    "attempt-0/no-probes.json": "ad2209057acc61ca7557418be60ec245b62f2f5e896da9d53886dced9ab833a9",
+    "attempt-0/target.json": "adbf79c5825ec2b4fab950564f8411a13dc75704997871daf91c531832cd12fa"
+  }
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "attempt": 0,
+    "block_id": "development-qa-04-n128-r1",
+    "configuration_id": "fixed1",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-qa-04",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "logging",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-qa-04-n128-r1",
+    "configuration_id": "cost-aware",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-qa-04",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "logging",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-qa-04-n128-r1",
+    "configuration_id": "cost-aware-detailed",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-qa-04",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "logging",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-qa-04-n128-r1",
+    "configuration_id": "target",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 128,
+    "prompt_id": "development-qa-04",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "logging",
+    "schema_version": 1
+  }
+]

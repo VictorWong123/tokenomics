@@ -1,0 +1,12 @@
+{
+  "attempts": [
+    1,
+    2
+  ],
+  "fit_and_calibration_unchanged": true,
+  "run_id": 42492089188,
+  "schema_version": 1,
+  "source_sha": "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c",
+  "unchanged_prior_sha256": "d302c2fd494b3aefeedca157a28f4b3e8689bf03b8feab5d3245213ab78baff5",
+  "unchanged_validation_blocks": 25
+}

@@ -1,0 +1,167 @@
+{
+  "frozen": {
+    "binary_sha256": "3b640fc90cca7b88cf02dc5fdde86c7c4f517dfa090e0ab7258bc09da8263d09",
+    "code": {
+      "owned_source_sha256": "6cca121943b6ac88fea0e15b597638a17c87d328dc1cd50aadbd4f0f19760249",
+      "revision": "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c"
+    },
+    "config": {
+      "ablations": [
+        "no-fallback",
+        "no-probes"
+      ],
+      "batch": 512,
+      "bootstrap_samples": 10000,
+      "comparators": [
+        "target",
+        "development_frozen_fixed",
+        "dynamic",
+        "acceptance"
+      ],
+      "configurations": [
+        {
+          "id": "target",
+          "policy": "target"
+        },
+        {
+          "drafter": "ngram",
+          "id": "fixed1",
+          "k": 1,
+          "policy": "fixed"
+        },
+        {
+          "drafter": "ngram",
+          "id": "fixed2",
+          "k": 2,
+          "policy": "fixed"
+        },
+        {
+          "drafter": "ngram",
+          "id": "fixed4",
+          "k": 4,
+          "policy": "fixed"
+        },
+        {
+          "drafter": "ngram",
+          "id": "fixed6",
+          "k": 6,
+          "policy": "fixed"
+        },
+        {
+          "drafter": "ngram",
+          "id": "fixed8",
+          "k": 8,
+          "policy": "fixed"
+        }
+      ],
+      "context": 2048,
+      "detailed": false,
+      "drafter": "ngram",
+      "fit_output_caps": [
+        64
+      ],
+      "fit_prompt_ids": [
+        "development-qa-01",
+        "development-code-01",
+        "development-summary-01"
+      ],
+      "fit_repetitions": 1,
+      "output_caps": [
+        64
+      ],
+      "phase": "controller_fit",
+      "practical_margin": 0.05,
+      "primary_metric": "geomean_prompt_cap_median_decode_throughput_ratio",
+      "repetitions": 1,
+      "schema_version": 1,
+      "scope": "Six development validation prompts; no full Pilot A/B or held-out claims. All policy variants use measured priors from the same executable and fit replay. Target is selected from prior measured bottlenecks, not assumed to yield a gain.",
+      "seed": 20261108,
+      "split": "development",
+      "target_model": "qwen25-3",
+      "threads": 2,
+      "trace_selection": [
+        "median_improvement",
+        "worst_regression"
+      ],
+      "validation_prompt_ids": [
+        "development-qa-03",
+        "development-qa-04",
+        "development-code-03",
+        "development-code-04",
+        "development-summary-03",
+        "development-summary-04"
+      ],
+      "warmup_prompt": "Warm-up: continue briefly.",
+      "warmup_tokens": 16
+    },
+    "draft_sha256": null,
+    "gpu_layers": 0,
+    "identity": {
+      "purpose": "bounded_controller_development_v1",
+      "synthetic_fixture": false
+    },
+    "prompts": [
+      {
+        "category": "qa",
+        "id": "development-qa-01",
+        "length_bucket": "long",
+        "license": "CC0-1.0",
+        "pilot": true,
+        "prompt": "<|im_start|>system\nYou are a helpful assistant. Answer the user directly.<|im_end|>\n<|im_start|>user\nExplain what a database transaction guarantees. Give a careful explanation with a concrete example, assumptions, failure cases, and a short worked comparison.<|im_end|>\n<|im_start|>assistant\n",
+        "sha256": "9aa69f0cbe349dbb9b65d96111a8a4da737fae37a9e711a3a50fbbeb77c0b922",
+        "source": "Tokenomics original synthetic workload v1; AI-assisted authorship",
+        "split": "development"
+      },
+      {
+        "category": "code",
+        "id": "development-code-01",
+        "length_bucket": "long",
+        "license": "CC0-1.0",
+        "pilot": true,
+        "prompt": "<|im_start|>system\nYou are a helpful assistant. Answer the user directly.<|im_end|>\n<|im_start|>user\nWrite C++20 code for this task: Merge two sorted integer arrays while preserving duplicates. Include explicit invariants, edge-case handling, a short usage example, and time/space complexity. Inputs may be empty or contain duplicate values. State any preconditions and avoid undefined behavior. Use only the standard library. Explain how the implementation handles failed operations.<|im_end|>\n<|im_start|>assistant\n",
+        "sha256": "2b0951524a530690eebb9aa1aab22fb3d5213ef7d12e986ef03a05091c4229b4",
+        "source": "Tokenomics original synthetic workload v1; AI-assisted authorship",
+        "split": "development"
+      },
+      {
+        "category": "summary",
+        "id": "development-summary-01",
+        "length_bucket": "long",
+        "license": "CC0-1.0",
+        "pilot": true,
+        "prompt": "<|im_start|>system\nYou are a helpful assistant. Answer the user directly.<|im_end|>\n<|im_start|>user\nSummarize the source below. Preserve the decision, quantitative findings, limitations, and next steps. Do not infer causation or invent missing facts.\n\nSOURCE:\nThe Birch district 2 council reviewed a six-month water monitoring pilot in an open meeting. This is an original hypothetical case, not a report about an actual town. The pilot began in March and ended in August. Staff recorded 127 delayed service cases during the first month and 107 in the last month. The approved operating budget was $28,137. The report separates observations from explanations and does not claim the pilot caused every change.\n\nThree neighborhoods participated. The central neighborhood received the new procedure first, the river neighborhood joined one month later, and the hill neighborhood retained the old procedure until the final month. Enrollment was voluntary. Staff said that participants who volunteered early had more time to complete forms, which may make their experiences unrepresentative. Records from two days were lost during a power outage and were marked missing rather than filled with estimated values.\n\nAn internal survey collected 84 responses. Respondents valued predictable opening hours and clear status updates. Several requested a telephone option because the online form was difficult to use on older devices. Survey respondents could submit only one response per household, but the council had no reliable way to identify households that moved during the pilot. The survey was used to identify practical problems, not to estimate the views of every resident.\n\nThe finance team reported that training and translation used most of the initial setup allowance. Recurring staff time was expected to matter more than printing costs in a larger rollout. The budget excludes volunteer labor, building depreciation and costs paid by partner organizations. A proposal to install extra sensors was deferred because procurement would extend beyond the pilot. Staff warned that comparing this partial accounting with a fully costed commercial service would be misleading.\n\nThe council approved a three-month extension rather than a permanent rollout. Staff must publish weekly counts, record missing data, and offer paper and telephone channels. The next review will compare the same calendar months to reduce seasonal confusion. One member requested an independent audit; another argued that the small sample could not support that expense yet. The decision preserves the existing service in neighborhoods that have not joined. No resident is required to participate.\n\nImplementation notes describe a staffing disruption in week seven, when two trained employees were absent and temporary staff handled intake. Processing times rose during that week. The team kept those observations in the final table and added an annotation. Removing the week would make the trend look smoother but would hide a plausible operating risk. The report recommends cross-training at least two additional people before adding a fourth neighborhood. It does not quantify how much cross-training would improve reliability.\n\nA local advisory group proposed publishing anonymized aggregate records, but individual case notes remain confidential. Aggregation will combine small cells to avoid revealing personal circumstances. The planned public file contains dates, district totals and missing-data flags. It will not include names, addresses or contact details. The council asked staff to publish a data dictionary with every release so that later analysts can distinguish a zero from a day with no usable records.\n\nSeveral constraints remain unresolved. The hill neighborhood has fewer public transport connections, the river neighborhood has intermittent broadband coverage, and the central office has longer staffed hours. These differences may explain part of the observed variation. The next phase will record opening hours alongside service counts. The report explicitly says that no randomized allocation took place. Readers should avoid treating differences between neighborhoods as a controlled estimate of the procedure's effect.\n\nThe final recommendation is to continue carefully, monitor access, and revisit the decision with a more complete cost record. Staff will report whether participation changes after a telephone channel becomes available. They will also document any change in the definition of a delayed case. The chair asked that future summaries include both the improvement in raw counts and the limitations of the evidence. A successful extension would establish operational practicality; it would still not prove the best design for every district.<|im_end|>\n<|im_start|>assistant\n",
+        "sha256": "7a69e67b0c7e22f08e23ad742a65558b4afeeb1d9f8ca03b5b64aa6da295304d",
+        "source": "Tokenomics original synthetic workload v1; AI-assisted authorship",
+        "split": "development"
+      }
+    ],
+    "schema_version": 1,
+    "target_sha256": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d"
+  },
+  "hardware_start": {
+    "compiler": {
+      "output": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+      "returncode": 0
+    },
+    "cpu_count": 2,
+    "cpu_quota": "max 100000",
+    "execution_environment": "codespaces",
+    "git_dirty": "",
+    "git_revision": "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c",
+    "llama_revision": "fd27b2034905f8dadd8bd6d2cc44595f4929d391",
+    "loadavg": "3.61 3.21 2.91 1/478 5825",
+    "lscpu": {
+      "output": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  2\nOn-line CPU(s) list:                     0,1\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 7763 64-Core Processor\nCPU family:                              25\nModel:                                   1\nThread(s) per core:                      2\nCore(s) per socket:                      1\nSocket(s):                               1\nStepping:                                1\nBogoMIPS:                                4890.87\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid aperfmperf tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves user_shstk clzero xsaveerptr rdpru arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload umip vaes vpclmulqdq rdpid fsrm\nVirtualization:                          AMD-V\nHypervisor vendor:                       Microsoft\nVirtualization type:                     full\nL1d cache:                               32 KiB (1 instance)\nL1i cache:                               32 KiB (1 instance)\nL2 cache:                                512 KiB (1 instance)\nL3 cache:                                32 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0,1\nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Vulnerable: Safe RET, no microcode\nVulnerability Spec store bypass:         Vulnerable\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Vulnerable: Clear CPU buffers attempted, no microcode\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected",
+      "returncode": 0
+    },
+    "machine": "x86_64",
+    "meminfo": "MemTotal:        8132888 kB\nMemFree:          148704 kB\nMemAvailable:    6770544 kB\nBuffers:            6788 kB\nCached:          6795552 kB\nSwapCached:            0 kB\nActive:          2804164 kB\nInactive:        4711336 kB\nActive(anon):     106936 kB\nInactive(anon):   724240 kB\nActive(file):    2697228 kB\nInactive(file):  3987096 kB\nUnevictable:       30960 kB\nMlocked:           27888 kB\nSwapTotal:             0 kB\nSwapFree:              0 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:              1248 kB\nWriteback:             0 kB\nAnonPages:        744172 kB\nMapped:           261140 kB\nShmem:            108860 kB\nKReclaimable:     251136 kB\nSlab:             346360 kB\nSReclaimable:     251136 kB\nSUnreclaim:        95224 kB\nKernelStack:        7664 kB\nPageTables:         9708 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     4066444 kB\nCommitted_AS:    3490228 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       44132 kB\nVmallocChunk:          0 kB\nPercpu:             1240 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nUnaccepted:            0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      159680 kB\nDirectMap2M:     7180288 kB\nDirectMap1G:     3145728 kB",
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+    "memory_limit": "max",
+    "memory_pressure": "some avg10=0.18 avg60=0.14 avg300=0.38 total=10228106\nfull avg10=0.00 avg60=0.09 avg300=0.30 total=7804705",
+    "platform": "Linux-6.8.0-1064-azure-x86_64-with-glibc2.39",
+    "timestamp_utc": "2026-11-08T15:12:44Z",
+    "vmstat": "nr_free_pages 37176\nnr_zone_inactive_anon 181060\nnr_zone_active_anon 26734\nnr_zone_inactive_file 996774\nnr_zone_active_file 674307\nnr_zone_unevictable 7740\nnr_zone_write_pending 312\nnr_mlock 6972\nnr_bounce 0\nnr_zspages 0\nnr_free_cma 0\nnr_unaccepted 0\nnuma_hit 36841018\nnuma_miss 0\nnuma_foreign 0\nnuma_interleave 88\nnuma_local 36841018\nnuma_other 0\nnr_inactive_anon 181060\nnr_active_anon 26734\nnr_inactive_file 996774\nnr_active_file 674307\nnr_unevictable 7740\nnr_slab_reclaimable 62784\nnr_slab_unreclaimable 23806\nnr_isolated_anon 0\nnr_isolated_file 0\nworkingset_nodes 108398\nworkingset_refault_anon 0\nworkingset_refault_file 4511569\nworkingset_activate_anon 0\nworkingset_activate_file 1305880\nworkingset_restore_anon 0\nworkingset_restore_file 80457\nworkingset_nodereclaim 2217\nnr_anon_pages 186043\nnr_mapped 65285\nnr_file_pages 1700585\nnr_dirty 312\nnr_writeback 0\nnr_writeback_temp 0\nnr_shmem 27215\nnr_shmem_hugepages 0\nnr_shmem_pmdmapped 0\nnr_file_hugepages 0\nnr_file_pmdmapped 0\nnr_anon_transparent_hugepages 0\nnr_vmscan_write 0\nnr_vmscan_immediate_reclaim 0\nnr_dirtied 6725809\nnr_written 6623347\nnr_throttled_written 0\nnr_kernel_misc_reclaimable 0\nnr_foll_pin_acquired 937\nnr_foll_pin_released 937\nnr_kernel_stack 7664\nnr_page_table_pages 2427\nnr_sec_page_table_pages 0\nnr_swapcached 0\npgpromote_success 0\npgpromote_candidate 0\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\nnr_dirty_threshold 334348\nnr_dirty_background_threshold 166969\npgpgin 24465394\npgpgout 37171893\npswpin 0\npswpout 0\npgalloc_dma 256\npgalloc_dma32 1527520\npgalloc_normal 41433475\npgalloc_movable 0\npgalloc_device 0\nallocstall_dma 0\nallocstall_dma32 0\nallocstall_normal 2\nallocstall_movable 51\nallocstall_device 0\npgskip_dma 0\npgskip_dma32 0\npgskip_normal 0\npgskip_movable 0\npgskip_device 0\npgfree 44063009\npgactivate 1640\npgdeactivate 0\npglazyfree 0\npgfault 18881434\npgmajfault 12696\npglazyfreed 0\npgrefill 1858809\npgreuse 240321\npgsteal_kswapd 12518402\npgsteal_direct 3381\npgsteal_khugepaged 0\npgscan_kswapd 12548375\npgscan_direct 3441\npgscan_khugepaged 0\npgscan_direct_throttle 0\npgscan_anon 0\npgscan_file 12551816\npgsteal_anon 0\npgsteal_file 12521783\nzone_reclaim_failed 0\npginodesteal 0\nslabs_scanned 1009408\nkswapd_inodesteal 32132\nkswapd_low_wmark_hit_quickly 242\nkswapd_high_wmark_hit_quickly 40\npageoutrun 836\npgrotated 22838\ndrop_pagecache 0\ndrop_slab 0\noom_kill 0\nnuma_pte_updates 0\nnuma_huge_pte_updates 0\nnuma_hint_faults 0\nnuma_hint_faults_local 0\nnuma_pages_migrated 0\npgmigrate_success 1068236\npgmigrate_fail 44139\nthp_migration_success 0\nthp_migration_fail 0\nthp_migration_split 0\ncompact_migrate_scanned 5036704\ncompact_free_scanned 38743865\ncompact_isolated 2198866\ncompact_stall 0\ncompact_fail 0\ncompact_success 0\ncompact_daemon_wake 196\ncompact_daemon_migrate_scanned 5036704\ncompact_daemon_free_scanned 38743865\nhtlb_buddy_alloc_success 0\nhtlb_buddy_alloc_fail 0\nunevictable_pgs_culled 13831\nunevictable_pgs_scanned 0\nunevictable_pgs_rescued 6091\nunevictable_pgs_mlocked 13063\nunevictable_pgs_munlocked 8\nunevictable_pgs_cleared 0\nunevictable_pgs_stranded 6083\nthp_fault_alloc 1\nthp_fault_fallback 0\nthp_fault_fallback_charge 0\nthp_collapse_alloc 0\nthp_collapse_alloc_failed 0\nthp_file_alloc 0\nthp_file_fallback 0\nthp_file_fallback_charge 0\nthp_file_mapped 0\nthp_split_page 0\nthp_split_page_failed 0\nthp_deferred_split_page 0\nthp_split_pmd 0\nthp_scan_exceed_none_pte 0\nthp_scan_exceed_swap_pte 0\nthp_scan_exceed_share_pte 0\nthp_split_pud 0\nthp_zero_page_alloc 0\nthp_zero_page_alloc_failed 0\nthp_swpout 0\nthp_swpout_fallback 0\nballoon_inflate 0\nballoon_deflate 0\nballoon_migrate 0\nswap_ra 0\nswap_ra_hit 0\nksm_swpin_copy 0\ncow_ksm 0\nzswpin 0\nzswpout 0\nzswpwb 0\ndirect_map_level2_splits 66\ndirect_map_level3_splits 4\nnr_unstable 0"
+  },
+  "run_id": "fit"
+}

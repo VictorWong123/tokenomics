@@ -1,0 +1,93 @@
+[
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n64-r1",
+    "configuration_id": "fixed1",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 64,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "validation",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n64-r1",
+    "configuration_id": "no-probes",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 64,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "validation",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n64-r1",
+    "configuration_id": "no-fallback",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 64,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "validation",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n64-r1",
+    "configuration_id": "acceptance",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 64,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "validation",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n64-r1",
+    "configuration_id": "target",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 64,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "validation",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n64-r1",
+    "configuration_id": "cost-aware",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 64,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "validation",
+    "schema_version": 1
+  },
+  {
+    "attempt": 0,
+    "block_id": "development-summary-03-n64-r1",
+    "configuration_id": "dynamic",
+    "first_mismatch": null,
+    "ok": true,
+    "output_cap": 64,
+    "prompt_id": "development-summary-03",
+    "prompt_mismatch": null,
+    "repetition": 1,
+    "run_id": "validation",
+    "schema_version": 1
+  }
+]

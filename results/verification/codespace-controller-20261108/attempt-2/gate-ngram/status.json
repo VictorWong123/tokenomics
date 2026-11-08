@@ -1,0 +1,20 @@
+{
+  "actions_observed": [
+    0,
+    1,
+    2,
+    4,
+    6,
+    8
+  ],
+  "binary_sha256": "3b640fc90cca7b88cf02dc5fdde86c7c4f517dfa090e0ab7258bc09da8263d09",
+  "comparisons": 28,
+  "correctness_only": true,
+  "draft_sha256": null,
+  "drafter": "ngram",
+  "records": 28,
+  "state": "passed",
+  "synced_tokens": 0,
+  "synthetic_priors": true,
+  "target_sha256": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d"
+}
