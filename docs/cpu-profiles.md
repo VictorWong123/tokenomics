@@ -151,3 +151,9 @@ This motivates the row-consistent packed-kernel study and the controller's
 charged fallback/probe measurements. It does not prove global optimality or a
 packed-profile speedup. The final comparisons must still use the same target,
 exact output IDs, natural token counts, complete costs and measured memory.
+
+
+The controller-compatible packed trained gate is queued as run42503429351,
+source `708993c603c89efcb75867d851292022b4960210`, after controller study
+42492089188 attempt2. It remains a separate experiment and does not change
+that controller study's guarded binary or calibration.

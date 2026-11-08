@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   verify:
-    if: github.repository == 'VictorWong123/tokenomics' && (github.event_name == 'workflow_dispatch' || contains(fromJSON('[42466570831,42474834521,42492089188]'), github.event.workflow_run.id))
+    if: github.repository == 'VictorWong123/tokenomics' && (github.event_name == 'workflow_dispatch' || contains(fromJSON('[42466570831,42474834521,42492089188,42503429351]'), github.event.workflow_run.id))
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:

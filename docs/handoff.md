@@ -283,3 +283,16 @@ partial receipt and attempt-specific lifecycle proof are retained in
 `results/verification/codespace-controller-20261108`. No partial-grid aggregate
 speedup is claimed. Rerun the same workflow run (all jobs) to resume e98c0fa,
 finish 11 remaining blocks and the logging grid, before the packed experiment.
+
+
+Controller attempt2 is active at the original e98c0fa source: initialize job
+128799069336 succeeds and workload128799270902 is running. It resumes the
+25 saved blocks and preserves the measured calibration/fixed1 baseline.
+Packed trained gate **42503429351** is queued at source
+`708993c603c89efcb75867d851292022b4960210`; the global Codespace concurrency
+waits for the controller attempt to finish. The new gate includes the same
+controller-compatible C++ code and the hosted lifecycle-report artifact.
+No trained packed-profile performance is claimed before its checks finish.
+The verifier's explicit run/source allowlist includes that point, and its
+kernel check now validates the selected point's exact source rather than the
+older cancelled run. The paired profile proof hash remains pending.
