@@ -125,6 +125,10 @@ comparisons, excluding a warm-up and retaining cold-load and whole-process costs
 .venv/bin/python -m analysis.report results/local/linux-pilot/qwen25-05-15-q4/pilot-a
 # A checked-in example is available without model downloads:
 .venv/bin/python -m analysis.report results/example-fixtures --out results/local/example-analysis
+# Observed trained-model timing screen (preliminary, unfavorable):
+.venv/bin/python -m analysis.timing_screen \
+  results/verification/codespace-timing-20261108/run \
+  --out results/local/observed-timing-screen
 ```
 
 The example contains observed synthetic-fixture timings for analysis testing;

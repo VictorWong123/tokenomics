@@ -70,7 +70,10 @@ An upstream-style control discards proposal KV and reprocesses the entire
 target verification batch on the draft before trimming. Comparing these paths
 can isolate saved draft work, including rejected suffixes. This control
 reproduces the supported example's behavior; it is not an execution of the
-stock executable, and an exact stock comparison remains additional work.
+stock executable. The optional unmodified executable now builds and runs as a
+separate diagnostic: on a synthetic cap-three case it reports eight generated
+tokens. Its stopping/counting behavior prevents treating its aggregate rate
+as an exact-budget baseline. Trained stock performance remains unmeasured.
 
 Only full-attention transformers with arbitrary partial sequence removal are
 accepted. Recurrent/hybrid/checkpoint-only contexts, stochastic sampling and

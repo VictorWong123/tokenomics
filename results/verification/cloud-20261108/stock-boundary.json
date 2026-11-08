@@ -1,0 +1,14 @@
+{
+  "execution_environment": "Codex Cloud Linux CPU",
+  "interpretation": "Synthetic stopping-boundary diagnostic, not a performance result or stock token-ID equivalence claim. Unmodified upstream example linked to the guarded CPU backend.",
+  "llama_revision": "fd27b2034905f8dadd8bd6d2cc44595f4929d391",
+  "owned_binary_sha256": "04c6fd4585daee5afe634dca41bc9d6210231991813f8cf547223eb75d351a48",
+  "owned_generated_tokens": 3,
+  "owned_requested_cap": 3,
+  "owned_stop": "budget",
+  "schema_version": 1,
+  "stock_binary_sha256": "0f38301e864864ea72f83a43f6f81ed970e51c693ffeb9c91ef9d94cdef2a69e",
+  "stock_reported_n_predict": 8,
+  "stock_requested_n_predict": 3,
+  "synthetic_fixture": true
+}

@@ -6,6 +6,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(CTest)
 option(TOKENOMICS_SANITIZE "Enable address/undefined sanitizers (CPU)" OFF)
 option(TOKENOMICS_CPU_BATCH_INVARIANT "Use consistent CPU dot kernels across verification batch widths" ON)
+option(TOKENOMICS_BUILD_STOCK_DIAGNOSTIC "Build the pinned upstream speculative example for diagnostics" OFF)
 if(TOKENOMICS_CPU_BATCH_INVARIANT)
   # Greedy speculative verification must use the same arithmetic as a one-row
   # target decode. The pinned backend's repack/SGEMM paths vary with batch width.
@@ -20,6 +21,12 @@ endif()
 execute_process(COMMAND git rev-parse HEAD WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third_party/llama.cpp OUTPUT_VARIABLE LLAMA_REV OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
 if(NOT LLAMA_REV STREQUAL "fd27b2034905f8dadd8bd6d2cc44595f4929d391")
   message(FATAL_ERROR "Wrong llama.cpp revision. Run git submodule update --init --recursive")
+endif()
+execute_process(COMMAND git status --porcelain --untracked-files=normal
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third_party/llama.cpp
+  OUTPUT_VARIABLE LLAMA_STATUS OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+if(NOT LLAMA_STATUS STREQUAL "")
+  message(FATAL_ERROR "llama.cpp must be clean: the pinned commit does not identify local source edits")
 endif()
 set(LLAMA_BUILD_COMMON ON CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -68,6 +75,14 @@ target_compile_options(tokenomics_runtime PRIVATE -Wall -Wextra -Wpedantic)
 add_executable(tokenomics src/main.cpp)
 target_link_libraries(tokenomics PRIVATE tokenomics_runtime)
 target_include_directories(tokenomics PRIVATE third_party/llama.cpp/vendor)
+if(TOKENOMICS_BUILD_STOCK_DIAGNOSTIC)
+  # Unmodified example, linked to the same guarded backend. Its stopping/count
+  # conventions differ from Tokenomics; do not merge its aggregate rate into
+  # the paired exact-token endpoint.
+  add_subdirectory(third_party/llama.cpp/examples/speculative-simple)
+  set_target_properties(llama-speculative-simple PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
+endif()
 if(BUILD_TESTING)
   add_executable(test_core tests/test_core.cpp)
   target_link_libraries(test_core PRIVATE tokenomics_core)

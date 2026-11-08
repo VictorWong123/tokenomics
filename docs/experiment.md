@@ -136,6 +136,25 @@ better on held-out data. The checked-in synthetic example explicitly declares
 its curated single repetition and retains the source-manifest fingerprint;
 it does not bypass completeness checks.
 
+Pilot B decision schema 2 also replays the existing dynamic baseline from each
+common prefix and requires the predictor to beat both it and the global action
+after estimated overhead. For independent models this is pinned confidence
+stopping at cap 8. For ngram it is upstream variable-length lookup at cap 8,
+which overlaps fixed8 and is labeled accordingly. Older schema-1 replay results
+cannot clear the strengthened gate. The active `87c7811` pilot still supplies
+valid frozen Pilot A blocks; replay its completed traces under schema 2 before
+implementing a controller. The standalone replay command verifies identical
+binary/model hashes and execution settings, so an analysis update can consume
+older Pilot A traces without mixing measurement implementations:
+
+```bash
+.venv/bin/python -m bench.replay --exe build-cpu/tokenomics \
+  --target TARGET.gguf --draft DRAFT.gguf \
+  --pilot-dir COMPLETED_PILOT_A --out NEW_PILOT_B_DIRECTORY
+```
+
+This command does not run held-out evaluation or claim the project is complete.
+
 The 90 held-out prompts and five-repetition protocol are versioned, but their
 configuration list stays empty until feasibility selects a contribution.
 If Q1 and Q2 pass, implement/calibrate the cost-aware controller, test real

@@ -102,6 +102,22 @@ def investigate(
     out = pathlib.Path(out)
     out.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((pathlib.Path(pilot_dir) / "run_manifest.json").read_text())
+    if not (pathlib.Path(pilot_dir) / "complete.json").exists():
+        raise RuntimeError("Pilot A must be complete before checkpoint replay")
+    operating_point = manifest["frozen"]
+    if (
+        sha256(exe) != operating_point["binary_sha256"]
+        or sha256(target) != operating_point["target_sha256"]
+        or (sha256(draft) if draft else None) != operating_point["draft_sha256"]
+        or gpu_layers != operating_point["gpu_layers"]
+        or any(
+            cfg[k] != operating_point["config"][k]
+            for k in ("context", "batch", "threads")
+        )
+    ):
+        raise RuntimeError(
+            "Replay binary, models or execution settings differ from Pilot A"
+        )
     frozen = {
         "code": source_fingerprint(),
         "binary": sha256(exe),
@@ -127,6 +143,7 @@ def investigate(
         ):
             refs[r["prompt_id"]] = r
     actions = [0, 1, 2, 4, 6, 8]
+    replay_actions = actions + ["dynamic"]
     rng = random.Random(cfg["seed"] + 1)
     measurements = []
     transitions = []
@@ -155,7 +172,7 @@ def investigate(
         checkpoints = [x for x in (32, 96, 224, 400) if x + 9 < len(tokens)]
         for cp in checkpoints:
             for rep in range(3):
-                order = list(actions)
+                order = list(replay_actions)
                 rng.shuffle(order)
                 for action in order:
                     jobs.append(
@@ -165,8 +182,12 @@ def investigate(
                             "prompt_id": pid,
                             "repetition": rep,
                             "checkpoint": cp,
-                            "policy": "target" if action == 0 else "fixed",
-                            "k": action or 4,
+                            "policy": (
+                                "confidence"
+                                if action == "dynamic" and drafter == "model"
+                                else "target" if action == 0 else "fixed"
+                            ),
+                            "k": 8 if action == "dynamic" else action or 4,
                             "drafter": drafter,
                             "prefix_tokens": prompt_ids + tokens[:cp],
                             "max_tokens": 9,
@@ -217,7 +238,7 @@ def investigate(
                 if c["configuration_id"] == "signal" and c["checkpoint"] == cp
             ][0]
             outcomes = {}
-            for action in actions:
+            for action in replay_actions:
                 cs = [
                     c
                     for c in cc
@@ -275,6 +296,11 @@ def investigate(
             "Synthetic transformer pipeline check; not scheduling feasibility evidence"
         )
     answer["transition_sync_ms"] = transitions
+    answer["dynamic_baseline"] = (
+        "pinned upstream confidence, cap 8"
+        if drafter == "model"
+        else "upstream variable-length ngram lookup, cap 8 (overlaps fixed8)"
+    )
     atomic_json(out / "decision.json", answer)
     return answer
 
@@ -284,10 +310,17 @@ def fit_validate(data, transition_ms, seed=20261107):
     val = [r for r in data if int(r["prompt_id"].rsplit("-", 1)[1]) % 6 >= 3]
     if not fit or not val:
         return {
+            "schema_version": 2,
             "q2_supported": False,
             "status": "insufficient common-prefix checkpoints",
         }
-    actions = list(fit[0]["outcomes"])
+    if any("dynamic" not in r["outcomes"] for r in data):
+        return {
+            "schema_version": 2,
+            "q2_supported": False,
+            "status": "missing existing dynamic baseline; replay required",
+        }
+    actions = [a for a in fit[0]["outcomes"] if a.isdigit()]
 
     def bucket(r):
         return (r["acceptance"] >= 0.5, r["context"] >= 256)
@@ -307,7 +340,7 @@ def fit_validate(data, transition_ms, seed=20261107):
         if b not in rules:
             rules[b] = best([x for x in fit if bucket(x) == b])
     by_prompt = {}
-    raw_ratios = []
+    dynamic_by_prompt = {}
     winners = set()
     trajectories = {}
     for r in val:
@@ -324,8 +357,9 @@ def fit_validate(data, transition_ms, seed=20261107):
             + (transition_ms / 4 if action != "0" else 0)
         )
         ratio = (o["tokens"] / charged) / g["rate"]
-        raw_ratios.append(ratio)
         by_prompt.setdefault(r["prompt_id"], []).append(math.log(ratio))
+        dynamic_ratio = (o["tokens"] / charged) / r["outcomes"]["dynamic"]["rate"]
+        dynamic_by_prompt.setdefault(r["prompt_id"], []).append(math.log(dynamic_ratio))
         winners.add(max(actions, key=lambda a: r["outcomes"][a]["rate"]))
         trajectories.setdefault(r["prompt_id"], set()).add(action)
     values = np.array([statistics.mean(v) for v in by_prompt.values()])
@@ -333,16 +367,36 @@ def fit_validate(data, transition_ms, seed=20261107):
     draws = np.exp(rng.choice(values, (10000, len(values)), replace=True).mean(axis=1))
     ratio = math.exp(float(values.mean()))
     ci = [float(np.quantile(draws, 0.025)), float(np.quantile(draws, 0.975))]
+    dynamic_values = np.array([statistics.mean(v) for v in dynamic_by_prompt.values()])
+    dynamic_draws = np.exp(
+        rng.choice(dynamic_values, (10000, len(dynamic_values)), replace=True).mean(
+            axis=1
+        )
+    )
+    dynamic_ratio = math.exp(float(dynamic_values.mean()))
+    dynamic_ci = [
+        float(np.quantile(dynamic_draws, 0.025)),
+        float(np.quantile(dynamic_draws, 0.975)),
+    ]
     within = any(len(v) > 1 for v in trajectories.values())
     return {
-        "schema_version": 1,
-        "q2_supported": len(winners) > 1 and within and ratio > 1.05 and ci[0] > 1,
+        "schema_version": 2,
+        "q2_supported": (
+            len(winners) > 1
+            and within
+            and ratio > 1.05
+            and ci[0] > 1
+            and dynamic_ratio > 1.05
+            and dynamic_ci[0] > 1
+        ),
         "status": "exploratory development replay; not a deployable speedup claim",
         "global_action": int(global_action),
         "rule": {str(k): int(v) for k, v in rules.items()},
         "features": "historical canonical acceptance >=0.5; context >=256",
         "validation_ratio_after_estimated_overhead": ratio,
         "ci95": ci,
+        "validation_ratio_vs_dynamic_after_estimated_overhead": dynamic_ratio,
+        "dynamic_ci95": dynamic_ci,
         "validation_prompts": len(by_prompt),
         "validation_checkpoints": len(val),
         "different_hindsight_winners": sorted(winners),
@@ -354,3 +408,27 @@ def fit_validate(data, transition_ms, seed=20261107):
         },
         "limitation": "Hindsight action variation is diagnostic, not an achievable bound. Canonical probe history differs from a learned policy history; a passing pilot still needs an online controller evaluation.",
     }
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--exe", type=pathlib.Path, required=True)
+    parser.add_argument("--target", type=pathlib.Path, required=True)
+    parser.add_argument("--draft", type=pathlib.Path)
+    parser.add_argument("--pilot-dir", type=pathlib.Path, required=True)
+    parser.add_argument("--out", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+    frozen = json.loads((args.pilot_dir / "run_manifest.json").read_text())["frozen"]
+    drafter = "ngram" if frozen["draft_sha256"] is None else "model"
+    investigate(
+        args.exe,
+        args.target,
+        args.draft,
+        args.pilot_dir,
+        args.out,
+        frozen["config"],
+        frozen["gpu_layers"],
+        drafter,
+    )

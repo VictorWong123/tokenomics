@@ -26,7 +26,7 @@ Still required: complete Q1/Q2 on resource-safe candidates; implement a justifie
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;
 finish the measured report/demo. Stock-executable stopping differs from the
-driver and needs a separately labeled diagnostic. Mac/Metal is supported by
+driver; an executed synthetic diagnostic confirms this difference. Mac/Metal is supported by
 configuration but unexecuted. The full runtime project remains incomplete.
 
 Evidence-based wording now: “Building a portable C++ speculative-decoding

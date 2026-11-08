@@ -377,6 +377,7 @@ class ToolingTests(unittest.TestCase):
                 }
                 winner = "2" if context < 256 else "8"
                 outcomes[winner] = {"rate": 0.5, "ms": 10, "tokens": 5}
+                outcomes["dynamic"] = {"rate": 0.01, "ms": 100, "tokens": 1}
                 records.append(
                     dict(
                         prompt_id=f"development-qa-{i:02d}",
@@ -390,12 +391,22 @@ class ToolingTests(unittest.TestCase):
         result = fit_validate(records, 0)
         self.assertTrue(result["q2_supported"])
         self.assertEqual(result["validation_prompts"], 3)
+        # A predictor beating global fixed settings must still beat the existing
+        # dynamic baseline before supporting a more complex controller.
+        for row in records:
+            row["outcomes"]["dynamic"]["rate"] = 1.0
+        self.assertFalse(fit_validate(records, 0)["q2_supported"])
+        for row in records:
+            row["outcomes"]["dynamic"]["rate"] = 0.01
         for r in records:
             if int(r["prompt_id"].rsplit("-", 1)[1]) >= 3:
                 r["outcomes"]["2"], r["outcomes"]["8"] = (
                     r["outcomes"]["8"],
                     r["outcomes"]["2"],
                 )
+        self.assertFalse(fit_validate(records, 0)["q2_supported"])
+        for row in records:
+            del row["outcomes"]["dynamic"]
         self.assertFalse(fit_validate(records, 0)["q2_supported"])
 
     def test_frozen_prompt_split_and_provenance(self):

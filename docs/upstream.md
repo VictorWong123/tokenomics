@@ -55,9 +55,27 @@ Consequently its printed decoded-token count and elapsed time are not an exact
 budget/EOG comparator for this driver's committed IDs. The stock example also
 requires the prompt to fit one batch. Do not silently include its aggregate
 tokens/sec in the paired policy endpoint or call `cache=upstream` an executed
-stock baseline. A future stock-executable diagnostic must disclose these
+stock baseline. A stock-executable diagnostic must disclose these
 differences and retain natural emitted lengths; it cannot establish exact-ID
 equivalence by comparing decoded text alone.
+
+This was executed in Cloud with the optional unmodified stock example linked
+to the same guarded CPU backend. On the controlled fixture, `-n 3` reported
+eight generated tokens, while Tokenomics `--max-tokens 3` committed exactly
+three. `results/verification/cloud-20261108/stock-boundary.json` retains the
+counts and binary hashes. This is a stopping diagnostic, not model performance.
+
+Build and reproduce after the normal bootstrap:
+
+```bash
+.venv/bin/cmake -S . -B build-cpu -DTOKENOMICS_BUILD_STOCK_DIAGNOSTIC=ON
+.venv/bin/cmake --build build-cpu --target llama-speculative-simple -j 2
+GGML_CPU_TILED_MM=1 build-cpu/bin/llama-speculative-simple \
+  -m build-cpu/fixtures/target.gguf -md build-cpu/fixtures/target.gguf \
+  --spec-type draft-simple --spec-draft-n-max 4 --spec-draft-n-min 0 \
+  --spec-draft-p-min 0 --temp 0 --samplers temperature \
+  -n 3 -p 'a b' -c 64 -b 32 -ub 32 -ngl 0 -ngld 0 -t 1 -td 1 -fa off
+```
 
 The owned adapter reuses proposal and target-batch allocations across cycles,
 reserves bounded output storage and avoids collecting discarded cycle logs in
