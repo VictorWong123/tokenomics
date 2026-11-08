@@ -2,7 +2,7 @@
 
 Technical report, implementation checkpoint, 8 November 2026.
 This is an in-progress engineering result, not an acceleration or research
-novelty claim. The full feasibility and held-out evaluation remain unexecuted.
+novelty claim. The full feasibility and held-out evaluation remain incomplete.
 
 ## Objective and current conclusion
 
@@ -17,12 +17,12 @@ in the preferred action.
 Tokenomics preserves that ordering. The implemented C++ runtime supports the
 feasibility experiments and contributes explicit cache-state management inside
 the inference loop. It does not select a cost-aware controller from fabricated
-or synthetic speedups. The two feasibility questions remain unresolved: trained
-correctness now passes in Codespaces, but only a preliminary performance screen
-has completed. A bounded repeated development pilot paused after 11/108
-blocks, with all 110 exact-ID checks passing and actual Shutdown confirmed.
-Every observed drafting-policy cell lost to target-only; the incomplete,
-unbalanced prefix cannot establish a full-suite estimate or feasibility gate.
+or synthetic speedups. The two full feasibility questions remain unresolved. Trained correctness
+passes in Codespaces, and the completed frozen-action confirmation gives no
+support for a practical gain on the guarded CPU point: cap1/target throughput
+is 0.9846, with 95% interval [0.9721, 1.0019]. The separate packed CPU profile
+is undergoing trained validation. The older partial development pilot remains
+exploratory and is not combined with the confirmation.
 
 | Environment | Actual execution | Feasibility evidence |
 |---|---|---|
@@ -242,14 +242,30 @@ proposals, accepting 5/6, 14/14 and 14/18 across the three prompts. Peak RSS is
 repeat uncertainty estimate; larger caps lose. The full ngram Pilot A duration
 extrapolation is 12.25 CPU hours.
 
-This ambiguous point motivates a frozen targeted confirmation on nine other
-development prompts, caps 128/512 and three repetitions. It selects fixed1
-only from the separate fit screen and compares target/fixed1/fixed8; the
-analysis cannot retune the challenger on validation. Completion requires all
-54 blocks/162 measurements. Bounded invocations retain partial data and cannot
-analyze it as complete. This is a targeted follow-up, not full Pilot A/B or a
-held-out controller result. Raw fit evidence is in
-`results/verification/codespace-ngram-20261108`.
+The frozen targeted confirmation completed on nine other development prompts,
+caps 128/512 and three repetitions. It selected fixed1 only from the separate
+fit screen and retained that choice through validation. All 54 blocks/162
+comparisons pass exact IDs and stops.
+
+| Configuration / ordinary target | Geometric mean throughput ratio | Prompt-clustered 95% interval |
+|---|---:|---:|
+| Frozen cap1 | 0.9846 | [0.9721, 1.0019] |
+| Cap8 comparator | 0.7727 | [0.7395, 0.8063] |
+
+Cap1 has one win, sixteen ties and one loss across the eighteen prompt/cap cells
+under the frozen symmetric 5% margin. Cap8 loses every cell; sixteen are more
+than 10% slower in time per token. The selected action fails the 5% practical
+gain criterion. The three categories are equally represented; repetitions are
+collapsed before prompt-clustered resampling.
+
+All 927 archive members, complete-block hashes, output/cycle/cache checks and
+regenerated ratio/interval statistics pass independent hosted verification.
+The retained controller report confirms actual Shutdown. Peak process RSS is
+2.18 GiB. Complete raw bytes and the verification receipt are in
+`results/verification/codespace-confirmation-20261108`.
+This targeted result does not complete full Pilot A/B, predictive scheduling,
+a controller comparison or held-out evaluation. The separate packed CPU profile
+is a new operating point, with its own correctness/memory/performance checks.
 
 ## Experiment design and timing
 
