@@ -10,17 +10,17 @@ Current checkpoint:
   including 906 differential fixture cases. Automatic pure-policy CI also passes.
 - Controller trained gates pass 28 model-drafter and 28 ngram records, covering
   every action. Raw IDs/stops/cache accounting are independently checked.
-- Study42492089188 attempt1 paused at 25/36 validation blocks, with 175 exact
+- Study 42492089188 attempt1 paused at 25/36 validation blocks, with 175 exact
   records and all 18 calibration fit records retained. Actual Shutdown is proven.
   Attempt2 is active at the same e98c0fa source and frozen fixed1 baseline,
   finishing 11 blocks and the separate logging/trajectory grid. No incomplete-grid
   throughput estimate is claimed.
-- Packed gate42503429351 is queued at exact source708993c, behind the current
+- Packed gate 42503429351 is queued at exact source 708993c, behind the current
   controller attempt under global Codespace concurrency. Its successful trained
   proof is required before the prepared 54-record paired profile/logging study.
 - Full 90-prompt held-out model evaluation is unexecuted; its guarded entry point
   and supplemental analysis are implemented/tested. The older CPU point suggests
-  roughly119 hours for 6300 conditions, not a same-day default experiment.
+  roughly 119 hours for 6300 conditions, not a same-day default experiment.
 - Preserve source/binary/model/configuration bindings. Use attempt-specific
   lifecycle proof for the legacy controller run. Future workflows retain a small
   hosted shutdown artifact automatically. Do not start a competing Codespace job
@@ -200,7 +200,7 @@ finish the measured report/demo. Stock-executable stopping differs from the
 driver; an executed synthetic diagnostic confirms this difference. Mac/Metal is supported by
 configuration but unexecuted. The full runtime project remains incomplete.
 
-Evidence-based wording now: “Building a portable C++ speculative-decoding
+Earlier pre-controller wording (historical): “Building a portable C++ speculative-decoding
 runtime with checked KV rollback and lazy synchronization; validated with
 468 transformer fixture cases and a 272-comparison trained-Qwen Linux gate.”
 Do not claim acceleration from the current unfavorable timing screen.
@@ -304,11 +304,11 @@ controller study before starting the separate packed trained gate.
 Controller study 42492089188 attempt1 paused successfully after 25/36 validation
 blocks (175 records). The full 18-record fit and calibration are retained;
 selected fixed baseline is fixed1. Both trained controller gates pass 28 records,
-all actions0/1/2/4/6/8, and the model path synchronizes 40 tokens. Independent
+all actions 0/1/2/4/6/8, and the model path synchronizes 40 tokens. Independent
 checks verify ZIP SHA256
 `4b8f47ca4969cc76d631749865f4255c69603d8d39becd58cb7f5e497323e9a3`,
 all 1078 members, immutable blocks, IDs/stops/cache counts and reconstructed prior.
-Finalizer job128797327277 confirms actual Shutdown. Raw attempt1, an explicit
+Finalizer job 128797327277 confirms actual Shutdown. Raw attempt1, an explicit
 partial receipt and attempt-specific lifecycle proof are retained in
 `results/verification/codespace-controller-20261108`. No partial-grid aggregate
 speedup is claimed. Rerun the same workflow run (all jobs) to resume e98c0fa,
@@ -316,7 +316,7 @@ finish 11 remaining blocks and the logging grid, before the packed experiment.
 
 
 Controller attempt2 is active at the original e98c0fa source: initialize job
-128799069336 succeeds and workload128799270902 is running. It resumes the
+128799069336 succeeds and workload 128799270902 is running. It resumes the
 25 saved blocks and preserves the measured calibration/fixed1 baseline.
 Packed trained gate **42503429351** is queued at source
 `708993c603c89efcb75867d851292022b4960210`; the global Codespace concurrency

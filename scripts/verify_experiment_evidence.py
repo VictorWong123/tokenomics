@@ -560,6 +560,7 @@ def verify_run(run_id, out, publish=False):
             "shutdown_confirmed": True,
             "shutdown_evidence_origin": shutdown_origin,
             "shutdown_source_job_id": finalizers[0]["id"],
+            "shutdown_controller_report": markers[0],
             "verifier_sha256": sha256(Path(__file__)),
             "independent_output_checks": True,
             "full_feasibility_cleared": False,

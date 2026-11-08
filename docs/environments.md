@@ -110,6 +110,8 @@ as a separate `tokenomics-lifecycle-<run>-<attempt>` artifact. It contains only
 the fixed ownership/result fields already printed by the controller, without
 credentials. The verifier checks its ZIP digest, single bounded JSON member,
 mode/run/attempt/source and actual Shutdown flag, and also requires the finalizer
-job to succeed. This supports independent shutdown checks when a hosted read
+job to succeed. Its verified controller report is also retained inside the
+verification receipt, so the proof survives artifact expiry. This supports
+independent shutdown checks when a hosted read
 token cannot fetch another job's logs. Legacy exact-source runs retain their
 job-log/API proof path, with separate lifecycle files for each attempt.
