@@ -1,0 +1,184 @@
+"""Calibration provenance and frozen-grid execution with real fixture processes."""
+
+import copy
+import json
+import os
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+from bench.controller import (
+    calibrate,
+    configurations,
+    point_from_frozen,
+    validate_binding,
+)
+from bench.common import atomic_json, sha256
+from bench.run import run
+from bench.replay import investigate
+
+
+@unittest.skipUnless(os.getenv("TOKENOMICS_TEST_BINARY"), "requires fixture engine")
+class Calibration(unittest.TestCase):
+    def test_freeze_replay_binding_ablations_and_tampering(self):
+        exe = Path(os.environ["TOKENOMICS_TEST_BINARY"]).resolve()
+        model = exe.parent / "fixtures/ngram-cycle.gguf"
+        cfg = dict(
+            split="development",
+            phase="controller_fit",
+            output_caps=[64],
+            repetitions=1,
+            seed=20261108,
+            context=256,
+            batch=32,
+            threads=1,
+            warmup_tokens=2,
+            warmup_prompt="a b",
+            configurations=[{"id": "target", "policy": "target"}]
+            + [
+                {"id": f"fixed{a}", "policy": "fixed", "k": a, "drafter": "ngram"}
+                for a in (1, 2, 4, 6, 8)
+            ],
+        )
+        prompts = [
+            dict(
+                id="development-qa-01", category="qa", split="development", prompt="a b"
+            )
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            run(
+                exe,
+                model,
+                None,
+                prompts,
+                cfg,
+                root / "fit",
+                identity={"synthetic_fixture": True},
+            )
+            investigate(
+                exe, model, None, root / "fit", root / "replay", cfg, drafter="ngram"
+            )
+            prior = calibrate(
+                root / "fit", root / "replay", "ngram", synthetic_fixture=True
+            )
+            self.assertTrue(prior["synthetic"])
+            self.assertEqual(len(prior["priors"]), 6)
+            self.assertTrue(all(p["base_ms"] > 0 for p in prior["priors"]))
+            self.assertEqual(prior["sync_ms_per_token"], 0)
+            frozen = json.loads((root / "fit/run_manifest.json").read_text())["frozen"]
+            point = point_from_frozen(frozen, "ngram")
+            validate_binding(prior, point, synthetic_fixture=True)
+            with self.assertRaisesRegex(ValueError, "non-synthetic"):
+                validate_binding(prior, point)
+            with self.assertRaisesRegex(ValueError, "backend"):
+                validate_binding(
+                    prior, point, synthetic_fixture=True, system_info="different"
+                )
+            mutated = copy.deepcopy(prior)
+            mutated["provenance"]["operating_point"]["binary_sha256"] = "0" * 64
+            with patch("bench.run.subprocess.run") as spawn, patch(
+                "bench.run.source_fingerprint", return_value={}
+            ):
+                with self.assertRaisesRegex(ValueError, "operating point"):
+                    run(
+                        exe,
+                        model,
+                        None,
+                        prompts,
+                        {**cfg, "configurations": configurations(mutated)},
+                        root / "bad",
+                        identity={"synthetic_fixture": True},
+                    )
+                spawn.assert_not_called()
+            validation = [{**prompts[0], "id": "development-qa-03"}]
+            measured = run(
+                exe,
+                model,
+                None,
+                validation,
+                {
+                    **cfg,
+                    "output_caps": [32],
+                    "selected_fixed": prior["provenance"]["selected_fixed"],
+                    "configurations": configurations(prior),
+                },
+                root / "validation",
+                identity={"synthetic_fixture": True},
+            )
+            from analysis.controller import report
+
+            summary = report(root / "validation")
+            self.assertTrue(summary["synthetic_fixture"])
+            self.assertFalse(summary["heldout"])
+            self.assertIn("cost-aware/target", summary["comparisons"])
+            self.assertLess(
+                summary["stage_costs"]["cost-aware"]["hot_policy_fraction"], 1
+            )
+            self.assertTrue(
+                (root / "validation/analysis/controller-comparison.png").exists()
+            )
+            self.assertEqual(len(measured), 7)
+            self.assertTrue(all(r["correctness"] == "pass" for r in measured))
+            for cid in ("cost-aware", "no-fallback", "no-probes"):
+                row = next(r for r in measured if r["configuration_id"] == cid)
+                self.assertTrue(row["controller_active"])
+                self.assertEqual(
+                    row["settings"]["controller"]["prior_id"], prior["prior_id"]
+                )
+            requests = next((root / "replay").glob("*/checkpoint-*/requests.jsonl"))
+            requests.write_text(requests.read_text() + "\n")
+            with self.assertRaisesRegex(ValueError, "hash changed"):
+                calibrate(
+                    root / "fit", root / "replay", "ngram", synthetic_fixture=True
+                )
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+@unittest.skipUnless(os.getenv("TOKENOMICS_TEST_BINARY"), "requires fixture engine")
+class StudyPipeline(unittest.TestCase):
+    def test_complete_study_and_resume_are_frozen(self):
+        from scripts.controller_study import execute_study, correctness_gate
+
+        exe = Path(os.environ["TOKENOMICS_TEST_BINARY"]).resolve()
+        model = exe.parent / "fixtures/ngram-cycle.gguf"
+        cfg = json.loads(
+            (
+                Path(__file__).resolve().parents[1] / "configs/controller-study-v1.json"
+            ).read_text()
+        )
+        cfg.update(
+            fit_prompt_ids=["development-qa-01"],
+            validation_prompt_ids=["development-qa-03", "development-code-04"],
+            output_caps=[16, 32],
+            repetitions=1,
+            context=256,
+            batch=32,
+            threads=1,
+            warmup_tokens=2,
+        )
+        prompts = [
+            dict(id=pid, category=pid.split("-")[1], split="development", prompt="a b")
+            for pid in cfg["fit_prompt_ids"] + cfg["validation_prompt_ids"]
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            gate = correctness_gate(
+                exe, model, model, prompts, cfg, out / "gate", "model"
+            )
+            self.assertEqual(gate["state"], "passed")
+            rows, result, logging = execute_study(
+                exe, model, None, prompts, cfg, out / "study", synthetic_fixture=True
+            )
+            self.assertEqual(len(rows), 28)
+            self.assertIn("cost-aware/acceptance", result["comparisons"])
+            self.assertIn("cost-aware-detailed/cost-aware", logging["comparisons"])
+            digest = sha256(out / "study/prior.json")
+            resumed, _, _ = execute_study(
+                exe, model, None, prompts, cfg, out / "study", synthetic_fixture=True
+            )
+            self.assertEqual(rows, resumed)
+            self.assertEqual(digest, sha256(out / "study/prior.json"))

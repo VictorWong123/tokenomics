@@ -28,7 +28,7 @@ def save_rows(out, requests, correctness):
         ("correctness.jsonl", correctness),
     ):
         tmp = out / (name + ".tmp")
-        tmp.write_text("".join(json.dumps(x) + "\n" for x in rows))
+        tmp.write_text("".join(json.dumps(x, sort_keys=True) + "\n" for x in rows))
         tmp.replace(out / name)
 
 
@@ -114,6 +114,19 @@ def run(
         "identity": identity or {},
         "code": source_fingerprint(),
     }
+    # Reject stale or synthetic calibration before any model execution. Backend
+    # identity is checked again on the returned record below.
+    from bench.controller import point_from_frozen, validate_binding
+
+    for conf in config["configurations"]:
+        if conf.get("policy") == "cost-aware":
+            validate_binding(
+                conf.get("controller", {}),
+                point_from_frozen(
+                    settings, conf.get("drafter", "model"), conf.get("cache", "retain")
+                ),
+                synthetic_fixture=settings["identity"].get("synthetic_fixture", False),
+            )
     manifest_path = out / "run_manifest.json"
     if manifest_path.exists():
         old = json.loads(manifest_path.read_text())
@@ -238,6 +251,19 @@ def run(
                 if len(rows) != 2 or rows[1].get("warmup", False):
                     raise RuntimeError("missing_or_malformed_record")
                 row = rows[1]
+                if conf.get("policy") == "cost-aware":
+                    validate_binding(
+                        conf["controller"],
+                        point_from_frozen(
+                            settings,
+                            conf.get("drafter", "model"),
+                            conf.get("cache", "retain"),
+                        ),
+                        synthetic_fixture=settings["identity"].get(
+                            "synthetic_fixture", False
+                        ),
+                        system_info=row["system_info"],
+                    )
                 row["process_ms"] = process_ms
                 row["category"] = prompt["category"]
                 row["block_id"] = block_id
@@ -319,15 +345,23 @@ def run(
         longest_block = max(longest_block, time.monotonic() - block_start)
     # Derived concatenations: immutable per-attempt raw records remain the source.
     save_rows(out, requests, correctness)
-    atomic_json(
-        out / "complete.json",
-        {
-            "schema_version": 1,
-            "blocks": total,
-            "records": len(requests),
-            "hardware_end": hardware(),
-        },
-    )
+    # Calibration hashes completed sources. An unchanged resume must preserve
+    # their bytes and the original completion-time hardware observation.
+    completion = out / "complete.json"
+    if completion.exists():
+        recorded = json.loads(completion.read_text())
+        if recorded.get("blocks") != total or recorded.get("records") != len(requests):
+            raise RuntimeError("Completed run receipt differs from frozen grid")
+    else:
+        atomic_json(
+            completion,
+            {
+                "schema_version": 1,
+                "blocks": total,
+                "records": len(requests),
+                "hardware_end": hardware(),
+            },
+        )
     return requests
 
 

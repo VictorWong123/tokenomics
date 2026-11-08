@@ -60,7 +60,7 @@ def pack(results, destination, owner):
 def workload():
     phase = os.environ.get("TOKENOMICS_EXPERIMENT_PHASE", "timing")
     lifecycle.require(
-        phase in ("timing", "pilot", "confirmation", "kernel"),
+        phase in ("timing", "pilot", "confirmation", "kernel", "controller"),
         "Unsupported fixed experiment",
     )
     selected = os.environ.get("TOKENOMICS_EXPERIMENT_CANDIDATE", "all")
@@ -72,9 +72,9 @@ def workload():
     drafter = os.environ.get("TOKENOMICS_EXPERIMENT_DRAFTER", "model")
     lifecycle.require(drafter in ("model", "ngram"), "Unsupported fixed drafter")
     lifecycle.require(
-        phase not in ("confirmation", "kernel")
+        phase not in ("confirmation", "kernel", "controller")
         or (selected == "qwen25-05-3-q4" and drafter == "ngram"),
-        "Confirmation/kernel experiments require the 3B target and ngram drafter",
+        "Confirmation/kernel/controller experiments require the 3B target and ngram drafter",
     )
     point = candidate + ("-ngram" if drafter == "ngram" else "")
     owner = lifecycle.current()
@@ -94,7 +94,7 @@ def workload():
         == owner["sha"],
         "Checkout identity mismatch",
     )
-    if phase in ("pilot", "confirmation"):
+    if phase in ("pilot", "confirmation", "controller"):
         # Retain only experiment measurements across owned stop/start cycles.
         # Lifecycle leases, runner configuration and credentials stay elsewhere.
         store = Path("/workspaces/.tokenomics-experiment-cache")
@@ -198,6 +198,21 @@ def workload():
                 "--run-dir",
                 str(results),
             ]
+        elif phase == "controller":
+            args = [
+                "timeout",
+                "--signal=TERM",
+                "--kill-after=15s",
+                "9000s",
+                str(workspace / ".venv/bin/python"),
+                "scripts/controller_study.py",
+                "--model-dir",
+                str(CACHE),
+                "--run-dir",
+                str(results),
+                "--budget-seconds",
+                "6600",
+            ]
         with open(
             results / f"pipeline-{owner['run_id']}-{owner['attempt']}.txt", "x"
         ) as log:
@@ -213,6 +228,7 @@ def workload():
         expected_states = {
             "confirmation": {0: "confirmation_complete", 11: "paused"},
             "kernel": {0: "kernel_profile_passed"},
+            "controller": {0: "controller_study_complete", 11: "paused"},
             "timing": {10: "timing_complete"},
             "pilot": {
                 11: "paused",
@@ -226,19 +242,46 @@ def workload():
             "Experiment did not satisfy its result contract",
         )
         timing = (
-            results / "confirmation"
-            if phase == "confirmation"
-            else results / point / "timing"
+            results / "validation"
+            if phase == "controller"
+            else (
+                results / "confirmation"
+                if phase == "confirmation"
+                else results / point / "timing"
+            )
         )
-        rows = read_jsonl(timing / "requests.jsonl")
-        checks = read_jsonl(timing / "correctness.jsonl")
+        if phase == "controller" and status["state"] == "paused":
+            rows = (
+                read_jsonl(timing / "requests.jsonl")
+                if (timing / "requests.jsonl").exists()
+                else []
+            )
+            checks = (
+                read_jsonl(timing / "correctness.jsonl")
+                if (timing / "correctness.jsonl").exists()
+                else []
+            )
+        else:
+            rows = read_jsonl(timing / "requests.jsonl")
+            checks = read_jsonl(timing / "correctness.jsonl")
         lifecycle.require(
             (
                 len(rows) % 3 == 0
                 and len(rows) <= 162
                 and (status["state"] != "confirmation_complete" or len(rows) == 162)
                 if phase == "confirmation"
-                else len(rows) == (18 if drafter == "ngram" else 21)
+                else (
+                    (
+                        len(rows) % 7 == 0
+                        and len(rows) <= 252
+                        and (
+                            status["state"] != "controller_study_complete"
+                            or len(rows) == 252
+                        )
+                    )
+                    if phase == "controller"
+                    else len(rows) == (18 if drafter == "ngram" else 21)
+                )
             )
             and len(checks) == len(rows)
             and all(c.get("ok") is True for c in checks),
@@ -341,6 +384,8 @@ def workload():
                 ("pilot_a", results / point / "pilot-a/analysis/summary.json"),
                 ("pilot_b", results / point / "pilot-b/decision.json"),
                 ("confirmation", results / "confirmation/analysis/summary.json"),
+                ("controller", results / "validation/analysis/summary.json"),
+                ("controller_logging", results / "logging/analysis/summary.json"),
                 ("kernel_gate", results / "kernel-gate/status.json"),
                 ("kernel_screen", results / point / "analysis/measurements.json"),
             ):
@@ -358,6 +403,7 @@ def workload():
             "timing_complete",
             "confirmation_complete",
             "kernel_profile_passed",
+            "controller_study_complete",
             "paused",
             "proceed_controller_implementation",
             "narrow_or_investigate",

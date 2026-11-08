@@ -1,0 +1,45 @@
+{
+  "asan_binary_sha256": "817c0e3ea59caab66c1bbdcc82fdb12e90c8bec8593b2defec003a0522049469",
+  "codespaces_started": false,
+  "compiler": "c++ (Debian 14.2.0-19) 14.2.0",
+  "detect_leaks": true,
+  "differential_fixture_cases": 906,
+  "evidence": {
+    "asan-ctest.txt": "07c84e283e473c112a120bb905c89b553601ba453e3c422b0918d9777df2ca08",
+    "asan-tooling-final.txt": "04760683db811fe2ff9527b24a45d6186c19e4c8a37a9477c647022d931c8a46",
+    "calibration-study-final.txt": "5dd568294f0866a09ec28b88d38b51d6392e6a193176914d961e96cc2c267b22",
+    "lifecycle-tests.txt": "0958e06fc6c9b49c9d207e977929aad5b7734f4e73e5c0ceb122adf85acf265a",
+    "release-ctest.txt": "7a96fd3a824573af5f023c6a33a3ff34715cd254773e5b39dc6686ac1f733c6e",
+    "release-tooling-final.txt": "643fca7947b7d78f4de6acb97a7788c7f26baf0941d70e3fd3be5365af494e89"
+  },
+  "release_binary_sha256": "1e513715f17677f25bc0cbddaba7a6cf14ed48c6ce7ad4c8399a1e4fa6d88c2b",
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "schema_version": 1,
+  "scope": "Codex Cloud generated fixtures and policy/configuration tests; not trained-model performance",
+  "source": {
+    "owned_source_sha256": "6cca121943b6ac88fea0e15b597638a17c87d328dc1cd50aadbd4f0f19760249",
+    "revision": "b0ab15c6dc3b3aad2a40eb1c029307e9b41e51e5"
+  },
+  "source_files": {
+    "CMakeLists.txt": "dc733c6ffef1a9547ee44236b94ce44a79dd9b1b51f920da078f747d8a936f1e",
+    "src/commit.cpp": "b559ba87623f585f3f432402390b05793364e881155eca3fc6409e8499300f43",
+    "src/commit.h": "6e67152bd1a1e000448b12f22a865c3debe30c06b2cf0f5305248e56d191b4ba",
+    "src/controller_io.cpp": "80331d30a9a147bfd7e0326e9aa81249d71db40a0c434fbbcc2306c37109b817",
+    "src/controller_io.h": "d67cd75ec71c380f58b9815919e2d84fc7419f94322aef44e969c5fd646a93a6",
+    "src/main.cpp": "6f61233b836df4ea774ae0c79fc7bcb092271a15c33b3e6cd84f91ddc665df02",
+    "src/policy.cpp": "9c088df669e21c66e3ce6cac767a4c517f557f48c3302087b1ff5d85de9fc604",
+    "src/policy.h": "03ff1f18e2715ce58ee4676ba4b56c9fd8beaadb71011b0690993ceae447cb55",
+    "src/runtime.cpp": "8f207013557d7571cc538b1e9aa9ff0ba52d5011ca85ac3527d1ce63ba7a5cf1",
+    "src/runtime.h": "1021eb27fda8f0561205824d96a4cd5d42f4f3803bbabc36ba8cc3367f2837b2",
+    "tests/test_controller.cpp": "189343b8b4547ab36486a72d071c164d8cbcb9f3f23d66d45d30081f65a6541a",
+    "tests/test_controller_calibration.py": "67fcf7d741ed3c0a9d33c315e999864821380e9abe44990cbbabcf4128941e02",
+    "tests/test_controller_cli.py": "7aedd057b0b955f0b1745ce33d5a93e734134e9d3e876c8c3bdf0adca8e2d6ae",
+    "tests/test_controller_io.cpp": "b2ca8c0824e4a87b7329e5d52cb0a4c7312cff99fa3547ca79294ead4ab82948",
+    "tests/test_runtime.cpp": "de641e04b35f5cd0f9cc8dcb39d0ed2b86e5217e3515f20de909de1eca3da3b6"
+  },
+  "suites": 6,
+  "timestamp_utc": "2026-11-08T14:52:58.112121+00:00"
+}

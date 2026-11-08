@@ -167,6 +167,34 @@ def validate_run(rows, manifest, complete):
         or complete.get("records") != len(actual)
     ):
         raise ValueError("incomplete, duplicate or unexpected frozen measurement cells")
+    for conf in cfg["configurations"]:
+        if conf.get("policy") == "cost-aware":
+            from bench.controller import point_from_frozen, validate_binding
+
+            prior = conf.get("controller", {})
+            fixture = frozen.get("identity", {}).get("synthetic_fixture", False)
+            point = point_from_frozen(
+                frozen, conf.get("drafter", "model"), conf.get("cache", "retain")
+            )
+            validate_binding(prior, point, synthetic_fixture=fixture)
+            if not fixture and {p["id"] for p in frozen["prompts"]} & set(
+                prior["provenance"]["fit_prompt_ids"]
+            ):
+                raise ValueError(
+                    "Controller validation overlaps development calibration"
+                )
+            for row in rows:
+                if row["configuration_id"] == conf["id"]:
+                    validate_binding(
+                        prior,
+                        point,
+                        synthetic_fixture=fixture,
+                        system_info=row["system_info"],
+                    )
+                    if not row.get("controller_active"):
+                        raise ValueError(
+                            "Controller measurement did not execute the controller"
+                        )
     if cfg.get("split") == "heldout":
         if not cfg.get("selected_fixed") or not cfg.get("development_selection_sha256"):
             raise ValueError(

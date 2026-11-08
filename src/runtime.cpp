@@ -243,9 +243,13 @@ Result Engine::generate(const Request &r) {
                 "checkpoint prefix does not match request");
     }
     const bool use_model = r.drafter == "model" && r.mode != "target";
+    require(!r.controller || r.mode == "cost-aware",
+            "controller configuration requires cost-aware policy");
     require(!use_model || bool(e.dft), "speculative model mode requires --draft");
-    auto policy = make_policy(r.mode, r.k, r.script);
+    const auto policy_start = Clock::now();
+    auto policy = make_policy(r.mode, r.k, r.script, r.controller ? &*r.controller : nullptr);
     policy->reset();
+    const double policy_init_ms = elapsed(policy_start);
     auto *tgt = e.tgt.get();
     auto *dft = e.dft.get();
     const auto *vocab = llama_model_get_vocab(e.target.get());
@@ -256,6 +260,8 @@ Result Engine::generate(const Request &r) {
     if (dft)
         llama_synchronize(dft);
     Result out;
+    out.policy_init_ms = policy_init_ms;
+    out.controller_active = r.mode == "cost-aware";
     out.prompt_ids = checkpoint
                          ? checkpoint->prefix
                          : (r.prefix_tokens.empty() ? common_tokenize(vocab, r.prompt, true, true)
@@ -350,12 +356,14 @@ Result Engine::generate(const Request &r) {
         const auto cycle_start = Clock::now();
         t = Clock::now();
         c.stale_before = use_model ? n - cached(dft) : 0;
-        c.action = policy->select_action({c.cycle, n + 1, remaining, c.stale_before});
+        c.action = policy->select_action(
+            {c.cycle, n + 1, std::min(remaining, context_limit - n), c.stale_before});
         require(valid_action(c.action), "policy selected unsupported action");
         c.switched = previous >= 0 && previous != c.action;
         previous = c.action;
         c.decision_ms = elapsed(t);
         const int cap = draft_budget(c.action, remaining, context_limit - n);
+        c.effective_cap = cap;
         proposed.clear();
         if (cap > 0) {
             if (use_model) {
@@ -431,6 +439,7 @@ Result Engine::generate(const Request &r) {
         if (use_model && r.cache == "upstream" && cap > 0) {
             require(common_speculative_process(spec.get(), batch), "upstream draft process failed");
             llama_synchronize(dft);
+            c.draft_replay_tokens = c.actual + 1;
         }
         auto plan = plan_commit(n, remaining, c.actual, ids,
                                 [vocab](int id) { return llama_vocab_is_eog(vocab, id); });
@@ -454,9 +463,54 @@ Result Engine::generate(const Request &r) {
         c.accepted = plan.accepted;
         c.committed = int(plan.tokens.size());
         c.cache_ms += elapsed(t);
-        c.wall_ms = elapsed(cycle_start);
-        policy->observe({c.action, c.actual, c.accepted, c.committed, c.wall_ms});
+        c.observation_ms = elapsed(cycle_start);
+        t = Clock::now();
+        policy->observe({c.action, c.actual, c.accepted, c.committed, c.observation_ms, c.sync_ms,
+                         c.synced, cap});
+        c.policy_update_ms = elapsed(t);
+        const auto *trace = policy->trace();
+        if (trace && r.detailed)
+            c.controller = *trace;
         c.wall_ms = elapsed(cycle_start); // include policy-update work in the diagnostic cycle
+        auto &sum = out.execution;
+        ++sum.cycles;
+        sum.drafted += c.actual;
+        sum.accepted += c.accepted;
+        sum.verified_rows += c.actual + 1;
+        sum.synced_tokens += c.synced;
+        sum.draft_replay_tokens += c.draft_replay_tokens;
+        sum.switches += c.switched;
+        sum.decision_ms += c.decision_ms;
+        sum.policy_update_ms += c.policy_update_ms;
+        sum.sync_ms += c.sync_ms;
+        sum.draft_ms += c.draft_ms;
+        sum.verify_ms += c.verify_ms;
+        sum.cache_ms += c.cache_ms;
+        sum.cycle_wall_ms += c.wall_ms;
+        auto &action_sum = sum.actions[action_index(c.action)];
+        ++action_sum.cycles;
+        action_sum.committed_tokens += c.committed;
+        action_sum.wall_ms += c.wall_ms;
+        if (trace) {
+            auto &s = out.controller;
+            s.probes += trace->probe;
+            s.normal_switches += trace->normal_switch;
+            s.forced_tail_cycles += trace->forced_tail;
+            s.learning_updates += trace->learning_applied;
+            s.tail_limited += trace->tail_limited;
+            if (trace->probe)
+                s.probe_ms += c.wall_ms;
+            if (c.action == 0 && !trace->probe && !trace->forced_tail) {
+                ++s.fallback_cycles;
+                s.fallback_tokens += c.committed;
+                s.fallback_ms += c.wall_ms;
+            }
+            s.predicted_sync_ms += trace->predicted_sync_ms;
+            s.actual_sync_ms += c.synced > 0 ? c.sync_ms : 0;
+            const double error = std::abs(c.observation_ms - trace->predicted_ms);
+            s.prediction_abs_ms += error;
+            s.prediction_abs_fraction += error / c.observation_ms;
+        }
         if (out.tokens.size() == plan.tokens.size())
             out.first_token_ms = elapsed(begin);
         if (r.detailed)

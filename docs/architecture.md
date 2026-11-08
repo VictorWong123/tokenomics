@@ -30,7 +30,11 @@ path never promotes an unverified draft token into committed history.
 Policies cannot mutate tokens or caches. Fixed caps disable confidence stopping.
 Confidence stopping can produce fewer actual proposals. Acceptance compares the
 accepted prefix against **actual** drafts. Scripted actions exist to test switching
-and rollback, and are excluded from performance selection.
+and rollback, and are excluded from performance selection. The experimental
+[cost-aware controller](controller-design.md) chooses among target-only and all
+five caps using frozen priors, measured committed-token rates, transition cost,
+hysteresis and probes. It only observes completed execution and never replaces
+upstream acceptance or cache reconciliation.
 
 ## Original-state checkpoint replay
 

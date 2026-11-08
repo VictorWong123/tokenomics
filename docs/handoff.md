@@ -119,17 +119,19 @@ the separate trained profile check is:
 It keeps the unchanged 272-comparison gate, measures RSS, runs the 18-request
 ngram screen and validates original-state checkpoints. Do not mix this binary
 with earlier fit/confirmation measurements or promote it before trained checks.
-The `kernel` phase is running as **42474834521**, attempt 2, at
+The `kernel` phase was cancelled as **42474834521**, attempt 2, at
 `63265d36939f802abb73b88962d96862c6c9169c`. Attempt 1 failed startup before
-inference; startup succeeds on retry and the workload is active. Inspect its
-artifact and finalizer before claiming a trained-profile pass.
+inference; startup succeeded on retry. The user then required the controller to work in
+Codex Cloud before any more Codespaces execution. Workload cancellation and actual
+Shutdown were confirmed by finalizer job 128753544517. No trained packed-profile
+pass follows; do not resume that older run before the controller requirement.
 An additional 128 KiB cache-chunk study passes its strict fixture tests but
 does not improve verification, so it is rejected; see
 `results/verification/cache-study-20261108`.
 
 The Codex Cloud shell attachment recovered after the workspace context refreshed;
 the project files remained intact. Development has resumed there. Codespaces
-remained available for the trained run. A paired CPU/logging benchmark is
+was stopped after cancellation; development continues in Codex Cloud. A paired CPU/logging benchmark is
 prepared and locally tested but not published to main: check the Cloud worktree
 and backup branch `codex/paired-cpu-profile` for `analysis/profile_comparison.py`,
 `scripts/compare_cpu_profiles.py`, `configs/cpu-profile-screen-v1.json`, the
@@ -145,8 +147,19 @@ and stages only verified raw data, with the repository staging guard.
 The documentation index is `docs/requirements.md`; environment roles and CPU
 dispatch details are in `docs/environments.md` and `docs/cpu-profiles.md`.
 
-Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
-cost-aware or narrower controller; quantify instrumentation/probe overhead;
+The dedicated controller design was committed as `d02a4c6` before implementation.
+The user explicitly requested experimental completion despite failed feasibility
+and asked not to run Codespaces until the controller works locally. Pure C++
+EWMA scheduling, transition charging, hold/margin, probes, ablations, reset,
+strict configuration and runtime telemetry are now implemented. Release tests
+and ASan/UBSan/leak-detected C++ integration pass; the full six-suite sanitizer
+run passed in 366.35 s. Calibration and the bounded study are tested end-to-end
+with generated fixtures, including byte-stable resume and tamper rejection.
+See `docs/controller-design.md` and `configs/controller-study-v1.json` for the
+complete policy contract and predeclared trained protocol. Trained controller
+measurements are still pending; no controller speedup is claimed.
+
+Still required: quantify actual controller/instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;
 finish the measured report/demo. Stock-executable stopping differs from the
 driver; an executed synthetic diagnostic confirms this difference. Mac/Metal is supported by

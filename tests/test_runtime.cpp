@@ -8,12 +8,49 @@ using namespace tokenomics;
         if (!(x))                                                                                  \
             throw std::runtime_error("check failed: " #x);                                         \
     } while (0)
+static ControllerConfig controller(int variant = 0) {
+    ControllerConfig c;
+    c.prior_id = "synthetic-runtime-test-v1";
+    c.synthetic = true;
+    c.probe_interval = 2; // Exhaust transitions quickly; production default remains 16.
+    c.allow_target_only = variant != 1;
+    c.enable_probes = variant != 2;
+    for (auto &p : c.priors)
+        p = {1, 1e9};
+    c.priors[0] = {1, 1e-9};
+    return c;
+}
+static void check_totals(const Result &r) {
+    CHECK(r.controller_active);
+    CHECK(r.execution.cycles == r.cycles.size());
+    std::uint64_t tokens = 0, drafted = 0, accepted = 0, synced = 0;
+    for (const auto &c : r.cycles) {
+        CHECK(c.controller.has_value());
+        CHECK(c.action == c.controller->selected && c.effective_cap == c.action);
+        CHECK(c.wall_ms >= c.observation_ms && c.policy_update_ms >= 0);
+        CHECK(c.controller->learning_applied && !c.controller->tail_limited);
+        tokens += c.committed;
+        drafted += c.actual;
+        accepted += c.accepted;
+        synced += c.synced;
+    }
+    CHECK(tokens == r.tokens.size() && drafted == r.execution.drafted);
+    CHECK(accepted == r.execution.accepted && synced == r.execution.synced_tokens);
+    CHECK(r.execution.verified_rows == r.execution.cycles + drafted);
+    CHECK(r.controller.learning_updates == r.execution.cycles);
+    std::uint64_t by_action = 0;
+    for (const auto &a : r.execution.actions)
+        by_action += a.committed_tokens;
+    CHECK(by_action == tokens);
+}
 int main(int argc, char **argv) {
     if (argc != 2)
         return 2;
     std::string dir = argv[1];
     int comparisons = 0;
     bool zero = false, partial = false, full = false, catchup = false, switched = false;
+    bool controller_catchup = false, controller_fallback = false, controller_probe = false;
+    std::array<bool, 6> controller_actions{};
     for (const std::string name :
          {"target", "random", "eos", "quantized", "quantized-k", "quantized-k-wide"}) {
         EngineConfig ec{dir + "/" + name + ".gguf", dir + "/" + name + ".gguf", 64, 32, 1, 0};
@@ -23,6 +60,39 @@ int main(int argc, char **argv) {
             base.prompt = "a b";
             base.max_tokens = cap;
             const auto expected = e.generate(base);
+            for (auto cache : {"retain", "upstream"})
+                for (auto drafter : {"model", "ngram"})
+                    for (int variant = 0; variant < 3; ++variant) {
+                        Request adaptive = base;
+                        adaptive.mode = "cost-aware";
+                        adaptive.cache = cache;
+                        adaptive.drafter = drafter;
+                        adaptive.controller = controller(variant);
+                        if (variant == 1)
+                            adaptive.proposal_transform = [](std::vector<int> &ids, int cycle) {
+                                if (!ids.empty())
+                                    ids[std::min(size_t(cycle % 3), ids.size() - 1)] = 260;
+                            };
+                        const auto result = e.generate(adaptive);
+                        CHECK(result.tokens == expected.tokens && result.stop == expected.stop);
+                        check_totals(result);
+                        for (const auto &c : result.cycles) {
+                            controller_actions[action_index(c.action)] = true;
+                            controller_catchup |= c.synced > 1;
+                            controller_probe |= c.controller->probe;
+                            if (variant == 1)
+                                CHECK(c.action != 0 || c.controller->forced_tail);
+                            if (variant == 2)
+                                CHECK(!c.controller->probe);
+                        }
+                        controller_fallback |= result.controller.fallback_cycles > 0;
+                        adaptive.detailed = false;
+                        const auto minimal = e.generate(adaptive);
+                        CHECK(minimal.cycles.empty() && minimal.controller_active);
+                        CHECK(minimal.tokens == result.tokens && minimal.stop == result.stop);
+                        CHECK(minimal.execution.cycles > 0 || cap == 0);
+                        ++comparisons;
+                    }
             for (auto cache : {"retain", "upstream"})
                 for (auto mode : {"fixed", "confidence", "acceptance", "script"}) {
                     Request r = base;
@@ -83,6 +153,13 @@ int main(int argc, char **argv) {
         boundary.mode = "fixed";
         boundary.k = 8;
         CHECK(e.generate(boundary).tokens == b.tokens);
+        ++comparisons;
+        boundary.mode = "cost-aware";
+        boundary.controller = controller(1);
+        auto tail = e.generate(boundary);
+        CHECK(tail.tokens == b.tokens && tail.stop == b.stop);
+        CHECK(tail.controller.forced_tail_cycles == 1);
+        CHECK(tail.controller.fallback_cycles == 0);
         ++comparisons;
         boundary.prefix_tokens.push_back(259);
         bool throws = false;
@@ -215,6 +292,9 @@ int main(int argc, char **argv) {
         }
     }
     CHECK(zero && partial && full && catchup && switched);
+    CHECK(controller_catchup && controller_fallback && controller_probe);
+    CHECK(std::all_of(controller_actions.begin(), controller_actions.end(),
+                      [](bool seen) { return seen; }));
     // A period-nine history makes upstream ngram-simple propose up to eight
     // tokens. A constant-token fixture can return no draft because its nearest
     // match has too little following history, so it cannot cover this path.

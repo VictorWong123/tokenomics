@@ -1,6 +1,6 @@
 # Experimental cost-aware controller
 
-Design v1, 8 November 2026. **Design stage: implement and validate next.**
+Design v1, 8 November 2026. **Implemented experimental C++ controller; trained measurements pending.**
 
 The user explicitly chose to finish the experimental C++ controller despite the
 negative feasibility evidence, then requested a controller-specific design
@@ -253,3 +253,110 @@ Useful outcomes include a working reusable C++ controller, exactness coverage,
 measured overhead and a defensible operating-point/regression analysis. Any
 later two-sentence CV description must use those actual results and name its
 measured scope; the engineering design and evidence remain the primary deliverable.
+
+
+## 11. Implementation and use
+
+The implementation follows the design above. `src/policy.*` owns the six-action
+state machine; `src/controller_io.*` validates JSON at the executable boundary;
+`src/runtime.*` supplies actual elapsed work, committed tokens and cache state.
+`bench/controller.py` freezes and binds calibration; `scripts/controller_study.py`
+coordinates the bounded trained study; `analysis/controller.py` independently
+checks the frozen grid, immutable record hashes, raw outputs, per-request totals
+and detailed traces before generating figures/statistics.
+
+Use an explicitly calibrated configuration with the same binary and operating
+point. For a single request:
+
+```bash
+build-cpu/tokenomics --target /path/to/target.gguf --drafter ngram \
+  --policy cost-aware --controller results/controller/prior.json \
+  --context 2048 --batch 512 --threads 2 --max-tokens 128 \
+  --prompt 'Continue this explanation.' --out request.jsonl --cycles cycles.jsonl
+```
+
+For a model drafter add `--draft /path/to/draft.gguf --drafter model` and use its
+own measured calibration. Jobs files embed a `controller` object per cost-aware
+request. Per-request flags belong in jobs records when using `--jobs`; the CLI
+rejects a simultaneous global `--controller`. Missing priors or a controller on
+a different policy fail clearly. The raw provenance object survives output.
+Direct CLI/API callers own compatibility; `bench.run` enforces the full binding.
+
+A prior JSON contains `schema_version: 1`, `prior_id`, the explicit Boolean
+`synthetic`, six unique `priors` entries (`action`, `committed_tokens`, `base_ms`),
+and optional validated controller parameters. The generated measured prior also
+contains the development fit IDs, executable/model hashes, backend identity,
+source hashes and frozen full-request fixed selection in `provenance`. There
+is no installed trained-model default. The correctness gate deliberately uses
+clearly labeled synthetic priors to force transitions, not to estimate speed.
+
+For the repeatable bounded study, after building/checking the controller:
+
+```bash
+.venv/bin/python scripts/controller_study.py \
+  --model-dir /path/to/model-cache --run-dir results/controller \
+  --budget-seconds 6600
+```
+
+The fixed protocol is `configs/controller-study-v1.json`: fit on three designated
+development prompts at cap64, collect equivalent original-state action replays,
+freeze the prior/fixed baseline, then compare seven conditions on six distinct
+development validation prompts at caps64/128 with three repetitions. Every
+condition uses minimal logging. The conditions are ordinary target, frozen fixed,
+existing dynamic ngram cap8, acceptance, cost-aware, no-fallback and no-probes.
+A separate paired logging grid runs minimal/detailed controller requests for the
+predeclared median-improvement/worst-regression prompts. Its fresh trajectories
+illustrate behavior; they are not the exact earlier minimal request histories.
+
+The study first runs focused trained correctness checks with both the 0.5B→1.5B
+model drafter and the 3B ngram target, both cache strategies, all three controller
+variants, budget tails and repeated/minimal requests. These synthetic-prior gate
+timings are excluded from performance analysis. No previous binary's calibration
+is reused. The first performance point keeps the guarded CPU profile, selected
+because earlier measurements identified independent-draft cost as a bottleneck.
+It is an engineering operating point, with no presumed speedup.
+
+The lifecycle supports this same script as phase `controller`; its fixed runner,
+ownership, timeout, bounded artifacts and confirmed-shutdown rules still apply.
+Codex Cloud tests precede any dispatch. Complete blocks are immutable; canonical
+aggregate ordering and preserved completion receipts make an unchanged resume
+retain calibration hashes. Any executable/model/source/configuration change
+requires a separate run directory. A planned pause retains completed blocks and
+has no completed-grid estimate until resumed unchanged.
+
+## 12. Telemetry interpretation and local validation
+
+JSON schema1 is extended additively. Existing fields keep their meanings.
+`execution` is present for every policy, including minimal mode: per-action
+cycles/tokens/wall time, drafted/accepted counts, verified rows, synchronized
+and upstream replay tokens, decision/update and inference-stage clocks.
+`controller_active` identifies execution of this policy; `controller` request
+totals include probes, incumbent switches, forced tails, ordinary fallback,
+learning updates, transition prediction and absolute prediction errors.
+
+`policy_init_ms` is a subset of setup; `controller_parse_ms` is inside warm
+request latency. A single-request configuration file read is separately reported
+as `controller_file_load_ms` before engine construction. Full process timing in
+the benchmark includes loading, warm-up, both requests and serialization.
+`observation_ms` stops immediately before the update; `wall_ms` additionally
+includes the update and optional trace copy. Generation also includes aggregate
+accounting and cycle retention outside that clock. Analysis reports the
+unassigned generation remainder instead of silently discarding it. Initialization,
+probes and synchronization remain in the complete measured endpoints.
+
+Detailed cycles contain six scored candidates and their eligibility, the selected
+and normal action, reason, probe/switch/tail flags, predicted cost/tokens/transition,
+observed base cost and post-update estimates. Minimal requests omit those arrays
+and retain totals. A forced final-slot action0 is never counted as ordinary fallback.
+Tail-limited observations do not update a full-cap action. Ngram may legitimately
+propose zero tokens; the selected full-cap observation is still learned.
+
+Local tests cover the deterministic mathematical contract, strict malformed JSON,
+real executable/provenance round trips, both mechanisms/cache modes, all actions,
+forced rejection, EOS, context/budget boundaries, resets and minimal/detailed
+output equivalence. Release and ASan/UBSan with leak detection have passed the
+C++ integration; the study pipeline additionally checks calibration mismatch
+before model launch, source tampering and byte-stable resume with generated
+transformer fixtures. Fixture performance is never evidence of a trained gain.
+The current exact test receipt/counts and trained result status are recorded in
+the handoff and requirements matrix as each checked stage is committed.

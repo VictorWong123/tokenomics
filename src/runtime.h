@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 namespace tokenomics {
@@ -25,6 +26,7 @@ struct Request {
     // Diagnostic, same-Engine checkpoints. A new ordinary request releases them.
     std::vector<int> capture_checkpoints;
     std::string checkpoint_namespace, resume_checkpoint;
+    std::optional<ControllerConfig> controller;
 };
 struct LogitProbe {
     int row = 0, output_index = 0, top_id = 0, second_id = 0;
@@ -35,7 +37,27 @@ struct Cycle {
     int context = 0, target_cached = 0, draft_cached = 0, stale_before = 0, synced = 0;
     double decision_ms = 0, sync_ms = 0, draft_ms = 0, verify_ms = 0, cache_ms = 0, wall_ms = 0;
     bool switched = false;
+    int effective_cap = 0, draft_replay_tokens = 0;
+    double observation_ms = 0, policy_update_ms = 0;
+    std::optional<DecisionTrace> controller;
     std::vector<LogitProbe> logits;
+};
+struct ActionTotals {
+    std::uint64_t cycles = 0, committed_tokens = 0;
+    double wall_ms = 0;
+};
+struct ExecutionTotals {
+    std::uint64_t cycles = 0, drafted = 0, accepted = 0, verified_rows = 0;
+    std::uint64_t synced_tokens = 0, draft_replay_tokens = 0, switches = 0;
+    double decision_ms = 0, policy_update_ms = 0, sync_ms = 0, draft_ms = 0;
+    double verify_ms = 0, cache_ms = 0, cycle_wall_ms = 0;
+    std::array<ActionTotals, 6> actions{};
+};
+struct ControllerTotals {
+    std::uint64_t probes = 0, normal_switches = 0, forced_tail_cycles = 0;
+    std::uint64_t fallback_cycles = 0, fallback_tokens = 0, learning_updates = 0, tail_limited = 0;
+    double probe_ms = 0, fallback_ms = 0, predicted_sync_ms = 0, actual_sync_ms = 0;
+    double prediction_abs_ms = 0, prediction_abs_fraction = 0;
 };
 struct Result {
     std::vector<int> prompt_ids, tokens;
@@ -48,6 +70,10 @@ struct Result {
     std::vector<std::string> checkpoint_ids;
     std::size_t checkpoint_bytes = 0;
     double checkpoint_save_ms = 0, checkpoint_restore_ms = 0;
+    double policy_init_ms = 0;
+    bool controller_active = false;
+    ExecutionTotals execution;
+    ControllerTotals controller;
 };
 class Engine {
     struct Impl;

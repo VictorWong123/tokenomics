@@ -2,20 +2,22 @@
 
 Portable C++20 speculative-decoding runtime engineering on a pinned llama.cpp.
 It keeps greedy verification upstream and implements draft-cache retention,
-checked rollback, lazy synchronization, target-only/re-entry, and policy hooks.
+checked rollback, lazy synchronization, target-only/re-entry, and an experimental
+cost-aware C++ controller with frozen calibration and online adaptation.
 Diagnostic action replay restores original target KV checkpoints and a shared
 prepared draft state instead of repeatedly reconstructing the combined prefix.
 CPU is the initial reference. macOS Metal is supported by configuration;
 CUDA is optional. Linux cloud, Codespaces and Mac results are separate.
 
 **Status: in progress.** Cloud Release and sanitizer checks pass, including
-468 differential fixture cases. Codespaces passed the 272-comparison trained
+906 differential fixture cases. Codespaces passed the 272-comparison trained
 correctness gate and trained original-KV replay checks. A completed nine-prompt
 confirmation passes all 162 exact comparisons, but its frozen cap1 throughput
 ratio is 0.9846 [0.9721, 1.0019] to target-only and fails the 5% practical-gain
-criterion. The opt-in packed CPU profile is undergoing separate trained checks.
-Full Pilot A/B, cost-aware scheduling, held-out evaluation and Metal execution
-remain incomplete. See [the handoff](docs/handoff.md),
+criterion. The experimental cost-aware controller passes local integration and
+sanitizer checks; trained controller measurements are pending. The opt-in packed
+CPU run was cancelled to prioritize the controller. Full Pilot A/B, held-out
+evaluation and Metal execution remain incomplete. See [the handoff](docs/handoff.md),
 [feasibility](docs/feasibility.md) and the
 [verified raw confirmation](results/verification/codespace-confirmation-20261108).
 
@@ -61,7 +63,9 @@ Terminal state-transition demonstration:
 The recorded demo shows scripted fallback, partial/full acceptance and lazy
 catch-up from the passing trained gate. It verifies original artifact file
 hashes and the selected request against ordinary target IDs before display.
-It demonstrates correctness mechanics; the cost-aware policy remains gated.
+It demonstrates scripted correctness mechanics. See the separate
+[controller design and use](docs/controller-design.md) for the implemented
+cost-aware policy, calibrated priors and planned trained comparison.
 
 ## Real-model feasibility: one entry point
 
@@ -102,6 +106,8 @@ gh workflow run codespace-experiment.yml --ref main -f phase=timing -f candidate
 gh workflow run codespace-experiment.yml --ref main -f phase=timing -f candidate=qwen25-05-3-q4 -f drafter=ngram
 gh workflow run codespace-experiment.yml --ref main -f phase=confirmation -f candidate=qwen25-05-3-q4 -f drafter=ngram
 gh workflow run codespace-experiment.yml --ref main -f phase=pilot
+# After the controller passes Codex Cloud checks, run its focused trained study:
+gh workflow run codespace-experiment.yml --ref main -f phase=controller -f candidate=qwen25-05-3-q4 -f drafter=ngram
 ```
 
 The fixed pilot investigates the versioned candidates and cheaper ngram mode.
@@ -113,16 +119,19 @@ Each invocation retains partial evidence and shuts down the same dedicated
 Codespace. Pilot data persists under `/workspaces/.tokenomics-experiment-cache/`
 by source SHA; rerun that exact SHA to resume. Code changes require a fresh run.
 Artifacts are retained for 30 days. This is development data, not held-out
-evaluation. Full controller implementation remains conditional on both gates.
+evaluation. The user authorized an experimental C++ controller despite the
+negative feasibility evidence; its [design, implementation and calibration contract](docs/controller-design.md)
+are documented. Full feasibility and held-out conclusions remain pending.
 
 The workflow deliberately stops at the scientific decision. Exit 20 means Q1
 and Q2 support proceeding with controller implementation; 21 means speculation
 helps but cycle-level prediction is unresolved; 22 means review the bounded
 investigation before a scope decision. Exit 2 means an execution/access blocker,
 12 a user-specified duration limit, 130 an interruption. Exit 0 is reserved for
-the fixture workflow and **does not mean the full project is complete**.
-This script runs the feasibility phase; controller implementation and held-out
-evaluation follow its evidence, not an automatic success message.
+successful fixture checks; dedicated confirmation/controller scripts also return
+0 for their own bounded completed grids. It **does not mean the full project is
+complete**. The feasibility script and separate experimental controller study
+report their own evidence; held-out evaluation is still separate.
 
 Manual smoke after model download:
 
