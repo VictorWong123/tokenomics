@@ -103,3 +103,13 @@ If Codespaces startup fails before inference, retain that failure and use the
 same owned initialization/dependency route for a retry. Its ownership checks
 decide whether cleanup/start is permitted; do not bypass them with direct SSH
 or copied lifecycle credentials.
+
+
+Future development workflows retain the hosted finalizer's small `report.json`
+as a separate `tokenomics-lifecycle-<run>-<attempt>` artifact. It contains only
+the fixed ownership/result fields already printed by the controller, without
+credentials. The verifier checks its ZIP digest, single bounded JSON member,
+mode/run/attempt/source and actual Shutdown flag, and also requires the finalizer
+job to succeed. This supports independent shutdown checks when a hosted read
+token cannot fetch another job's logs. Legacy exact-source runs retain their
+job-log/API proof path, with separate lifecycle files for each attempt.

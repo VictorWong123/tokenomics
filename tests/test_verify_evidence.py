@@ -171,3 +171,35 @@ class PartialControllerRetention(unittest.TestCase):
                 path.write_text(json.dumps(receipt))
                 retain(evidence, path)
                 self.assertEqual((retained / "verification.json").read_bytes(), final)
+
+
+class HostedLifecycleArtifact(unittest.TestCase):
+    def test_only_bounded_digest_checked_finalizer_json_is_read(self):
+        from scripts.verify_experiment_evidence import lifecycle_archive
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for variant in ("valid", "extra", "oversized", "wrong-mode"):
+                path = root / (variant + ".zip")
+                body = dict(
+                    mode="initialize" if variant == "wrong-mode" else "finalize",
+                    passed=True,
+                    shutdown_confirmed=True,
+                    run_id="42492089188",
+                    attempt="1",
+                    sha="a" * 40,
+                )
+                with zipfile.ZipFile(path, "w") as archive:
+                    archive.writestr(
+                        "report.json",
+                        " " * 65537 if variant == "oversized" else json.dumps(body),
+                    )
+                    if variant == "extra":
+                        archive.writestr("unexpected.txt", "rejected")
+                if variant == "valid":
+                    self.assertEqual(lifecycle_archive(path, sha256(path)), body)
+                    with self.assertRaisesRegex(ValueError, "digest"):
+                        lifecycle_archive(path, "0" * 64)
+                else:
+                    with self.assertRaises(ValueError):
+                        lifecycle_archive(path, sha256(path))

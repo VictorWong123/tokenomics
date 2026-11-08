@@ -103,4 +103,12 @@ jobs:
           TOKENOMICS_RUNNER_ID: ${{ vars.TOKENOMICS_RUNNER_ID }}
           WORKLOAD_SUMMARY: ${{ needs.workload.outputs.summary }}
         run: python3 scripts/codespaces/controller.py finalize
+      - name: Retain hosted lifecycle result
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: tokenomics-lifecycle-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/tokenomics-artifacts/report.json
+          retention-days: 30
+          if-no-files-found: warn
 

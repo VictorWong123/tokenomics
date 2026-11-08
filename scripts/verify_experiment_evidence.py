@@ -41,7 +41,10 @@ def api(path, binary_out=None):
     args = ["gh", "api", f"repos/{REPO}/{path}"]
     if binary_out is not None:
         with binary_out.open("wb") as stream:
-            subprocess.run(args, stdout=stream, check=True, timeout=120)
+            result = subprocess.run(
+                args, stdout=stream, stderr=subprocess.PIPE, check=False, timeout=120
+            )
+            require(result.returncode == 0, "GitHub artifact download failed")
         return None
     result = subprocess.run(args, check=True, capture_output=True, timeout=120)
     return json.loads(result.stdout)
@@ -106,6 +109,27 @@ def unpack(archive, expected_zip_sha, out):
             str(report[key]) == str(manifest[key]), "Archive/report ownership mismatch"
         )
     return report, manifest, evidence
+
+
+def lifecycle_archive(path, expected_sha):
+    """Only the fixed small JSON report; never extract lifecycle ZIP members."""
+    require(sha256(path) == expected_sha, "Lifecycle ZIP digest mismatch")
+    with zipfile.ZipFile(path) as archive:
+        require(
+            len(archive.infolist()) == 1 and archive.namelist() == ["report.json"],
+            "Unexpected lifecycle ZIP members",
+        )
+        member = archive.infolist()[0]
+        require(
+            not member.is_dir() and member.file_size <= 65536,
+            "Oversized lifecycle report",
+        )
+        report = json.loads(archive.read("report.json"))
+    require(
+        isinstance(report, dict) and report.get("mode") == "finalize",
+        "Wrong lifecycle report mode",
+    )
+    return report
 
 
 def verify_grid(directory, complete_required, expected_source):
@@ -451,41 +475,67 @@ def verify_run(run_id, out, publish=False):
             j for j in jobs if j["name"] == "finalize" and j["conclusion"] == "success"
         ]
         require(len(finalizers) == 1, "Missing successful finalizer")
-        log_result = subprocess.run(
-            ["gh", "api", f"repos/{REPO}/actions/jobs/{finalizers[0]['id']}/logs"],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=120,
-        )
-        shutdown_origin = "direct GitHub job-log API"
-        if log_result.returncode == 0:
+        lifecycle_matches = [
+            a
+            for a in artifacts
+            if a["name"] == f"tokenomics-lifecycle-{run_id}-{attempt}"
+            and not a["expired"]
+        ]
+        lifecycle_proof = {}
+        if lifecycle_matches:
+            require(len(lifecycle_matches) == 1, "Ambiguous lifecycle artifact")
+            item = lifecycle_matches[0]
+            require(
+                item["size_in_bytes"] <= 131072
+                and item["digest"].startswith("sha256:"),
+                "Invalid lifecycle artifact",
+            )
+            lifecycle_zip = root / "lifecycle.zip"
+            api(f"actions/artifacts/{item['id']}/zip", lifecycle_zip)
             markers = [
-                json.loads(m.group(1))
-                for line in log_result.stdout.splitlines()
-                if (m := re.search(r"TOKENOMICS_CONTROLLER_REPORT (\{.*\})", line))
+                lifecycle_archive(lifecycle_zip, item["digest"].removeprefix("sha256:"))
             ]
+            shutdown_origin = f"GitHub lifecycle artifact {item['id']}"
+            lifecycle_proof = {
+                "shutdown_artifact_id": item["id"],
+                "shutdown_artifact_sha256": sha256(lifecycle_zip),
+            }
         else:
-            # The connected GitHub reader can retain the exact controller report
-            # when a hosted job's read token cannot download another job's logs.
-            # Never infer Shutdown merely from a successful inference workload.
-            folder = FOLDERS[run_id]
-            retained_root = ROOT / "results/verification" / folder
-            retained = retained_root / f"lifecycle-attempt-{attempt}.json"
-            if not retained.exists():
-                retained = retained_root / "lifecycle.json"
-            require(
-                retained.is_file(),
-                "Lifecycle log unavailable; retained API report required",
+            log_result = subprocess.run(
+                ["gh", "api", f"repos/{REPO}/actions/jobs/{finalizers[0]['id']}/logs"],
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=120,
             )
-            lifecycle = json.loads(retained.read_text())
-            require(
-                lifecycle["source_job_id"] == finalizers[0]["id"],
-                "Wrong retained finalizer",
-            )
-            markers = [lifecycle["controller_report"]]
-            shutdown_origin = str(retained.relative_to(ROOT))
-            print("TOKENOMICS_RETAINED_LIFECYCLE " + shutdown_origin, flush=True)
+            shutdown_origin = "direct GitHub job-log API"
+            if log_result.returncode == 0:
+                markers = [
+                    json.loads(m.group(1))
+                    for line in log_result.stdout.splitlines()
+                    if (m := re.search(r"TOKENOMICS_CONTROLLER_REPORT (\{.*\})", line))
+                ]
+            else:
+                # The connected GitHub reader can retain the exact controller report
+                # when a hosted job's read token cannot download another job's logs.
+                # Never infer Shutdown merely from a successful inference workload.
+                folder = FOLDERS[run_id]
+                retained_root = ROOT / "results/verification" / folder
+                retained = retained_root / f"lifecycle-attempt-{attempt}.json"
+                if not retained.exists():
+                    retained = retained_root / "lifecycle.json"
+                require(
+                    retained.is_file(),
+                    "Lifecycle log unavailable; retained API report required",
+                )
+                lifecycle = json.loads(retained.read_text())
+                require(
+                    lifecycle["source_job_id"] == finalizers[0]["id"],
+                    "Wrong retained finalizer",
+                )
+                markers = [lifecycle["controller_report"]]
+                shutdown_origin = str(retained.relative_to(ROOT))
+                print("TOKENOMICS_RETAINED_LIFECYCLE " + shutdown_origin, flush=True)
         require(
             len(markers) == 1
             and markers[0]["passed"] is True
@@ -511,6 +561,7 @@ def verify_run(run_id, out, publish=False):
             "verifier_sha256": sha256(Path(__file__)),
             "independent_output_checks": True,
             "full_feasibility_cleared": False,
+            **lifecycle_proof,
             **checked,
         }
         path = out / f"{run_id}.json"
