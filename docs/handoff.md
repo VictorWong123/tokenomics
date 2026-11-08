@@ -22,6 +22,13 @@ Q1/Q2 decisions. The bounded repeated pilot is run 42454095789 at exact source
 must be checked. Preserve that source on resume; do not combine new-code rows
 with its frozen run. Details and retained evidence are in `feasibility.md`.
 
+That pilot is preserved as `experiments/pilot-87c7811`. Resume that exact branch
+for Pilot A, then use schema-2 replay from main before a controller decision.
+Schema 2 adds the existing dynamic baseline and refuses a different binary,
+model or execution setting. See `experiment.md`; schema-1 Q2 cannot clear the
+strengthened gate. The optional stock diagnostic and clean-submodule build
+check also pass in Cloud.
+
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;

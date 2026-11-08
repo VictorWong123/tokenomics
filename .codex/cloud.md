@@ -19,6 +19,15 @@ The worker pauses between complete blocks/checkpoint groups before its budget,
 uploads bounded evidence and always finalizes. Timing/pilots use development
 prompts; held-out evaluation and controller implementation remain gated.
 
+Pilot run 42454095789 is frozen at `87c7811` (also preserved as branch
+`experiments/pilot-87c7811`). Resume that branch to retain its Pilot A blocks,
+even after main advances. Its schema-1 Pilot B must not justify a controller:
+the strengthened schema-2 replay also compares against the existing dynamic
+baseline. Once Pilot A completes, the standalone `python -m bench.replay`
+command can run schema 2 from those traces, requiring identical executable and
+model hashes plus context/batch/thread/backend settings. Use a new replay
+directory and retain both versions. New main pilot runs use schema 2 directly.
+
 ## Verified Linux test route
 
 [Run 42420516268](https://github.com/VictorWong123/tokenomics/actions/runs/42420516268),
