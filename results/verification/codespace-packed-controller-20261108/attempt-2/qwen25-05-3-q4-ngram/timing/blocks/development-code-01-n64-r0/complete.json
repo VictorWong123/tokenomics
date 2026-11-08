@@ -1,0 +1,99 @@
+{
+  "attempt": 0,
+  "correctness": [
+    {
+      "attempt": 0,
+      "block_id": "development-code-01-n64-r0",
+      "configuration_id": "fixed8",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-code-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-01-n64-r0",
+      "configuration_id": "fixed2",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-code-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-01-n64-r0",
+      "configuration_id": "fixed1",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-code-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-01-n64-r0",
+      "configuration_id": "target",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-code-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-01-n64-r0",
+      "configuration_id": "fixed4",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-code-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    },
+    {
+      "attempt": 0,
+      "block_id": "development-code-01-n64-r0",
+      "configuration_id": "fixed6",
+      "first_mismatch": null,
+      "ok": true,
+      "output_cap": 64,
+      "prompt_id": "development-code-01",
+      "prompt_mismatch": null,
+      "repetition": 0,
+      "run_id": "timing",
+      "schema_version": 1
+    }
+  ],
+  "records": [
+    "attempt-0/fixed8.json",
+    "attempt-0/fixed2.json",
+    "attempt-0/fixed1.json",
+    "attempt-0/target.json",
+    "attempt-0/fixed4.json",
+    "attempt-0/fixed6.json"
+  ],
+  "sha256": {
+    "attempt-0/fixed1.json": "66371edf429eca6eb7a9b434225b96f92af44c2e83079e65269923d1d9462420",
+    "attempt-0/fixed2.json": "fa3b724cc9b71caabb53109aa0951d9a46aeea3fe653853e27ae4283d0965ae5",
+    "attempt-0/fixed4.json": "86fa27f808d447b6c284e4ccfb3cfdb3135298d6a5ea35bb9c5c4e3344f88203",
+    "attempt-0/fixed6.json": "2c29bc16f848401a25c4a85c8f26f778e62c4fa3b7002c50bf883626285f0229",
+    "attempt-0/fixed8.json": "8462822997623f90e2166fbf1d9e557752297d612be5d97f2e9327c0ba6c65df",
+    "attempt-0/target.json": "35d99c75ef5fdc9ee8b6b179c6765b3afe5e870f5095e769b9a925b6c01256ca"
+  }
+}
