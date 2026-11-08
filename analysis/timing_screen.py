@@ -9,7 +9,7 @@ from analysis.report import validate_run
 from bench.run import first_mismatch
 
 
-def report(run, out):
+def report(run, out, *, plots=True):
     rows = read_jsonl(run / "requests.jsonl")
     manifest = json.loads((run / "run_manifest.json").read_text())
     complete = json.loads((run / "complete.json").read_text())
@@ -94,6 +94,8 @@ def report(run, out):
     out.mkdir(parents=True, exist_ok=True)
     atomic_json(out / "measurements.json", summary)
     atomic_json(out / "stage-costs.json", costs)
+    if not plots:
+        return summary
     import matplotlib
 
     matplotlib.use("Agg")

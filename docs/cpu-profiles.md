@@ -179,3 +179,8 @@ block. This separates a native execution improvement from changes in proposal
 or acceptance counts. These counters stay outside the primary timing-ratio
 calculation. The actual 54-record two-executable fixture audit and altered-summary
 rejection pass; see [tooling proof](../results/verification/paired-profile-tooling-20261108).
+
+The packed-gate verifier also independently regenerates its preliminary timing
+ratios and stage costs into a temporary directory and compares them with the
+archived summary. A modified aggregate is rejected even when token checks pass.
+This audit has no plotting dependency and never modifies raw evidence.

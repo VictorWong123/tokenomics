@@ -216,6 +216,24 @@ def verify_grid(directory, complete_required, expected_source):
     return rows, frozen, len(groups)
 
 
+def verify_screen_statistics(point, archived):
+    from analysis.timing_screen import report
+    from scripts.verify_controller_evidence import equal
+
+    with tempfile.TemporaryDirectory() as tmp:
+        destination = Path(tmp)
+        derived = report(point, destination, plots=False)
+        for name in ("measurements.json", "stage-costs.json"):
+            require(
+                equal(
+                    json.loads((destination / name).read_text()),
+                    json.loads((archived / name).read_text()),
+                ),
+                "Timing screen statistics differ from raw records",
+            )
+    return derived
+
+
 def verify_kernel(evidence, expected_source):
     gate = evidence / "kernel-gate"
     status = json.loads((gate / "status.json").read_text())
@@ -324,7 +342,7 @@ def verify_kernel(evidence, expected_source):
         "binary_sha256": frozen["binary_sha256"],
         "screen_target_sha256": frozen["target_sha256"],
         "peak_rss_bytes": max(r["peak_rss_bytes"] for r in candidates + rows),
-        "screen": json.loads((point.parent / "analysis/measurements.json").read_text()),
+        "screen": verify_screen_statistics(point, point.parent / "analysis"),
     }
 
 

@@ -203,3 +203,29 @@ class HostedLifecycleArtifact(unittest.TestCase):
                 else:
                     with self.assertRaises(ValueError):
                         lifecycle_archive(path, sha256(path))
+
+
+class ScreenStatistics(unittest.TestCase):
+    def test_regenerated_screen_rejects_changed_statistics_without_writing_raw(self):
+        import shutil
+        from bench.common import ROOT
+        from scripts.verify_experiment_evidence import verify_screen_statistics
+
+        root = ROOT / "results/verification/codespace-ngram-20261108"
+        # Existing immutable trained records; this test starts no inference.
+        point = root / "qwen25-05-3-q4-ngram/timing"
+        archived = root / "analysis"
+        original = (point / "requests.jsonl").read_bytes()
+        with tempfile.TemporaryDirectory() as tmp:
+            destination = Path(tmp)
+            for name in ("measurements.json", "stage-costs.json"):
+                shutil.copy2(archived / name, destination / name)
+            verified = verify_screen_statistics(point, destination)
+            self.assertFalse(verified["synthetic_fixture"])
+            path = destination / "measurements.json"
+            changed = json.loads(path.read_text())
+            changed["geomean_ratios_vs_target"]["fixed1"] += 0.1
+            path.write_text(json.dumps(changed))
+            with self.assertRaisesRegex(ValueError, "statistics differ"):
+                verify_screen_statistics(point, destination)
+        self.assertEqual((point / "requests.jsonl").read_bytes(), original)
