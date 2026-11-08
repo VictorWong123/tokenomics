@@ -113,6 +113,11 @@ unaccepted proposals. It still evaluates 4.3% more rows than ordinary decoding.
 Verification occupies 99.992% of its measured generation time; lookup and policy
 bookkeeping are small. The guarded CPU's limited verification batching savings
 cannot compensate for rejected rows. High acceptance alone is not the objective.
+If verification cost stayed fixed, removing all other measured generation time
+would improve throughput by only about **0.0083%** (`generation_ms / verify_ms`).
+This timing-based bound applies to the observed serial CPU execution; it does not
+prove the native kernels are optimal. It explains why the next optimization
+changes native execution rather than further reducing policy bookkeeping.
 
 The next experiment targets native target execution: a separately gated,
 row-consistent packed CPU profile. Its ordinary target baseline must receive

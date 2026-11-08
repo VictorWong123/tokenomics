@@ -22,7 +22,9 @@ cache reconciliation and ngram geometry. In particular, the model confidence
 baseline and upstream variable-length ngram comparator must both be included
 when judging the corresponding scheduling hypothesis.
 
-The defensible current contribution is the owned C++ execution/state adapter,
-its differential checks and measured protocol. Cache reuse and scheduling are
-not claimed novel. The cost-aware controller, held-out gains and cross-platform
-performance remain unestablished until their declared gates are completed.
+The current contribution is the owned C++ execution/state adapter, experimental
+cost-aware controller, differential checks and reproducible measured protocol.
+The [bounded controller study](controller-results.md) is complete; it beats the
+cap8 ngram comparator but does not accelerate ordinary decoding. Cache reuse and
+scheduling are not claimed novel. Held-out gains and cross-platform performance
+remain unestablished.
