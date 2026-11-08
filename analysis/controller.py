@@ -62,6 +62,44 @@ def verify(directory):
             ]
             if len(raw) != 1 or any(row.get(k) != v for k, v in raw[0].items()):
                 raise ValueError("Raw controller record differs from measurement")
+            for setting in (
+                "policy",
+                "k",
+                "cache",
+                "drafter",
+                "confidence",
+                "detailed",
+            ):
+                if setting in conf and row["settings"][setting] != conf[setting]:
+                    raise ValueError("Controller condition setting changed")
+            if any(
+                row["settings"][k] != frozen["config"][k]
+                for k in ("context", "batch", "threads")
+            ):
+                raise ValueError("Controller execution settings changed")
+            expected_cache = len(row["prompt_ids"]) + row["generated_tokens"] - 1
+            if row["generated_tokens"] and (
+                row["target_cached"] != expected_cache
+                or not 0 <= row["draft_cached"] <= expected_cache
+            ):
+                raise ValueError("Controller final cache accounting differs")
+            if (
+                row["peak_rss_bytes"] <= 0
+                or row["generated_tokens"] > row["output_cap"]
+                or row["settings"]["max_tokens"] != row["output_cap"]
+                or any(
+                    not math.isfinite(row[k]) or row[k] < 0
+                    for k in (
+                        "generation_ms",
+                        "warm_ms",
+                        "policy_init_ms",
+                        "controller_parse_ms",
+                    )
+                )
+                or row["generation_ms"] <= 0
+                or row["warm_ms"] < row["generation_ms"]
+            ):
+                raise ValueError("Invalid controller timing/resource measurement")
             totals = row["execution"]
             if (
                 sum(a["committed_tokens"] for a in totals["actions"])
@@ -119,7 +157,7 @@ def verify(directory):
     return rows, manifest
 
 
-def report(directory, out=None):
+def report(directory, out=None, *, plots=True):
     directory = Path(directory)
     out = Path(out) if out else directory / "analysis"
     rows, manifest = verify(directory)
@@ -239,7 +277,8 @@ def report(directory, out=None):
                 f"| {name} | {value['ratio']:.4f} | [{value['ci95'][0]:.4f}, {value['ci95'][1]:.4f}] |"
             )
     (out / "report.md").write_text("\n".join(lines) + "\n")
-    plot(result, out)
+    if plots:
+        plot(result, out)
     return result
 
 

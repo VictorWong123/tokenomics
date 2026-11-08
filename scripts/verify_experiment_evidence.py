@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify only the two frozen development runs; never start a Codespace."""
+"""Verify only the frozen development runs; never start a Codespace."""
 import argparse
 import hashlib
 import json
@@ -21,6 +21,14 @@ REPO = "VictorWong123/tokenomics"
 EXPECTED = {
     42466570831: "af8b4044133ecef0de8751216248278a2fdb8ebd",
     42474834521: "63265d36939f802abb73b88962d96862c6c9169c",
+    42492089188: "e98c0fa84a2c2ff52df198f19eae6ce72d51c83c",
+}
+
+
+FOLDERS = {
+    42466570831: "codespace-confirmation-20261108",
+    42474834521: "codespace-packed-20261108",
+    42492089188: "codespace-controller-20261108",
 }
 
 
@@ -348,11 +356,7 @@ def retain(evidence, receipt_path):
     receipt = json.loads(receipt_path.read_text())
     run_id = receipt["run_id"]
     require(run_id in EXPECTED, "Unknown retained run")
-    folder = (
-        "codespace-confirmation-20261108"
-        if run_id == 42466570831
-        else "codespace-packed-20261108"
-    )
+    folder = FOLDERS[run_id]
     root = ROOT / "results/verification" / folder
     destination = root / f"attempt-{receipt['attempt']}"
     destination.mkdir(parents=True, exist_ok=True)
@@ -396,6 +400,11 @@ def verify_run(run_id, out, publish=False):
     if run["status"] != "completed":
         print(f"TOKENOMICS_VERIFICATION_WAITING {run_id}", flush=True)
         return
+    if run_id == 42474834521 and run["conclusion"] == "cancelled":
+        # Explicit sequencing interruption: retain no successful performance
+        # receipt, and do not relabel it a completed packed-profile experiment.
+        print(f"TOKENOMICS_VERIFICATION_CANCELLED {run_id}", flush=True)
+        return
     attempt = run["run_attempt"]
     name = f"tokenomics-development-timing-{run_id}-{attempt}"
     artifacts = api(f"actions/runs/{run_id}/artifacts?per_page=100")["artifacts"]
@@ -422,6 +431,11 @@ def verify_run(run_id, out, publish=False):
         if run_id == 42466570831:
             require(state in ("paused", "confirmation_complete"), "Confirmation failed")
             checked = verify_confirmation(evidence, state)
+        elif run_id == 42492089188:
+            from scripts.verify_controller_evidence import check
+
+            require(state == "controller_study_complete", "Controller study incomplete")
+            checked = check(evidence)
         else:
             require(state == "kernel_profile_passed", "Experimental CPU profile failed")
             checked = verify_kernel(evidence)
@@ -448,11 +462,7 @@ def verify_run(run_id, out, publish=False):
             # The connected GitHub reader can retain the exact controller report
             # when a hosted job's read token cannot download another job's logs.
             # Never infer Shutdown merely from a successful inference workload.
-            folder = (
-                "codespace-confirmation-20261108"
-                if run_id == 42466570831
-                else "codespace-packed-20261108"
-            )
+            folder = FOLDERS[run_id]
             retained = ROOT / "results/verification" / folder / "lifecycle.json"
             require(
                 retained.is_file(),

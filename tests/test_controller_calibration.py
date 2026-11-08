@@ -133,6 +133,79 @@ class Calibration(unittest.TestCase):
                     root / "fit", root / "replay", "ngram", synthetic_fixture=True
                 )
 
+    def test_model_calibration_measures_catchup_and_requires_it(self):
+        exe = Path(os.environ["TOKENOMICS_TEST_BINARY"]).resolve()
+        model = exe.parent / "fixtures/ngram-cycle.gguf"
+        cfg = dict(
+            split="development",
+            phase="controller_fit",
+            output_caps=[64],
+            repetitions=1,
+            seed=20261108,
+            context=256,
+            batch=32,
+            threads=1,
+            warmup_tokens=2,
+            warmup_prompt="a b",
+            configurations=[dict(id="target", policy="target")]
+            + [
+                dict(id=f"fixed{a}", policy="fixed", k=a, drafter="model")
+                for a in (1, 2, 4, 6, 8)
+            ],
+        )
+        prompts = [
+            dict(
+                id="development-qa-01", category="qa", split="development", prompt="a b"
+            )
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            run(
+                exe,
+                model,
+                model,
+                prompts,
+                cfg,
+                out / "fit",
+                identity={"synthetic_fixture": True},
+            )
+            investigate(
+                exe, model, model, out / "fit", out / "replay", cfg, drafter="model"
+            )
+            prior = calibrate(
+                out / "fit", out / "replay", "model", synthetic_fixture=True
+            )
+            self.assertGreater(prior["sync_ms_per_token"], 0)
+            self.assertEqual(
+                prior["provenance"]["operating_point"]["draft_sha256"], sha256(model)
+            )
+            import subprocess, sys
+
+            destination = out / "exported.json"
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "bench.controller",
+                    "--fit-dir",
+                    str(out / "fit"),
+                    "--replay-dir",
+                    str(out / "replay"),
+                    "--drafter",
+                    "model",
+                    "--out",
+                    str(destination),
+                    "--synthetic-fixture",
+                ],
+                check=True,
+                capture_output=True,
+            )
+            self.assertEqual(json.loads(destination.read_text()), prior)
+            transition = next((out / "replay").glob("*/transition/complete.json"))
+            transition.unlink()
+            with self.assertRaisesRegex(ValueError, "actual catch-up"):
+                calibrate(out / "fit", out / "replay", "model", synthetic_fixture=True)
+
 
 if __name__ == "__main__":
     unittest.main()
@@ -182,3 +255,46 @@ class StudyPipeline(unittest.TestCase):
             )
             self.assertEqual(rows, resumed)
             self.assertEqual(digest, sha256(out / "study/prior.json"))
+            import shutil
+            from scripts.verify_controller_evidence import check
+            from bench.common import source_fingerprint
+
+            shutil.copytree(out / "gate", out / "study/gate-model")
+            correctness_gate(
+                exe, model, None, prompts, cfg, out / "study/gate-ngram", "ngram"
+            )
+            atomic_json(
+                out / "study/controller-build.json",
+                dict(
+                    binary_sha256=sha256(exe),
+                    configuration=dict(
+                        values=dict(
+                            TOKENOMICS_CPU_BATCH_INVARIANT="ON",
+                            TOKENOMICS_CPU_PACKED_VERIFY="OFF",
+                        )
+                    ),
+                ),
+            )
+            atomic_json(
+                out / "study/status.json",
+                dict(
+                    state="controller_study_complete",
+                    peak_rss_bytes=max(r["peak_rss_bytes"] for r in rows),
+                ),
+            )
+            receipt = check(
+                out / "study",
+                source=source_fingerprint()["revision"],
+                synthetic_fixture=True,
+            )
+            self.assertEqual(receipt["verified_validation_records"], 28)
+            path = out / "study/validation/analysis/summary.json"
+            summary = json.loads(path.read_text())
+            summary["comparisons"]["cost-aware/target"]["ratio"] += 0.1
+            atomic_json(path, summary)
+            with self.assertRaisesRegex(ValueError, "regenerated statistics"):
+                check(
+                    out / "study",
+                    source=source_fingerprint()["revision"],
+                    synthetic_fixture=True,
+                )

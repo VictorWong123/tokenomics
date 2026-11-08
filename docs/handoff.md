@@ -157,7 +157,12 @@ run passed in 366.35 s. Calibration and the bounded study are tested end-to-end
 with generated fixtures, including byte-stable resume and tamper rejection.
 See `docs/controller-design.md` and `configs/controller-study-v1.json` for the
 complete policy contract and predeclared trained protocol. Trained controller
-measurements are still pending; no controller speedup is claimed.
+study **42492089188** is active at exact checked source
+`e98c0fa84a2c2ff52df198f19eae6ce72d51c83c`; initialize job 128766464003
+succeeded, workload job 128766659255 is executing. It starts only after local
+checks pass. Measurements and actual finalizer Shutdown confirmation are pending;
+no controller speedup is claimed. The independent artifact checker reconstructs
+priors/statistics and verifies raw output/accounting without inference.
 
 Still required: quantify actual controller/instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;

@@ -32,7 +32,11 @@ def cells(rows):
             raise ValueError("non-passing correctness record")
         if diagnostic_request(r):
             raise ValueError("diagnostic requests cannot enter performance summaries")
-        if r["generation_ms"] <= 0 or r["generated_tokens"] <= 0:
+        if (
+            not math.isfinite(r["generation_ms"])
+            or r["generation_ms"] <= 0
+            or r["generated_tokens"] <= 0
+        ):
             raise ValueError("no measurable generated tokens")
         grouped[(r["prompt_id"], r["output_cap"], r["configuration_id"])].append(
             r["generated_tokens"] * 1000 / r["generation_ms"]

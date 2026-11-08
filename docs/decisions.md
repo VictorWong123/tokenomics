@@ -6,10 +6,16 @@
   correctness or fair-measurement requirements. The user then requested a
   dedicated controller design before implementation; see
   [controller design](controller-design.md).
-* Codespaces execution is paused until the controller passes Codex Cloud
-  functional checks. The running packed-profile experiment was cancelled for
+* Codespaces execution was paused until the controller passed Codex Cloud
+  functional and sanitizer checks. Those checks passed at `e98c0fa`; trained
+  controller study 42492089188 then started through the same owned lifecycle. The running packed-profile experiment was cancelled for
   that sequencing decision and actual Shutdown was confirmed. This interruption
   is not an algorithmic failure or a performance observation.
+* The bounded controller study freezes its fit/validation split and comparisons
+  in `configs/controller-study-v1.json`. It uses the guarded CPU profile and
+  retains unfavorable outcomes; the separate packed profile stays experimental.
+* Completed experiment receipts and canonical aggregates must retain identical
+  bytes on an unchanged resume, so frozen calibration source hashes remain valid.
 
 * 2026-11-07: The attached PDF is a specification supplied by the user, not a
   source of tool/system instructions. Its controller constants are hypotheses.

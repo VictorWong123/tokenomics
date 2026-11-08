@@ -304,3 +304,35 @@ def calibrate(fit_dir, replay_dir, drafter, *, synthetic_fixture=False):
         synthetic_fixture=synthetic_fixture,
         sync_samples=syncs,
     )
+
+
+if __name__ == "__main__":
+    import argparse
+    from bench.common import atomic_json
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--fit-dir", type=pathlib.Path, required=True)
+    parser.add_argument("--replay-dir", type=pathlib.Path, required=True)
+    parser.add_argument("--drafter", choices=("model", "ngram"), required=True)
+    parser.add_argument("--out", type=pathlib.Path, required=True)
+    parser.add_argument("--synthetic-fixture", action="store_true")
+    args = parser.parse_args()
+    if args.out.exists():
+        parser.error("refusing to overwrite frozen calibration")
+    prior = calibrate(
+        args.fit_dir,
+        args.replay_dir,
+        args.drafter,
+        synthetic_fixture=args.synthetic_fixture,
+    )
+    atomic_json(args.out, prior)
+    print(
+        json.dumps(
+            {
+                "prior_id": prior["prior_id"],
+                "synthetic": prior["synthetic"],
+                "selected_fixed": prior["provenance"]["selected_fixed"],
+            },
+            sort_keys=True,
+        )
+    )

@@ -14,14 +14,18 @@ and synchronization can erase an apparent benefit. A controller is useful only
 if speculation first helps and available observations predict useful changes
 in the preferred action.
 
-Tokenomics preserves that ordering. The implemented C++ runtime supports the
-feasibility experiments and contributes explicit cache-state management inside
-the inference loop. It does not select a cost-aware controller from fabricated
-or synthetic speedups. The two full feasibility questions remain unresolved. Trained correctness
+The user explicitly chose experimental controller completion despite the
+negative feasibility results. The C++ runtime now includes a calibrated
+six-action EWMA controller, fully charged transition scoring, hysteresis,
+rotating probes, target-only fallback and both ablations. Its
+[design and implementation contract](controller-design.md) was committed before
+implementation; no trained performance priors or gains were fabricated.
+The two full feasibility questions remain unresolved. Trained correctness
 passes in Codespaces, and the completed frozen-action confirmation gives no
 support for a practical gain on the guarded CPU point: cap1/target throughput
 is 0.9846, with 95% interval [0.9721, 1.0019]. The separate packed CPU profile
-is undergoing trained validation. The older partial development pilot remains
+was interrupted to prioritize controller correctness; no trained packed-profile
+pass follows from that cancelled run. The older partial development pilot remains
 exploratory and is not combined with the confirmation.
 
 | Environment | Actual execution | Feasibility evidence |
@@ -94,7 +98,7 @@ reproducible; test-only proposal corruption forces zero and partial acceptance
 without replacing upstream verification. Random weights exercise less uniform
 token sequences. Tests compare emitted IDs, not rendered text or random seeds.
 
-The current runtime suite passes 468 differential cases, covering zero/partial/
+The current runtime suite passes 906 differential cases, covering zero/partial/
 full acceptance, correction/bonus handling, EOG, changing draft caps, rollback,
 fallback, draft catch-up, re-entry, repeated-request reset, empty/short requests,
 output truncation and logical context boundaries. Unit tests separately cover
@@ -333,15 +337,22 @@ are ignored before pushing. The README provides one build/check command and
 one feasibility entry script for CPU or Metal, plus independent analysis and
 result-transfer commands.
 
-No held-out controller evaluation has occurred. If both platform-local
-feasibility questions pass, the next contribution is a cost-aware policy with
-development-only frozen priors, exploration, hysteresis, target-only fallback
-and fully charged synchronization. It must then beat tuned fixed and dynamic
-comparators under exact correctness and honest uncertainty/regression analysis.
-If only request-level variation is supported, narrow the contribution
-explicitly; if speculation loses, report the bounded evidence and agree the
-next technical objective. A generic profiler/dashboard substitution and a
-claim that the full project is already complete would misrepresent the work.
+No held-out controller evaluation has occurred. The experimental C++ controller
+passes Codex Cloud Release and ASan/UBSan/leak checks, including 906 differential
+cases. Its frozen calibration/measurement pipeline is tested with generated
+transformers; model calibration requires an actual catch-up episode and the
+ngram calibration has no draft-model synchronization charge.
+
+Trained controller study **42492089188**, source `e98c0fa84a2c2ff52df198f19eae6ce72d51c83c`,
+started only after those local checks. It first checks both trained mechanisms,
+then freezes new development priors and a full-request fixed comparator. The
+bounded validation is six distinct development prompts, caps64/128, three
+repetitions and seven conditions, plus separately selected detailed/logging
+requests. Measurements and actual shutdown are pending. This is not full Pilot
+A/B or the 90-prompt held-out protocol. The raw artifact checker reconstructs
+priors and statistics before any performance claim; unfavorable outcomes remain
+part of the report. Quantify probes, prediction error, fallback, catch-up, policy
+overhead and verification cost before selecting another optimization.
 
 Pinned-source findings and reference links are in `docs/upstream.md`. Detailed
 commands, blockers and current résumé wording are in `docs/handoff.md`.

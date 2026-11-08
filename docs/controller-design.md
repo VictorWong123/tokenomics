@@ -290,6 +290,18 @@ source hashes and frozen full-request fixed selection in `provenance`. There
 is no installed trained-model default. The correctness gate deliberately uses
 clearly labeled synthetic priors to force transitions, not to estimate speed.
 
+Export an additional calibration from already captured compatible fit/replay
+artifacts without running inference:
+
+```bash
+.venv/bin/python -m bench.controller --fit-dir results/controller/fit \
+  --replay-dir results/controller/replay --drafter ngram \
+  --out results/controller/another-frozen-prior.json
+```
+
+This refuses overwriting a frozen file. Fixture sources require the explicit
+`--synthetic-fixture` flag; model calibration requires measured catch-up work.
+
 For the repeatable bounded study, after building/checking the controller:
 
 ```bash
@@ -360,3 +372,21 @@ before model launch, source tampering and byte-stable resume with generated
 transformer fixtures. Fixture performance is never evidence of a trained gain.
 The current exact test receipt/counts and trained result status are recorded in
 the handoff and requirements matrix as each checked stage is committed.
+
+
+## 13. Current trained run and independent evidence checks
+
+The first controller-focused trained run is 42492089188, exact source
+`e98c0fa84a2c2ff52df198f19eae6ce72d51c83c`. It started only after the Cloud
+checks above passed. Measurements and finalizer Shutdown confirmation are
+pending; no controller speedup is claimed while the run is in progress.
+
+The read-only evidence verifier hashes the outer ZIP, inner archive and every
+member, then checks immutable block records, exact output IDs/stops, budgets,
+final caches and request/cycle accounting. `scripts/verify_controller_evidence.py`
+reconstructs the frozen prior from its retained sources and recomputes the
+statistics/intervals. It verifies both correctness gates separately and rejects
+changed summaries or altered calibration. It does not start inference or a
+Codespace. A separate short publisher may retain only verified artifacts.
+The earlier cancelled packed run is explicitly skipped as an interrupted point;
+it never receives a successful performance receipt.
