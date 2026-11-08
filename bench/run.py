@@ -70,6 +70,19 @@ def run(
     max_new_blocks=None,
 ):
     conf_ids = [c["id"] for c in config["configurations"]]
+    if any(
+        c.get(key)
+        for c in config["configurations"]
+        for key in (
+            "capture_checkpoints",
+            "checkpoint_namespace",
+            "resume_checkpoint",
+            "prefix_tokens",
+            "max_cycles",
+            "diagnostic_logits",
+        )
+    ):
+        raise ValueError("diagnostic requests cannot be performance conditions")
     prompt_ids = [p["id"] for p in prompts]
     if (
         not prompts
@@ -177,6 +190,7 @@ def run(
                     "detailed": conf.get("detailed", config.get("detailed", True)),
                 }
                 warm = {**job, "warmup": True, "max_tokens": config["warmup_tokens"]}
+                warm["prompt"] = config.get("warmup_prompt", job["prompt"])
                 if conf["policy"] == "target" and conf.get("resident", False):
                     # Mapping the draft alone does not fault in its weight pages.
                     warm.update(policy="fixed", k=4, drafter="model")

@@ -11,11 +11,27 @@ import numpy as np
 from bench.common import atomic_json, read_jsonl
 
 
+def diagnostic_request(row):
+    settings = row.get("settings", {})
+    return any(
+        settings.get(k)
+        for k in (
+            "diagnostic",
+            "diagnostic_logits",
+            "max_cycles",
+            "capture_checkpoints",
+            "resume_checkpoint",
+        )
+    )
+
+
 def cells(rows):
     grouped = collections.defaultdict(list)
     for r in rows:
         if r.get("correctness") != "pass":
             raise ValueError("non-passing correctness record")
+        if diagnostic_request(r):
+            raise ValueError("diagnostic requests cannot enter performance summaries")
         if r["generation_ms"] <= 0 or r["generated_tokens"] <= 0:
             raise ValueError("no measurable generated tokens")
         grouped[(r["prompt_id"], r["output_cap"], r["configuration_id"])].append(
@@ -131,6 +147,8 @@ def validate_run(rows, manifest, complete):
     """Require the exact frozen Cartesian product before estimating performance."""
     frozen = manifest["frozen"]
     cfg = frozen["config"]
+    if any(diagnostic_request(row) for row in rows):
+        raise ValueError("diagnostic requests cannot enter performance summaries")
     expected = {
         (p["id"], cap, c["id"], rep)
         for p in frozen["prompts"]

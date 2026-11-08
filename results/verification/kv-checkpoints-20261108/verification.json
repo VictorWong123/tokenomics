@@ -1,0 +1,25 @@
+{
+  "binary_sha256": "c29f03211f3a4b95bb23730e0bfeb3bd0ad678ef89b14521d905a101195bf093",
+  "canonical_action_checks": 264,
+  "canonical_trace_captures": 12,
+  "complete_project": false,
+  "fixture_generator_sha256": "f56eb876780d071fbc66d0800983e95a884df7ed8bbeeb2c846e05d3010d295e",
+  "kv_checkpoint_groups": 12,
+  "limitation": "Fixture correctness and artifact checks only. Trained-model checkpoint validation is the next Codespace stage.",
+  "max_host_checkpoint_bytes": 101088,
+  "model_catalog_sha256": "af0d76ed032f3fc6f7cc1a3bd466701a98e8baf36a6bdf24c0957432978aeccf",
+  "pilot_config_sha256": "3be92824fda6fbea2fc6b7c2529fd6dcf2f8ed04847c1095c7de6d8a734d0a0a",
+  "q1_supported": null,
+  "q2_supported": false,
+  "release_ctest": "4/4 passed",
+  "runtime_fixture_comparisons": 378,
+  "runtime_test_sha256": "ed1151ab60196fac9bff9a7f2fe07637c4cd2472eccc68e33c6f2f25977a3dea",
+  "sanitizers": "4/4 suites passed with leak detection; extended-prefix runtime check also passed",
+  "schema_version": 3,
+  "source": {
+    "owned_source_sha256": "8bf626b74a776b5920f0ea1573a89827fb45d87e998e4c3564a06bb9c328b3b1",
+    "revision": "c773db0531a240d22a1e650d16f65399a025aa21"
+  },
+  "state_protocol": "host-owned original target KV snapshots; shared prepared draft KV per prefix",
+  "synthetic_fixture": true
+}

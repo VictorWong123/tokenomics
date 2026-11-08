@@ -60,7 +60,17 @@ def run_jobs(exe, target, draft, jobs, directory, cfg, gpu_layers):
     if draft:
         args += ["--draft", str(draft)]
     # Excluded warm-up primes weights/graphs before any action measurement.
-    warm = {**jobs[0], "warmup": True, "max_tokens": 9, "max_cycles": 1}
+    warm = {
+        **jobs[0],
+        "warmup": True,
+        "max_tokens": 9,
+        "max_cycles": 1,
+        "capture_checkpoints": [],
+        "checkpoint_namespace": "",
+        "resume_checkpoint": "",
+    }
+    if jobs[0].get("capture_checkpoints"):
+        warm["prefix_tokens"] = warm["prefix_tokens"][:16]
     attempt_jobs = d / "jobs.jsonl"
     attempt_jobs.write_text(json.dumps(warm) + "\n" + encoded)
     args[args.index("--jobs") + 1] = str(attempt_jobs)
@@ -190,6 +200,7 @@ def investigate(
                             "k": 8 if action == "dynamic" else action or 4,
                             "drafter": drafter,
                             "prefix_tokens": prompt_ids + tokens[:cp],
+                            "resume_checkpoint": f"{pid}:{cp}",
                             "max_tokens": 9,
                             "max_cycles": 1,
                             "warmup": False,
@@ -207,6 +218,7 @@ def investigate(
                     "k": 4,
                     "drafter": drafter,
                     "prefix_tokens": prompt_ids + tokens[: cp - 8],
+                    "resume_checkpoint": f"{pid}:{cp - 8}",
                     "max_tokens": 9,
                     "max_cycles": 1,
                 }
@@ -215,15 +227,45 @@ def investigate(
             continue
         rr, cc = [], []
         for cp in checkpoints:
+            capture = {
+                "run_id": out.name,
+                "configuration_id": "capture",
+                "prompt_id": pid,
+                "repetition": 0,
+                "checkpoint": cp,
+                "policy": "target",
+                "drafter": drafter,
+                "prefix_tokens": prompt_ids,
+                "max_tokens": cp,
+                "capture_checkpoints": [cp - 8, cp],
+                "checkpoint_namespace": pid,
+            }
             r, c = replay(
-                [j for j in jobs if j["checkpoint"] == cp],
+                [capture] + [j for j in jobs if j["checkpoint"] == cp],
                 out / pid / f"checkpoint-{cp}",
             )
-            rr.extend(r)
-            cc.extend(c)
+            source = [row for row in r if row["configuration_id"] == "capture"]
+            if (
+                len(source) != 1
+                or source[0]["prompt_ids"] != prompt_ids
+                or source[0]["token_ids"] != tokens[:cp]
+                or source[0].get("checkpoint_ids") != [f"{pid}:{cp - 8}", f"{pid}:{cp}"]
+            ):
+                raise RuntimeError(
+                    "checkpoint capture did not reproduce the canonical trace"
+                )
+            rr.extend(row for row in r if row["configuration_id"] != "capture")
+            cc.extend(row for row in c if row["configuration_id"] != "capture")
         for r in rr:
             cp = r["checkpoint"] - (8 if r["configuration_id"] == "signal" else 0)
             expect = tokens[cp : cp + len(r["token_ids"])]
+            if (
+                r["prompt_ids"] != prompt_ids + tokens[:cp]
+                or r["settings"].get("resume_checkpoint") != f"{pid}:{cp}"
+            ):
+                raise RuntimeError(
+                    "action did not restore its exact canonical checkpoint"
+                )
             mismatch = first_mismatch(expect, r["token_ids"])
             if mismatch is not None:
                 atomic_json(
@@ -296,6 +338,9 @@ def investigate(
             "Synthetic transformer pipeline check; not scheduling feasibility evidence"
         )
     answer["transition_sync_ms"] = transitions
+    answer["state_protocol"] = (
+        "host-owned original target KV snapshots; shared prepared draft KV per prefix"
+    )
     answer["dynamic_baseline"] = (
         "pinned upstream confidence, cap 8"
         if drafter == "model"
@@ -310,13 +355,13 @@ def fit_validate(data, transition_ms, seed=20261107):
     val = [r for r in data if int(r["prompt_id"].rsplit("-", 1)[1]) % 6 >= 3]
     if not fit or not val:
         return {
-            "schema_version": 2,
+            "schema_version": 3,
             "q2_supported": False,
             "status": "insufficient common-prefix checkpoints",
         }
     if any("dynamic" not in r["outcomes"] for r in data):
         return {
-            "schema_version": 2,
+            "schema_version": 3,
             "q2_supported": False,
             "status": "missing existing dynamic baseline; replay required",
         }
@@ -380,7 +425,7 @@ def fit_validate(data, transition_ms, seed=20261107):
     ]
     within = any(len(v) > 1 for v in trajectories.values())
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "q2_supported": (
             len(winners) > 1
             and within

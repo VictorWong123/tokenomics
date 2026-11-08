@@ -22,12 +22,13 @@ Q1/Q2 decisions. The bounded repeated pilot is run 42454095789 at exact source
 must be checked. Preserve that source on resume; do not combine new-code rows
 with its frozen run. Details and retained evidence are in `feasibility.md`.
 
-That pilot is preserved as `experiments/pilot-87c7811`. Resume that exact branch
-for Pilot A, then use schema-2 replay from main before a controller decision.
-Schema 2 adds the existing dynamic baseline and refuses a different binary,
-model or execution setting. See `experiment.md`; schema-1 Q2 cannot clear the
-strengthened gate. The optional stock diagnostic and clean-submodule build
-check also pass in Cloud.
+That pilot is preserved as `experiments/pilot-87c7811` for reproducibility.
+Current Pilot B schema 3 restores original target KV and identical prepared
+draft KV from memory-bounded, within-process checkpoints. It includes the
+dynamic baseline and rejects a different binary/model/execution setting.
+Older points remain exploratory; freeze a new checkpoint-capable driver for
+confirmation. The optional stock diagnostic and clean-submodule build check
+also pass in Cloud.
 
 The latest CLI also repairs incomplete UTF-8 display text instead of crashing
 JSON serialization. Eighteen byte-boundary cases preserve exact IDs across
@@ -41,6 +42,21 @@ remaining budget. A row-0 match no longer hides a row-1 divergence, and rows
 after divergence are marked as having a different history. The Cloud fixture
 diagnostic passes 14 full comparisons and checks 20 replay rows; its
 `correctness_supported` remains false, as diagnosis is not the trained gate.
+
+The saved-state implementation passes 378 C++ differential cases, plus the
+25 minimal/checkpoint and 18 Unicode cases. First-row logits match the original
+trace exactly across all fixed caps after long-prefix state restoration.
+All four sanitizer suites passed with leak detection, and the extended-prefix
+runtime check passed separately. The fixture Pilot B checks 264 canonical
+action outputs across 12 checkpoint groups. Normal performance conditions
+cannot request snapshots or diagnostic logits. This is fixture evidence;
+trained-state validation is part of the next Codespace timing screen.
+
+Current warm-up uses a frozen short prompt, and budget estimation separates
+fixed request costs from actual-token decode cost. The larger candidate can
+now be screened with 5 GiB available and must still pass the measured 20%
+headroom requirement. Select it with `candidate=qwen25-05-3-q4`; no new machine
+or lifecycle credential route is introduced.
 
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;

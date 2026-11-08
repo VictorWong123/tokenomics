@@ -32,6 +32,30 @@ Confidence stopping can produce fewer actual proposals. Acceptance compares the
 accepted prefix against **actual** drafts. Scripted actions exist to test switching
 and rollback, and are excluded from performance selection.
 
+## Original-state checkpoint replay
+
+Diagnostic target-only requests can capture selected output positions with
+`capture_checkpoints` and `checkpoint_namespace`. The engine stores the exact
+target sequence state at P, plus authoritative P+L token IDs. `resume_checkpoint`
+restores that state inside the same Engine. The draft prefix is prepared once
+and saved separately; every action, including target-only, restores the same
+two-model state. This avoids reconstructing target KV with a different prefill
+batch shape and avoids repeated prefix prefill for every action.
+
+The pinned `llama_state_seq_*_ext` APIs use `LLAMA_STATE_SEQ_FLAGS_NONE` with
+independent host buffers. `PARTIAL_ONLY` would omit full-attention KV, and
+`ON_DEVICE` would invalidate earlier snapshots for that sequence. Save/restore
+sizes and cache positions are checked. Storage is limited to eight checkpoints
+and 1 GiB of state payload; a new ordinary request releases the pool. Snapshots
+are never read from externally supplied byte blobs.
+
+Capture, one-time draft preparation, and restore are diagnostic setup. Their
+times/bytes are retained, with save/restore subtimes nested inside request
+generation/prompt timing; do not add nested counters together. Actions are timed
+only after restoration. Such requests are marked diagnostic and rejected by
+the performance runner and summaries. Normal benchmark generation does not
+capture or restore checkpoints.
+
 All requests clear KV, create a fresh upstream sampler/speculator and reset policy
 state. Weights stay resident within a job process. Model load is measured once;
 warm request time includes tokenization, reset, sampler/policy initialization,

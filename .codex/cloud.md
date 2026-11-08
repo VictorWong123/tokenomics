@@ -19,14 +19,13 @@ The worker pauses between complete blocks/checkpoint groups before its budget,
 uploads bounded evidence and always finalizes. Timing/pilots use development
 prompts; held-out evaluation and controller implementation remain gated.
 
-Pilot run 42454095789 is frozen at `87c7811` (also preserved as branch
-`experiments/pilot-87c7811`). Resume that branch to retain its Pilot A blocks,
-even after main advances. Its schema-1 Pilot B must not justify a controller:
-the strengthened schema-2 replay also compares against the existing dynamic
-baseline. Once Pilot A completes, the standalone `python -m bench.replay`
-command can run schema 2 from those traces, requiring identical executable and
-model hashes plus context/batch/thread/backend settings. Use a new replay
-directory and retain both versions. New main pilot runs use schema 2 directly.
+Pilot run 42454095789 is frozen at `87c7811`, preserved as branch
+`experiments/pilot-87c7811`. Retain its results as an exploratory older point.
+Current Pilot B schema 3 restores original target KV snapshots and identical
+prepared draft state, and compares against the existing dynamic baseline.
+Older replays cannot clear that gate. Use a fresh Pilot A with the corrected,
+checkpoint-capable driver; do not mix versions or disable binary/model/settings
+identity checks. Timing screens now also exercise checkpoint correctness.
 
 Main additionally fixes incomplete-UTF-8 display serialization. The older
 `87c7811` invocation may still finish or expose this failure; preserve its raw

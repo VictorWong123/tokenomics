@@ -1,4 +1,5 @@
 #include "runtime.h"
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 using namespace tokenomics;
@@ -129,6 +130,62 @@ int main(int argc, char **argv) {
         empty.prompt = "";
         empty.max_tokens = 2;
         CHECK(!e.generate(empty).prompt_ids.empty());
+        Request capture;
+        capture.prompt = "a b";
+        capture.prefix_tokens = std::vector<int>(16, 259);
+        capture.max_tokens = 32;
+        capture.capture_checkpoints = {1, 12};
+        capture.checkpoint_namespace = "trace";
+        capture.diagnostic_logits = true;
+        const auto trace = e.generate(capture);
+        CHECK((trace.checkpoint_bytes > 0) == !trace.checkpoint_ids.empty());
+        for (int cp : {1, 12}) {
+            const std::string id = "trace:" + std::to_string(cp);
+            if (std::find(trace.checkpoint_ids.begin(), trace.checkpoint_ids.end(), id) ==
+                trace.checkpoint_ids.end())
+                continue; // EOS checkpoints cannot be continued.
+            Request mismatched_prefix;
+            mismatched_prefix.resume_checkpoint = id;
+            mismatched_prefix.prefix_tokens = trace.prompt_ids;
+            bool mismatch_throws = false;
+            try {
+                e.generate(mismatched_prefix);
+            } catch (const std::exception &) {
+                mismatch_throws = true;
+            }
+            CHECK(mismatch_throws);
+            for (int action : {0, 1, 2, 4, 6, 8}) {
+                Request replay;
+                replay.resume_checkpoint = id;
+                replay.mode = action == 0 ? "target" : "fixed";
+                replay.k = action == 0 ? 4 : action;
+                replay.max_tokens = 9;
+                replay.diagnostic_logits = true;
+                auto restored = e.generate(replay);
+                const auto end = std::min(trace.tokens.size(), size_t(cp + 9));
+                CHECK(restored.tokens ==
+                      std::vector<int>(trace.tokens.begin() + cp, trace.tokens.begin() + end));
+                CHECK(restored.prompt_ids.size() == trace.prompt_ids.size() + cp);
+                const auto &original = trace.cycles.at(cp).logits.at(0);
+                const auto &resumed = restored.cycles.at(0).logits.at(0);
+                CHECK(original.top_id == resumed.top_id);
+                CHECK(original.top_logit == resumed.top_logit);
+                CHECK(original.second_logit == resumed.second_logit);
+                CHECK(original.second_id == resumed.second_id);
+                CHECK(restored.cycles.at(0).synced == 0);
+                ++comparisons;
+            }
+        }
+        (void)e.generate(empty); // A new ordinary request releases diagnostic storage.
+        Request expired;
+        expired.resume_checkpoint = "trace:1";
+        bool expired_throws = false;
+        try {
+            e.generate(expired);
+        } catch (const std::exception &) {
+            expired_throws = true;
+        }
+        CHECK(expired_throws);
     }
     Engine wrong({dir + "/target.gguf", dir + "/wrong.gguf", 64, 32, 1, 0});
     Request r;

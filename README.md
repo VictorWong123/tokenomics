@@ -3,6 +3,8 @@
 Portable C++20 speculative-decoding runtime engineering on a pinned llama.cpp.
 It keeps greedy verification upstream and implements draft-cache retention,
 checked rollback, lazy synchronization, target-only/re-entry, and policy hooks.
+Diagnostic action replay restores original target KV checkpoints and a shared
+prepared draft state instead of repeatedly reconstructing the combined prefix.
 CPU is the initial reference. macOS Metal is supported by configuration;
 CUDA is optional. Linux cloud, Codespaces and Mac results are separate.
 
@@ -79,10 +81,16 @@ measurements through its owned Actions lifecycle:
 
 ```bash
 gh workflow run codespace-experiment.yml --ref main -f phase=timing
+# Screen the larger memory-safe candidate and validate checkpoint replay:
+gh workflow run codespace-experiment.yml --ref main -f phase=timing -f candidate=qwen25-05-3-q4
 gh workflow run codespace-experiment.yml --ref main -f phase=pilot
 ```
 
 The fixed pilot investigates the versioned candidates and cheaper ngram mode.
+`candidate=all` is the pilot default; either catalog candidate can be selected
+explicitly. Timing screens also validate original-state replay on trained
+weights when enough continuation is available; this is not a Q2 feasibility
+decision from three prompts.
 Each invocation retains partial evidence and shuts down the same dedicated
 Codespace. Pilot data persists under `/workspaces/.tokenomics-experiment-cache/`
 by source SHA; rerun that exact SHA to resume. Code changes require a fresh run.

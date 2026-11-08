@@ -60,6 +60,12 @@ def pack(results, destination, owner):
 def workload():
     phase = os.environ.get("TOKENOMICS_EXPERIMENT_PHASE", "timing")
     lifecycle.require(phase in ("timing", "pilot"), "Unsupported fixed experiment")
+    selected = os.environ.get("TOKENOMICS_EXPERIMENT_CANDIDATE", "all")
+    lifecycle.require(
+        selected in ("all", "qwen25-05-15-q4", "qwen25-05-3-q4"),
+        "Unsupported fixed candidate",
+    )
+    candidate = "qwen25-05-15-q4" if selected == "all" else selected
     owner = lifecycle.current()
     expected = lifecycle.expected_runner()
     root = lifecycle.ownership(owner)
@@ -132,7 +138,7 @@ def workload():
             "timeout",
             "--signal=TERM",
             "--kill-after=15s",
-            "9000s",
+            "1800s" if phase == "timing" else "9000s",
             str(workspace / ".venv/bin/python"),
             "scripts/run_all.py",
             "--backend",
@@ -145,10 +151,12 @@ def workload():
             str(results),
         ]
         args += (
-            ["--timing-only", "--candidate", "qwen25-05-15-q4"]
+            ["--timing-only", "--candidate", candidate]
             if phase == "timing"
             else ["--budget-seconds", "6600"]
         )
+        if phase == "pilot" and selected != "all":
+            args += ["--candidate", candidate]
         with open(
             results / f"pipeline-{owner['run_id']}-{owner['attempt']}.txt", "x"
         ) as log:
@@ -156,7 +164,7 @@ def workload():
                 args,
                 cwd=workspace,
                 env=env,
-                timeout=9030,
+                timeout=1830 if phase == "timing" else 9030,
                 stdout=log,
                 stderr=log,
             ).returncode
@@ -175,14 +183,63 @@ def workload():
             code in expected_states and status["state"] == expected_states[code],
             "Experiment did not satisfy its result contract",
         )
-        rows = read_jsonl(results / "qwen25-05-15-q4/timing/requests.jsonl")
-        checks = read_jsonl(results / "qwen25-05-15-q4/timing/correctness.jsonl")
+        timing = results / candidate / "timing"
+        rows = read_jsonl(timing / "requests.jsonl")
+        checks = read_jsonl(timing / "correctness.jsonl")
         lifecycle.require(
-            len(rows) == 9
-            and len(checks) == 9
+            len(rows) == 21
+            and len(checks) == 21
             and all(c.get("ok") is True for c in checks),
             "Invalid timing evidence",
         )
+        if phase == "timing":
+            status["stage"] = "checkpoint-validation"
+            atomic_json(results / "status.json", status)
+            print("TOKENOMICS_EXPERIMENT_STAGE checkpoint-validation", flush=True)
+            catalog = json.loads((workspace / "configs/models-v1.json").read_text())
+            pair = next(c for c in catalog["candidates"] if c["id"] == candidate)
+            target = CACHE / catalog["models"][pair["target"]]["file"]
+            draft = CACHE / catalog["models"][pair["draft"]]["file"]
+            validation = results / "checkpoint-validation"
+            with open(results / "checkpoint-validation.txt", "x") as log:
+                subprocess.run(
+                    [
+                        "timeout",
+                        "--signal=TERM",
+                        "--kill-after=15s",
+                        "1800s",
+                        str(workspace / ".venv/bin/python"),
+                        "-m",
+                        "bench.replay",
+                        "--exe",
+                        str(workspace / "build-cpu/tokenomics"),
+                        "--target",
+                        str(target),
+                        "--draft",
+                        str(draft),
+                        "--pilot-dir",
+                        str(timing),
+                        "--out",
+                        str(validation),
+                    ],
+                    cwd=workspace,
+                    env=env,
+                    timeout=1830,
+                    check=True,
+                    stdout=log,
+                    stderr=log,
+                )
+            groups = len(list(validation.glob("*/checkpoint-*/complete.json")))
+            lifecycle.require(
+                groups > 0, "No checkpoint path exercised on trained weights"
+            )
+            status["checkpoint_validation"] = {
+                "state": "passed",
+                "groups": groups,
+                "protocol": json.loads((validation / "decision.json").read_text())[
+                    "state_protocol"
+                ],
+            }
     except Exception as exc:
         status.update(state="failed", error_type=type(exc).__name__, error=str(exc))
     finally:
@@ -192,6 +249,7 @@ def workload():
         report = {
             **owner,
             "workload": "development-" + phase,
+            "candidate": candidate if phase == "timing" else selected,
             "hostname": socket.gethostname(),
             "runner_id": expected["id"],
             "state": status["state"],
@@ -221,8 +279,8 @@ def workload():
                 list(results.glob("*/pilot-a/blocks/*/complete.json"))
             )
             for label, path in (
-                ("pilot_a", results / "qwen25-05-15-q4/pilot-a/analysis/summary.json"),
-                ("pilot_b", results / "qwen25-05-15-q4/pilot-b/decision.json"),
+                ("pilot_a", results / candidate / "pilot-a/analysis/summary.json"),
+                ("pilot_b", results / candidate / "pilot-b/decision.json"),
             ):
                 if path.exists():
                     report[label] = json.loads(path.read_text())

@@ -21,6 +21,8 @@ static const char *help = R"(Tokenomics: greedy speculative decoding laboratory
 Jobs contain prompt, policy, k, max_tokens, cache, drafter, confidence,
 detailed, diagnostic_logits, warmup, and arbitrary metadata. prefix_tokens supports diagnostic
 replay from exact target trace IDs. No stochastic sampling or context shifting.
+capture_checkpoints + checkpoint_namespace save diagnostic KV states in this
+process; resume_checkpoint restores them. A new ordinary request releases them.
 Cost-aware scheduling remains unimplemented until the feasibility gate supports it.
 )";
 static json cycle_json(const Cycle &c) {
@@ -159,6 +161,9 @@ int main(int argc, char **argv) {
             r.diagnostic_logits = job.value("diagnostic_logits", false);
             r.script = job.value("script", std::vector<int>{});
             r.prefix_tokens = job.value("prefix_tokens", std::vector<int>{});
+            r.capture_checkpoints = job.value("capture_checkpoints", std::vector<int>{});
+            r.checkpoint_namespace = job.value("checkpoint_namespace", "");
+            r.resume_checkpoint = job.value("resume_checkpoint", "");
             const auto request_start = std::chrono::steady_clock::now();
             auto result = engine.generate(r);
             const auto request_ms = std::chrono::duration<double, std::milli>(
@@ -194,6 +199,15 @@ int main(int argc, char **argv) {
             rec["settings"]["max_cycles"] = r.max_cycles;
             rec["settings"]["script"] = r.script;
             rec["settings"]["diagnostic_logits"] = r.diagnostic_logits;
+            rec["settings"]["capture_checkpoints"] = r.capture_checkpoints;
+            rec["settings"]["resume_checkpoint"] = r.resume_checkpoint;
+            rec["settings"]["diagnostic"] =
+                r.diagnostic_logits || r.max_cycles > 0 || !r.prefix_tokens.empty() ||
+                !r.capture_checkpoints.empty() || !r.resume_checkpoint.empty();
+            rec["checkpoint_ids"] = result.checkpoint_ids;
+            rec["checkpoint_bytes"] = result.checkpoint_bytes;
+            rec["checkpoint_save_ms"] = result.checkpoint_save_ms;
+            rec["checkpoint_restore_ms"] = result.checkpoint_restore_ms;
             rec["llama_revision"] = TOKENOMICS_LLAMA_REV;
             rec["system_info"] = engine.system_info();
             rec["prompt_ids"] = result.prompt_ids;

@@ -22,6 +22,7 @@ from bench.common import (
     hardware,
     available_memory,
     sha256,
+    estimate_pilot_budget,
 )
 from bench.run import run, RunPaused
 from bench.replay import investigate
@@ -221,7 +222,16 @@ def pipeline(a):
         small["configurations"] = [
             x
             for x in cfg["configurations"]
-            if x["id"] in ("target", "fixed4", "confidence")
+            if x["id"]
+            in (
+                "target",
+                "fixed1",
+                "fixed2",
+                "fixed4",
+                "fixed6",
+                "fixed8",
+                "confidence",
+            )
         ]
         timing_prompts = [
             next(
@@ -244,24 +254,14 @@ def pipeline(a):
             deadline=deadline,
         )
         elapsed = time.monotonic() - start
-        measured_execution = sum(r["process_ms"] for r in sample) / 1000
-        # Process time includes load, excluded warm-up and measured execution.
-        # Scale generated budgets conservatively; EOS makes the estimate rough.
-        estimated = (
-            measured_execution
-            * (len(prompts) / len(timing_prompts))
-            * cfg["repetitions"]
-            * (sum(cfg["output_caps"]) / 64)
-            * (len(cfg["configurations"]) / len(small["configurations"]))
-        )
+        budget = estimate_pilot_budget(sample, len(prompts), cfg)
+        estimated = budget["estimated_full_pilot_seconds"]
         atomic_json(
             pair_dir / "duration-estimate.json",
             {
                 "sample_wall_seconds": elapsed,
-                "sample_execution_seconds": measured_execution,
+                **budget,
                 "sample_prompt_ids": [p["id"] for p in timing_prompts],
-                "estimated_full_pilot_seconds": estimated,
-                "assumption": "rough linear token/config scaling incl load/warm-up; EOS/prefill/cache/shared CPU can change it in either direction",
             },
         )
         print(

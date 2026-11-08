@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <map>
 #include <mutex>
 #include <stdexcept>
 #include <sys/resource.h>
@@ -86,6 +87,29 @@ static void decode(llama_context *ctx, const std::vector<int> &ids, int start, i
         offset += len;
     }
 }
+static std::vector<uint8_t> save_state(llama_context *ctx, size_t used) {
+    constexpr size_t limit = size_t(1) << 30;
+    llama_synchronize(ctx);
+    // PARTIAL_ONLY omits full-attention KV; ON_DEVICE invalidates earlier saves.
+    // Independent host copies with NONE preserve all checkpoints simultaneously.
+    const size_t size = llama_state_seq_get_size_ext(ctx, 0, LLAMA_STATE_SEQ_FLAGS_NONE);
+    require(size > 0 && used <= limit && size <= limit - used,
+            "diagnostic checkpoint storage exceeds 1 GiB");
+    std::vector<uint8_t> state(size);
+    require(llama_state_seq_get_data_ext(ctx, state.data(), size, 0, LLAMA_STATE_SEQ_FLAGS_NONE) ==
+                size,
+            "checkpoint save failed");
+    return state;
+}
+static void restore_state(llama_context *ctx, const std::vector<uint8_t> &state, int n) {
+    require(!state.empty() &&
+                llama_state_seq_set_data_ext(ctx, state.data(), state.size(), 0,
+                                             LLAMA_STATE_SEQ_FLAGS_NONE) == state.size(),
+            "checkpoint restore failed");
+    llama_synchronize(ctx);
+    require(cached(ctx) == n && (n == 0 || llama_memory_seq_pos_min(llama_get_memory(ctx), 0) == 0),
+            "restored checkpoint positions differ");
+}
 static void compatible(const llama_model *a, const llama_model *b) {
     require(common_speculative_are_compatible(a, b),
             "upstream tokenizer compatibility check failed");
@@ -101,11 +125,17 @@ static void compatible(const llama_model *a, const llama_model *b) {
     }
 }
 struct Engine::Impl {
+    struct Checkpoint {
+        std::vector<int> prefix;
+        std::vector<uint8_t> target, draft;
+    };
     EngineConfig cfg;
     Model target{nullptr, llama_model_free}, draft{nullptr, llama_model_free};
     Context tgt{nullptr, llama_free}, dft{nullptr, llama_free};
     double loading = 0;
     std::string execution_evidence;
+    std::map<std::string, Checkpoint> checkpoints;
+    size_t checkpoint_bytes = 0;
     explicit Impl(const EngineConfig &c) : cfg(c) {
         static Backend backend;
         (void)backend;
@@ -186,6 +216,26 @@ Result Engine::generate(const Request &r) {
     require(r.cache == "retain" || r.cache == "upstream", "cache must be retain or upstream");
     require(r.drafter == "model" || r.drafter == "ngram", "drafter must be model or ngram");
     require(r.confidence >= 0 && r.confidence <= 1, "confidence must be in [0,1]");
+    auto captures = r.capture_checkpoints;
+    std::sort(captures.begin(), captures.end());
+    require(captures.empty() ||
+                (r.mode == "target" && r.max_cycles == 0 && r.resume_checkpoint.empty() &&
+                 !r.checkpoint_namespace.empty() && r.checkpoint_namespace.size() <= 120 &&
+                 captures.size() <= 8 && captures.front() > 0 && captures.back() <= r.max_tokens &&
+                 std::adjacent_find(captures.begin(), captures.end()) == captures.end()),
+            "capture requires target-only, a namespace and up to eight unique output checkpoints");
+    if (r.resume_checkpoint.empty()) {
+        e.checkpoints.clear();
+        e.checkpoint_bytes = 0;
+    }
+    Engine::Impl::Checkpoint *checkpoint = nullptr;
+    if (!r.resume_checkpoint.empty()) {
+        const auto found = e.checkpoints.find(r.resume_checkpoint);
+        require(found != e.checkpoints.end(), "unknown or expired diagnostic checkpoint");
+        checkpoint = &found->second;
+        require(r.prefix_tokens.empty() || r.prefix_tokens == checkpoint->prefix,
+                "checkpoint prefix does not match request");
+    }
     const bool use_model = r.drafter == "model" && r.mode != "target";
     require(!use_model || bool(e.dft), "speculative model mode requires --draft");
     auto policy = make_policy(r.mode, r.k, r.script);
@@ -200,8 +250,10 @@ Result Engine::generate(const Request &r) {
     if (dft)
         llama_synchronize(dft);
     Result out;
-    out.prompt_ids =
-        r.prefix_tokens.empty() ? common_tokenize(vocab, r.prompt, true, true) : r.prefix_tokens;
+    out.prompt_ids = checkpoint
+                         ? checkpoint->prefix
+                         : (r.prefix_tokens.empty() ? common_tokenize(vocab, r.prompt, true, true)
+                                                    : r.prefix_tokens);
     require(!out.prompt_ids.empty(), "prompt tokenizes to no tokens; provide nonempty prompt");
     const int context_limit = std::min(e.cfg.context, int(llama_n_ctx(tgt)));
     require(out.prompt_ids.size() <= size_t(context_limit), "prompt exceeds context limit");
@@ -247,14 +299,30 @@ Result Engine::generate(const Request &r) {
     if (r.detailed)
         out.cycles.reserve(capacity);
     auto t = Clock::now();
-    decode(tgt, prefix, 0, n, 0, e.cfg.batch);
+    if (checkpoint) {
+        restore_state(tgt, checkpoint->target, n);
+        out.checkpoint_restore_ms += elapsed(t);
+    } else
+        decode(tgt, prefix, 0, n, 0, e.cfg.batch);
     out.prompt_target_ms = elapsed(t);
     // Diagnostic replay must start every action, including action 0, from the
     // same two-model KV state. Ordinary target-only requests do not do this.
-    const bool replay_resident = !r.prefix_tokens.empty() && r.drafter == "model" && dft != nullptr;
+    const bool replay_resident = captures.empty() && (checkpoint || !r.prefix_tokens.empty()) &&
+                                 r.drafter == "model" && dft != nullptr;
     if (use_model || replay_resident) {
         t = Clock::now();
-        decode(dft, prefix, 0, n, 0, e.cfg.batch);
+        if (checkpoint && !checkpoint->draft.empty()) {
+            restore_state(dft, checkpoint->draft, n);
+            out.checkpoint_restore_ms += elapsed(t);
+        } else {
+            decode(dft, prefix, 0, n, 0, e.cfg.batch);
+            if (checkpoint) {
+                const auto save_start = Clock::now();
+                checkpoint->draft = save_state(dft, e.checkpoint_bytes);
+                out.checkpoint_save_ms += elapsed(save_start);
+                e.checkpoint_bytes += checkpoint->draft.size();
+            }
+        }
         out.prompt_draft_ms = elapsed(t);
     }
     if (spec)
@@ -387,6 +455,20 @@ Result Engine::generate(const Request &r) {
             out.first_token_ms = elapsed(begin);
         if (r.detailed)
             out.cycles.push_back(std::move(c)); // serialize after generation
+        if (!captures.empty() && !plan.eog && n < context_limit &&
+            std::binary_search(captures.begin(), captures.end(), int(out.tokens.size()))) {
+            Engine::Impl::Checkpoint saved;
+            saved.prefix = prefix;
+            saved.prefix.push_back(pending);
+            const auto save_start = Clock::now();
+            saved.target = save_state(tgt, e.checkpoint_bytes);
+            out.checkpoint_save_ms += elapsed(save_start);
+            const auto saved_bytes = saved.target.size();
+            const auto id = r.checkpoint_namespace + ":" + std::to_string(out.tokens.size());
+            e.checkpoints.emplace(id, std::move(saved));
+            e.checkpoint_bytes += saved_bytes;
+            out.checkpoint_ids.push_back(id);
+        }
         if (plan.eog) {
             out.stop = "eog";
             break;
@@ -403,6 +485,7 @@ Result Engine::generate(const Request &r) {
     out.final_target_cached = cached(tgt);
     out.final_draft_cached = dft ? cached(dft) : 0;
     out.peak_rss_bytes = peak_rss_bytes();
+    out.checkpoint_bytes = e.checkpoint_bytes;
     for (int id : out.tokens)
         if (!llama_vocab_is_eog(vocab, id))
             out.text += common_token_to_piece(vocab, id);

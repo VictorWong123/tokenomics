@@ -56,6 +56,29 @@ def read_jsonl(path):
         return [json.loads(x) for x in f if x.strip()]
 
 
+def estimate_pilot_budget(sample, prompt_count, config):
+    """Extrapolate fixed request costs separately from full-cap decode work."""
+    if not sample or any(r["process_ms"] < r["generation_ms"] for r in sample):
+        raise ValueError("invalid timing screen for duration estimation")
+    tokens = sum(r["generated_tokens"] for r in sample)
+    if tokens <= 0:
+        raise ValueError("timing screen generated no tokens")
+    generation = sum(r["generation_ms"] for r in sample) / 1000
+    process = sum(r["process_ms"] for r in sample) / 1000
+    scale = prompt_count * config["repetitions"] * len(config["configurations"])
+    fixed = (process - generation) * scale * len(config["output_caps"]) / len(sample)
+    decode = generation * scale * sum(config["output_caps"]) / tokens
+    return {
+        "sample_execution_seconds": process,
+        "sample_generation_seconds": generation,
+        "sample_generated_tokens": tokens,
+        "estimated_fixed_seconds": fixed,
+        "estimated_decode_seconds": decode,
+        "estimated_full_pilot_seconds": fixed + decode,
+        "assumption": "Fixed load/prefill/warm-up/serialization cost per request plus measured decode cost per actual token, assuming full output caps. Unmeasured configurations, prompt lengths, EOS, caches and shared CPU can change duration in either direction.",
+    }
+
+
 def command(args):
     p = subprocess.run(
         args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT

@@ -91,7 +91,7 @@ reproducible; test-only proposal corruption forces zero and partial acceptance
 without replacing upstream verification. Random weights exercise less uniform
 token sequences. Tests compare emitted IDs, not rendered text or random seeds.
 
-The current runtime suite passes 330 differential cases, covering zero/partial/
+The current runtime suite passes 378 differential cases, covering zero/partial/
 full acceptance, correction/bonus handling, EOG, changing draft caps, rollback,
 fallback, draft catch-up, re-entry, repeated-request reset, empty/short requests,
 output truncation and logical context boundaries. Unit tests separately cover
@@ -103,6 +103,17 @@ kernel transitions, exact first-row top-two logit equality across draft caps,
 and 25 additional minimal-logging/checkpoint comparisons. The latest Cloud
 Release and address/undefined-sanitized builds both pass all four CTest suites;
 24 separate lifecycle tests also pass. See `results/verification/cloud-20261108`.
+
+Additional C++ work provides bounded, within-process target KV snapshots for
+common-prefix replay. Actions restore the original target history rather than
+rebuilding it with different prefill batching; their draft state is prepared
+once per prefix and restored identically. This also removes repeated full
+prefix processing for every action. Capture/restore/setup costs remain logged
+as diagnostics, and those requests are prohibited from performance summaries.
+Fixture checks cover 12 groups and 264 canonical continuations, plus exact
+first-row logit equality after restoring long-prefix quantized state.
+See `results/verification/kv-checkpoints-20261108`. Trained-model validation of
+this extension remains separate from the earlier trained gate.
 
 Codespace run 42420516268 passed all 272 comparisons on trained Qwen2.5
 0.5B/1.5B Q4_K_M weights, following a documented batch-dependent arithmetic

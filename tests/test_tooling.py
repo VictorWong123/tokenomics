@@ -258,7 +258,7 @@ class ToolingTests(unittest.TestCase):
                 run_all.subprocess, "run", side_effect=child_run
             ):
                 # Only skip the recursive ctest call; execute the real tokenizer
-                # and nine timing requests through the fixture engine.
+                # and the full-cap timing screen through the fixture engine.
                 self.assertEqual(run_all.pipeline(args), 10)
                 self.assertEqual(
                     download.call_args.args[1:],
@@ -274,7 +274,7 @@ class ToolingTests(unittest.TestCase):
                     .read_text()
                     .splitlines()
                 ),
-                9,
+                21,
             )
             self.assertFalse((args.run_dir / "fixture/pilot-a").exists())
 
@@ -419,6 +419,8 @@ class ToolingTests(unittest.TestCase):
         rows[0]["correctness"] = "pending"
         with self.assertRaises(ValueError):
             cells(rows)
+        with self.assertRaisesRegex(ValueError, "diagnostic"):
+            cells([{**rows[1], "settings": {"diagnostic": True}}])
 
     def test_replay_prediction_separates_fit_and_validation(self):
         records = []

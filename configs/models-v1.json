@@ -2,7 +2,7 @@
   "schema_version": 1,
   "candidates": [
     {"id":"qwen25-05-15-q4", "target":"qwen25-15", "draft":"qwen25-05", "min_available_gib":5, "reason":"Small compatible-family smoke/first feasibility candidate; no assumed gain"},
-    {"id":"qwen25-05-3-q4", "target":"qwen25-3", "draft":"qwen25-05", "min_available_gib":7, "reason":"Larger target cost separation, still within inspected 16 GiB limit; actual RSS and swap checked"}
+    {"id":"qwen25-05-3-q4", "target":"qwen25-3", "draft":"qwen25-05", "min_available_gib":5, "reason":"Larger target cost gap. Small-pair RSS measured 1.78 GiB on the 7.8 GiB Codespace; screen this candidate only with at least 5 GiB available, then enforce measured RSS below 80% of available memory. No assumed gain."}
   ],
   "models": {
     "qwen25-05":{"repo":"Qwen/Qwen2.5-0.5B-Instruct-GGUF", "file":"qwen2.5-0.5b-instruct-q4_k_m.gguf", "license":"Apache-2.0"},

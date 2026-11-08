@@ -41,7 +41,7 @@ The manifest must change if a different tokenizer/model family is selected.
 Every prompt/cap/repetition is a comparison block. A seeded base permutation
 is rotated across shuffled blocks to balance configuration order; one request
 is active at a time. Each trial starts a process, loads appropriate models,
-runs an excluded 16-token warm-up, clears request state and measures the real
+runs an excluded warm-up capped at 16 tokens, clears request state and measures the real
 request. Initialization, warm-up and whole-process cost are retained separately
 from warm generation. This avoids a resident draft contaminating target-alone
 peak RSS. The resident-draft control warms both models through an excluded
@@ -49,8 +49,19 @@ speculative request before measuring target-only; merely mapping the draft file
 would not establish physical weight residency. Load/file-cache variability
 remains visible, not silently discarded.
 
-The initial timing batch is three longer development requests (one per category) at cap 64 with target,
-fixed4 and confidence; its wall time predicts an approximate full run budget.
+The current timing batch uses three longer development prompts (one per
+category) at cap 64 with target, all five fixed caps and confidence: 21 requests.
+The historical nine-request screen used only fixed4 and confidence. The sweep
+avoids rejecting a candidate solely because an arbitrary cap is unfavorable;
+it still does not replace the repeated Pilot A/B protocol.
+
+Current runs freeze `warmup_prompt` in the configuration. This short original
+prompt faults the dense candidate weights without repeating each long measured
+prompt's prefill. Earlier evidence used the measured prompt for warm-up; retain
+it as a separate operating point. Request initialization and any graph setup
+left for the measured request remain charged. The duration estimator separates
+fixed load/prefill/warm-up/output costs from per-token generation, and assumes
+full output caps for its decode budget. It remains a rough estimate, not an ETA.
 Pilot A has 1,080 measured requests per pair (18×2×3×10), plus warm-ups and
 replays. EOS and hardware can make a CPU run take hours. The script prints its
 measured estimate before proceeding; it does not promise an overnight finish.
@@ -76,9 +87,9 @@ of this strict gate as proof that speculation cannot help.
 
 Use ordinary target greedy traces at cap512/repetition0. At generated prefixes
 32,96,224,400, if nine later trace tokens exist, replay each action {0,1,2,4,6,8}
-from the same exact prefix IDs and fresh equivalent KV, three times. Use an
+from saved original target KV and identical prepared draft KV, three times. Use an
 excluded warm-up. End after one cycle. Compare variable-length committed output
-with the corresponding target trace slice. Replay prefill is setup work, not
+with the corresponding target trace slice. Capture/restore/prefill is setup work, not
 runtime overhead; actual draft, verification, reconciliation and cycle costs
 are included. It is diagnostic work, not a deployable acceleration bound.
 
@@ -136,14 +147,18 @@ better on held-out data. The checked-in synthetic example explicitly declares
 its curated single repetition and retains the source-manifest fingerprint;
 it does not bypass completeness checks.
 
-Pilot B decision schema 2 also replays the existing dynamic baseline from each
+Pilot B decision schema 3 also replays the existing dynamic baseline from each
 common prefix and requires the predictor to beat both it and the global action
 after estimated overhead. For independent models this is pinned confidence
 stopping at cap 8. For ngram it is upstream variable-length lookup at cap 8,
-which overlaps fixed8 and is labeled accordingly. Older schema-1 replay results
-cannot clear the strengthened gate. The active `87c7811` pilot still supplies
-valid frozen Pilot A blocks; replay its completed traces under schema 2 before
-implementing a controller. The standalone replay command verifies identical
+which overlaps fixed8 and is labeled accordingly. Schema 3 captures the target
+trace inside each checkpoint group and restores its original KV bytes for all
+actions, rather than freshly prefilling the combined prefix. Diagnostic warm-up
+uses at most 16 input tokens; the source trace and draft preparation then warm
+the actual models before action timing. Older replay versions cannot clear the
+strengthened gate. The active `87c7811` pilot supplies exploratory older-point
+observations. A corrected, checkpoint-capable binary requires a fresh Pilot A.
+The standalone replay command verifies identical
 binary/model hashes and execution settings, so an analysis update can consume
 older Pilot A traces without mixing measurement implementations:
 

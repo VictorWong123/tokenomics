@@ -1,5 +1,6 @@
 #pragma once
 #include "policy.h"
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
@@ -21,6 +22,9 @@ struct Request {
     std::function<void(std::vector<int> &, int)> proposal_transform;
     // Diagnostic common-prefix replay; authoritative token IDs, no re-tokenization.
     std::vector<int> prefix_tokens;
+    // Diagnostic, same-Engine checkpoints. A new ordinary request releases them.
+    std::vector<int> capture_checkpoints;
+    std::string checkpoint_namespace, resume_checkpoint;
 };
 struct LogitProbe {
     int row = 0, output_index = 0, top_id = 0, second_id = 0;
@@ -41,6 +45,9 @@ struct Result {
     double generation_ms = 0, warm_ms = 0, first_token_ms = 0;
     long long peak_rss_bytes = 0;
     int final_target_cached = 0, final_draft_cached = 0;
+    std::vector<std::string> checkpoint_ids;
+    std::size_t checkpoint_bytes = 0;
+    double checkpoint_save_ms = 0, checkpoint_restore_ms = 0;
 };
 class Engine {
     struct Impl;
