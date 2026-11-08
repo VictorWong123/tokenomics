@@ -92,17 +92,16 @@ prompts. `confirmation` is a fixed workflow phase; preserve its exact source
 on resume. Its driver/model/settings must match the fit point. Tests cover a
 complete 108-request fixture grid and reject partial grids or validation retuning.
 
-The targeted confirmation is active as run **42466570831**, frozen at
-`af8b4044133ecef0de8751216248278a2fdb8ebd`. Attempt 1 paused after 32/54
-blocks and 96 passing comparisons. Artifact 13614284724, its inner archive and
-all 550 members are verified; binary/target/settings match the fit point, and
-hosted finalization confirms actual Shutdown. Attempt 2 resumes the remaining
-22 blocks at that same source. Each invocation has a 6,600-second measurement
-allowance plus setup. If paused, rerun **all jobs of that run**, preserving its SHA:
-`gh run rerun 42466570831 --repo VictorWong123/tokenomics`.
-Do not dispatch a newer main and combine its records. Only all 54 blocks/162
-passing records permit confirmation analysis. A positive targeted result still
-does not complete the full Pilot A/B, cost-aware or held-out requirements.
+The targeted confirmation completed as run **42466570831**, attempt 2, at
+`af8b4044133ecef0de8751216248278a2fdb8ebd`: all 54 blocks/162 exact comparisons
+pass. Attempt 1's 32 blocks were resumed at the same source. The frozen cap1
+ratio is 0.9846, 95% interval [0.9721, 1.0019]; cap8 is 0.7727.
+The 5% practical-gain criterion is false. Do not retune or relabel this as full
+Pilot A/B, a controller result or held-out evaluation.
+All 927 members, block hashes, output/cycle/cache checks and regenerated
+statistics pass independent hosted verification. Actual Shutdown is confirmed.
+The complete raw archive is retained under
+`results/verification/codespace-confirmation-20261108/attempt-2`.
 
 The optional packed CPU profile is independent of that frozen confirmation.
 Cloud Release and ASan/UBSan suites pass for both profiles; the expanded fixture
@@ -120,11 +119,24 @@ the separate trained profile check is:
 It keeps the unchanged 272-comparison gate, measures RSS, runs the 18-request
 ngram screen and validates original-state checkpoints. Do not mix this binary
 with earlier fit/confirmation measurements or promote it before trained checks.
-The `kernel` phase is queued as run **42474834521** at
-`63265d36939f802abb73b88962d96862c6c9169c`, after the confirmation resume.
+The `kernel` phase is running as **42474834521**, attempt 2, at
+`63265d36939f802abb73b88962d96862c6c9169c`. Attempt 1 failed startup before
+inference; the same initialize/workload/finalize graph succeeds on retry.
 An additional 128 KiB cache-chunk study passes its strict fixture tests but
 does not improve verification, so it is rejected; see
 `results/verification/cache-study-20261108`.
+
+The Cloud service recovered from a transport interruption, but this chat's
+execution attachment remains unavailable. Tested C++ changes are already on
+main. A paired CPU/logging benchmark is prepared and locally tested but not
+published: check the Cloud worktree for `analysis/profile_comparison.py`,
+`scripts/compare_cpu_profiles.py`, `configs/cpu-profile-screen-v1.json`, the
+per-configuration executable extension in `bench/run.py`, and their tests.
+Its gate-proof SHA is deliberately pending. Publish it only after the trained
+packed-profile evidence is verified; retain the same binary/target hashes.
+The hosted `verify-evidence.yml` independently checks the two frozen runs.
+Its read-only job precedes a short `publish-evidence.yml` job that rechecks
+and stages only verified raw data, with the repository staging guard.
 
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
