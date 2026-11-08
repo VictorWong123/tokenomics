@@ -1,0 +1,72 @@
+{
+  "adopted": false,
+  "checks": {
+    "cache_bound_release": "4/4 suites pass, including 468 strict differential cases; 8.46 seconds",
+    "controlled_requests": "36 exact declared-period and ordinary-reference matches; all proposals accepted"
+  },
+  "decision": "Reject adoption: no useful verification improvement over the simpler packed profile. The ordinary-row arithmetic is unchanged but its timings also differ; this component study cannot establish the cause of that variation. No trained-model, Codespace, Mac, adaptive-controller or general speedup result.",
+  "diagnostic_only": true,
+  "fixture": {
+    "bytes": 190040768,
+    "layers": 2,
+    "quantization": "manufactured Q4_K",
+    "sha256": "fb9fa58568a31b4774ab218a7de6cfe4055217f86c7f18ab51d9917f614f652e",
+    "width": 4096
+  },
+  "llama_revision": "fd27b2034905f8dadd8bd6d2cc44595f4929d391",
+  "median_generation_ms_by_process": {
+    "base-a": {
+      "0": 549.051825,
+      "4": 334.83514,
+      "8": 318.753465
+    },
+    "base-b": {
+      "0": 553.062027,
+      "4": 367.756341,
+      "8": 385.301538
+    },
+    "cache128-a": {
+      "0": 493.196496,
+      "4": 352.93657,
+      "8": 329.701676
+    },
+    "cache128-b": {
+      "0": 481.035662,
+      "4": 352.356225,
+      "8": 333.728024
+    }
+  },
+  "median_generation_ms_by_profile": {
+    "packed_base": {
+      "0": 551.056926,
+      "4": 351.2957405,
+      "8": 328.3248555
+    },
+    "packed_cache128": {
+      "0": 484.96207100000004,
+      "4": 352.8814625,
+      "8": 331.872743
+    }
+  },
+  "process_order": [
+    "base-a",
+    "cache128-a",
+    "cache128-b",
+    "base-b"
+  ],
+  "requests": 36,
+  "runtime_source_sha256": "a69e10ac298713aae707019bf7f797623bea7c45364d6450de7c5444c32823be",
+  "schema_version": 1,
+  "sha256": {
+    "base-provenance.json": "e5d91c79463a64a97991b8697df4a31c6c4631f4bd59d1d10499a0195a478d26",
+    "cache128-provenance.json": "a9cddcdcfe82aba39e342342042e32794ac570644bf0fdd6490aae4ebf8d4b73",
+    "raw/base-a.tsv": "d5531c1432e7499fb8f049e1131bdf521a76535de9dd1fbacf512f20830fb80f",
+    "raw/base-b.tsv": "6908d65c43f4b3d666b959f62388b35cfd74c646d263a251a9b3a3e1f915515d",
+    "raw/cache128-a.tsv": "7a12deb27b8686c4d4e61d62c38446980e84bfe5aae17aea38138ffb88b4021a",
+    "raw/cache128-b.tsv": "c08e13ceccb20a9ea1e4fb35d4093e1d1f8b577ab85a84f400c17eb722c29f49",
+    "source/tokenomics_cache_study.cmake": "6e8344cdcc12cb7d70849a4c25de1d823f858422717b2784649f5c36fbf9aac8",
+    "source/tokenomics_cache_study.cpp": "d02c7bd0bdae82a9986686176f95d353386e1b8d207132e6b82e650ac4171324"
+  },
+  "source_sha": "63265d36939f802abb73b88962d96862c6c9169c",
+  "synthetic_fixture": true
+}

@@ -1,0 +1,12 @@
+# SYNTHETIC PERFECT-COPY KERNEL DIAGNOSTIC; no language-model speedup claim
+# CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | BMI2 = 1 | OPENMP = 1 | REPACK = 1 | ; devices=CPU,; TOKENOMICS_CPU_PACKED_VERIFY=ON; packed_gemv_max_rows=9; tiled_min_rows=10
+profile	threads	repetition	action	tokens	generation_ms	drafted	accepted	verify_ms
+packed_cache128	2	0	0	64	456.53353	0	0	456.309366
+packed_cache128	2	0	4	64	352.943521	51	51	352.844542
+packed_cache128	2	0	8	64	329.701676	56	56	329.638773
+packed_cache128	2	1	4	64	352.93657	51	51	352.839735
+packed_cache128	2	1	8	64	340.796163	56	56	340.729471
+packed_cache128	2	1	0	64	556.791963	0	0	556.522103
+packed_cache128	2	2	8	64	329.256597	56	56	329.180284
+packed_cache128	2	2	0	64	493.196496	0	0	492.941984
+packed_cache128	2	2	4	64	352.826355	51	51	352.716919

@@ -93,9 +93,12 @@ on resume. Its driver/model/settings must match the fit point. Tests cover a
 complete 108-request fixture grid and reject partial grids or validation retuning.
 
 The targeted confirmation is active as run **42466570831**, frozen at
-`af8b4044133ecef0de8751216248278a2fdb8ebd`. Its first invocation has a
-6,600-second measurement allowance plus setup. Inspect its final artifact and
-actual Shutdown; if paused, rerun **all jobs of that run**, preserving its SHA:
+`af8b4044133ecef0de8751216248278a2fdb8ebd`. Attempt 1 paused after 32/54
+blocks and 96 passing comparisons. Artifact 13614284724, its inner archive and
+all 550 members are verified; binary/target/settings match the fit point, and
+hosted finalization confirms actual Shutdown. Attempt 2 resumes the remaining
+22 blocks at that same source. Each invocation has a 6,600-second measurement
+allowance plus setup. If paused, rerun **all jobs of that run**, preserving its SHA:
 `gh run rerun 42466570831 --repo VictorWong123/tokenomics`.
 Do not dispatch a newer main and combine its records. Only all 54 blocks/162
 passing records permit confirmation analysis. A positive targeted result still
@@ -117,6 +120,11 @@ the separate trained profile check is:
 It keeps the unchanged 272-comparison gate, measures RSS, runs the 18-request
 ngram screen and validates original-state checkpoints. Do not mix this binary
 with earlier fit/confirmation measurements or promote it before trained checks.
+The `kernel` phase is queued as run **42474834521** at
+`63265d36939f802abb73b88962d96862c6c9169c`, after the confirmation resume.
+An additional 128 KiB cache-chunk study passes its strict fixture tests but
+does not improve verification, so it is rejected; see
+`results/verification/cache-study-20261108`.
 
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;

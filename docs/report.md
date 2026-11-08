@@ -147,6 +147,12 @@ correctness, memory and throughput must be checked separately. The fixed
 `kernel` workflow phase performs that gate and an independent development
 screen; it never clears full feasibility by itself.
 
+A separate 128 KiB weight-chunk prototype also preserves one-row quantization
+and GEMV arithmetic, and passes the 468-case strict fixture suite. It does not
+improve the controlled verification endpoint, so it is rejected. Per-process
+measurements and unexplained ordinary-row timing variation are retained in
+`results/verification/cache-study-20261108`; this is no trained-model result.
+
 Codespace run 42420516268 passed all 272 comparisons on trained Qwen2.5
 0.5B/1.5B Q4_K_M weights, following a documented batch-dependent arithmetic
 repair. Repacking, llamafile and BLAS are disabled in this CPU profile; tiled

@@ -12,8 +12,11 @@ test-only stopping point below. Preserve the existing lifecycle and credential
 boundaries. Develop and check changes in Codex Cloud, push checked stages to
 `main`, then use Codespaces for trained-model tests and measurements.
 `codespace-experiment.yml` adds manual fixed `timing` and resumable `pilot`
-tasks on the same dedicated resource and global concurrency group. Experiments
-do not repeat the completed 272-comparison gate. Partial pilots are retained by
+tasks on the same dedicated resource and global concurrency group. Ordinary
+timing/pilot experiments reuse the completed 272-comparison gate. The optional
+`kernel` phase changes CPU arithmetic paths, so it repeats that unchanged gate
+before its independent 3B ngram screen and original-state checks. The packed
+profile stays off by default. Partial pilots are retained by
 source SHA outside checkout cleanup; dispatch that exact SHA again to resume.
 The worker pauses between complete blocks/checkpoint groups before its budget,
 uploads bounded evidence and always finalizes. Timing/pilots use development
