@@ -670,6 +670,9 @@ class ToolingTests(unittest.TestCase):
             cells(rows)
         with self.assertRaisesRegex(ValueError, "diagnostic"):
             cells([{**rows[1], "settings": {"diagnostic": True}}])
+        for settings in ({"policy": "script"}, {"script": [0, 4]}):
+            with self.assertRaisesRegex(ValueError, "diagnostic"):
+                cells([{**rows[1], "settings": settings}])
 
     def test_replay_prediction_separates_fit_and_validation(self):
         records = []
@@ -883,3 +886,28 @@ open(a['--cycles'],'w').close()
             self.assertTrue(
                 list((root / "run").glob("blocks/*/attempt-*/failure.json"))
             )
+
+
+class DiagnosticSelection(unittest.TestCase):
+    def test_scripted_diagnostic_cannot_launch_a_performance_condition(self):
+        from unittest.mock import patch
+        from bench.run import run
+
+        for extra in ({"policy": "script"}, {"policy": "fixed", "script": [0, 4]}):
+            cfg = {
+                "configurations": [
+                    {"id": "target", "policy": "target"},
+                    {"id": "diagnostic", **extra},
+                ]
+            }
+            with patch("bench.run.subprocess.run") as launch:
+                with self.assertRaisesRegex(ValueError, "diagnostic"):
+                    run(
+                        pathlib.Path("not-an-executable"),
+                        pathlib.Path("not-a-model"),
+                        None,
+                        [],
+                        cfg,
+                        pathlib.Path("unused"),
+                    )
+                launch.assert_not_called()

@@ -79,10 +79,11 @@ def run(
     conf_ids = [c["id"] for c in config["configurations"]]
     if executables is not None and set(executables) != set(conf_ids):
         raise ValueError("Each configuration requires an explicit executable")
-    if any(
+    if any(c.get("policy") == "script" for c in config["configurations"]) or any(
         c.get(key)
         for c in config["configurations"]
         for key in (
+            "script",
             "capture_checkpoints",
             "checkpoint_namespace",
             "resume_checkpoint",

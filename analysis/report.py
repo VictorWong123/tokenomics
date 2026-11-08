@@ -27,10 +27,11 @@ def draw_interval(ax, value, position, interval, *, color="#356b9a"):
 
 def diagnostic_request(row):
     settings = row.get("settings", {})
-    return any(
+    return settings.get("policy") == "script" or any(
         settings.get(k)
         for k in (
             "diagnostic",
+            "script",
             "diagnostic_logits",
             "max_cycles",
             "capture_checkpoints",
