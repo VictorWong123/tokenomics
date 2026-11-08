@@ -1,10 +1,11 @@
 # Feasibility decision — development experiments in progress
 
-Q1 (repeatable benefit over target-only): **unresolved**.
+Q1 (repeatable benefit over target-only): **not established**. The completed
+frozen-action confirmation does not clear the practical margin.
 Q2 (predictable preferable action): **unresolved**.
-Recommendation: complete the frozen targeted ngram confirmation before selecting
-a controller. Both independent-model screens are unfavorable; the cheaper
-ngram shortest cap is near-neutral and needs repeated validation.
+Recommendation: evaluate the opt-in packed CPU implementation as a new operating
+point. The guarded-profile results do not justify a full cycle controller;
+full Pilot A/B and held-out requirements remain incomplete.
 
 ## Current evidence (8 November 2026)
 
@@ -74,6 +75,31 @@ ngram cap8. `configs/ngram-confirmation-v1.json` hashes the fit evidence;
 It uses bounded resumable invocations. This targeted confirmation does not
 replace the full Pilot A/B or held-out protocol and cannot itself unlock a
 cycle controller. The full ngram Pilot A extrapolation is 12.25 CPU hours.
+
+## Completed frozen-action confirmation
+
+Run [42466570831, attempt 2](https://github.com/VictorWong123/tokenomics/actions/runs/42466570831/attempts/2)
+completed all 54 blocks and 162 exact-ID/stop comparisons on nine distinct
+development validation prompts, caps 128/512 and three repetitions. Cap 1,
+frozen from the separate three-prompt fit screen, achieved a geometric mean
+throughput ratio of **0.9846** to ordinary target-only, with prompt-clustered
+95% interval **[0.9721, 1.0019]**. Cap 8 achieved **0.7727 [0.7395, 0.8063]**.
+The frozen 5% practical-gain criterion is false; the selected action is not
+retuned from this validation.
+
+All 927 manifest members, completed-block hashes, request IDs/stops, cycle/cache
+accounting and regenerated ratio/interval statistics pass independent hosted
+verification. The connected GitHub API supplied the retained finalizer report,
+confirming actual Shutdown. Peak process RSS is 2.18 GiB. Raw bytes are retained
+in `results/verification/codespace-confirmation-20261108/attempt-2`, with the
+canonical verification receipt and lifecycle evidence alongside them.
+
+This rejects a practical-gain claim for the frozen action on this validation
+point. It is not a completed 18-prompt Pilot A, a Q2 decision, an all-cap or
+all-platform impossibility result, a controller experiment or held-out evidence.
+The separate packed CPU profile must pass its trained gate before performance
+assessment. Its first startup attempt failed before inference; the unchanged
+source/lifecycle succeeded on retry.
 
 ## Historical foundation and access blockers (7 November 2026)
 
