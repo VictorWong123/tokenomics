@@ -14,7 +14,7 @@ from bench.common import atomic_json, read_jsonl, sha256
 from scripts.codespaces import controller as lifecycle
 from scripts.model_workload import CACHE
 
-SUFFIXES = {".json", ".jsonl", ".txt", ".png", ".md"}
+SUFFIXES = {".json", ".jsonl", ".txt", ".log", ".png", ".md"}
 
 
 def pack(results, destination, owner):
@@ -60,7 +60,8 @@ def pack(results, destination, owner):
 def workload():
     phase = os.environ.get("TOKENOMICS_EXPERIMENT_PHASE", "timing")
     lifecycle.require(
-        phase in ("timing", "pilot", "confirmation"), "Unsupported fixed experiment"
+        phase in ("timing", "pilot", "confirmation", "kernel"),
+        "Unsupported fixed experiment",
     )
     selected = os.environ.get("TOKENOMICS_EXPERIMENT_CANDIDATE", "all")
     lifecycle.require(
@@ -71,9 +72,9 @@ def workload():
     drafter = os.environ.get("TOKENOMICS_EXPERIMENT_DRAFTER", "model")
     lifecycle.require(drafter in ("model", "ngram"), "Unsupported fixed drafter")
     lifecycle.require(
-        phase != "confirmation"
+        phase not in ("confirmation", "kernel")
         or (selected == "qwen25-05-3-q4" and drafter == "ngram"),
-        "Confirmation is frozen to the 3B target and ngram drafter",
+        "Confirmation/kernel experiments require the 3B target and ngram drafter",
     )
     point = candidate + ("-ngram" if drafter == "ngram" else "")
     owner = lifecycle.current()
@@ -184,6 +185,19 @@ def workload():
                 "--budget-seconds",
                 "6600",
             ]
+        elif phase == "kernel":
+            args = [
+                "timeout",
+                "--signal=TERM",
+                "--kill-after=15s",
+                "9000s",
+                str(workspace / ".venv/bin/python"),
+                "scripts/check_kernel_profile.py",
+                "--model-dir",
+                str(CACHE),
+                "--run-dir",
+                str(results),
+            ]
         with open(
             results / f"pipeline-{owner['run_id']}-{owner['attempt']}.txt", "x"
         ) as log:
@@ -196,20 +210,17 @@ def workload():
                 stderr=log,
             ).returncode
         status = json.loads((results / "status.json").read_text())
-        expected_states = (
-            {0: "confirmation_complete", 11: "paused"}
-            if phase == "confirmation"
-            else (
-                {10: "timing_complete"}
-                if phase == "timing"
-                else {
-                    11: "paused",
-                    20: "proceed_controller_implementation",
-                    21: "narrow_or_investigate",
-                    22: "scope_decision_required",
-                }
-            )
-        )
+        expected_states = {
+            "confirmation": {0: "confirmation_complete", 11: "paused"},
+            "kernel": {0: "kernel_profile_passed"},
+            "timing": {10: "timing_complete"},
+            "pilot": {
+                11: "paused",
+                20: "proceed_controller_implementation",
+                21: "narrow_or_investigate",
+                22: "scope_decision_required",
+            },
+        }[phase]
         lifecycle.require(
             code in expected_states and status["state"] == expected_states[code],
             "Experiment did not satisfy its result contract",
@@ -233,7 +244,7 @@ def workload():
             and all(c.get("ok") is True for c in checks),
             "Invalid timing evidence",
         )
-        if phase == "timing":
+        if phase in ("timing", "kernel"):
             status["stage"] = "checkpoint-validation"
             atomic_json(results / "status.json", status)
             print("TOKENOMICS_EXPERIMENT_STAGE checkpoint-validation", flush=True)
@@ -330,6 +341,8 @@ def workload():
                 ("pilot_a", results / point / "pilot-a/analysis/summary.json"),
                 ("pilot_b", results / point / "pilot-b/decision.json"),
                 ("confirmation", results / "confirmation/analysis/summary.json"),
+                ("kernel_gate", results / "kernel-gate/status.json"),
+                ("kernel_screen", results / point / "analysis/measurements.json"),
             ):
                 if path.exists():
                     report[label] = json.loads(path.read_text())
@@ -344,6 +357,7 @@ def workload():
         in (
             "timing_complete",
             "confirmation_complete",
+            "kernel_profile_passed",
             "paused",
             "proceed_controller_implementation",
             "narrow_or_investigate",

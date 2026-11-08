@@ -53,9 +53,12 @@ def create(
     k_quantized=False,
     unicode_cycle=False,
     ngram_cycle=False,
+    width_override=0,
 ):
     rng = np.random.default_rng(seed)
-    width = 256 if quantized or k_quantized else 32
+    width = width_override or (256 if quantized or k_quantized else 32)
+    if width <= 0 or width % (256 if k_quantized else 32):
+        raise ValueError("fixture width must align with its quantization blocks")
     hidden = 2 * width
     w = gguf.GGUFWriter(str(path), "llama")
     w.add_name("Tokenomics synthetic correctness fixture; NOT a language model")
@@ -157,5 +160,12 @@ if __name__ == "__main__":
     create(a.out / "random.gguf", 259, random=True)
     create(a.out / "quantized.gguf", 259, random=True, quantized=True)
     create(a.out / "quantized-k.gguf", 259, random=True, k_quantized=True)
+    create(
+        a.out / "quantized-k-wide.gguf",
+        259,
+        random=True,
+        k_quantized=True,
+        width_override=512,
+    )
     create(a.out / "utf8-cycle.gguf", 259, unicode_cycle=True)
     create(a.out / "ngram-cycle.gguf", 259, ngram_cycle=True)

@@ -24,11 +24,11 @@ def source_fingerprint():
     """Freeze owned executable/analysis source, including uncommitted edits."""
     h = hashlib.sha256()
     paths = [ROOT / "CMakeLists.txt", ROOT / "requirements.txt"]
-    for folder in ("src", "bench", "analysis", "scripts"):
+    for folder in ("src", "bench", "analysis", "scripts", "cmake"):
         paths += [
             p
             for p in (ROOT / folder).rglob("*")
-            if p.suffix in (".py", ".cpp", ".h", ".sh")
+            if p.suffix in (".py", ".cpp", ".h", ".sh", ".cmake")
         ]
     for path in sorted(paths):
         h.update(str(path.relative_to(ROOT)).encode())

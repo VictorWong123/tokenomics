@@ -141,6 +141,9 @@ struct Engine::Impl {
         (void)backend;
         require(c.context >= 16 && c.batch >= 9 && c.threads > 0 && c.gpu_layers >= 0,
                 "invalid context, batch, threads or gpu_layers");
+#ifdef TOKENOMICS_CPU_PACKED_VERIFY
+        require(c.gpu_layers == 0, "experimental packed CPU profile requires gpu_layers=0");
+#endif
         require(c.gpu_layers == 0 ||
                     ggml_backend_dev_by_type(GGML_BACKEND_DEVICE_TYPE_GPU) != nullptr ||
                     ggml_backend_dev_by_type(GGML_BACKEND_DEVICE_TYPE_IGPU) != nullptr,
@@ -205,6 +208,9 @@ std::string Engine::system_info() const {
     auto info = std::string(llama_print_system_info()) + impl_->execution_evidence;
 #ifdef TOKENOMICS_CPU_BATCH_INVARIANT
     info += "; TOKENOMICS_CPU_BATCH_INVARIANT=ON; GGML_CPU_TILED_MM=1; tiled_min_rows=10";
+#endif
+#ifdef TOKENOMICS_CPU_PACKED_VERIFY
+    info += "; TOKENOMICS_CPU_PACKED_VERIFY=ON; packed_gemv_max_rows=9; tiled_min_rows=10";
 #endif
     return info;
 }

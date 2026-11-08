@@ -94,7 +94,7 @@ reproducible; test-only proposal corruption forces zero and partial acceptance
 without replacing upstream verification. Random weights exercise less uniform
 token sequences. Tests compare emitted IDs, not rendered text or random seeds.
 
-The current runtime suite passes 390 differential cases, covering zero/partial/
+The current runtime suite passes 468 differential cases, covering zero/partial/
 full acceptance, correction/bonus handling, EOG, changing draft caps, rollback,
 fallback, draft catch-up, re-entry, repeated-request reset, empty/short requests,
 output truncation and logical context boundaries. Unit tests separately cover
@@ -103,7 +103,7 @@ sanitizer testing with leak detection has passed on Linux.
 
 The suite now also exercises Q4_0 and Q4_K weights, large-prefill/small-decode
 kernel transitions, exact first-row top-two logit equality across draft caps,
-and 25 additional minimal-logging/checkpoint comparisons. The latest Cloud
+and 30 additional minimal-logging/checkpoint comparisons. The latest Cloud
 Release and address/undefined-sanitized builds both pass all four CTest suites;
 24 separate lifecycle tests also pass. See `results/verification/cloud-20261108`.
 
@@ -121,6 +121,31 @@ screen below now also validates 66 canonical actions from three trained-model
 checkpoints. A period-nine fixture additionally forces ngram proposals at every
 cap and tests corruption, fallback/re-entry and reset without a draft model;
 Release and extended sanitizer checks pass with leak detection.
+
+The K-quant suite now also uses width-512 random weights, widening the
+attention/output projections and cache state (the earlier FFN-down projection
+already exercised multiple quantization blocks). The expanded default passes all four Release and
+address/undefined-sanitized suites with leak detection. A separate forced-all-
+tiled configuration passes the fixture checks but is not adopted: on a tiny
+perfect-copy diagnostic its target-only cost grows from 30.20 to 158.74 ms,
+while cap8 stays about 26 ms in both profiles. This prevents claiming a gain
+against a deliberately slowed baseline. The source, raw controlled measurements,
+wide logit probes and rejected initial harness are retained in
+`results/verification/kernel-study-20261108`. They establish no trained-model,
+Codespace or Mac performance result.
+
+An experimental `TOKENOMICS_CPU_PACKED_VERIFY` profile instead keeps native
+packed GEMV and its one-row activation quantizer for each of up to nine
+verification rows. Larger prefills retain the upstream matrix path; unsupported
+packing types retain the dot-kernel guard. Four checked substitutions are applied
+to a generated source copy, with no submodule edit or verifier change. This
+CPU-only profile is off by default and mutually exclusive with the existing
+batch-invariant profile. It passes all 468 differential cases, Release suites
+and address/undefined-sanitizer suites with leak detection. Its controlled
+fixture improves ordinary decode as well as verification, but trained-model
+correctness, memory and throughput must be checked separately. The fixed
+`kernel` workflow phase performs that gate and an independent development
+screen; it never clears full feasibility by itself.
 
 Codespace run 42420516268 passed all 272 comparisons on trained Qwen2.5
 0.5B/1.5B Q4_K_M weights, following a documented batch-dependent arithmetic

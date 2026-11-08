@@ -1,0 +1,10 @@
+/workspace/tokenomics/third_party/llama.cpp/common/speculative.cpp:3143: GGML_ASSERT(n_accepted == 0) failed
+build-tiled-study/tokenomics_kernel_study(+0x4a4e55) [0x556d23c58e55]
+build-tiled-study/tokenomics_kernel_study(+0x4a537f) [0x556d23c5937f]
+build-tiled-study/tokenomics_kernel_study(+0x4a5508) [0x556d23c59508]
+build-tiled-study/tokenomics_kernel_study(+0x102f36) [0x556d238b6f36]
+build-tiled-study/tokenomics_kernel_study(+0x89217) [0x556d2383d217]
+build-tiled-study/tokenomics_kernel_study(+0x81fd5) [0x556d23835fd5]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29ca8) [0x7feb3c1c0ca8]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x85) [0x7feb3c1c0d65]
+build-tiled-study/tokenomics_kernel_study(+0x85491) [0x556d23839491]

@@ -15,11 +15,15 @@ class ExperimentEvidenceTests(unittest.TestCase):
             results.mkdir()
             status = results / "status.json"
             status.write_text(json.dumps({"state": "failed"}))
+            model_log = results / "candidate.stderr.log"
+            model_log.write_text("model load diagnostics\n")
             archive = root / "evidence.tgz"
             pack(results, archive, {"sha": "a" * 40})
             with tarfile.open(archive) as tar:
                 manifest = json.load(tar.extractfile("execution-manifest.json"))
-                self.assertEqual(set(manifest["files"]), {"status.json"})
+                self.assertEqual(
+                    set(manifest["files"]), {"status.json", "candidate.stderr.log"}
+                )
                 self.assertEqual(
                     manifest["files"]["status.json"]["bytes"], status.stat().st_size
                 )

@@ -101,6 +101,23 @@ Do not dispatch a newer main and combine its records. Only all 54 blocks/162
 passing records permit confirmation analysis. A positive targeted result still
 does not complete the full Pilot A/B, cost-aware or held-out requirements.
 
+The optional packed CPU profile is independent of that frozen confirmation.
+Cloud Release and ASan/UBSan suites pass for both profiles; the expanded fixture
+suite has 468 differential cases, 30 minimal/checkpoint comparisons and 18
+Unicode cases. Enable it only with
+`-DTOKENOMICS_CPU_BATCH_INVARIANT=OFF -DTOKENOMICS_CPU_PACKED_VERIFY=ON`.
+It applies four pinned repack substitutions to generated source, retaining
+one-row quantization/GEMV through nine verification rows and the guard for
+non-packed types. The default is unchanged. Controlled toy measurements and
+the rejected all-tiled alternative are retained in
+`results/verification/kernel-study-20261108`; neither establishes a trained gain.
+After confirmation has finished or its exact-source resume has priority,
+the separate trained profile check is:
+`gh workflow run codespace-experiment.yml --ref main -f phase=kernel -f candidate=qwen25-05-3-q4 -f drafter=ngram`.
+It keeps the unchanged 272-comparison gate, measures RSS, runs the 18-request
+ngram screen and validates original-state checkpoints. Do not mix this binary
+with earlier fit/confirmation measurements or promote it before trained checks.
+
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;
@@ -110,7 +127,7 @@ configuration but unexecuted. The full runtime project remains incomplete.
 
 Evidence-based wording now: “Building a portable C++ speculative-decoding
 runtime with checked KV rollback and lazy synchronization; validated with
-390 transformer fixture cases and a 272-comparison trained-Qwen Linux gate.”
+468 transformer fixture cases and a 272-comparison trained-Qwen Linux gate.”
 Do not claim acceleration from the current unfavorable timing screen.
 
 ## Earlier completed Codespace setup

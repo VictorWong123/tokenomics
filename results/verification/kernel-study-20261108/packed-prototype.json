@@ -1,0 +1,64 @@
+{
+  "cache_provenance": "The prototype build directory was reconfigured for the integrated opt-in profile after timing. Its current CMakeCache is not timing provenance. The retained helper, original generated sources and original standalone timing executable identify this prototype.",
+  "diagnostic_only": true,
+  "environment_reference": "summary.json environment_snapshot_after_measurement; Cloud CPU, 4-core quota; fixture timing uses one thread; not Codespace measurements",
+  "fixture_sha256": "b5d0ac8058bdf09f0542065edb1fd3135e855c8d5f5c49b5786efb53d6816632",
+  "guarded_binary_sha256": "992fb57767e4ec51e7f598940f17cc34583e093c35604daf717a5efc1a52e920",
+  "integrated_profile_checks": {
+    "asan_ubsan": "4/4 pass, leak detection enabled; 178.91 seconds",
+    "release": "4/4 pass, 468 differential cases; 8.08 seconds"
+  },
+  "median_generation_ms": {
+    "guarded": {
+      "0": 30.053886,
+      "1": 28.1490755,
+      "2": 26.947622,
+      "4": 26.2739105,
+      "6": 26.076795,
+      "8": 25.8379865
+    },
+    "packed_prototype": {
+      "0": 25.4090925,
+      "1": 21.828497,
+      "2": 20.8015695,
+      "4": 19.573541499999997,
+      "6": 19.9331305,
+      "8": 19.5330705
+    }
+  },
+  "process_order": [
+    "guarded-c",
+    "packed-a",
+    "packed-b",
+    "guarded-d"
+  ],
+  "prototype_binary_sha256": "1c606396d5bb60b7e717ba90e6be23ddbef964e420b32ac936d544f7453d0acb",
+  "prototype_flags_from_invocation": {
+    "CMAKE_BUILD_TYPE": "Release",
+    "GGML_BLAS": "OFF",
+    "GGML_CPU_REPACK": "ON",
+    "GGML_CUDA": "OFF",
+    "GGML_LLAMAFILE": "OFF",
+    "GGML_METAL": "OFF",
+    "GGML_NATIVE": "OFF",
+    "TOKENOMICS_CPU_BATCH_INVARIANT": "OFF"
+  },
+  "prototype_generated_source_sha256": {
+    "tokenomics-repack-study.cpp": "caf4386323fa918998b18cfc2444a5ba602e83606ea21129058621eea9ae7997",
+    "tokenomics-tiled-study.cpp": "29eb6d6805be81da81e1af7ecd79b5081e0b968c7fb222b2bf0fc845be6c0220"
+  },
+  "requests": 144,
+  "schema_version": 1,
+  "sha256": {
+    "raw/guarded-c.tsv": "c4aca6d191bf153d9b5b7d01eb2ca5e9f8c7417418b737d91e5095790a56b3f7",
+    "raw/guarded-d.tsv": "0eed61488d2f2cf4847fe8ec55c36ed61d64c39966c6d8381f38060b4889c668",
+    "raw/packed-a.tsv": "f298ad618e463f0fe4d137b32751db92c9fa48b3e21e0e62d3c411b81169ea52",
+    "raw/packed-b.tsv": "00a185dfd8555446722558b35be569a60dc48a74a1ec244ac92ebee546225ceb",
+    "source/tokenomics_kernel_study.cpp": "8cfa5174045faf2c40d0c13041f333a3279320efcb08674813b36c6731377856",
+    "source/tokenomics_repack_study.cmake": "d6610954045c7d1b07305a8e1d0b7948ef1d31124706fa291d08d684c829bf7b"
+  },
+  "source_note": "Runtime implementation from the revision above; only wide-fixture test changes were present. Prototype uses the retained deferred CMake helper. Integrated opt-in runtime marker was added after these measurements.",
+  "source_revision": "6254bef65b63fbebb627257a6740d09df4e1a343",
+  "synthetic_fixture": true,
+  "trained_model_speedup_supported": false
+}
