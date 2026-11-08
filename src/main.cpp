@@ -198,7 +198,16 @@ int main(int argc, char **argv) {
             rec["system_info"] = engine.system_info();
             rec["prompt_ids"] = result.prompt_ids;
             rec["token_ids"] = result.tokens;
-            rec["text"] = result.text;
+            // Byte-fallback tokens can end halfway through a UTF-8 code point
+            // at a budget/context boundary. Keep IDs authoritative and repair
+            // only the display string before strict JSON serialization.
+            json display = result.text;
+            if (std::any_of(result.text.begin(), result.text.end(),
+                            [](unsigned char c) { return c >= 0x80; })) {
+                display = json::parse(display.dump(-1, ' ', false, json::error_handler_t::replace));
+            }
+            rec["text_utf8_repaired"] = display.get_ref<const std::string &>() != result.text;
+            rec["text"] = std::move(display);
             rec["stop"] = result.stop;
             rec["load_ms"] = engine.load_ms();
             rec["setup_ms"] = result.setup_ms;

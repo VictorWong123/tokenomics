@@ -12,6 +12,59 @@ from bench.replay import fit_validate
 
 
 class ToolingTests(unittest.TestCase):
+    @unittest.skipUnless(
+        os.getenv("TOKENOMICS_TEST_BINARY"), "requires built fixture engine"
+    )
+    def test_utf8_budget_boundaries_preserve_every_token_id(self):
+        import subprocess
+
+        exe = pathlib.Path(os.environ["TOKENOMICS_TEST_BINARY"]).resolve()
+        model = exe.parent / "fixtures/utf8-cycle.gguf"
+        jobs = [
+            {
+                "prompt": "a b",
+                "policy": policy,
+                "k": 2,
+                "script": [0, 2, 0, 4],
+                "max_tokens": cap,
+            }
+            for policy in ("target", "fixed", "script")
+            for cap in (0, 1, 2, 3, 4, 7)
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp) / "jobs.jsonl"
+            path.write_text("".join(json.dumps(j) + "\n" for j in jobs))
+            proc = subprocess.run(
+                [
+                    str(exe),
+                    "--target",
+                    str(model),
+                    "--draft",
+                    str(model),
+                    "--jobs",
+                    str(path),
+                    "--threads",
+                    "1",
+                    "--context",
+                    "64",
+                    "--batch",
+                    "32",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            rows = [json.loads(line) for line in proc.stdout.splitlines()]
+            self.assertEqual(len(rows), len(jobs))
+            for job, row in zip(jobs, rows):
+                cap = job["max_tokens"]
+                raw = (b"\xe2\x82\xac" * 3)[:cap]
+                self.assertEqual(row["token_ids"], ([229, 133, 175] * 3)[:cap])
+                self.assertEqual(row["generated_tokens"], cap)
+                self.assertEqual(row["stop"], "budget")
+                self.assertEqual(row["text"], raw.decode("utf-8", errors="replace"))
+                self.assertEqual(row["text_utf8_repaired"], cap % 3 != 0)
+
     def test_screen_cannot_trust_a_forged_passing_correctness_flag(self):
         from analysis.timing_screen import report
 

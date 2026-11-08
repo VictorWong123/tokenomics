@@ -44,7 +44,15 @@ def quantize_k_fixture(value):
     return raw
 
 
-def create(path, winner, seed=31, random=False, quantized=False, k_quantized=False):
+def create(
+    path,
+    winner,
+    seed=31,
+    random=False,
+    quantized=False,
+    k_quantized=False,
+    unicode_cycle=False,
+):
     rng = np.random.default_rng(seed)
     width = 256 if quantized or k_quantized else 32
     hidden = 2 * width
@@ -82,6 +90,16 @@ def create(path, winner, seed=31, random=False, quantized=False, k_quantized=Fal
         emb = np.ones((n, width), np.float32)
         out = np.zeros((n, width), np.float32)
         out[winner] = 1
+    if unicode_cycle:
+        # A three-state output cycle emits the UTF-8 bytes E2 82 AC (Euro).
+        # Budgets one/two truncate a code point; budget three completes it.
+        emb.fill(0)
+        emb[:, 0] = 1
+        out.fill(0)
+        for i, token in enumerate((3 + 0xE2, 3 + 0x82, 3 + 0xAC)):
+            emb[token] = 0
+            emb[token, (i + 1) % 3] = 1
+            out[token, i] = 1
 
     def tensor(name, value):
         if k_quantized and value.ndim == 2:
@@ -133,3 +151,4 @@ if __name__ == "__main__":
     create(a.out / "random.gguf", 259, random=True)
     create(a.out / "quantized.gguf", 259, random=True, quantized=True)
     create(a.out / "quantized-k.gguf", 259, random=True, k_quantized=True)
+    create(a.out / "utf8-cycle.gguf", 259, unicode_cycle=True)

@@ -28,6 +28,12 @@ command can run schema 2 from those traces, requiring identical executable and
 model hashes plus context/batch/thread/backend settings. Use a new replay
 directory and retain both versions. New main pilot runs use schema 2 directly.
 
+Main additionally fixes incomplete-UTF-8 display serialization. The older
+`87c7811` invocation may still finish or expose this failure; preserve its raw
+evidence and shutdown. It is an exploratory older point. The corrected main
+driver has a different binary hash, so do not mix rows or disable the binary
+identity check to resume it as the same experiment.
+
 ## Verified Linux test route
 
 [Run 42420516268](https://github.com/VictorWong123/tokenomics/actions/runs/42420516268),

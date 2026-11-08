@@ -151,6 +151,10 @@ cache behavior; it is not an execution of the unmodified stock executable.
 Full-attention transformers with arbitrary partial KV removal are supported;
 hybrid/recurrent models, stochastic sampling and context shifting are rejected.
 
+JSON `token_ids` are authoritative. If a budget stops inside a byte-encoded
+UTF-8 character, display `text` uses a replacement character and
+`text_utf8_repaired` is true; the token sequence is preserved exactly.
+
 The [architecture](docs/architecture.md) explains cache invariants and timing.
 All original prompt text is CC0, including original summary documents;
 the software is MIT, llama.cpp retains its own license, and model licenses

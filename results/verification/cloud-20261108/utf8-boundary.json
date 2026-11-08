@@ -1,0 +1,21 @@
+{
+  "address_undefined_leak_checks": "fixtures and tooling passed after this serializer change; core/runtime sanitizer suites passed before it",
+  "after": {
+    "generated_tokens": 1,
+    "stop": "budget",
+    "text": "\ufffd",
+    "text_utf8_repaired": true,
+    "token_ids": [
+      229
+    ]
+  },
+  "before": "Exit 1: json.exception.type_error.316 incomplete UTF-8, final byte 0xE2; no output record",
+  "binary_sha256": "8e0a40d3e9196ced23c70d11ee4e4e9ebf7b32b9df357b6eaf2bb3ecabb12add",
+  "boundary_comparisons": 18,
+  "coverage": "target/fixed/script; caps 0,1,2,3,4,7; complete and truncated Euro byte cycles",
+  "execution_environment": "Codex Cloud Linux CPU",
+  "numeric_reference_changed": false,
+  "release_ctest": "4/4 passed",
+  "schema_version": 1,
+  "synthetic_fixture": true
+}

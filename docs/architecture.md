@@ -52,6 +52,12 @@ cycle storage and serialization but still takes stage timestamps;
 the logging ablation quantifies that narrower distinction. Do not describe it as
 a fully instrumentation-free build.
 
+Token IDs remain authoritative when a byte-fallback sequence ends midway
+through a UTF-8 character. The CLI replaces invalid bytes only in display text
+and records `text_utf8_repaired`; complete UTF-8 is preserved. This runs during
+JSON output preparation, outside the warm-request timer and inside the runner's
+whole-process time. It changes no sampling, acceptance, or cache state.
+
 `getrusage(RUSAGE_SELF).ru_maxrss` supplies lifetime peak RSS (bytes on macOS,
 KiB multiplied by 1024 on Linux). It includes loading and excluded warm-up,
 is not per-request allocation or device VRAM, and cannot establish energy or

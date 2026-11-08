@@ -29,6 +29,13 @@ model or execution setting. See `experiment.md`; schema-1 Q2 cannot clear the
 strengthened gate. The optional stock diagnostic and clean-submodule build
 check also pass in Cloud.
 
+The latest CLI also repairs incomplete UTF-8 display text instead of crashing
+JSON serialization. Eighteen byte-boundary cases preserve exact IDs across
+target/fixed/script modes; Release and targeted sanitizer checks pass. This
+changes the driver binary, so do not mix its measurements with the frozen
+`87c7811` pilot or bypass replay's binary check. Retain the older run as
+exploratory evidence; freeze the corrected driver for future confirmation.
+
 Still required: complete Q1/Q2 on resource-safe candidates; implement a justified
 cost-aware or narrower controller; quantify instrumentation/probe overhead;
 freeze development priors and baselines; run held-out evaluation/ablations;
