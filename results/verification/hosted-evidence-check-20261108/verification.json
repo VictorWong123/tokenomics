@@ -1,0 +1,23 @@
+{
+  "artifact_id": 13634708630,
+  "artifact_zip_sha256": "f5869943b0bca4c25831f2301ff12c8c99c495f1b0338f642ba74e4df6b25195",
+  "conclusion": "success",
+  "created_at": "2026-11-08T21:25:12Z",
+  "event": "workflow_dispatch",
+  "head_sha": "97f89daac72bad1d05427b30072f58931361e6fa",
+  "html_url": "https://github.com/VictorWong123/tokenomics/actions/runs/42525108573",
+  "id": 42525108573,
+  "job_id": 128866893150,
+  "path": ".github/workflows/verify-evidence.yml",
+  "retained_file_sha256": {
+    "42466570831.json": "21274cce2c69dd95b67f291b6bada29036450221bbf6709bd8de4d1194f8e6aa",
+    "42492089188.json": "bdd8a4160ed6f9769aa3344a2ac81bf1c51e6336c2ad3c4a120a11e065b8ff6d",
+    "42503429351.json": "2cd33b03c096d97a4a128d887944120667f7e190f59e38c0187597b829fc9d3b",
+    "42519929357.json": "b3b6b90180843937314b59faa8d3b4d75e6ab01e9beacec6b5a642f6d4817663",
+    "42523392101.json": "9cc2ef5d08adad930798a0b06f1baedc7a871a6797bf51c157ee8c30ea29f6bb"
+  },
+  "run_attempt": 1,
+  "scope": "Hosted read-only independent artifact verification; starts no Codespace or inference.",
+  "status": "completed",
+  "updated_at": "2026-11-08T21:25:42Z"
+}

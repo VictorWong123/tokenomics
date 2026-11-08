@@ -1,0 +1,193 @@
+{
+  "archive_sha256": "46dc38639aacf5d0e4994cdb6d551e1675bebc6457766e0762cf1c598f52e649",
+  "artifact_id": 13616949021,
+  "attempt": 2,
+  "confirmation": {
+    "baseline_table": {
+      "fixed1": {
+        "cells": 18,
+        "geomean_median_tps": 6.881630955437239,
+        "median_load_ms": 670.683097,
+        "median_warm_ms": 63312.268501,
+        "peak_lifetime_rss_bytes": 2331389952
+      },
+      "fixed8": {
+        "cells": 18,
+        "geomean_median_tps": 5.400503655496522,
+        "median_load_ms": 669.435703,
+        "median_warm_ms": 69547.2028865,
+        "peak_lifetime_rss_bytes": 2335670272
+      },
+      "target": {
+        "cells": 18,
+        "geomean_median_tps": 6.989571633675457,
+        "median_load_ms": 672.6092195,
+        "median_warm_ms": 62604.2261155,
+        "peak_lifetime_rss_bytes": 2330193920
+      }
+    },
+    "categories": {
+      "code": {
+        "ci95": [
+          0.9772687099093502,
+          1.0496579312813747
+        ],
+        "losses": 0,
+        "more_than_10pct_slower": 0,
+        "prompt_cap_cells": 6,
+        "prompts": 3,
+        "ratio": 1.0011148147867912,
+        "ties": 5,
+        "wins": 1,
+        "worst_ratio": 0.9696394684042132
+      },
+      "qa": {
+        "ci95": [
+          0.9661361737470828,
+          0.983106566046692
+        ],
+        "losses": 0,
+        "more_than_10pct_slower": 0,
+        "prompt_cap_cells": 6,
+        "prompts": 3,
+        "ratio": 0.9766954355567793,
+        "ties": 6,
+        "wins": 0,
+        "worst_ratio": 0.9600981231016996
+      },
+      "summary": {
+        "ci95": [
+          0.9662046086443932,
+          0.9957744617667541
+        ],
+        "losses": 1,
+        "more_than_10pct_slower": 0,
+        "prompt_cap_cells": 6,
+        "prompts": 3,
+        "ratio": 0.9760665046476507,
+        "ties": 5,
+        "wins": 0,
+        "worst_ratio": 0.9394285356010312
+      }
+    },
+    "chosen_fixed_exceeds_practical_margin": false,
+    "comparisons": {
+      "fixed1/fixed1": {
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "losses": 0,
+        "more_than_10pct_slower": 0,
+        "prompt_cap_cells": 18,
+        "prompts": 9,
+        "ratio": 1.0,
+        "ties": 18,
+        "wins": 0,
+        "worst_ratio": 1.0
+      },
+      "fixed1/target": {
+        "ci95": [
+          0.9721160799113967,
+          1.0018726496416552
+        ],
+        "losses": 1,
+        "more_than_10pct_slower": 0,
+        "prompt_cap_cells": 18,
+        "prompts": 9,
+        "ratio": 0.9845568964887398,
+        "ties": 16,
+        "wins": 1,
+        "worst_ratio": 0.9394285356010312
+      },
+      "fixed8/fixed1": {
+        "ci95": [
+          0.7531683593327941,
+          0.8197177461383307
+        ],
+        "losses": 18,
+        "more_than_10pct_slower": 16,
+        "prompt_cap_cells": 18,
+        "prompts": 9,
+        "ratio": 0.7847708908641104,
+        "ties": 0,
+        "wins": 0,
+        "worst_ratio": 0.6857704033656694
+      },
+      "fixed8/target": {
+        "ci95": [
+          0.739528488377475,
+          0.8063233538064473
+        ],
+        "losses": 18,
+        "more_than_10pct_slower": 16,
+        "prompt_cap_cells": 18,
+        "prompts": 9,
+        "ratio": 0.7726515927638722,
+        "ties": 0,
+        "wins": 0,
+        "worst_ratio": 0.655097560280201
+      },
+      "target/fixed1": {
+        "ci95": [
+          0.9981308506226898,
+          1.0286837350656597
+        ],
+        "losses": 1,
+        "more_than_10pct_slower": 0,
+        "prompt_cap_cells": 18,
+        "prompts": 9,
+        "ratio": 1.0156853337438756,
+        "ties": 16,
+        "wins": 1,
+        "worst_ratio": 0.9147208451130621
+      },
+      "target/target": {
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "losses": 0,
+        "more_than_10pct_slower": 0,
+        "prompt_cap_cells": 18,
+        "prompts": 9,
+        "ratio": 1.0,
+        "ties": 18,
+        "wins": 0,
+        "worst_ratio": 1.0
+      }
+    },
+    "fit_analysis_sha256": "26d43519735ce70c8dd92906749737396a472339943f82be0cdb22a787c4f9e3",
+    "full_feasibility_cleared": false,
+    "limitation": "Frozen-action confirmation on nine distinct development validation prompts. No retuning, full Pilot A/B completion, Q2 decision, controller gain or held-out result follows.",
+    "phase": "targeted_confirmation",
+    "schema_version": 1,
+    "selected_fixed": "fixed1",
+    "selection_rule": "fixed baseline frozen on separate development data",
+    "synthetic_fixture": false
+  },
+  "exact_comparisons": 162,
+  "full_feasibility_cleared": false,
+  "independent_output_checks": true,
+  "run_id": 42466570831,
+  "schema_version": 1,
+  "shutdown_confirmed": true,
+  "shutdown_controller_report": {
+    "attempt": "2",
+    "evidence_status": "No valid fixture summary; lifecycle cleanup only",
+    "fixture_evidence_valid": false,
+    "mode": "finalize",
+    "passed": true,
+    "run_id": "42466570831",
+    "sha": "af8b4044133ecef0de8751216248278a2fdb8ebd",
+    "shutdown_confirmed": true
+  },
+  "shutdown_evidence_origin": "results/verification/codespace-confirmation-20261108/lifecycle.json",
+  "shutdown_source_job_id": 128734353929,
+  "source_sha": "af8b4044133ecef0de8751216248278a2fdb8ebd",
+  "state": "confirmation_complete",
+  "verified_blocks": 54,
+  "verified_files": 927,
+  "verifier_sha256": "b617ef1b107e43a69bb49dcaf8c7824acac7271010b9d44f3889775c8b893797",
+  "zip_sha256": "95a35bb10075da48c51607c8c421afea48633678da4966fcb375c00a0131452b"
+}

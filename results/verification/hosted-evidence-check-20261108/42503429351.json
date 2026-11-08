@@ -1,0 +1,62 @@
+{
+  "archive_sha256": "460cdc117a2892cf709331c966a8e633767373dfbf6860cefa574d5ec7333076",
+  "artifact_id": 13632452210,
+  "attempt": 2,
+  "binary_sha256": "ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f",
+  "checkpoint_actions": 66,
+  "checkpoint_captures": 3,
+  "diagnostic_comparisons": 14,
+  "exact_comparisons": 272,
+  "full_feasibility_cleared": false,
+  "independent_output_checks": true,
+  "peak_rss_bytes": 3662598144,
+  "run_id": 42503429351,
+  "schema_version": 1,
+  "screen": {
+    "geomean_ratios_vs_target": {
+      "fixed1": 0.9913389961623134,
+      "fixed2": 0.9684713230716538,
+      "fixed4": 0.8883984193197905,
+      "fixed6": 0.8544224492698131,
+      "fixed8": 0.8012173700444084,
+      "target": 1.0
+    },
+    "limitation": "No repeated-pilot decision or controller gain follows from this screen.",
+    "output_caps": [
+      64
+    ],
+    "prompts": 3,
+    "q1_supported": null,
+    "q2_supported": null,
+    "repetitions": 1,
+    "schema_version": 1,
+    "source": {
+      "owned_source_sha256": "bae5eb7c58866e8b181f80a5d716c1a52565155e7b8980d61a9bb7b0e61406a5",
+      "revision": "708993c603c89efcb75867d851292022b4960210"
+    },
+    "status": "development timing screen only",
+    "synthetic_fixture": false
+  },
+  "screen_target_sha256": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d",
+  "shutdown_artifact_id": 13632319421,
+  "shutdown_artifact_sha256": "5ed4b37d2ab03456e6d1ef7ed6cf6ca26e6d5a6b2c4eeeb49d283f84dc284825",
+  "shutdown_confirmed": true,
+  "shutdown_controller_report": {
+    "attempt": "2",
+    "evidence_status": "No valid fixture summary; lifecycle cleanup only",
+    "fixture_evidence_valid": false,
+    "mode": "finalize",
+    "passed": true,
+    "run_id": "42503429351",
+    "sha": "708993c603c89efcb75867d851292022b4960210",
+    "shutdown_confirmed": true
+  },
+  "shutdown_evidence_origin": "GitHub lifecycle artifact 13632319421",
+  "shutdown_source_job_id": 128849625747,
+  "source_sha": "708993c603c89efcb75867d851292022b4960210",
+  "state": "kernel_profile_passed",
+  "timing_records": 18,
+  "verified_files": 166,
+  "verifier_sha256": "b617ef1b107e43a69bb49dcaf8c7824acac7271010b9d44f3889775c8b893797",
+  "zip_sha256": "fcd8c67c00bce03bdc9589890d8fdc16938ce73d712c22f4ad85b7915e23f9c0"
+}

@@ -39,6 +39,9 @@ rows or benchmark environment file. Regression checks reject changed original
 jobs, inconsistent top-token claims and unapproved reportless archives. No
 model rerun is needed to recover an already complete diagnostic.
 
+The final [hosted archive check](../hosted-evidence-check-20261108) passes from
+the published code and reproduces the canonical diagnostic receipt exactly.
+
 To re-audit retained measurements without inference or downloads:
 
 ```bash

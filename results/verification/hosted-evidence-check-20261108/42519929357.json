@@ -1,0 +1,62 @@
+{
+  "archive_sha256": "ef6fe5118263c2cab5129fa36f7d013e56470a88b25a8c875dec4d00d8f95bd9",
+  "artifact_id": 13633866583,
+  "attempt": 1,
+  "binary_sha256": "ab5530171da6c3168e8bc40af144bc2cd5a7c3deddbfb27c5b333193ef31620f",
+  "correctness_passed": false,
+  "cross_profile_mismatches": {
+    "guarded-detailed": null,
+    "guarded-fixed8": null,
+    "packed-detailed": {
+      "actual": 882,
+      "position": 36,
+      "reference": 323
+    },
+    "packed-fixed8": {
+      "actual": 882,
+      "position": 36,
+      "reference": 323
+    },
+    "packed-target": {
+      "actual": 882,
+      "position": 36,
+      "reference": 323
+    },
+    "target": null
+  },
+  "exact_comparisons": 0,
+  "first_mismatch": {
+    "actual": 882,
+    "position": 36,
+    "reference": 323
+  },
+  "full_feasibility_cleared": false,
+  "independent_output_checks": true,
+  "observed_requests": 6,
+  "performance_summary_produced": false,
+  "reference_binary_sha256": "3b640fc90cca7b88cf02dc5fdde86c7c4f517dfa090e0ab7258bc09da8263d09",
+  "run_id": 42519929357,
+  "schema_version": 1,
+  "screen_target_sha256": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d",
+  "shutdown_artifact_id": 13634210073,
+  "shutdown_artifact_sha256": "54a6851dc55ddeb4aae5dafe548564fafb8eecf327713f85c87450372cc93c46",
+  "shutdown_confirmed": true,
+  "shutdown_controller_report": {
+    "attempt": "1",
+    "evidence_status": "No valid fixture summary; lifecycle cleanup only",
+    "fixture_evidence_valid": false,
+    "mode": "finalize",
+    "passed": true,
+    "run_id": "42519929357",
+    "sha": "c834026c6bdddc4d219a25945befc318361e74fb",
+    "shutdown_confirmed": true
+  },
+  "shutdown_evidence_origin": "GitHub lifecycle artifact 13634210073",
+  "shutdown_source_job_id": 128856866921,
+  "source_sha": "c834026c6bdddc4d219a25945befc318361e74fb",
+  "state": "failed",
+  "verified_files": 36,
+  "verifier_sha256": "b617ef1b107e43a69bb49dcaf8c7824acac7271010b9d44f3889775c8b893797",
+  "within_profile_nonself_checks": 4,
+  "zip_sha256": "f257276b204e84b273deb85440d902c9777d09a2107808e8a2f624e991c971a9"
+}

@@ -39,6 +39,11 @@ Current checkpoint:
   completed before a report-writer bug failed the workflow; the receipt records
   that failure and missing report explicitly. Finalizer 128865017149 confirms
   actual Shutdown. The writer is fixed and tested; no model rerun is needed.
+- Final hosted evidence check42525108573 passes from published source97f89da,
+  independently rechecking all five frozen archives without inference or a
+  Codespace start. Its receipts are retained in
+  `results/verification/hosted-evidence-check-20261108`; the diagnostic receipt
+  matches canonical, including the original workflow reporting failure.
 - The separately named controller-packed extension is locally checked and now
   has a frozen prerequisite. It has no trained performance result yet. Use fresh
   calibration; run it only if the paired component result justifies that point.
