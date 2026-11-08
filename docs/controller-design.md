@@ -436,3 +436,28 @@ attempt. Resume the same source before starting a different Codespaces study.
 commit and strict configuration tests on relevant pushes/PRs, without model
 execution or Codespaces. Full inference differential and sanitizer checks remain
 separate because that small CI job does not validate backend/model behavior.
+
+## 14. Gated packed-profile extension
+
+The completed guarded result remains immutable. A second operating point may
+reuse the C++ policy and the predeclared fit/validation workload, but must not
+reuse its learned prior or ordinary baseline. The packed controller entry point
+will be separately named and disabled until a SHA-bound canonical packed gate
+proves 272 exact comparisons, independent output checks and actual Shutdown.
+It must rebuild the exact gate executable, check its binary and target hashes,
+run both focused controller gates, then calibrate all actions again on the same
+three designated development fit prompts. No parameters or prompt subset will
+be tuned from the packed validation outcomes.
+
+The separate protocol retains six validation prompts, caps64/128, three repeats,
+all comparators and ablations, and fresh median/worst logging traces. Requests
+reset to the new frozen prior. Source/model/executable/configuration bindings,
+immutable complete blocks, bounded pauses and independent summary reconstruction
+remain required. The artifact checker must distinguish profiles and never turn
+a partial packed grid into a canonical complete result. The guarded CLI default
+and legacy evidence checks remain supported.
+
+First verify the native gate and paired CPU component study. Launch a new packed
+controller measurement only if those results justify it; a prepared command is
+not an executed result. This extension changes orchestration/provenance rather
+than the C++ scoring, cache ownership or upstream acceptance implementation.
