@@ -48,7 +48,8 @@ Prerequisites, provisioned once by the runtime owner:
   system Python wins while allowing `/usr/local/bin/git`. Public pinned
   llama.cpp/submodule and Python package-index network access are required.
   Bootstrap installs the pinned CMake/Ninja/Python requirements, builds CPU,
-  and runs four CTest tests. No real model download or project pilot is run.
+  and runs all six CTest suites. This bootstrap step downloads no trained model
+  and starts no project pilot; the separate workload selects any trained stage.
 
 Initialize admits only exact target metadata and Shutdown. SSH wakes it and
 atomically creates `/dev/shm/tokenomics-codespace-lifecycle.lease` after verifying

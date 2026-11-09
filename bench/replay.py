@@ -13,7 +13,13 @@ import subprocess
 import math
 import time
 import numpy as np
-from bench.common import atomic_json, read_jsonl, sha256, source_fingerprint
+from bench.common import (
+    atomic_json,
+    read_jsonl,
+    sha256,
+    source_fingerprint,
+    write_jsonl,
+)
 from bench.run import first_mismatch, RunPaused
 
 
@@ -83,7 +89,7 @@ def run_jobs(exe, target, draft, jobs, directory, cfg, gpu_layers):
     if len(rows) != len(jobs):
         raise RuntimeError("incomplete replay records")
     for name, values in (("requests.jsonl", rows), ("cycles.jsonl", cycles)):
-        (directory / name).write_text("".join(json.dumps(x) + "\n" for x in values))
+        write_jsonl(directory / name, values)
     atomic_json(
         done,
         {

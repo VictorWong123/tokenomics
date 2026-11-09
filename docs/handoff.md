@@ -1,5 +1,31 @@
 # Tokenomics continuation handoff
 
+## Repository cleanup (9 November 2026)
+
+The root README now leads with the C++ executable and measured scope. Build/test
+instructions and the C++/Python source map are in `docs/development.md`, full
+benchmark commands are in `docs/benchmarking.md`, and `scripts/README.md` catalogs
+the stable tools. `docs/README.md` and `results/README.md` index guides/evidence.
+
+`TOKENOMICS_PYTHON_TESTS=OFF` enables the native executable and three pure C++
+policy/configuration suites without discovering Python. The default remains ON,
+and bootstrap explicitly enables the full six-suite development contract.
+Policy CI uses the native-only setting; it is not a model-correctness gate.
+
+The former broad Python tooling test module is split by contract, retaining all
+65 original discovered Python test methods. A shared JSONL writer removes repeated
+complete-record encoding; an additional compatibility check preserves existing
+artifact bytes. Runtime/controller C++ source and archived measurement payloads,
+canonical receipts and hash-bound configurations are unchanged by this cleanup.
+
+Cloud checks pass: a fresh native executable and all three native policy/config
+suites without Python discovery; all six full-development CTest suites; all 66
+Python tests with both CPU-profile binaries supplied; and all 24 lifecycle tests.
+The native executable also emits 16 synthetic-fixture tokens directly. Recorded
+demo/example analysis commands work, and regenerating the controller summary
+matches the canonical trained result exactly. No new trained performance result
+or Codespace execution follows from this cleanup.
+
 ## Current continuation (8 November 2026)
 
 Current checkpoint:

@@ -23,6 +23,7 @@ from bench.common import (
     read_jsonl,
     sha256,
     source_fingerprint,
+    write_jsonl,
 )
 from bench.run import first_mismatch
 
@@ -137,7 +138,7 @@ def validate_record(a, job, row):
 
 def execute(a, name, jobs, resident, on_row=None):
     job_path = a.out / f"{name}.jobs.jsonl"
-    job_path.write_text("".join(json.dumps(j) + "\n" for j in jobs))
+    write_jsonl(job_path, jobs)
     command = [
         str(a.binary.resolve()),
         "--target",

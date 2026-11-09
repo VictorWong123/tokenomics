@@ -56,6 +56,17 @@ def read_jsonl(path):
         return [json.loads(x) for x in f if x.strip()]
 
 
+def write_jsonl(path, rows, *, sort_keys=False):
+    """Write complete JSONL records using the existing experiment byte format.
+
+    The caller owns directory creation and atomic replacement when required.
+    Do not use this helper for flushed, incremental engine output.
+    """
+    pathlib.Path(path).write_text(
+        "".join(json.dumps(row, sort_keys=sort_keys) + "\n" for row in rows)
+    )
+
+
 def estimate_pilot_budget(sample, prompt_count, config):
     """Extrapolate fixed request costs separately from full-cap decode work."""
     if not sample or any(r["process_ms"] < r["generation_ms"] for r in sample):

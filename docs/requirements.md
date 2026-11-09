@@ -28,6 +28,11 @@ See [the technical report](report.md) for interpretation and
 
 ## Reading guide
 
+- [Documentation index](README.md): current guides grouped by purpose.
+- [Development](development.md): native C++ build/tests, Python's offline role,
+  full test matrix and contribution/evidence rules.
+- [Benchmarking](benchmarking.md) and [script catalog](../scripts/README.md):
+  stable experiment commands and the purpose of each Python entry point.
 - [Build and run](../README.md): bootstrap, real models and demonstrations.
 - [Workspace and test environment](environments.md): Codex Cloud, Codespaces,
   workflows, credentials, artifacts and recovery.

@@ -6,7 +6,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from bench.common import read_jsonl, atomic_json, sha256
+from bench.common import read_jsonl, atomic_json, sha256, write_jsonl
 from analysis.report import write_report
 
 
@@ -32,14 +32,12 @@ def curate(source, out):
                 c for c in read_jsonl(source / original) if not c.get("warmup", False)
             )
         row["source_cycles"] = "cycles.jsonl"
-    (out / "requests.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
-    (out / "cycles.jsonl").write_text("".join(json.dumps(c) + "\n" for c in cycles))
+    write_jsonl(out / "requests.jsonl", rows)
+    write_jsonl(out / "cycles.jsonl", cycles)
     checks = [
         c for c in read_jsonl(source / "correctness.jsonl") if c["repetition"] == 0
     ]
-    (out / "correctness.jsonl").write_text(
-        "".join(json.dumps(c) + "\n" for c in checks)
-    )
+    write_jsonl(out / "correctness.jsonl", checks)
     atomic_json(out / "run_manifest.json", manifest)
     atomic_json(
         out / "complete.json",

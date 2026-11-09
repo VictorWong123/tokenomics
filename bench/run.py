@@ -15,6 +15,7 @@ from bench.common import (
     hardware,
     read_jsonl,
     source_fingerprint,
+    write_jsonl,
 )
 
 
@@ -28,7 +29,7 @@ def save_rows(out, requests, correctness):
         ("correctness.jsonl", correctness),
     ):
         tmp = out / (name + ".tmp")
-        tmp.write_text("".join(json.dumps(x, sort_keys=True) + "\n" for x in rows))
+        write_jsonl(tmp, rows, sort_keys=True)
         tmp.replace(out / name)
 
 
@@ -230,7 +231,7 @@ def run(
                     # Mapping the draft alone does not fault in its weight pages.
                     warm.update(policy="fixed", k=4, drafter="model")
                 jobs = adir / f"{cid}.jobs.jsonl"
-                jobs.write_text(json.dumps(warm) + "\n" + json.dumps(job) + "\n")
+                write_jsonl(jobs, (warm, job))
                 result_path = adir / f"{cid}.requests.jsonl"
                 cycles_path = adir / f"{cid}.cycles.jsonl"
                 args = [

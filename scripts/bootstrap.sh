@@ -14,6 +14,7 @@ python3 -m venv .venv
 .venv/bin/cmake -S . -B "build-$backend" -G Ninja -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_MAKE_PROGRAM="$PWD/.venv/bin/ninja" \
   -DPython3_EXECUTABLE="$PWD/.venv/bin/python" \
+  -DBUILD_TESTING=ON -DTOKENOMICS_PYTHON_TESTS=ON \
   -DGGML_NATIVE=OFF -DGGML_METAL="$metal" -DGGML_CUDA="$cuda"
 .venv/bin/cmake --build "build-$backend" -j "${TOKENOMICS_BUILD_JOBS:-4}"
 .venv/bin/ctest --test-dir "build-$backend" --output-on-failure
