@@ -46,9 +46,8 @@ def _calibration_system_info(rows, configurations, drafter):
     offload = re.compile(r"; load_tensors: offloaded [^\n]*\n")
     target_loads = offload.findall(target_info)
     loaded_loads = offload.findall(system_info)
-    if (
-        loaded_loads[:-1] != target_loads
-        or offload.sub("", system_info) != offload.sub("", target_info)
+    if loaded_loads[:-1] != target_loads or offload.sub("", system_info) != offload.sub(
+        "", target_info
     ):
         raise ValueError("Mixed calibration backends")
     return system_info
