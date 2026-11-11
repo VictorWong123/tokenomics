@@ -50,8 +50,9 @@ bash scripts/bootstrap.sh cpu
 
 Set `TOKENOMICS_BUILD_JOBS=2` on a memory-limited host. The
 [development guide](docs/development.md) covers C++-only policy tests, full
-integration tests, sanitizers and formatting. Metal/CUDA are build options;
-their model execution has not been validated by the retained Linux results.
+integration tests, sanitizers and formatting. A physical Apple M3 also passed
+the Metal fixture pipeline and a trained ngram controller check. See the
+[Mac and Linux comparison](results/verification/mac-m3-metal-20261111/README.md).
 
 ## Inspect the measured controller
 
@@ -79,8 +80,8 @@ and the [retained evidence index](results/README.md).
 
 The experimental packed CPU profile passes its within-profile correctness gate
 but fails cross-profile greedy equality. Guarded CPU remains the default.
-Full Pilot A/B, 90-prompt held-out evaluation and Metal execution remain
-incomplete; see [requirements and status](docs/requirements.md).
+Full Pilot A/B and the 90-prompt held-out evaluation remain incomplete. See
+[requirements and status](docs/requirements.md).
 
 ## Repository map
 

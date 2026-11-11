@@ -16,7 +16,11 @@ token is pending, so cache length and generated count differ by one.
    must be a prefix of P. This supports lazy fallback and re-entry.
 3. Ask upstream for up to k proposals; it processes L and all but its final
    proposed token. Do not assume a fully accepted block leaves both caches equal.
-4. Target-decode [L, proposals], then call upstream sample-and-accept.
+4. Target-decode [L, proposals], then call upstream sample-and-accept. On
+   Metal, short offloaded causal batches that request every output row use
+   one-row physical batches to match ordinary greedy arithmetic. Prompt prefill
+   and draft catch-up still batch tokens. This trades batched verification
+   throughput for token equality on the M3.
 5. Stop at the first target EOG or output cap; append the old pending token and
    each committed token except the new pending token to P.
 6. Remove target/draft KV after new P. Assert the target cache equals |P| and

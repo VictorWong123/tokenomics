@@ -9,6 +9,7 @@ local experiments. The completed controller result is a bounded Linux CPU
 | Evidence | What it establishes |
 |---|---|
 | [Controller study](verification/codespace-controller-20261108/verification.json) | Complete 252-record validation grid, 16 logging records, frozen calibration, exact IDs/stops and actual shutdown |
+| [Apple M3 Metal tests and Linux comparison](verification/mac-m3-metal-20261111/README.md) | Native fixture checks, trained greedy output comparisons and target-only decode measurements |
 | [Controller results and figures](../docs/controller-results.md) | Ratios, uncertainty, ablations, overhead, work counts and limitations derived from that study |
 | [Four-page PDF](verification/engineering-report-20261108/tokenomics-engineering-report.pdf) | Reproducible engineering report; generator/receipt/figure hashes are in `report-provenance.json` beside it |
 | [Frozen-action confirmation](verification/codespace-confirmation-20261108/verification.json) | Separate nine-prompt fixed1 result; no practical ordinary-decoding gain |
@@ -22,7 +23,7 @@ local experiments. The completed controller result is a bounded Linux CPU
 Controller/ordinary throughput is 0.9709×, controller/frozen-fixed1 is 0.9943×
 and controller/cap8 is 1.2048×. The [result document](../docs/controller-results.md)
 contains the confidence intervals, exact operating point and unfavorable cells.
-Full Pilot A/B, 90-prompt held-out evaluation and Metal execution remain incomplete.
+Full Pilot A/B and the 90-prompt held-out evaluation remain incomplete.
 
 ## Layout and integrity
 

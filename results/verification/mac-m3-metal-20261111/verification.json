@@ -1,0 +1,27 @@
+{
+  "archives_sha256": {
+    "calibration-and-smoke.tar.gz": "8d658228aabdc793d26f0fc43ad58c62756fae58bd5e0987513616131f6624c8",
+    "logging.tar.gz": "8ca8684f6ed37c4e621897def4634abcfae217079b912ba962b5bfa3587835ba",
+    "original-metal-run.tar.gz": "9680faff87a11fa480cccac9296498f9db932130361ef2dc716e9008a1a3b8ed",
+    "validation.tar.gz": "687c0b85823e56af859190c0a9b6742d49173685c2f94d384b4be354ddc9bbb8"
+  },
+  "binary_sha256": "265609b052f7388d07da8a5d6633ada1ceea11223f1d4b53ddc1cbd8dedd6829",
+  "cpu_runtime_fixture_comparisons": 906,
+  "ctest_suites_passed": 6,
+  "fit_records": 18,
+  "held_out": false,
+  "llama_revision": "fd27b2034905f8dadd8bd6d2cc44595f4929d391",
+  "logging_records": 16,
+  "metal_fixture_records": 168,
+  "model_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+  "platform": "Apple M3, 8 GiB, macOS 15.6.1 (24G90), Metal 25/25 layers",
+  "python_tests_run": 68,
+  "python_tests_skipped_packed_cpu": 3,
+  "source": {
+    "owned_source_sha256": "c5c9e67fa9fe580fe3b755a1244ca5a36b4ba0dd0e4e61ceaebdbc45532949d6",
+    "revision": "47e7a428170c7694166426909256a3b3d946df55"
+  },
+  "trained_ngram_smoke_records": 28,
+  "validation_blocks": 36,
+  "validation_records": 252
+}
