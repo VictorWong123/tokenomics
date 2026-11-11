@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 import pathlib
+import re
 import statistics
 from analysis.report import cells, select_fixed, validate_run
 from bench.common import read_jsonl, sha256
@@ -22,6 +23,35 @@ POINT_KEYS = (
     "drafter",
     "cache",
 )
+
+
+def _calibration_system_info(rows, configurations, drafter):
+    drafted = {
+        c["id"]
+        for c in configurations
+        if (c["policy"] != "target" and c.get("drafter", "model") == "model")
+        or c.get("resident", False)
+    }
+    loaded = {r["system_info"] for r in rows if r["configuration_id"] in drafted}
+    ordinary = {r["system_info"] for r in rows if r["configuration_id"] not in drafted}
+    if drafter != "model":
+        loaded |= ordinary
+        ordinary.clear()
+    if len(loaded) != 1 or ordinary and len(ordinary) != 1:
+        raise ValueError("Mixed calibration backends")
+    system_info = next(iter(loaded))
+    if not ordinary or system_info == next(iter(ordinary)):
+        return system_info
+    target_info = next(iter(ordinary))
+    offload = re.compile(r"; load_tensors: offloaded [^\n]*\n")
+    target_loads = offload.findall(target_info)
+    loaded_loads = offload.findall(system_info)
+    if (
+        loaded_loads[:-1] != target_loads
+        or offload.sub("", system_info) != offload.sub("", target_info)
+    ):
+        raise ValueError("Mixed calibration backends")
+    return system_info
 
 
 def point_from_frozen(frozen, drafter, cache="retain", *, configuration_id=None):
@@ -94,9 +124,9 @@ def freeze(
     ids = {p["id"] for p in prompts}
     if not replay_samples or any(s["prompt_id"] not in ids for s in replay_samples):
         raise ValueError("Replay priors must use the same development fit prompts")
-    system = {r["system_info"] for r in rows}
-    if len(system) != 1:
-        raise ValueError("Mixed calibration backends")
+    system_info = _calibration_system_info(
+        rows, frozen["config"]["configurations"], drafter
+    )
     priors = []
     for action in ACTIONS:
         samples = [s for s in replay_samples if s["action"] == action]
@@ -140,7 +170,7 @@ def freeze(
         raise ValueError("Invalid synchronization calibration observation")
     selected = select_fixed(cells(rows))
     point = point_from_frozen(frozen, drafter)
-    point["system_info"] = next(iter(system))
+    point["system_info"] = system_info
     sources = {
         "fit/run_manifest.json": sha256(fit_dir / "run_manifest.json"),
         "fit/requests.jsonl": sha256(fit_dir / "requests.jsonl"),
