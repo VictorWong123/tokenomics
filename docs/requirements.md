@@ -8,7 +8,7 @@ See [the technical report](report.md) for interpretation and
 | Requirement | Status and evidence |
 |---|---|
 | Pin execution code, model provenance and settings | Implemented: clean llama.cpp pin, model catalog/locks, executable/source/model hashes and frozen manifests |
-| Portable C++20 inference-loop integration | Implemented and tested on Linux CPU; Metal/CUDA build options exist, execution remains unverified |
+| Portable C++20 inference-loop integration | Tested on Linux CPU and on [Apple M3 Metal](../results/verification/mac-m3-metal-20261111/README.md). CUDA remains unverified |
 | Upstream greedy verification | Implemented: the adapter calls upstream sample-and-accept; no second verifier |
 | Fixed caps and existing dynamic/acceptance baselines | Implemented; actual proposal counts and stopping are logged |
 | Target-only fallback, retained KV, lazy catch-up, re-entry and reset | Implemented; synthetic edge cases and trained differential checks cover the executed paths |
@@ -23,7 +23,7 @@ See [the technical report](report.md) for interpretation and
 | Timing, RSS, minimal/detailed logging | Implemented with documented boundaries. The controller logging grid is complete; the paired CPU comparison stopped on cross-profile token divergence and supplies no accepted timing estimate |
 | Stock executable | Optional unmodified diagnostic builds and stopping-semantic investigation exist; no equivalent-endpoint stock performance claim |
 | CPU performance optimization | Buffer reuse is implemented. Row-consistent packed verification passes Cloud Release/sanitizers, 906 fixture cases and its within-profile trained gate (272 comparisons, 14 diagnosis checks and 66 replay actions). The paired comparison fails cross-profile greedy equality at token36; guarded stays the default and no CPU-profile speedup is accepted. Rejected alternatives and raw diagnostics are retained |
-| Final held-out result, controller figures and resume claim | Bounded trained study/figures/demo complete: 1.2048× cap8, 0.9943× frozen fixed1, 0.9709× ordinary decoding, 1.67 µs/cycle policy cost. Full held-out evaluation remains incomplete; no ordinary-decoding gain, research novelty or M3 execution is claimed |
+| Final held-out result, controller figures and resume claim | Bounded trained study/figures/demo complete: 1.2048× cap8, 0.9943× frozen fixed1, 0.9709× ordinary decoding, 1.67 µs/cycle policy cost. Full held-out evaluation remains incomplete; these Linux measurements apply to the tested 3B configuration |
 | Reproducible documentation and evidence | Build/CLI/runtime/experiment/lifecycle docs, raw artifacts, verification receipts and decision records are maintained alongside code |
 
 ## Reading guide

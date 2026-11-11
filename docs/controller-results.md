@@ -165,9 +165,10 @@ Without models or inference:
   --out results/local/reproduced-controller-details
 ```
 
-The full 90-prompt held-out matrix, full Pilot A/B decision and Mac/Metal
-measurements remain unexecuted. These are bounded development engineering
-results. No universal acceleration, model-quality, energy, dollar-cost or research
+The full 90-prompt held-out matrix and full Pilot A/B decision remain open.
+The [Apple M3 comparison](../results/verification/mac-m3-metal-20261111/README.md)
+reports the separate Metal operating point. These Linux results cover the bounded
+development grid. No universal acceleration, model-quality, energy, dollar-cost or research
 novelty claim follows. The controller remains a reusable C++ implementation with
 explained behavior and a measured operating-point limitation.
 

@@ -8,6 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from bench.controller import (
+    _calibration_system_info,
     calibrate,
     configurations,
     point_from_frozen,
@@ -16,6 +17,42 @@ from bench.controller import (
 from bench.common import atomic_json, sha256
 from bench.run import run
 from bench.replay import investigate
+
+
+class BackendIdentity(unittest.TestCase):
+    def test_model_calibration_uses_draft_loaded_backend_identity(self):
+        configurations = [
+            dict(id="target", policy="target"),
+            dict(id="fixed1", policy="fixed", k=1, drafter="model"),
+            dict(id="fixed2", policy="fixed", k=2, drafter="model"),
+        ]
+        prefix = "backend; devices=MTL0,CPU,"
+        target_load = "; load_tensors: offloaded 25/25 layers to GPU\n"
+        draft_load = "; load_tensors: offloaded 29/29 layers to GPU\n"
+        suffix = "; profile=guarded"
+        target_only = prefix + target_load + suffix
+        target_and_draft = prefix + target_load + draft_load + suffix
+        rows = [
+            dict(configuration_id="target", system_info=target_only),
+            dict(configuration_id="fixed1", system_info=target_and_draft),
+            dict(configuration_id="fixed2", system_info=target_and_draft),
+        ]
+        self.assertEqual(
+            _calibration_system_info(rows, configurations, "model"),
+            target_and_draft,
+        )
+        for changed_target in (
+            target_only.replace("MTL0", "CPU0"),
+            target_only.replace("25/25", "24/25"),
+        ):
+            with self.subTest(changed_target=changed_target):
+                rows[0]["system_info"] = changed_target
+                with self.assertRaisesRegex(ValueError, "Mixed calibration backends"):
+                    _calibration_system_info(rows, configurations, "model")
+        rows[0]["system_info"] = target_only
+        rows[-1]["system_info"] = target_and_draft.replace("MTL0", "CPU0")
+        with self.assertRaisesRegex(ValueError, "Mixed calibration backends"):
+            _calibration_system_info(rows, configurations, "model")
 
 
 @unittest.skipUnless(os.getenv("TOKENOMICS_TEST_BINARY"), "requires fixture engine")

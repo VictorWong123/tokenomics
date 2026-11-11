@@ -1,0 +1,40 @@
+[
+  {
+    "first_token_mismatch": null,
+    "linux_decode_tokens_per_second": 14.963114624867107,
+    "mac_decode_tokens_per_second": 70.66525590255344,
+    "mac_output_ids_preserved_after_fix": true,
+    "mac_peak_rss_bytes": 1253818368,
+    "prompt": "development-code-01",
+    "repaired_mac_decode_tokens_per_second": 57.8752285256526,
+    "tokens": 64
+  },
+  {
+    "first_token_mismatch": {
+      "actual": 279,
+      "position": 19,
+      "reference": 678
+    },
+    "linux_decode_tokens_per_second": 14.84340296152867,
+    "mac_decode_tokens_per_second": 58.07029244307248,
+    "mac_output_ids_preserved_after_fix": true,
+    "mac_peak_rss_bytes": 1226620928,
+    "prompt": "development-qa-01",
+    "repaired_mac_decode_tokens_per_second": 69.21936194647752,
+    "tokens": 64
+  },
+  {
+    "first_token_mismatch": {
+      "actual": 785,
+      "position": 4,
+      "reference": 334
+    },
+    "linux_decode_tokens_per_second": 13.289554252461048,
+    "mac_decode_tokens_per_second": 62.60536887092143,
+    "mac_output_ids_preserved_after_fix": true,
+    "mac_peak_rss_bytes": 1270349824,
+    "prompt": "development-summary-01",
+    "repaired_mac_decode_tokens_per_second": 64.49042277267993,
+    "tokens": 64
+  }
+]

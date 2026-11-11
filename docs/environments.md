@@ -20,8 +20,9 @@ comparison and verified/retained completed artifacts. Development resumed in
 Codex Cloud when its shell attachment recovered. No Codespaces configuration
 change was needed for that interruption.
 
-These hosts provide Linux CPU evidence. Metal and CUDA are build options;
-neither a Mac/M3 nor GPU performance result has been executed here.
+Separate [Apple M3 results](../results/verification/mac-m3-metal-20261111/README.md)
+cover a physical Mac with 8 GiB unified memory, macOS 15.6.1 and Metal offload.
+The smaller Mac controller target and the Linux 3B target have separate calibrations.
 
 ## Supported Codespaces route
 
