@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "scope": "Post-hoc exploratory development work replay on already observed CPU fit/validation collections; not a new validation, published tree reproduction, deployment or speed claim",
+  "output_cap": 64,
+  "transition_orders": [1, 2],
+  "transition_selection": "Most recently observed successor of the exact context; frozen edges while constructing a draft; no draft self-training",
+  "transition_caps": [1, 4, 8],
+  "past_second_logit_cap": 1,
+  "controls": ["ordinary", "upstream_ngram3", "minimum_five_suffix"],
+  "control_caps": [1, 4, 8],
+  "reserved_held_out_access": false
+}
