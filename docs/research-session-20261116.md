@@ -412,3 +412,24 @@ reported as unavailable; it cannot establish Metal execution correctness.
 Neither hosted M1 execution nor synthetic graphs establish local M3 throughput.
 See [GitHub runner documentation](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
 and [preflight implementation](../scripts/hosted_metal_preflight.py).
+
+### Arithmetic-preserving dispatch locality prototype
+
+Research review confirmed upstream PR29869 is already in our pin. It shares
+weight dequantization using few-row MMA, but those reductions differ from the
+ordinary one-row reference. Added a separate, default-OFF
+`TOKENOMICS_METAL_INTERLEAVE` prototype requiring short-MV and embedded shaders.
+For dense Q4_K/Q6_K projections, it swaps the two host grid extents and adds two
+shader wrappers that swap them back before calling the unchanged upstream
+mat-vec implementations. This may reuse weight tiles in cache between adjacent
+activation rows. GPU scheduling and cache benefit are not guaranteed.
+
+Generated common/ops/device C++ and both context copies compile on Linux.
+All320 host dispatch cases and589896 padding split cases pass; the original
+shader body is preserved except for removed internal includes. Default CPU
+passes7/7 suites in38.20 seconds. The trained-model gate requires an explicit
+interleaved candidate marker; the ordinary short-MV study forces the extra flag
+OFF. Hosted preflight now also compiles this third profile and separately probes
+the offline shader compiler. No Metal execution or M3 speedup is claimed.
+[Host evidence](../results/verification/metal-interleave-host-20261116/summary.json)
+and [research rationale](metal-research-directions-20261116.md).

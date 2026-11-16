@@ -33,7 +33,8 @@ def main():
     def save():
         (out / "summary.json").write_text(json.dumps(report, indent=2) + "\n")
 
-    def run(name, command):
+    def run(name, command, *, required=True):
+        print(f"Running {name}", flush=True)
         log = out / f"{name}.log"
         with log.open("wb") as stream:
             result = subprocess.run(command, cwd=ROOT, stdout=stream, stderr=stream)
@@ -46,10 +47,11 @@ def main():
             }
         )
         save()
-        if result.returncode:
+        if result.returncode and required:
             # GitHub displays the failure without requiring an artifact download.
             print(log.read_text(errors="replace")[-18000:], flush=True)
             raise RuntimeError(f"{name} failed ({result.returncode})")
+        return result.returncode
 
     try:
         run(
@@ -64,7 +66,16 @@ def main():
             ],
         )
         report["metal_device"] = json.loads((out / "device-probe.log").read_text())
-        for profile, short in (("reference", "OFF"), ("short-mv", "ON")):
+        metal_compiler = (
+            run("shader-compiler-probe", ["xcrun", "--find", "metal"], required=False)
+            == 0
+        )
+        report["shader_compilation"] = "pending" if metal_compiler else "unavailable"
+        for profile, short, interleave in (
+            ("reference", "OFF", "OFF"),
+            ("short-mv", "ON", "OFF"),
+            ("interleaved", "ON", "ON"),
+        ):
             build = ROOT / f"build-hosted-{profile}"
             run(
                 f"{profile}-configure",
@@ -91,6 +102,7 @@ def main():
                     "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
                     "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
                     f"-DTOKENOMICS_METAL_SHORT_MV={short}",
+                    f"-DTOKENOMICS_METAL_INTERLEAVE={interleave}",
                 ],
             )
             run(
@@ -109,6 +121,34 @@ def main():
                     "2",
                 ],
             )
+            if metal_compiler:
+                # Embedded shaders compile lazily at device execution. Compile
+                # the relevant source separately even when no GPU is exposed.
+                for kind in ("mul_mv", "softmax"):
+                    prefix = (
+                        "tokenomics"
+                        if interleave == "ON" and kind == "mul_mv"
+                        else "ggml"
+                    )
+                    matches = list(build.rglob(f"{prefix}-metal-embed-{kind}.metal"))
+                    if len(matches) != 1:
+                        raise RuntimeError(f"Expected one embedded {kind} source")
+                    run(
+                        f"{profile}-shader-{kind}",
+                        [
+                            "xcrun",
+                            "-sdk",
+                            "macosx",
+                            "metal",
+                            "-std=metal3.1",
+                            "-DGGML_METAL_EMBED_LIBRARY",
+                            "-O3",
+                            "-c",
+                            str(matches[0]),
+                            "-o",
+                            str(build / f"preflight-{kind}.air"),
+                        ],
+                    )
             report.setdefault("binary_sha256", {})[profile] = hashlib.sha256(
                 (build / "tokenomics").read_bytes()
             ).hexdigest()
@@ -124,12 +164,17 @@ def main():
                 ],
             )
             run(f"{profile}-cpu-rows", [str(build / "test_backend_rows"), "--cpu"])
-            if report["metal_device"]["available"]:
+            if profile != "reference" and report["metal_device"]["available"]:
+                # The default context guard splits model verification, not raw
+                # backend graphs. Only the candidate promises row-invariant
+                # dispatch for this direct backend test.
                 run(
                     f"{profile}-metal-rows",
                     [str(build / "test_backend_rows"), "--metal"],
                 )
         report["state"] = "passed"
+        if metal_compiler:
+            report["shader_compilation"] = "passed"
         report["metal_execution"] = (
             "passed" if report["metal_device"]["available"] else "unavailable"
         )

@@ -231,6 +231,10 @@ std::string Engine::system_info() const {
         info += "; TOKENOMICS_METAL_SHORT_MV=ON; short_mv_max_rows=9; "
                 "verification_ubatch=padding_safe; kv_padding=256";
 #endif
+#ifdef TOKENOMICS_METAL_INTERLEAVE
+    if (impl_->cfg.gpu_layers > 0)
+        info += "; TOKENOMICS_METAL_INTERLEAVE=ON; interleave_types=q4_K,q6_K";
+#endif
     return info;
 }
 

@@ -12,6 +12,8 @@ from unittest.mock import patch
 from bench.common import ROOT, read_jsonl, sha256, write_jsonl
 from scripts.check_metal_profile import (
     CANDIDATE_MARKER,
+    INTERLEAVE_MARKER,
+    interleaved_profile,
     REFERENCE_MARKER,
     gate,
     metal_profile,
@@ -21,6 +23,28 @@ from scripts.check_metal_profile import (
 
 
 class MetalProfileIdentityTests(unittest.TestCase):
+    def test_interleave_is_explicit_and_excluded_from_other_profiles(self):
+        row = {
+            "system_info": CANDIDATE_MARKER
+            + "; devices=MTL0; offloaded 25/25 layers to GPU",
+            "settings": {"gpu_layers": 99},
+        }
+        with self.assertRaises(ValueError):
+            interleaved_profile(row, True)
+        row["system_info"] += "; " + INTERLEAVE_MARKER
+        interleaved_profile(row, True)
+        with self.assertRaises(ValueError):
+            metal_profile(row, True)
+        with self.assertRaises(ValueError):
+            interleaved_profile(row, False)
+        row["system_info"] = row["system_info"].replace(
+            CANDIDATE_MARKER, REFERENCE_MARKER
+        )
+        with self.assertRaises(ValueError):
+            interleaved_profile(row, False)
+        row["system_info"] = row["system_info"].replace(INTERLEAVE_MARKER, "")
+        interleaved_profile(row, False)
+
     def test_legacy_receipt_preserves_its_original_coverage(self):
         archive_path = (
             ROOT

@@ -78,6 +78,7 @@ def study(args):
                     "-DTOKENOMICS_SANITIZE=OFF",
                     "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
                     "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
+                    "-DTOKENOMICS_METAL_INTERLEAVE=OFF",
                     "-DGGML_METAL=ON",
                     "-DGGML_CUDA=OFF",
                     "-DGGML_NATIVE=ON",

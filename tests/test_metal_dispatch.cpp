@@ -1,3 +1,4 @@
+#include "../src/metal_interleave.h"
 #include "ggml-metal-common.h"
 #include "ggml.h"
 #include <iostream>
@@ -19,6 +20,9 @@ int main() {
             for (int rows = 1; rows <= 32; ++rows) {
                 auto *input = ggml_new_tensor_3d(ctx, GGML_TYPE_F32, 256, rows, heads);
                 auto *op = ggml_mul_mat(ctx, weight, input);
+                check(tokenomics_metal_interleave(op) ==
+                      (heads == 1 && rows >= 2 && rows <= 9 &&
+                       (type == GGML_TYPE_Q4_K || type == GGML_TYPE_Q6_K)));
                 // Ordinary decode is still MV; 2..9 no longer select MMA/MM.
                 check(ggml_metal_op_mul_mat_use_mma(op) == (rows >= 10 && rows <= 16));
                 check(ggml_metal_op_mul_mat_use_mm(op, true) == (rows >= 10));

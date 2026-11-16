@@ -1,0 +1,42 @@
+{
+  "purpose": "Host compilation of opt-in Metal scheduling permutation; no GPU or throughput result",
+  "state": "host_checks_passed",
+  "source_sha256": {
+    "cmake/metal-interleave.cmake": "1c419d742678a5dd9f1d54745e5f95c8be38c1bc7b3c1b32e776feb8e7b15043",
+    "src/metal_interleave.h": "715a55049df26ee8b60a1ef0f3145055acf744cbc92fb7438a7ddeef7893b2c4",
+    "tests/test_metal_dispatch.cpp": "08a001f2c2c43397a355674992f433b15d377e4c1d6713a15ffbaa0ddbe9542c",
+    "tests/metal-host/CMakeLists.txt": "bbbef2b04effca437fc3a90e213a672f2a389ecfbb11c14cc664608d9a6035d8"
+  },
+  "generated_sha256": {
+    "tokenomics-metal-common.cpp": "2df15e10db263679ad855cda83b50afe54f9c958047370748a91c1caa4b9c4e8",
+    "tokenomics-metal-embed-mul_mv.metal": "13d90119717643603a0a483559b7139c39d538195be3b7256e220e9e97f7e4a3",
+    "tokenomics-metal-embed-mul_mv.s": "7fe83237c4e82f932cbbef895d87178c247db0465db92413ba3e5b5d0a138d10",
+    "tokenomics-metal-ops.cpp": "f5a195092737669fca87c660d52631da42b039ef7a40391a83a7b36158c05b2b",
+    "tokenomics-metal-device.cpp": "de11f8655516017bc21e7d2ca9443785c1a875eb768a24c7e7c1375ad4a3113d"
+  },
+  "checks": {
+    "generated_common_ops_device_cpp": "compiled on Linux",
+    "generated_context_cpp": "both modes compiled on Linux",
+    "dispatch_cases": 320,
+    "padding_split_cases": 589896,
+    "original_mul_mv_body": "preserved verbatim apart from removed internal includes",
+    "additional_wrappers": [
+      "q4_K_f32_interleaved",
+      "q6_K_f32_interleaved"
+    ],
+    "wrapper_change": "pass uint3(tgpig.y,tgpig.x,tgpig.z) to unchanged implementation",
+    "host_suites": "2/2 passed",
+    "default_cpu_suites": "7/7 passed, 38.20 seconds",
+    "profile_identity_tests": "4 passed; 2 runtime orchestration tests skipped without binary environment"
+  },
+  "limitations": [
+    "No Metal shader compiler or GPU was used for these host checks.",
+    "A permutation of coordinates does not establish whole-model token identity.",
+    "Cache reuse and M3 throughput remain unmeasured."
+  ],
+  "reproduce": [
+    ".venv/bin/cmake -S tests/metal-host -B build-metal-interleave-host -G Ninja -DCMAKE_MAKE_PROGRAM=$PWD/.venv/bin/ninja -DTOKENOMICS_HOST_INTERLEAVE=ON",
+    ".venv/bin/cmake --build build-metal-interleave-host -j 2",
+    ".venv/bin/ctest --test-dir build-metal-interleave-host --output-on-failure"
+  ]
+}

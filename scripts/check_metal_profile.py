@@ -14,10 +14,11 @@ from scripts.check_models import check_cycles, compare, execute, validate_record
 REFERENCE_MARKER = "TOKENOMICS_METAL_VERIFY_SINGLE_ROW=ON"
 CANDIDATE_MARKER = "TOKENOMICS_METAL_SHORT_MV=ON"
 MODEL_SHA256 = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+INTERLEAVE_MARKER = "TOKENOMICS_METAL_INTERLEAVE=ON"
 GREEDY_MARKER = "TOKENOMICS_GREEDY_NO_TEMP=ON"
 
 
-def metal_profile(row, candidate):
+def metal_profile(row, candidate, *, interleave=False):
     info = row["system_info"]
     marker, excluded = (
         (CANDIDATE_MARKER, REFERENCE_MARKER)
@@ -25,7 +26,8 @@ def metal_profile(row, candidate):
         else (REFERENCE_MARKER, CANDIDATE_MARKER)
     )
     if (
-        marker not in info
+        (INTERLEAVE_MARKER in info) != (candidate and interleave)
+        or marker not in info
         or excluded in info
         or "devices=MTL0" not in info
         or "offloaded 25/25 layers to GPU" not in info
@@ -34,6 +36,10 @@ def metal_profile(row, candidate):
         raise ValueError(
             "Expected fully offloaded Qwen 0.5B Metal profile was not executed"
         )
+
+
+def interleaved_profile(row, candidate):
+    metal_profile(row, candidate, interleave=True)
 
 
 def greedy_profile(row, candidate):
@@ -415,7 +421,9 @@ def main():
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument(
-        "--candidate-profile", choices=("short-mv", "greedy"), default="short-mv"
+        "--candidate-profile",
+        choices=("short-mv", "interleaved", "greedy"),
+        default="short-mv",
     )
     args = parser.parse_args()
     if sha256(args.model) != MODEL_SHA256:
@@ -425,9 +433,11 @@ def main():
         args.candidate.resolve(),
         args.model.resolve(),
         args.out,
-        profile_validator=(
-            greedy_profile if args.candidate_profile == "greedy" else metal_profile
-        ),
+        profile_validator={
+            "short-mv": metal_profile,
+            "interleaved": interleaved_profile,
+            "greedy": greedy_profile,
+        }[args.candidate_profile],
     )
 
 
