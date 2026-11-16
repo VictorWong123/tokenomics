@@ -452,3 +452,24 @@ feature is reported as unavailable. Artifact bytes could not be downloaded into
 this execution workspace through its proxy; the public failure excerpt and
 fail-fast stage ordering are retained without claiming absent successful logs.
 [Retained negative evidence](../results/verification/hosted-metal-20261116/summary.json).
+
+### Request-local retrieval ceiling on frozen fit trajectories
+
+Added a future-aware oracle diagnostic to distinguish retrieval limitations
+from backend verification cost. It only copies already observed tokens but uses
+the canonical future to choose the occurrence/length and computes the minimum
+cycle path. This is deliberately non-deployable: no rejection or lookup cost,
+no cross-request corpus, no latency prediction. All30 archived ngram policy
+counts per platform are revalidated before comparison. The implementation
+matches an independent breadth-first enumerator on2480 short trajectories.
+
+For192 fit tokens per platform, the minimum-five-token, cap1 suffix already
+matches the oracle's cycles:161 on M3 and169 on Linux. At cap8 the oracle and
+causal suffix also share137/155 cycles, while the oracle removes5/38 wasted
+rows. Relaxing matches to one token gives an optimistic147/145 cycles at cap1
+or115/111 at cap8, with perfect future-aware filtering. This limits the fit-set
+benefit available from merely improving occurrence selection; it does not rule
+out learned proposals, cross-request retrieval or other workloads. The90
+reserved held-out prompts remain untouched.
+[Method and table](retrieval-envelope.md),
+[all90 oracle traces](../results/verification/retrieval-envelope-20261116/envelope.json).
