@@ -196,3 +196,29 @@ same logical inference work across kernel profiles. Reports compare suffix
 caps against both ordinary baselines, both ngram cap8 baselines, and suffix
 cap1. These fit prompts informed proposal/cap exploration, so the screen cannot
 support a held-out performance claim. The interleaving prototype remains OFF.
+
+## Weight-tile interleaving candidate
+
+The expanded interleaving prototype passes native Apple C++ and Metal shader
+compilation, fixture suites and CPU row checks. The hosted virtual GPU cannot
+execute the required SIMD operations; actual M3 graph arithmetic still needs
+the local exactness gates.
+
+Use the same runner with an explicit candidate choice:
+
+```bash
+.venv/bin/python scripts/metal_short_mv_study.py \
+  --interleave --screen retrieval \
+  --model models/qwen2.5-0.5b-instruct-q4_k_m.gguf \
+  --out results/local/metal-interleaved-retrieval-01
+```
+
+It builds the original guarded reference and `build-metal-interleaved`, enables
+both short-MV and interleaving on the candidate, and uses distinct frozen
+configuration IDs and marker checks. Direct GPU row arithmetic and both
+trained exactness gates precede the126-record retrieval screen. Sampler and
+stage-timing experiments remain OFF. `--gate-only` stops before timings;
+omitting `--screen retrieval` uses the original ngram policy set. This compares
+the combined candidate against unchanged baselines; it does not isolate the
+interleaving effect from the short-MV effect. Neither experimental option is
+enabled by default.

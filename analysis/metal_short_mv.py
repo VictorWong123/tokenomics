@@ -7,7 +7,7 @@ import statistics
 from analysis.controller import verify
 from analysis.report import cells, paired_summary
 from bench.common import ROOT, atomic_json, read_jsonl
-from scripts.check_metal_profile import MODEL_SHA256, metal_profile
+from scripts.check_metal_profile import MODEL_SHA256, interleaved_profile, metal_profile
 
 
 SCREENS = {
@@ -16,11 +16,25 @@ SCREENS = {
 }
 
 
-def analyze(directory, *, screen="ngram"):
+def screen_configuration(screen, interleaved=False):
+    config = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
+    if interleaved:
+        config["kernel_variant"] = "interleaved"
+        config["phase"] = config["phase"].replace("metal_", "metal_interleaved_", 1)
+        for condition in config["configurations"]:
+            if condition["kernel_profile"] == "short-mv":
+                condition["kernel_profile"] = "interleaved"
+                condition["id"] = condition["id"].replace("short-mv", "interleaved")
+    return config
+
+
+def analyze(directory, *, screen="ngram", interleaved=False):
     directory = Path(directory)
     verify(directory)
     frozen = json.loads((directory / "run_manifest.json").read_text())["frozen"]
-    expected = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
+    expected = screen_configuration(screen, interleaved)
+    candidate = "interleaved" if interleaved else "short-mv"
+    profile_check = interleaved_profile if interleaved else metal_profile
     corpus = {p["id"]: p for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")}
     if (
         frozen["config"] != expected
@@ -36,7 +50,7 @@ def analyze(directory, *, screen="ngram"):
     binaries = frozen.get("configuration_binary_sha256", {})
     if set(binaries) != set(confs):
         raise ValueError("Missing paired executable identity")
-    for profile in ("guarded", "short-mv"):
+    for profile in ("guarded", candidate):
         if (
             len(
                 {
@@ -48,7 +62,7 @@ def analyze(directory, *, screen="ngram"):
             != 1
         ):
             raise ValueError("Profile changed executable across conditions")
-    if binaries["target"] == binaries["short-mv-target"]:
+    if binaries["target"] == binaries[f"{candidate}-target"]:
         raise ValueError("Baseline and candidate must be distinct executables")
     rows = read_jsonl(directory / "requests.jsonl")
     groups = {}
@@ -56,7 +70,7 @@ def analyze(directory, *, screen="ngram"):
     totals = {}
     for row in rows:
         cid = row["configuration_id"]
-        metal_profile(row, confs[cid]["kernel_profile"] == "short-mv")
+        profile_check(row, confs[cid]["kernel_profile"] == candidate)
         key = row["prompt_id"], row["output_cap"], row["repetition"]
         groups.setdefault(key, {})[cid] = row
         total = totals.setdefault(
@@ -75,30 +89,30 @@ def analyze(directory, *, screen="ngram"):
             total[key] += row["execution"][key]
         for key in ("generation_ms", "prompt_target_ms"):
             total[key] += row[key]
-    pairs = [("short-mv-target", "target")]
-    same_policy = [("short-mv-target", "target")]
+    pairs = [(f"{candidate}-target", "target")]
+    same_policy = [(f"{candidate}-target", "target")]
     for k in (1, 4, 8):
-        same_policy.append((f"short-mv-fixed{k}", f"guarded-fixed{k}"))
+        same_policy.append((f"{candidate}-fixed{k}", f"guarded-fixed{k}"))
         pairs += [
-            (f"short-mv-fixed{k}", b)
-            for b in (f"guarded-fixed{k}", "target", "short-mv-target")
+            (f"{candidate}-fixed{k}", b)
+            for b in (f"guarded-fixed{k}", "target", f"{candidate}-target")
         ]
         pairs.append((f"guarded-fixed{k}", "target"))
     if screen == "retrieval":
         for k in (1, 4, 8):
-            candidate = f"short-mv-suffix{k}"
-            same_policy.append((candidate, f"guarded-suffix{k}"))
+            suffix_candidate = f"{candidate}-suffix{k}"
+            same_policy.append((suffix_candidate, f"guarded-suffix{k}"))
             pairs += [
-                (candidate, baseline)
+                (suffix_candidate, baseline)
                 for baseline in (
                     f"guarded-suffix{k}",
                     "target",
-                    "short-mv-target",
+                    f"{candidate}-target",
                     "guarded-fixed8",
-                    "short-mv-fixed8",
-                    "short-mv-suffix1",
+                    f"{candidate}-fixed8",
+                    f"{candidate}-suffix1",
                 )
-                if baseline != candidate
+                if baseline != suffix_candidate
             ]
     for group in groups.values():
         for a, b in same_policy:
@@ -120,11 +134,16 @@ def analyze(directory, *, screen="ngram"):
     summary = {
         "schema_version": 1,
         "state": (
-            "metal_short_mv_comparison_complete"
-            if screen == "ngram"
-            else "metal_retrieval_comparison_complete"
+            f"metal_interleaved_{screen}_comparison_complete"
+            if interleaved
+            else (
+                "metal_short_mv_comparison_complete"
+                if screen == "ngram"
+                else "metal_retrieval_comparison_complete"
+            )
         ),
         "screen": screen,
+        "kernel_variant": candidate,
         "records": len(rows),
         "comparisons": {f"{a}/{b}": paired_summary(table, a, b) for a, b in pairs},
         "warm_comparisons": {f"{a}/{b}": paired_summary(warm, a, b) for a, b in pairs},

@@ -51,7 +51,9 @@ An opt-in prototype now implements this scheduling permutation as
 `TOKENOMICS_METAL_INTERLEAVE=ON`, requiring short-MV and embedded shaders.
 The original mat-vec kernel body is preserved; four wrappers pass swapped grid
 coordinates to its existing implementations, retaining shared-memory arguments. Host C++ compilation and
-dispatch tests pass. No native shader execution or throughput result exists yet.
+dispatch tests pass. The expanded four-type profile also passes native Apple
+C++/Metal shader compilation and native CPU fixture suites. No Metal graph
+execution or throughput result exists yet.
 The cache-reuse benefit remains a hypothesis. Metal does
 not promise a scheduling order that guarantees the proposed cache benefit.
 The output projection can exceed cache capacity even for a small model;

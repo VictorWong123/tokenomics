@@ -108,8 +108,11 @@ class MetalGateOrchestrationTests(unittest.TestCase):
     def test_retrieval_screen_checks_suffix_work_and_strong_baselines(self):
         self._screen_analysis("retrieval")
 
-    def _screen_analysis(self, screen):
-        from analysis.metal_short_mv import SCREENS, analyze
+    def test_interleaved_retrieval_screen_has_distinct_frozen_identity(self):
+        self._screen_analysis("retrieval", interleaved=True)
+
+    def _screen_analysis(self, screen, interleaved=False):
+        from analysis.metal_short_mv import SCREENS, analyze, screen_configuration
         from bench.run import run
         from make_fixtures import create
 
@@ -132,6 +135,10 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             ]
             write_jsonl(root / "bench/prompts-v1.jsonl", prompts)
             (root / "configs" / SCREENS[screen]).write_text(json.dumps(config))
+            if interleaved:
+                with patch("analysis.metal_short_mv.ROOT", root):
+                    config = screen_configuration(screen, interleaved=True)
+            candidate_profile = "interleaved" if interleaved else "short-mv"
             model = root / "repeat.gguf"
             create(model, 100, ngram_cycle=True)
             # Distinct executable identity; same actual CPU runtime. This tests
@@ -140,7 +147,7 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             wrapper.write_text(f'#!/bin/sh\nexec {shlex.quote(str(binary))} "$@"\n')
             wrapper.chmod(0o700)
             executables = {
-                c["id"]: wrapper if c["kernel_profile"] == "short-mv" else binary
+                c["id"]: wrapper if c["kernel_profile"] == candidate_profile else binary
                 for c in config["configurations"]
             }
             run(
@@ -155,8 +162,14 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             )
             with patch("analysis.metal_short_mv.ROOT", root), patch(
                 "analysis.metal_short_mv.MODEL_SHA256", sha256(model)
-            ), patch("analysis.metal_short_mv.metal_profile") as profile:
-                result = analyze(root / "screen", screen=screen)
+            ), patch(
+                "analysis.metal_short_mv.interleaved_profile"
+                if interleaved
+                else "analysis.metal_short_mv.metal_profile"
+            ) as profile:
+                result = analyze(
+                    root / "screen", screen=screen, interleaved=interleaved
+                )
                 self.assertEqual(result["records"], len(config["configurations"]) * 9)
                 self.assertEqual(profile.call_count, result["records"])
                 self.assertTrue(result["same_work_within_each_policy"])
@@ -164,7 +177,7 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                 rows[0]["generation_ms"] *= 0.5
                 write_jsonl(root / "screen/requests.jsonl", rows)
                 with self.assertRaises(ValueError):
-                    analyze(root / "screen", screen=screen)
+                    analyze(root / "screen", screen=screen, interleaved=interleaved)
 
     def test_cross_binary_gate_retains_success_and_first_failure(self):
         from make_fixtures import create

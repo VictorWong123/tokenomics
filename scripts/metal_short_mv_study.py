@@ -2,7 +2,6 @@
 """Build and gate the opt-in Metal profile, then run a small paired local screen."""
 
 import argparse
-import json
 from pathlib import Path
 import platform
 import shutil
@@ -10,7 +9,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from analysis.metal_short_mv import SCREENS, analyze
+from analysis.metal_short_mv import SCREENS, analyze, screen_configuration
 from bench.common import (
     ROOT,
     atomic_json,
@@ -20,7 +19,12 @@ from bench.common import (
     source_fingerprint,
 )
 from bench.run import run
-from scripts.check_metal_profile import MODEL_SHA256, gate
+from scripts.check_metal_profile import (
+    MODEL_SHA256,
+    gate,
+    interleaved_profile,
+    metal_profile,
+)
 from scripts.diagnose_models import build_configuration
 
 
@@ -57,15 +61,19 @@ def study(args):
     source = source_fingerprint()
     atomic_json(out / "environment-before.json", hardware())
     atomic_json(out / "source.json", source)
+    interleaved = getattr(args, "interleave", False)
+    candidate = "interleaved" if interleaved else "short-mv"
+    profile_check = interleaved_profile if interleaved else metal_profile
     builds = {
         "guarded": ROOT / "build-metal-reference",
-        "short-mv": ROOT / "build-metal-short-mv",
+        candidate: ROOT / f"build-metal-{candidate}",
     }
     state = "building"
     try:
         binaries = {}
         for profile, build in builds.items():
-            enabled = "ON" if profile == "short-mv" else "OFF"
+            enabled = "ON" if profile == candidate else "OFF"
+            locality = "ON" if interleaved and profile == candidate else "OFF"
             print(f"Metal study: configuring {profile}; logs in {out}", flush=True)
             command(
                 [
@@ -78,8 +86,9 @@ def study(args):
                     "-DTOKENOMICS_SANITIZE=OFF",
                     "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
                     "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
-                    "-DTOKENOMICS_METAL_INTERLEAVE=OFF",
+                    f"-DTOKENOMICS_METAL_INTERLEAVE={locality}",
                     "-DGGML_METAL=ON",
+                    "-DGGML_METAL_EMBED_LIBRARY=ON",
                     "-DGGML_CUDA=OFF",
                     "-DGGML_NATIVE=ON",
                     "-DTOKENOMICS_CPU_BATCH_INVARIANT=ON",
@@ -101,7 +110,7 @@ def study(args):
             )
             binaries[profile] = build / "tokenomics"
         state = "direct_backend_rows"
-        candidate_build = builds["short-mv"]
+        candidate_build = builds[candidate]
         command(
             [
                 tool("cmake"),
@@ -162,9 +171,10 @@ def study(args):
         )
         gate(
             binaries["guarded"],
-            binaries["short-mv"],
+            binaries[candidate],
             args.model.resolve(),
             out / "gate",
+            profile_validator=profile_check,
         )
         check_binaries()
         screen = getattr(args, "screen", "ngram")
@@ -172,17 +182,18 @@ def study(args):
             state = "suffix_correctness_gate"
             gate(
                 binaries["guarded"],
-                binaries["short-mv"],
+                binaries[candidate],
                 args.model.resolve(),
                 out / "gate-suffix",
                 drafter="suffix",
+                profile_validator=profile_check,
             )
             check_binaries()
         if args.gate_only:
             state = "gate_passed_no_timings"
         else:
             state = "development_screen"
-            config = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
+            config = screen_configuration(screen, interleaved)
             prompts = [
                 p
                 for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")
@@ -203,10 +214,10 @@ def study(args):
                 config,
                 out / "screen",
                 gpu_layers=99,
-                identity={"purpose": "local M3 short-MV component screen"},
+                identity={"purpose": f"local M3 {candidate} {screen} component screen"},
                 executables=executables,
             )
-            analyze(out / "screen", screen=screen)
+            analyze(out / "screen", screen=screen, interleaved=interleaved)
             state = "complete"
         if source_fingerprint() != source:
             raise RuntimeError("Source changed during the study")
@@ -217,6 +228,7 @@ def study(args):
                 "state": state,
                 "gate": "passed",
                 "screen": screen,
+                "kernel_variant": candidate,
                 "gate_drafters": (
                     ["ngram", "suffix"] if screen == "retrieval" else ["ngram"]
                 ),
@@ -241,6 +253,11 @@ def study(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--interleave",
+        action="store_true",
+        help="Build/gate the weight-tile interleaving candidate instead of plain short-MV",
+    )
     parser.add_argument(
         "--screen",
         choices=tuple(SCREENS),

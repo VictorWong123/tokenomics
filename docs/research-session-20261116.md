@@ -561,3 +561,19 @@ are excluded. The actual learned-model result remains pending.
 Before dispatch, its orchestration passes160 synthetic comparisons and a
 negative wrong-sampler-profile test in1.72 seconds. The test explicitly labels
 those outputs synthetic. [Smoke contract](trained-cpu-smoke.md).
+
+The [expanded native job](https://github.com/VictorWong123/tokenomics/actions/runs/43810371502)
+passes all10 stages for the four-type candidate, including Apple C++ linkage,
+Metal3.1 shader compilation, native fixture suites and CPU row comparisons.
+GPU graph execution remains explicitly unavailable on the paravirtual device.
+[Expanded native receipt](../results/verification/hosted-metal-20261116/interleaved-expanded-native.json).
+
+Added `--interleave` to the existing local study runner so the new prototype is
+concrete and runnable: it builds the guarded reference and interleaved candidate,
+checks direct GPU row arithmetic, runs the appropriate trained exactness gates,
+and only then times a distinct frozen grid. `--screen retrieval` includes suffix
+caps1/4/8 and strong ordinary/ngram8 controls. The report labels the combined
+short-MV/interleaving candidate rather than claiming an isolated cache effect.
+Eight gate/analysis tests pass in11.42 seconds, covering original, retrieval and
+interleaved retrieval fixture grids plus tampered-output rejection. Those tests
+remain explicitly CPU orchestration evidence.
