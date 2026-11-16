@@ -16,6 +16,8 @@ from analysis.proposal_replay import (
     extract_mac_fit,
     load_fit,
     replay,
+    suffix_draft,
+    upstream_ngram,
 )
 from bench.common import ROOT, atomic_json, sha256, source_fingerprint
 
@@ -140,6 +142,7 @@ def analyze(directory, source_id, protocol):
                 traces.extend(
                     {
                         "source_id": source_id,
+                        "family": "frequency",
                         "prompt_id": target["prompt_id"],
                         "id": configuration["id"],
                         "requested_cap": cap,
@@ -182,16 +185,62 @@ def analyze(directory, source_id, protocol):
                 != totals[-1]["verified_rows"]
             ):
                 raise AssertionError("Query-shape accounting differs from replay work")
-    controls = [
+    # Matched-length raw suffixes distinguish filtering from match-length effects.
+    strategies = {"upstream-ngram3": upstream_ngram}
+    strategies.update(
         {
-            "family": "control",
-            "id": row["strategy"],
-            "cap": row["cap"],
-            **{key: row[key] for key in WORK},
+            f"suffix{minimum}": lambda h, p, c, m=minimum: suffix_draft(
+                h, p, c, minimum=m
+            )
+            for minimum in protocol["minimum_match_lengths"]
         }
-        for row in audited["totals"]
-        if row["strategy"] in ("upstream-ngram3", "suffix5")
-    ]
+    )
+    controls = []
+    archived = {(r["strategy"], r["cap"]): r for r in audited["totals"]}
+    for name, drafter in strategies.items():
+        for cap in protocol["caps"]:
+            counts = Counter()
+            histogram = Counter()
+            for target in targets:
+                proposals = []
+
+                def propose(history, pending, budget):
+                    proposal = drafter(history, pending, budget)
+                    proposals.append(proposal)
+                    return proposal
+
+                work, cycles = replay(
+                    target["prompt_ids"], target["token_ids"], cap, propose
+                )
+                counts.update({key: work[key] for key in WORK})
+                histogram.update(c["drafted"] + 1 for c in cycles)
+                traces.extend(
+                    {
+                        "source_id": source_id,
+                        "family": "control",
+                        "prompt_id": target["prompt_id"],
+                        "id": name,
+                        "requested_cap": cap,
+                        **cycle,
+                        "proposal_ids": proposal,
+                    }
+                    for cycle, proposal in zip(cycles, proposals, strict=True)
+                )
+            if (name, cap) in archived and any(
+                counts[key] != archived[(name, cap)][key] for key in WORK
+            ):
+                raise AssertionError(
+                    "Control differs from the independently audited replay"
+                )
+            controls.append(
+                {
+                    "family": "control",
+                    "id": name,
+                    "cap": cap,
+                    **counts,
+                    "verification_rows_histogram": dict(sorted(histogram.items())),
+                }
+            )
     tokens = sum(len(t["token_ids"]) for t in targets)
     controls.append(
         {
@@ -204,6 +253,7 @@ def analyze(directory, source_id, protocol):
             "accepted": 0,
             "verified_rows": tokens,
             "wasted_rows": 0,
+            "verification_rows_histogram": {1: tokens},
         }
     )
     return {
@@ -214,6 +264,7 @@ def analyze(directory, source_id, protocol):
         "rows": rows,
         "totals": totals,
         "controls": controls,
+        "control_scope": "Upstream ngram3 work matches measured archived aggregates; raw suffix/frequency alternatives are counterfactual replay. Matched-length suffix controls isolate frequency filtering.",
         "unique_work_points": len({(r["cycles"], r["wasted_rows"]) for r in totals}),
         "pareto": frontier(totals + controls),
     }, traces

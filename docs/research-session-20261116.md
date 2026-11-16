@@ -459,8 +459,8 @@ Added a future-aware oracle diagnostic to distinguish retrieval limitations
 from backend verification cost. It only copies already observed tokens but uses
 the canonical future to choose the occurrence/length and computes the minimum
 cycle path. This is deliberately non-deployable: no rejection or lookup cost,
-no cross-request corpus, no latency prediction. All30 archived ngram policy
-counts per platform are revalidated before comparison. The implementation
+no cross-request corpus, no latency prediction. All15 archived ngram policy
+counts per platform (30 total) are revalidated before comparison. The implementation
 matches an independent breadth-first enumerator on2480 short trajectories.
 
 For192 fit tokens per platform, the minimum-five-token, cap1 suffix already

@@ -3,7 +3,7 @@
 This offline diagnostic computes the **minimum possible verification cycles**
 for a restricted retrieval family on the three frozen development-fit prompts.
 It uses archived canonical trajectories and performs no model inference. It
-checks all30 measured upstream policy work counts per platform before producing
+checks15 measured upstream policy work counts per platform (30 total) before producing
 the bound. Reserved held-out prompts are not read.
 
 The oracle can choose any earlier occurrence matching the observed suffix
