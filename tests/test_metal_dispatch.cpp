@@ -1,4 +1,5 @@
 #include "../src/metal_interleave.h"
+#include "../src/metal_q8_group.h"
 #include "ggml-metal-common.h"
 #include "ggml.h"
 #include <iostream>
@@ -35,6 +36,10 @@ int main() {
                       (heads == 1 && rows >= 2 && rows <= 9 &&
                        (type == GGML_TYPE_Q4_K || type == GGML_TYPE_Q6_K ||
                         type == GGML_TYPE_Q5_0 || type == GGML_TYPE_Q8_0)));
+                check(tokenomics_metal_q8_group_rows(op) ==
+                      (heads == 1 && rows >= 2 && rows <= 9 && type == GGML_TYPE_Q8_0
+                           ? TOKENOMICS_METAL_Q8_GROUP_ROWS
+                           : 1));
                 // Ordinary decode is still MV; 2..9 no longer select MMA/MM.
                 check(ggml_metal_op_mul_mat_use_mma(op) == (rows >= 10 && rows <= 16));
                 check(ggml_metal_op_mul_mat_use_mm(op, true) == (rows >= 10));
@@ -45,6 +50,19 @@ int main() {
                 ++cases;
             }
         }
+    }
+    for (unsigned rows = 2; rows <= 9; ++rows) {
+        std::vector<unsigned> visits(rows, 0);
+        const unsigned groups =
+            (rows + TOKENOMICS_METAL_Q8_GROUP_ROWS - 1) / TOKENOMICS_METAL_Q8_GROUP_ROWS;
+        for (unsigned group = 0; group < groups; ++group)
+            for (unsigned offset = 0; offset < TOKENOMICS_METAL_Q8_GROUP_ROWS; ++offset) {
+                const unsigned row = TOKENOMICS_METAL_Q8_GROUP_ROWS * group + offset;
+                if (row < rows)
+                    ++visits[row];
+            }
+        for (unsigned count : visits)
+            check(count == 1);
     }
     static_assert(tokenomics::metal_verification_graph(true, true, true, 3, 3));
     static_assert(!tokenomics::metal_verification_graph(true, true, true, 3, 1));

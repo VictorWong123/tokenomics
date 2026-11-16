@@ -13,6 +13,8 @@ from bench.common import ROOT, read_jsonl, sha256, write_jsonl
 from scripts.check_metal_profile import (
     CANDIDATE_MARKER,
     INTERLEAVE_MARKER,
+    Q8_GROUP_MARKER,
+    q8_group_profile,
     interleaved_profile,
     REFERENCE_MARKER,
     gate,
@@ -23,6 +25,23 @@ from scripts.check_metal_profile import (
 
 
 class MetalProfileIdentityTests(unittest.TestCase):
+    def test_q8_group_marker_excludes_other_kernel_variants(self):
+        row = {
+            "system_info": CANDIDATE_MARKER
+            + "; devices=MTL0; offloaded 25/25 layers to GPU",
+            "settings": {"gpu_layers": 99},
+        }
+        with self.assertRaises(ValueError):
+            q8_group_profile(row, True)
+        row["system_info"] += "; " + Q8_GROUP_MARKER
+        q8_group_profile(row, True)
+        for validator in (metal_profile, interleaved_profile):
+            with self.assertRaises(ValueError):
+                validator(row, True)
+        row["system_info"] += "; " + INTERLEAVE_MARKER
+        with self.assertRaises(ValueError):
+            q8_group_profile(row, True)
+
     def test_interleave_is_explicit_and_excluded_from_other_profiles(self):
         row = {
             "system_info": CANDIDATE_MARKER
@@ -111,8 +130,16 @@ class MetalGateOrchestrationTests(unittest.TestCase):
     def test_interleaved_retrieval_screen_has_distinct_frozen_identity(self):
         self._screen_analysis("retrieval", interleaved=True)
 
-    def _screen_analysis(self, screen, interleaved=False):
-        from analysis.metal_short_mv import SCREENS, analyze, screen_configuration
+    def test_q8_group_retrieval_screen_keeps_distinct_profile_identity(self):
+        self._screen_analysis("retrieval", group_q8=True)
+
+    def _screen_analysis(self, screen, interleaved=False, group_q8=False):
+        from analysis.metal_short_mv import (
+            SCREENS,
+            analyze,
+            kernel_variant,
+            screen_configuration,
+        )
         from bench.run import run
         from make_fixtures import create
 
@@ -135,10 +162,10 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             ]
             write_jsonl(root / "bench/prompts-v1.jsonl", prompts)
             (root / "configs" / SCREENS[screen]).write_text(json.dumps(config))
-            if interleaved:
+            if interleaved or group_q8:
                 with patch("analysis.metal_short_mv.ROOT", root):
-                    config = screen_configuration(screen, interleaved=True)
-            candidate_profile = "interleaved" if interleaved else "short-mv"
+                    config = screen_configuration(screen, interleaved, group_q8)
+            candidate_profile = kernel_variant(interleaved, group_q8)
             model = root / "repeat.gguf"
             create(model, 100, ngram_cycle=True)
             # Distinct executable identity; same actual CPU runtime. This tests
@@ -163,12 +190,19 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             with patch("analysis.metal_short_mv.ROOT", root), patch(
                 "analysis.metal_short_mv.MODEL_SHA256", sha256(model)
             ), patch(
-                "analysis.metal_short_mv.interleaved_profile"
-                if interleaved
-                else "analysis.metal_short_mv.metal_profile"
+                "analysis.metal_short_mv.q8_group_profile"
+                if group_q8
+                else (
+                    "analysis.metal_short_mv.interleaved_profile"
+                    if interleaved
+                    else "analysis.metal_short_mv.metal_profile"
+                )
             ) as profile:
                 result = analyze(
-                    root / "screen", screen=screen, interleaved=interleaved
+                    root / "screen",
+                    screen=screen,
+                    interleaved=interleaved,
+                    group_q8=group_q8,
                 )
                 self.assertEqual(result["records"], len(config["configurations"]) * 9)
                 self.assertEqual(profile.call_count, result["records"])
@@ -177,7 +211,12 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                 rows[0]["generation_ms"] *= 0.5
                 write_jsonl(root / "screen/requests.jsonl", rows)
                 with self.assertRaises(ValueError):
-                    analyze(root / "screen", screen=screen, interleaved=interleaved)
+                    analyze(
+                        root / "screen",
+                        screen=screen,
+                        interleaved=interleaved,
+                        group_q8=group_q8,
+                    )
 
     def test_cross_binary_gate_retains_success_and_first_failure(self):
         from make_fixtures import create

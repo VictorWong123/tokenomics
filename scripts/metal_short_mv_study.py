@@ -9,7 +9,12 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from analysis.metal_short_mv import SCREENS, analyze, screen_configuration
+from analysis.metal_short_mv import (
+    SCREENS,
+    analyze,
+    kernel_variant,
+    screen_configuration,
+)
 from bench.common import (
     ROOT,
     atomic_json,
@@ -24,6 +29,7 @@ from scripts.check_metal_profile import (
     gate,
     interleaved_profile,
     metal_profile,
+    q8_group_profile,
 )
 from scripts.diagnose_models import build_configuration
 
@@ -62,8 +68,13 @@ def study(args):
     atomic_json(out / "environment-before.json", hardware())
     atomic_json(out / "source.json", source)
     interleaved = getattr(args, "interleave", False)
-    candidate = "interleaved" if interleaved else "short-mv"
-    profile_check = interleaved_profile if interleaved else metal_profile
+    group_q8 = getattr(args, "group_q8", False)
+    candidate = kernel_variant(interleaved, group_q8)
+    profile_check = {
+        "short-mv": metal_profile,
+        "interleaved": interleaved_profile,
+        "q8-group": q8_group_profile,
+    }[candidate]
     builds = {
         "guarded": ROOT / "build-metal-reference",
         candidate: ROOT / f"build-metal-{candidate}",
@@ -74,6 +85,7 @@ def study(args):
         for profile, build in builds.items():
             enabled = "ON" if profile == candidate else "OFF"
             locality = "ON" if interleaved and profile == candidate else "OFF"
+            grouped = "ON" if group_q8 and profile == candidate else "OFF"
             print(f"Metal study: configuring {profile}; logs in {out}", flush=True)
             command(
                 [
@@ -87,6 +99,7 @@ def study(args):
                     "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
                     "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
                     f"-DTOKENOMICS_METAL_INTERLEAVE={locality}",
+                    f"-DTOKENOMICS_METAL_Q8_GROUP={grouped}",
                     "-DGGML_METAL=ON",
                     "-DGGML_METAL_EMBED_LIBRARY=ON",
                     "-DGGML_CUDA=OFF",
@@ -193,7 +206,7 @@ def study(args):
             state = "gate_passed_no_timings"
         else:
             state = "development_screen"
-            config = screen_configuration(screen, interleaved)
+            config = screen_configuration(screen, interleaved, group_q8)
             prompts = [
                 p
                 for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")
@@ -217,7 +230,12 @@ def study(args):
                 identity={"purpose": f"local M3 {candidate} {screen} component screen"},
                 executables=executables,
             )
-            analyze(out / "screen", screen=screen, interleaved=interleaved)
+            analyze(
+                out / "screen",
+                screen=screen,
+                interleaved=interleaved,
+                group_q8=group_q8,
+            )
             state = "complete"
         if source_fingerprint() != source:
             raise RuntimeError("Source changed during the study")
@@ -253,7 +271,13 @@ def study(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
+    locality = parser.add_mutually_exclusive_group()
+    locality.add_argument(
+        "--group-q8",
+        action="store_true",
+        help="Run two Q8 query rows per threadgroup using the unchanged arithmetic routine",
+    )
+    locality.add_argument(
         "--interleave",
         action="store_true",
         help="Build/gate the weight-tile interleaving candidate instead of plain short-MV",

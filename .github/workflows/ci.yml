@@ -8,9 +8,9 @@ on:
         options: [portable, metal-research, model-metadata, trained-cpu, metal-ir]
         default: portable
       metal_profiles:
-        description: Apple profiles (use interleaved to check only the remaining prototype)
+        description: Apple correctness profiles (all or one candidate)
         type: choice
-        options: [all, interleaved]
+        options: [all, interleaved, q8-group]
         default: all
 permissions:
   contents: read
@@ -119,7 +119,7 @@ jobs:
             -DTOKENOMICS_CPU_BATCH_INVARIANT=ON -DTOKENOMICS_CPU_PACKED_VERIFY=OFF \
             -DTOKENOMICS_CPU_Q4_PAIR=OFF -DTOKENOMICS_GREEDY_NO_TEMP=OFF \
             -DTOKENOMICS_VERIFY_STAGE_TIMING=OFF -DTOKENOMICS_METAL_SHORT_MV=OFF \
-            -DTOKENOMICS_METAL_INTERLEAVE=OFF
+            -DTOKENOMICS_METAL_INTERLEAVE=OFF -DTOKENOMICS_METAL_Q8_GROUP=OFF
           .venv/bin/cmake --build build-hosted-trained --target tokenomics -j 2
           cp build-hosted-trained/tokenomics results/local/trained-cpu/binaries/guarded
           .venv/bin/python -c 'from bench.common import atomic_json; from scripts.diagnose_models import build_configuration; atomic_json("results/local/trained-cpu/compilation-reference.json", build_configuration("build-hosted-trained/tokenomics"))'

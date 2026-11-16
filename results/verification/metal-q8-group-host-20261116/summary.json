@@ -1,0 +1,36 @@
+{
+  "state": "host_integration_passed_native_shader_pending",
+  "purpose": "Alternative Q8_0 cache locality with unchanged source arithmetic; no GPU or speed claim",
+  "source_sha256": {
+    "CMakeLists.txt": "27a66ac32271118b66f8c8af44bd7a694968c5375ed1c1eff71846441af54492",
+    "cmake/metal-q8-group.cmake": "0373dce3771465aff5d65bd23a9a61c5c88c67dfb3fa22d89f1836494c32ef79",
+    "cmake/metal-embed.cmake": "36b26cb64d5e77b8401552004c658d297896b65794f4cb0ebfafd6eeaf783746",
+    "src/metal_q8_group.h": "742e71a494e98a30e7204c281be2aa932b5c1e1a169cc5b8b22bdd62aa2ca4e1",
+    "src/metal_q8_group_constants.h": "86f0d153173d2c22baa2dfc4c2037d2183e4bd804a5e0e2a87905fa30280d669",
+    "src/metal_q8_group.metal.inc": "dd906ed01687be2bb28352ef00495498333f5471e135b17e03ff8022c54b7475",
+    "tests/test_metal_dispatch.cpp": "75d2242bea0dbf7cfff586976702a059a73be96af68e9793d40ec485f4b735ce"
+  },
+  "query_rows_per_threadgroup": 2,
+  "selector": "marked short verification, Q8_0, dense planes, nontransposed inputs",
+  "arithmetic": "original kernel_mul_mv_q8_0_f32_impl invoked once per valid logical row",
+  "scratch_reuse": "uniform threadgroup barrier before subsequent query calls",
+  "odd_tail": "skip only logical rows beyond ne11; first row always valid under ceil division",
+  "original_kernel_body": "preserved in generated module",
+  "host_cpp_units": [
+    "common",
+    "ops",
+    "device",
+    "both context modes"
+  ],
+  "host_dispatch_cases": 448,
+  "row_coverage_cases": 8,
+  "padding_split_cases": 589896,
+  "default_ctest_suites": 7,
+  "default_ctest_seconds": 43.35,
+  "protocol_tests": "10 gate/profile/analysis tests pass as part of default tooling suite; grouped retrieval fixture alone passed in1.93s after correcting a missing test argument",
+  "interleaved_shader_unchanged_sha256": "bfde18aac2f2b40fad372d57215586e71d2aa9acd510b95a3a1890a56a17f3de",
+  "conflicting_kernel_flags": "rejected before backend configuration",
+  "metal_graph_executed": false,
+  "native_grouped_shader_compiled": false,
+  "performance_claim": null
+}

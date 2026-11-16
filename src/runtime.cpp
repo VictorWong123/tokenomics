@@ -4,6 +4,7 @@
 #include "ggml-backend.h"
 #include "llama.h"
 #include "log.h"
+#include "metal_q8_group_constants.h"
 #include "sampling.h"
 #include "speculative.h"
 #include "suffix.h"
@@ -235,6 +236,11 @@ std::string Engine::system_info() const {
 #ifdef TOKENOMICS_METAL_INTERLEAVE
     if (impl_->cfg.gpu_layers > 0)
         info += "; TOKENOMICS_METAL_INTERLEAVE=ON; interleave_types=q4_K,q6_K,q5_0,q8_0";
+#endif
+#ifdef TOKENOMICS_METAL_Q8_GROUP
+    if (impl_->cfg.gpu_layers > 0)
+        info += "; TOKENOMICS_METAL_Q8_GROUP=ON; q8_group_rows=" +
+                std::to_string(TOKENOMICS_METAL_Q8_GROUP_ROWS);
 #endif
     return info;
 }

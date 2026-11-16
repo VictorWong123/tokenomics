@@ -15,10 +15,11 @@ REFERENCE_MARKER = "TOKENOMICS_METAL_VERIFY_SINGLE_ROW=ON"
 CANDIDATE_MARKER = "TOKENOMICS_METAL_SHORT_MV=ON"
 MODEL_SHA256 = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
 INTERLEAVE_MARKER = "TOKENOMICS_METAL_INTERLEAVE=ON"
+Q8_GROUP_MARKER = "TOKENOMICS_METAL_Q8_GROUP=ON"
 GREEDY_MARKER = "TOKENOMICS_GREEDY_NO_TEMP=ON"
 
 
-def metal_profile(row, candidate, *, interleave=False):
+def metal_profile(row, candidate, *, interleave=False, group_q8=False):
     info = row["system_info"]
     marker, excluded = (
         (CANDIDATE_MARKER, REFERENCE_MARKER)
@@ -26,7 +27,8 @@ def metal_profile(row, candidate, *, interleave=False):
         else (REFERENCE_MARKER, CANDIDATE_MARKER)
     )
     if (
-        (INTERLEAVE_MARKER in info) != (candidate and interleave)
+        (Q8_GROUP_MARKER in info) != (candidate and group_q8)
+        or (INTERLEAVE_MARKER in info) != (candidate and interleave)
         or marker not in info
         or excluded in info
         or "devices=MTL0" not in info
@@ -40,6 +42,10 @@ def metal_profile(row, candidate, *, interleave=False):
 
 def interleaved_profile(row, candidate):
     metal_profile(row, candidate, interleave=True)
+
+
+def q8_group_profile(row, candidate):
+    metal_profile(row, candidate, group_q8=True)
 
 
 def greedy_profile(row, candidate):
@@ -422,7 +428,7 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument(
         "--candidate-profile",
-        choices=("short-mv", "interleaved", "greedy"),
+        choices=("short-mv", "interleaved", "q8-group", "greedy"),
         default="short-mv",
     )
     args = parser.parse_args()
@@ -436,6 +442,7 @@ def main():
         profile_validator={
             "short-mv": metal_profile,
             "interleaved": interleaved_profile,
+            "q8-group": q8_group_profile,
             "greedy": greedy_profile,
         }[args.candidate_profile],
     )

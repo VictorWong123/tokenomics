@@ -28,6 +28,7 @@ def build_configuration(binary):
         "TOKENOMICS_CPU_Q4_PAIR",
         "TOKENOMICS_METAL_SHORT_MV",
         "TOKENOMICS_METAL_INTERLEAVE",
+        "TOKENOMICS_METAL_Q8_GROUP",
         "TOKENOMICS_VERIFY_STAGE_TIMING",
         "TOKENOMICS_GREEDY_NO_TEMP",
         "GGML_NATIVE",

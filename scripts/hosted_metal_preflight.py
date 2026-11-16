@@ -17,7 +17,7 @@ def main():
     parser.add_argument("--probe-only", action="store_true")
     parser.add_argument(
         "--profiles",
-        choices=("all", "reference", "short-mv", "interleaved"),
+        choices=("all", "reference", "short-mv", "interleaved", "q8-group"),
         default="all",
     )
     args = parser.parse_args()
@@ -91,10 +91,11 @@ def main():
             == 0
         )
         report["shader_compilation"] = "pending" if metal_compiler else "unavailable"
-        for profile, short, interleave in (
-            ("reference", "OFF", "OFF"),
-            ("short-mv", "ON", "OFF"),
-            ("interleaved", "ON", "ON"),
+        for profile, short, interleave, grouped in (
+            ("reference", "OFF", "OFF", "OFF"),
+            ("short-mv", "ON", "OFF", "OFF"),
+            ("interleaved", "ON", "ON", "OFF"),
+            ("q8-group", "ON", "OFF", "ON"),
         ):
             if args.profiles != "all" and profile != args.profiles:
                 continue
@@ -125,6 +126,7 @@ def main():
                     "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
                     f"-DTOKENOMICS_METAL_SHORT_MV={short}",
                     f"-DTOKENOMICS_METAL_INTERLEAVE={interleave}",
+                    f"-DTOKENOMICS_METAL_Q8_GROUP={grouped}",
                 ],
             )
             run(
@@ -149,7 +151,7 @@ def main():
                 for kind in ("mul_mv", "softmax"):
                     prefix = (
                         "tokenomics"
-                        if interleave == "ON" and kind == "mul_mv"
+                        if (interleave == "ON" or grouped == "ON") and kind == "mul_mv"
                         else "ggml"
                     )
                     matches = list(build.rglob(f"{prefix}-metal-embed-{kind}.metal"))

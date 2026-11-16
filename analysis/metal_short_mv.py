@@ -7,7 +7,12 @@ import statistics
 from analysis.controller import verify
 from analysis.report import cells, paired_summary
 from bench.common import ROOT, atomic_json, read_jsonl
-from scripts.check_metal_profile import MODEL_SHA256, interleaved_profile, metal_profile
+from scripts.check_metal_profile import (
+    MODEL_SHA256,
+    interleaved_profile,
+    metal_profile,
+    q8_group_profile,
+)
 
 
 SCREENS = {
@@ -16,25 +21,38 @@ SCREENS = {
 }
 
 
-def screen_configuration(screen, interleaved=False):
+def kernel_variant(interleaved=False, group_q8=False):
+    if interleaved and group_q8:
+        raise ValueError("Select only one kernel locality experiment")
+    return "q8-group" if group_q8 else "interleaved" if interleaved else "short-mv"
+
+
+def screen_configuration(screen, interleaved=False, group_q8=False):
     config = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
-    if interleaved:
-        config["kernel_variant"] = "interleaved"
-        config["phase"] = config["phase"].replace("metal_", "metal_interleaved_", 1)
+    variant = kernel_variant(interleaved, group_q8)
+    if variant != "short-mv":
+        config["kernel_variant"] = variant
+        config["phase"] = config["phase"].replace(
+            "metal_", f"metal_{variant.replace('-', '_')}_", 1
+        )
         for condition in config["configurations"]:
             if condition["kernel_profile"] == "short-mv":
-                condition["kernel_profile"] = "interleaved"
-                condition["id"] = condition["id"].replace("short-mv", "interleaved")
+                condition["kernel_profile"] = variant
+                condition["id"] = condition["id"].replace("short-mv", variant)
     return config
 
 
-def analyze(directory, *, screen="ngram", interleaved=False):
+def analyze(directory, *, screen="ngram", interleaved=False, group_q8=False):
     directory = Path(directory)
     verify(directory)
     frozen = json.loads((directory / "run_manifest.json").read_text())["frozen"]
-    expected = screen_configuration(screen, interleaved)
-    candidate = "interleaved" if interleaved else "short-mv"
-    profile_check = interleaved_profile if interleaved else metal_profile
+    expected = screen_configuration(screen, interleaved, group_q8)
+    candidate = kernel_variant(interleaved, group_q8)
+    profile_check = {
+        "short-mv": metal_profile,
+        "interleaved": interleaved_profile,
+        "q8-group": q8_group_profile,
+    }[candidate]
     corpus = {p["id"]: p for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")}
     if (
         frozen["config"] != expected
@@ -134,8 +152,8 @@ def analyze(directory, *, screen="ngram", interleaved=False):
     summary = {
         "schema_version": 1,
         "state": (
-            f"metal_interleaved_{screen}_comparison_complete"
-            if interleaved
+            f"metal_{candidate.replace('-', '_')}_{screen}_comparison_complete"
+            if candidate != "short-mv"
             else (
                 "metal_short_mv_comparison_complete"
                 if screen == "ngram"

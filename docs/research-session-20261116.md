@@ -677,3 +677,27 @@ report. Added a unique-initializer name mapping that still compares its entire
 body, rather than ignoring it. Six tests pass, including changed initializer
 math and ambiguous extra initializer rejection.
 [First separate-module report](../results/verification/metal-ir-20261116/separate-module-diagnostic.json).
+
+### Alternative Q8 query grouping
+
+Added a second locality candidate for the145MB Q8 output head. Each threadgroup
+calls the unchanged pinned Q8 routine for two consecutive query rows, with a
+uniform barrier before shared scratch reuse and an odd-tail guard. The original
+arithmetic function, SIMD group count and scratch allocation remain unchanged.
+The hypothesis is better nearby weight reuse with fewer threadgroups; repeated
+dequantization, extra barriers and serialized work can erase any benefit.
+
+It is default-OFF and exclusive with interleaving. The local runner's
+`--group-q8` builds/gates a distinct candidate with ordinary/ngram controls and
+optional suffix caps1/4/8. Marker checks reject mixed profiles. Host generation
+and C++ compilation pass,448 dispatch cases and589896 split cases pass, and
+logical row coverage checks2–9 rows including odd tails. The initial new fixture
+test omitted its new analysis argument; corrected, that fixture passes in1.93
+seconds. Default Release passes all7 suites in43.35 seconds, including the
+expanded10-test gate/analysis set. Native shader validation remains pending.
+
+A shared embedding helper avoids duplicating source expansion. The existing
+interleaved shader remains byte-identical (SHA256bfde18aa…a17f3de), so this
+refactor does not alter its compiled input.
+[Host evidence](../results/verification/metal-q8-group-host-20261116/summary.json)
+and [local grouped-Q8 command](metal-q8-group.md).
