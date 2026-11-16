@@ -54,6 +54,7 @@ def create(
     unicode_cycle=False,
     ngram_cycle=False,
     logit_cycle=False,
+    cycle_eos=False,
     width_override=0,
     suppress_tokens=(),
 ):
@@ -109,6 +110,8 @@ def create(
             if unicode_cycle
             else tuple(3 + ord(c) for c in "abcdefghi")
         )
+        if cycle_eos:
+            cycle = cycle[:3] + (2,) + cycle[4:]
         for i, token in enumerate(cycle):
             emb[token] = 0
             emb[token, (i + 1) % len(cycle)] = 1

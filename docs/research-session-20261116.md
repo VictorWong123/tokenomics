@@ -1081,3 +1081,15 @@ native reference cases in Release and ASAN/UBSAN;127 Python tests pass with
 eight unrelated optional skips. A60-request live synthetic validation matches
 canonical replay outputs and work exactly. Bounded learned-model live checks
 will verify that this replay agreement also holds with real target logits.
+
+### 12:03 UTC — replay early-EOG audit
+
+An audit caught a new replay limitation: truncating draft budgets to final
+transcript length would reveal an early EOG boundary. Replay now uses only the
+declared budget/context capacity for proposal budgets and applies stopping only
+after verification. It reproduces the pinned last-draft-EOG accepted/bonus
+accounting. Two live60-request synthetic suites (full budget and early EOG)
+match outputs and work exactly;129 Python tests pass with eight optional skips.
+All retained learned fit/validation trajectories are full64-token cases, so
+this fix leaves those work comparisons unchanged. The native rank-embedding
+harness explicitly restricts its replay mode to full-budget fit trajectories.

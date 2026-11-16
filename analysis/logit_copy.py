@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 
 from analysis.frequency_copy import frontier
-from analysis.proposal_replay import replay, suffix_draft, upstream_ngram
+from analysis.proposal_replay import suffix_draft, upstream_ngram
 from bench.common import ROOT, atomic_json, read_jsonl, sha256, source_fingerprint
 from bench.model_identity import model_identity
 from scripts.collect_logit_fit import PROTOCOL, PROTOCOL_SHA256, collection_protocol
@@ -230,6 +230,69 @@ def load_collection(directory):
     return rows, receipt
 
 
+def replay_canonical(target, cap, propose, *, budget=64, context=2048):
+    """Use declared budget/context, never the future EOS position, to draft.
+
+    Match the pinned sample_and_accept_n/plan_commit EOS convention: a matched
+    EOS in the last draft slot can count as accepted while its bonus is omitted.
+    """
+    prompt, output = target["prompt_ids"], target["token_ids"]
+    stop = target["stop"]
+    if (
+        not prompt
+        or not output
+        or cap not in (1, 2, 4, 6, 8)
+        or stop not in ("budget", "context", "eog")
+    ):
+        raise ValueError("Unsupported canonical trajectory for work replay")
+    limit = min(budget, context - len(prompt) + 1)
+    if not 1 <= len(output) <= limit or (stop != "eog" and len(output) != limit):
+        raise ValueError("Canonical stopping differs from declared budget/context")
+    history, pending = list(prompt[:-1]), prompt[-1]
+    cursor, cycles = 0, []
+    while cursor < len(output):
+        effective = min(cap, budget - cursor - 1, context - len(history) - 1)
+        proposals = propose(history, pending, effective)
+        if len(proposals) > effective:
+            raise ValueError("Proposal exceeded causal budget")
+        matches = 0
+        for token, expected in zip(proposals, output[cursor:]):
+            if token != expected:
+                break
+            matches += 1
+        matched_eos = stop == "eog" and cursor + matches == len(output)
+        if matched_eos:
+            committed = matches
+            accepted = matches if matches == len(proposals) else matches - 1
+        else:
+            accepted = matches
+            committed = matches + 1
+        if not 1 <= committed <= len(output) - cursor:
+            raise ValueError("Replay requires unrecorded canonical output")
+        cycles.append(
+            {
+                "output_index": cursor,
+                "cap": effective,
+                "drafted": len(proposals),
+                "accepted": accepted,
+                "committed": committed,
+            }
+        )
+        for token in output[cursor : cursor + committed]:
+            history.append(pending)
+            pending = token
+        cursor += committed
+    counts = {
+        "tokens": len(output),
+        "cycles": len(cycles),
+        "drafted": sum(c["drafted"] for c in cycles),
+        "accepted": sum(c["accepted"] for c in cycles),
+    }
+    counts["verified_rows"] = counts["cycles"] + counts["drafted"]
+    counts["wasted_rows"] = counts["verified_rows"] - counts["tokens"]
+    return counts, cycles
+
+
 def analyze(directory, out):
     targets, receipt = load_collection(directory)
     phase = receipt.get("collection_phase", "fit")
@@ -329,9 +392,7 @@ def analyze(directory, out):
                 proposals = [[] for _ in cycles]
                 used_hints = [None for _ in cycles]
             else:
-                counts, cycles = replay(
-                    target["prompt_ids"], target["token_ids"], config["cap"], propose
-                )
+                counts, cycles = replay_canonical(target, config["cap"], propose)
             histogram = dict(sorted(Counter(c["drafted"] + 1 for c in cycles).items()))
             if (
                 sum(histogram.values()) != counts["cycles"]

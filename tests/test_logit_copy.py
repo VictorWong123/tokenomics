@@ -16,6 +16,7 @@ from analysis.logit_copy import (
     guided_draft,
     import_collection,
     past_hint,
+    replay_canonical,
 )
 from analysis.proposal_replay import suffix_draft
 from bench.common import sha256, write_jsonl
@@ -98,6 +99,38 @@ class LogitCopyTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "pending token"):
             guided_draft([1], 2, 1, [8, 1], minimum=1, cutoff=8, fallback=True)
+
+    def test_early_eos_never_sets_the_draft_budget(self):
+        seen = []
+
+        def propose(history, pending, cap):
+            seen.append(cap)
+            return [7, 8, 9][:cap]
+
+        target = {"prompt_ids": [1, 2, 3], "token_ids": [7], "stop": "eog"}
+        counts, cycles = replay_canonical(target, 8, propose)
+        self.assertEqual(seen, [8])
+        self.assertEqual(
+            (
+                counts["cycles"],
+                counts["drafted"],
+                counts["accepted"],
+                counts["wasted_rows"],
+            ),
+            (1, 3, 0, 3),
+        )
+        self.assertEqual(cycles[0]["committed"], 1)
+        counts, cycles = replay_canonical(target, 1, lambda h, p, cap: [7])
+        self.assertEqual(
+            (counts["accepted"], cycles[0]["committed"], counts["wasted_rows"]),
+            (1, 1, 1),
+        )
+        # Context capacity is known; it may legitimately clip the draft budget.
+        context_target = {"prompt_ids": [1, 2, 3], "token_ids": [7], "stop": "context"}
+        counts, cycles = replay_canonical(
+            context_target, 8, lambda h, p, cap: [], context=3
+        )
+        self.assertEqual(cycles[0]["cap"], 0)
 
     def test_long_overlapping_sources_and_first_rank_exclusion(self):
         history = [1, 2, 3] * 30

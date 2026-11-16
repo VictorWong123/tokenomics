@@ -20,18 +20,24 @@ from scripts.collect_logit_fit import collect, collection_protocol
 )
 class LiveLogitCopyTests(unittest.TestCase):
     def test_live_correction_rows_match_all_frozen_validation_work(self):
+        self._check(False)
+
+    def test_early_eos_budget_and_matched_terminal_draft_match_live(self):
+        self._check(True)
+
+    def _check(self, eos):
         from make_fixtures import create
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             model = root / "ranked-cycle.gguf"
-            create(model, 100, logit_cycle=True)
+            create(model, 100, logit_cycle=True, cycle_eos=eos)
             protocol, _ = collection_protocol("validation")
             corpus = root / "prompts.jsonl"
             write_jsonl(
                 corpus,
                 [
-                    {"id": pid, "prompt": "abcdefghi" * 2}
+                    {"id": pid, "prompt": ("abc</s>efghi" if eos else "abcdefghi") * 2}
                     for pid in json.loads(protocol.read_text())["prompt_ids"]
                 ],
             )

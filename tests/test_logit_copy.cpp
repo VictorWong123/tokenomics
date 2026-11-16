@@ -124,6 +124,8 @@ static void replay_file(const char *path) {
         const auto target = json::parse(line);
         const auto prompt = target.at("prompt_ids").get<std::vector<int>>();
         const auto tokens = target.at("token_ids").get<std::vector<int>>();
+        check(tokens.size() == 64 && target.at("stop") == "budget",
+              "native rank-embedding fixture requires full64-token budget trajectories");
         for (int minimum : {1, 3, 5})
             for (int cutoff : {8, 64})
                 for (int cap : {1, 4, 8}) {

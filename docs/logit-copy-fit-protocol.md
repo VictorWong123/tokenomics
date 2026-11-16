@@ -129,3 +129,11 @@ extra cycles for10 fewer wasted rows versus ngram cap4 C315/W36. These exclude
 ranking cost and do not establish lower latency. The runtime prototype stays
 default-OFF. Full10-cell results and all6447 validation cycle records are
 retained separately from fit. No new guided parameter search used validation.
+
+Replay now uses the declared output budget and known context capacity even when
+the canonical sequence stops early at EOG. The final transcript length never
+clips a draft before verification. It also matches the pinned verifier's
+special accepted-count convention when EOG is the last drafted token and the
+bonus is discarded. Independent edge tests and two60-request live synthetic
+suites cover full-budget and early-EOG cases. All retained learned collections
+have full64-token outputs; their published work points are unchanged.
