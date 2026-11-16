@@ -263,3 +263,18 @@ boundaries and therefore480 requests. This targets another possible numerical
 source: larger padded attention widths can alter reduction order even when
 matmul uses the same kernel. The Metal candidate remains default-OFF and no
 Metal numerical or speed claim is made.
+
+### Frozen suffix validation replay
+
+Evaluated the already committed minimum5/cap1 rule on the six archived
+**development-validation** prompts, caps64/128; no additional search or tuning.
+Reproduced 144 archived ngram1/ngram8 aggregate work checks across both operating
+points and timing repetitions. Repetition0 supplies one trajectory per cell.
+
+M3: suffix requires951 cycles, accepts201/220 proposals and wastes19 rows, versus
+ngram1's920 cycles,232/273 acceptance and41 wasted rows. Linux: suffix requires
+1098 cycles,54/74 acceptance and20 wasted rows, versus ngram1's1050 cycles,
+102/142 acceptance and40 wasted rows. Each totals1152 canonical tokens. The
+fit-set zero-rejection finding does not persist in validation. Proposal quality
+improves at the cost of fewer saved cycles; no speed conclusion follows.
+The reserved90-prompt held-out evaluation remains untouched.

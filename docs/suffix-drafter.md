@@ -140,3 +140,42 @@ identity, and distinguishes repeated timing samples from distinct contexts.
 The suffix correctness gate also writes a complete hashed receipt. Run
 `python scripts/verify_metal_gate.py results/local/suffix-study-01/gate`
 to check saved payload integrity and exact outputs without inference.
+
+## Frozen development-validation replay
+
+After committing the suffix threshold at `ce2e032`, the fixed minimum5/cap1
+strategy was replayed on the six historical development-validation prompts,
+caps64/128. No threshold or cap search used these validation outcomes. Before
+comparing the suffix alternative, the replay reproduced all 144 archived
+ngram1/ngram8 work counters across the two platforms and three timing repeats.
+Only repetition0 contributes the canonical token trajectory per prompt/cap cell;
+repeated deterministic outputs are not treated as independent proposal samples.
+
+| Operating point | Strategy | Cycles | Proposed | Accepted | Wasted rows |
+|---|---|---:|---:|---:|---:|
+| M3 Metal, 0.5B | Ngram cap1 | 920 | 273 | 232 | 41 |
+| M3 Metal, 0.5B | Ngram cap8 | 735 | 671 | 417 | 254 |
+| M3 Metal, 0.5B | Suffix5 cap1 | 951 | 220 | 201 | 19 |
+| Linux CPU, 3B | Ngram cap1 | 1050 | 142 | 102 | 40 |
+| Linux CPU, 3B | Ngram cap8 | 981 | 543 | 171 | 372 |
+| Linux CPU, 3B | Suffix5 cap1 | 1098 | 74 | 54 | 20 |
+
+Each row accounts for 1,152 canonical tokens across the twelve prompt/cap cells.
+The fit-set absence of rejected suffix proposals does **not** generalize:
+validation rejects19 proposals on M3 and20 on Linux. Wasted work falls relative
+to ngram1, while useful batching also falls. On M3 the stylized zero-draft-cost
+model requires a batch-fixed share above19/220 (8.6%) to beat ordinary decoding,
+versus41/273 (15.0%) for ngram1. These are cost-model thresholds, not measured
+speedups. The additional lookup work and actual backend costs remain charged
+in local measurements.
+
+Reproduce this fixed comparison without inference:
+
+```bash
+.venv/bin/python -m analysis.proposal_validation \
+  --out results/local/proposal-validation-01
+```
+
+This uses existing development validation only. It leaves the reserved90-prompt
+held-out set untouched and assumes alternate proposal paths retain canonical
+target outputs. The local trained exactness gate must test that assumption.

@@ -1,0 +1,20 @@
+{
+  "baseline_work_checks": 144,
+  "files_sha256": {
+    "analysis/proposal_replay.py": "13ebfbd52a1738cb7c158c816e4537fd15608eb101ca7dc7bb10af5339c35cb3",
+    "analysis/proposal_validation.py": "27a6677c3a7b91af20dc5dc1fca6a3ec2423df07055ef1637a91c102508edf31",
+    "tests/test_proposal_validation.py": "d851cbe0623a83325075293a5bfc25498324d40fbba7e8519e3bc02af1b79fac"
+  },
+  "heldout_executed": false,
+  "interpretation": "Fewer rejected suffix proposals but fewer saved cycles. Zero rejections on fit did not persist on validation.",
+  "prompt_cap_cells_per_platform": 12,
+  "selection_commit": "ce2e032",
+  "source": {
+    "owned_source_sha256": "1e467b1011c67e07b816b6d3b22665a7c39378932ead3b0d7961ca46eeea2f05",
+    "revision": "6c4bfddfbdf5acf42955f57111d1013dffa1c817"
+  },
+  "speed_claim": null,
+  "state": "offline_development_validation_replayed",
+  "timing_repeats_used_as_independent_trajectories": false,
+  "trained_inference_executed": false
+}
