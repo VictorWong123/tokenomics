@@ -144,7 +144,7 @@ def projection_census(records):
         30: (1, 2),
     }
     total = embedding = other = 0
-    by_type, by_role = {}, {}
+    by_type, by_role, variants = {}, {}, {}
     names = set()
     for row in records:
         name, shape = row["name"], row["shape"]
@@ -169,10 +169,21 @@ def projection_census(records):
         if name != "output.weight" and match is None:
             raise ValueError("Unclassified dense-model matrix")
         role = "output" if name == "output.weight" else match[1]
+        variant = variants.setdefault(
+            (role, row["type"], tuple(shape)), {"tensors": 0, "encoded_bytes": 0}
+        )
+        variant["tensors"] += 1
+        variant["encoded_bytes"] += encoded
         for table, key in ((by_type, row["type"]), (by_role, role)):
             cell = table.setdefault(key, {"tensors": 0, "encoded_bytes": 0})
             cell["tensors"] += 1
             cell["encoded_bytes"] += encoded
+    for role, cell in by_role.items():
+        cell["variants"] = [
+            {"type": kind, "shape": list(shape), **counts}
+            for (name, kind, shape), counts in sorted(variants.items())
+            if name == role
+        ]
     projected = sum(row["encoded_bytes"] for row in by_type.values())
     if projected + embedding + other != total or projected != sum(
         row["encoded_bytes"] for row in by_role.values()
@@ -254,6 +265,8 @@ def main():
                 "token_embd.weight",
                 "blk.0.attn_q.weight",
                 "blk.0.ffn_down.weight",
+                "blk.0.ffn_up.weight",
+                "blk.0.ffn_gate.weight",
             )
         ]
         print("GGUF_HEADER_SUMMARY=" + json.dumps(summary, sort_keys=True))

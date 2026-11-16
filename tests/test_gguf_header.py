@@ -107,6 +107,24 @@ class ProjectionCensusTests(unittest.TestCase):
             "type": "Q6_K",
         }
         self.assertEqual(projection_census([row])["projection_bytes"], 11289600)
+        mixed = projection_census(
+            [
+                row,
+                {
+                    **row,
+                    "name": "blk.1.ffn_down.weight",
+                    "type_code": 12,
+                    "type": "Q4_K",
+                },
+            ]
+        )
+        self.assertEqual(
+            [
+                (r["type"], r["shape"], r["tensors"])
+                for r in mixed["projection_by_role"]["ffn_down"]["variants"]
+            ],
+            [("Q4_K", [8960, 1536], 1), ("Q6_K", [8960, 1536], 1)],
+        )
         for rows in (
             [row, row],
             [{**row, "shape": [8959, 1536]}],
