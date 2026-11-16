@@ -984,3 +984,19 @@ then126 development records with original/optimized ordinary and both retrieval
 drafters. The paired analyzer requires equal work and distinct executable hashes.
 All14 profile/orchestration tests pass, including a CPU-fixture version of this
 screen. That fixture validates orchestration, not Metal or throughput.
+
+### 10:31 UTC — learned1.5B correctness and durable compact receipts
+
+Run43846510993 passes160 learned CPU comparisons with full pinned1.5B SHA
+verification, equal IDs/stops and equal per-policy work between original and
+no-temperature sampling. Each policy's canonical output totals348 tokens. Ngram
+cap4 needs269 cycles/412 verified rows; suffix cap8 needs288/418, so the latter
+is dominated in both counts on this corpus. No throughput result follows. The
+archived summary links the run and discloses that its raw artifact and binary
+hashes were not downloaded locally.
+
+Future smoke runs additionally print a compact selected receipt binding source,
+model, executable hashes and sealed payload hashes. It contains no environment
+variables, model weights or generated text. A fixture check validates its hashes.
+This avoids relying solely on expiring artifacts for provenance; it does not
+replace raw-record verification.

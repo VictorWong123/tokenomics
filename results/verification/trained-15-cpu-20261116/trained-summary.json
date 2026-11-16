@@ -1,0 +1,141 @@
+{
+  "checked_comparisons": 160,
+  "model_id": "qwen25-15",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "performance_claim": null,
+  "same_work_between_sampler_profiles": true,
+  "state": "passed",
+  "synthetic_fixture": false,
+  "totals": {
+    "greedy": {
+      "ngram1": {
+        "accepted": 50,
+        "cycles": 298,
+        "drafted": 66,
+        "synced_tokens": 0,
+        "verified_rows": 364
+      },
+      "ngram4": {
+        "accepted": 79,
+        "cycles": 269,
+        "drafted": 143,
+        "synced_tokens": 0,
+        "verified_rows": 412
+      },
+      "ngram8": {
+        "accepted": 88,
+        "cycles": 260,
+        "drafted": 202,
+        "synced_tokens": 0,
+        "verified_rows": 462
+      },
+      "script-ngram": {
+        "accepted": 70,
+        "cycles": 278,
+        "drafted": 148,
+        "synced_tokens": 0,
+        "verified_rows": 426
+      },
+      "suffix1": {
+        "accepted": 34,
+        "cycles": 314,
+        "drafted": 44,
+        "synced_tokens": 0,
+        "verified_rows": 358
+      },
+      "suffix4": {
+        "accepted": 56,
+        "cycles": 292,
+        "drafted": 82,
+        "synced_tokens": 0,
+        "verified_rows": 374
+      },
+      "suffix8": {
+        "accepted": 60,
+        "cycles": 288,
+        "drafted": 130,
+        "synced_tokens": 0,
+        "verified_rows": 418
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    },
+    "guarded": {
+      "ngram1": {
+        "accepted": 50,
+        "cycles": 298,
+        "drafted": 66,
+        "synced_tokens": 0,
+        "verified_rows": 364
+      },
+      "ngram4": {
+        "accepted": 79,
+        "cycles": 269,
+        "drafted": 143,
+        "synced_tokens": 0,
+        "verified_rows": 412
+      },
+      "ngram8": {
+        "accepted": 88,
+        "cycles": 260,
+        "drafted": 202,
+        "synced_tokens": 0,
+        "verified_rows": 462
+      },
+      "script-ngram": {
+        "accepted": 70,
+        "cycles": 278,
+        "drafted": 148,
+        "synced_tokens": 0,
+        "verified_rows": 426
+      },
+      "suffix1": {
+        "accepted": 34,
+        "cycles": 314,
+        "drafted": 44,
+        "synced_tokens": 0,
+        "verified_rows": 358
+      },
+      "suffix4": {
+        "accepted": 56,
+        "cycles": 292,
+        "drafted": 82,
+        "synced_tokens": 0,
+        "verified_rows": 374
+      },
+      "suffix8": {
+        "accepted": 60,
+        "cycles": 288,
+        "drafted": 130,
+        "synced_tokens": 0,
+        "verified_rows": 418
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    }
+  },
+  "provenance": {
+    "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43846510993",
+    "source_commit": "c5dd25e260bc4e8805ce5c192812bf0eb228ee7a",
+    "runner": "ubuntu-24.04 standard public hosted",
+    "evidence_kind": "Workflow-reported learned CPU correctness summary",
+    "raw_payload_location": "Seven-day trained-cpu-smoke workflow artifact; not downloaded into this archive",
+    "local_archive_limitation": "Raw token/cycle records and executable hashes are not reproduced in this compact summary",
+    "baseline": "Original guarded host sampler",
+    "candidate": "Redundant temperature-zero filter removed; direct-logit option did not exist at this checkpoint"
+  },
+  "work_only_observation": {
+    "suffix8_dominated_by_ngram4_in_cycles_and_verified_rows": true,
+    "scope": "Only these four development prompts, tiny budgets and KV-boundary requests; no speed or held-out claim"
+  }
+}

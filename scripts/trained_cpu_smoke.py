@@ -242,6 +242,27 @@ def smoke(args, *, expected_sha=None):
             out / "complete.json",
             {"sha256": {name: sha256(out / name) for name in names}},
         )
+        # A compact, explicitly selected receipt survives artifact expiration
+        # in public logs. Never print weights, environment variables or tokens.
+        receipt = {
+            "schema_version": 1,
+            "source": report["source"],
+            "binary_sha256": report["binary_sha256"],
+            "model_id": model_id,
+            "model_sha256": report["model_sha256"],
+            "candidate_profile": candidate_profile,
+            "synthetic_fixture": synthetic_fixture,
+            "platform": {
+                key: report["hardware"][key] for key in ("platform", "machine")
+            },
+            "complete_sha256": sha256(out / "complete.json"),
+            "payload_sha256": json.loads((out / "complete.json").read_text())["sha256"],
+        }
+        atomic_json(out / "public-receipt.json", receipt)
+        print(
+            "TRAINED_CPU_SMOKE_RECEIPT=" + json.dumps(receipt, sort_keys=True),
+            flush=True,
+        )
         print(
             "TRAINED_CPU_SMOKE_SUMMARY=" + json.dumps(status, sort_keys=True),
             flush=True,

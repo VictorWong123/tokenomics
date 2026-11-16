@@ -75,6 +75,16 @@ class TrainedCPUSmokeTests(unittest.TestCase):
                 self.assertEqual(result["checked_comparisons"], 160)
                 self.assertTrue(result["synthetic_fixture"])
                 self.assertTrue((args.out / "complete.json").is_file())
+                receipt = json.loads((args.out / "public-receipt.json").read_text())
+                self.assertEqual(
+                    receipt["complete_sha256"], sha256(args.out / "complete.json")
+                )
+                self.assertEqual(receipt["candidate_profile"], args.candidate_profile)
+                self.assertTrue(receipt["synthetic_fixture"])
+                self.assertEqual(
+                    receipt["payload_sha256"]["correctness.jsonl"],
+                    sha256(args.out / "correctness.jsonl"),
+                )
                 manifest = json.loads((args.out / "manifest.json").read_text())
                 self.assertNotEqual(
                     manifest["binary_sha256"]["reference"],

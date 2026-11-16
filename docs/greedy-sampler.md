@@ -132,3 +132,12 @@ caps1/4/8 are retained as distinct conditions. The analyzer requires equal
 logical work for each policy across binaries. Metadata identifies a host-sampler
 experiment with unchanged guarded verification. Do not combine this command
 with the kernel locality options, and run studies sequentially on the Mac.
+
+The pinned1.5B Q4_K_M CPU run43846510993 also passes160 learned comparisons
+between the original and no-temperature profiles with equal logical work. Its
+summary is retained in `results/verification/trained-15-cpu-20261116`. That
+checkpoint predates direct-logit integration. In this small correctness corpus,
+suffix cap8 uses288 verification cycles/418 rows, versus ngram cap4's269/412;
+more lookahead is not automatically useful. These are work counts, not latency.
+Raw records and binary hashes remain in the seven-day workflow artifact; the
+compact archived summary explicitly discloses that limitation.
