@@ -1,0 +1,25 @@
+{
+  "alternating_order": true,
+  "by_vocabulary": {
+    "151936": {
+      "candidate_median_ns": 89939.45000000001,
+      "median_paired_ratio": 1.6889156410833155,
+      "reference_median_ns": 146557.0
+    },
+    "263": {
+      "candidate_median_ns": 177.094,
+      "median_paired_ratio": 1.6791889043868689,
+      "reference_median_ns": 293.6095
+    },
+    "32768": {
+      "candidate_median_ns": 22064.4,
+      "median_paired_ratio": 1.5487245868564803,
+      "reference_median_ns": 31104.15
+    }
+  },
+  "calls_per_trial": 32,
+  "run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43826134066",
+  "scope": "Synthetic cache-warm Apple ARM hosted-VM CPU candidate preparation plus sampler application; no model/Metal/M3 throughput claim",
+  "source_commit": "4dac2baa05d040836b0f2859a775619758505eca",
+  "trials_per_vocabulary": 16
+}

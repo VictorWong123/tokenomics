@@ -1,0 +1,129 @@
+{
+  "architecture": "Darwin arm64",
+  "checked_comparisons": 160,
+  "performance_claim": null,
+  "run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43826134066",
+  "same_work_between_sampler_profiles": true,
+  "scope_note": "Printed learned-model aggregate only. Full payloads and verified model identity remain in the seven-day Actions artifact. No cross-ISA agreement, GPU graph or M3 throughput claim.",
+  "source_commit": "4dac2baa05d040836b0f2859a775619758505eca",
+  "state": "passed",
+  "synthetic_fixture": false,
+  "totals": {
+    "greedy": {
+      "ngram1": {
+        "accepted": 50,
+        "cycles": 298,
+        "drafted": 61,
+        "synced_tokens": 0,
+        "verified_rows": 359
+      },
+      "ngram4": {
+        "accepted": 78,
+        "cycles": 270,
+        "drafted": 127,
+        "synced_tokens": 0,
+        "verified_rows": 397
+      },
+      "ngram8": {
+        "accepted": 87,
+        "cycles": 261,
+        "drafted": 171,
+        "synced_tokens": 0,
+        "verified_rows": 432
+      },
+      "script-ngram": {
+        "accepted": 73,
+        "cycles": 275,
+        "drafted": 116,
+        "synced_tokens": 0,
+        "verified_rows": 391
+      },
+      "suffix1": {
+        "accepted": 41,
+        "cycles": 307,
+        "drafted": 45,
+        "synced_tokens": 0,
+        "verified_rows": 352
+      },
+      "suffix4": {
+        "accepted": 65,
+        "cycles": 283,
+        "drafted": 81,
+        "synced_tokens": 0,
+        "verified_rows": 364
+      },
+      "suffix8": {
+        "accepted": 71,
+        "cycles": 277,
+        "drafted": 110,
+        "synced_tokens": 0,
+        "verified_rows": 387
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    },
+    "guarded": {
+      "ngram1": {
+        "accepted": 50,
+        "cycles": 298,
+        "drafted": 61,
+        "synced_tokens": 0,
+        "verified_rows": 359
+      },
+      "ngram4": {
+        "accepted": 78,
+        "cycles": 270,
+        "drafted": 127,
+        "synced_tokens": 0,
+        "verified_rows": 397
+      },
+      "ngram8": {
+        "accepted": 87,
+        "cycles": 261,
+        "drafted": 171,
+        "synced_tokens": 0,
+        "verified_rows": 432
+      },
+      "script-ngram": {
+        "accepted": 73,
+        "cycles": 275,
+        "drafted": 116,
+        "synced_tokens": 0,
+        "verified_rows": 391
+      },
+      "suffix1": {
+        "accepted": 41,
+        "cycles": 307,
+        "drafted": 45,
+        "synced_tokens": 0,
+        "verified_rows": 352
+      },
+      "suffix4": {
+        "accepted": 65,
+        "cycles": 283,
+        "drafted": 81,
+        "synced_tokens": 0,
+        "verified_rows": 364
+      },
+      "suffix8": {
+        "accepted": 71,
+        "cycles": 277,
+        "drafted": 110,
+        "synced_tokens": 0,
+        "verified_rows": 387
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    }
+  }
+}

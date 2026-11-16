@@ -40,3 +40,11 @@ output tokens, suffix cap4 uses296 cycles/353 verification rows; ngram cap8 uses
 artificial prefix-boundary cases. They are not a workload performance estimate.
 Only the printed aggregate summary is retained locally; full raw payloads
 remain in the workflow artifact. No Metal graph or M3 speed claim is made.
+
+The [standard Apple ARM run](https://github.com/VictorWong123/tokenomics/actions/runs/43826134066)
+also passes160 learned comparisons and equal work between sampler profiles.
+Its348 canonical output tokens use261 cycles/432 verification rows with ngram8
+and283 cycles/364 rows with suffix4. These differ from the x86 aggregate counts;
+each run checks against its own same-machine ordinary reference. Cross-ISA
+token agreement was not tested. The native sampler equivalence executable and
+synthetic orchestration tests also pass. This remains CPU correctness evidence.

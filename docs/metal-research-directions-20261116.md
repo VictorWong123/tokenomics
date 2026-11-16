@@ -98,3 +98,27 @@ batch sizes. This reinforces auditing the complete graph rather than GEMM
 alone. Replacing both one-row and batched arithmetic with a new canonical kernel
 still differs from this project's requirement to preserve its existing ordinary
 reference; our candidate must pass against that reference explicitly.
+
+## Recent Apple-specific evidence
+
+[Yemets et al., October2026](https://arxiv.org/pdf/2610.31479), section2.3.2,
+reports modest small-batch Metal gains from reusing register-resident quantized
+weight reconstruction across activation rows. Its supplementary speculative
+example improves at verification sizes3/5/8 but disengages at9. The main matched
+chat benchmark still reports no net speculative gain. These are different MLX
+models, machines and arithmetic from our pinned GGUF reference, so their ratios
+are not forecasts for this codebase.
+
+For our Q8 head, a next candidate can share integer weight loads and conversions
+between two query accumulators while retaining each original eight-element
+dot-product order, block-scale placement and reduction helper. Expanding each
+weight to floating point before the dot product would change scale placement
+relative to the original Q8 routine; algebraic equivalence is insufficient for
+its bitwise contract. Compared with the current repeated-helper grouping, this
+candidate targets actual redundant work. It also increases register pressure.
+It needs source-derived per-thread arithmetic checks, native shader compilation
+and real M3 gates before performance conclusions.
+
+[DISCO](https://proceedings.mlr.press/v262/mamou24a.html) motivates adaptive draft
+length. Its learned stopping classifier differs from our EWMA cost controller;
+neither can compensate for a verifier whose extra rows remain too expensive.

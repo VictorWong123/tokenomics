@@ -745,3 +745,20 @@ falling back to CPU. Three analyzer tests reject missing/duplicate records,
 changed cross-profile data, failed gates, CPU results and invalid durations.
 All7 default suites pass in43.55 seconds; Python/C++ formatting passes.
 [Host evidence](../results/verification/matvec-component-host-20261116/summary.json).
+
+### Native Apple ARM learned CPU result
+
+[Run43826134066](https://github.com/VictorWong123/tokenomics/actions/runs/43826134066)
+passes the native sampler equivalence executable, fixture orchestration, pinned
+full-model SHA256 download, and all160 learned-model CPU exact-ID/stop/work
+comparisons. The aggregate covers348 canonical output tokens per configuration:
+ngram8 uses261 cycles/432 rows; suffix4 uses283 cycles/364 rows. Counts differ
+from the x86 smoke; agreement is scoped to the same-machine ordinary reference,
+and cross-ISA token agreement was not tested.
+
+Retained the printed learned aggregate separately from the earlier synthetic
+fixture summary in the same log. Full raw learned payloads remain in the
+seven-day Actions artifact. Retained all48 sampler component timings: at151936
+vocabulary entries, reference median146.6µs versus89.9µs, median paired ratio1.69.
+These cache-warm component timings are not model throughput or an M3 result.
+[ARM evidence](../results/verification/trained-arm-cpu-20261116/trained-summary.json).

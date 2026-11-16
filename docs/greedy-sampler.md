@@ -68,6 +68,13 @@ backend synchronization and model suppression, and do not estimate M3 speed.
 The removed work applies to ordinary decoding too; it cannot establish a
 speculative speedup by itself.
 
+A standard Apple ARM hosted-VM run also passes native sampler equivalence and
+160 learned-model CPU comparisons. At151936 entries its component benchmark
+measures median146.6µs versus89.9µs, with median paired ratio1.69 across16
+alternating trials. The ratio is the median of individual ratios, not the ratio
+of the two duration medians. This is a synthetic hosted CPU result, not M3
+generation throughput. [Raw pairs and summary](../results/verification/trained-arm-cpu-20261116/sampler-component-summary.json).
+
 ```bash
 .venv/bin/cmake --build build-metal-greedy --target test_greedy_equivalence -j2
 build-metal-greedy/test_greedy_equivalence
