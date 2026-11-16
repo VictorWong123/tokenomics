@@ -25,7 +25,7 @@ def functions(module):
 def normalize(body, attributes, *, swap=False):
     header = body.splitlines()[0]
     grids = re.findall(r"<[34] x i32>[^,%]*\s+(%[-\w.$]+)", header)
-    if len(grids) != 1:
+    if swap and len(grids) != 1:
         raise ValueError("Expected one integer grid-coordinate argument")
     # Metadata is deliberately outside this textual diagnostic's claim.
     body = re.sub(r",?\s*![\w.]+\s+!\d+", "", body)
@@ -83,20 +83,86 @@ def normalize(body, attributes, *, swap=False):
     return " ".join(body.split())
 
 
-def compare_ir(module):
+def callees(body):
+    return [
+        name.strip('"')
+        for name in re.findall(r'\bcall\b[^\n]*?@("[^"\n]+"|[-\w.$]+)\(', body)
+    ]
+
+
+def compare_helpers(
+    symbols, reference, candidate, reference_attributes, candidate_attributes
+):
+    pending, visited, rows = list(symbols), set(), []
+    while pending:
+        symbol = pending.pop()
+        if symbol in visited or symbol.startswith(("air.", "llvm.")):
+            continue
+        visited.add(symbol)
+        row = {"symbol": symbol}
+        if symbol not in reference or symbol not in candidate:
+            row["state"] = "unresolved_helper"
+        else:
+            ordinary = normalize(reference[symbol], reference_attributes)
+            modified = normalize(candidate[symbol], candidate_attributes)
+            row.update(
+                {
+                    "state": "matched" if ordinary == modified else "different",
+                    "ordinary_sha256": hashlib.sha256(ordinary.encode()).hexdigest(),
+                    "candidate_sha256": hashlib.sha256(modified.encode()).hexdigest(),
+                }
+            )
+            pending += callees(reference[symbol]) + callees(candidate[symbol])
+        rows.append(row)
+    return sorted(rows, key=lambda row: row["symbol"])
+
+
+def compare_ir(module, reference_module=None):
     definitions = functions(module)
+    reference = (
+        functions(reference_module) if reference_module is not None else definitions
+    )
     attributes = dict(re.findall(r"^attributes #(\d+) = (\{[^\n]*\})", module, re.M))
+    reference_attributes = (
+        dict(re.findall(r"^attributes #(\d+) = (\{[^\n]*\})", reference_module, re.M))
+        if reference_module is not None
+        else attributes
+    )
+    reference_changes = []
+    if reference_module is not None:
+        for symbol, body in reference.items():
+            if symbol not in definitions:
+                reference_changes.append({"symbol": symbol, "state": "missing"})
+                continue
+            original = normalize(body, reference_attributes)
+            modified = normalize(definitions[symbol], attributes)
+            if original != modified:
+                reference_changes.append(
+                    {
+                        "symbol": symbol,
+                        "state": "different",
+                        "ordinary_sha256": hashlib.sha256(
+                            original.encode()
+                        ).hexdigest(),
+                        "candidate_sha256": hashlib.sha256(
+                            modified.encode()
+                        ).hexdigest(),
+                    }
+                )
     pairs = []
     for kind in KINDS:
         base = f"kernel_mul_mv_{kind}_f32"
         names = []
-        for desired in (base, base + "_interleaved"):
-            matches = [name for name in definitions if name == desired]
+        for desired, available in (
+            (base, reference),
+            (base + "_interleaved", definitions),
+        ):
+            matches = [name for name in available if name == desired]
             if not matches:
                 # Some Metal versions retain C++ mangling for unannotated kernels.
                 matches = [
                     name
-                    for name in definitions
+                    for name in available
                     if desired in name
                     and ("_interleaved" in name) == desired.endswith("_interleaved")
                     and "_impl" not in name
@@ -108,12 +174,10 @@ def compare_ir(module):
         else:
             try:
                 row["direct_callees"] = {
-                    label: re.findall(
-                        r'\bcall\b[^\n]*?@("[^"\n]+"|[-\w.$]+)\(', definitions[symbol]
-                    )
-                    for label, symbol in zip(("ordinary", "candidate"), names)
+                    "ordinary": callees(reference[names[0]]),
+                    "candidate": callees(definitions[names[1]]),
                 }
-                ordinary = normalize(definitions[names[0]], attributes)
+                ordinary = normalize(reference[names[0]], reference_attributes)
                 candidate = normalize(definitions[names[1]], attributes, swap=True)
                 equal = ordinary == candidate
                 row.update(
@@ -128,6 +192,18 @@ def compare_ir(module):
                         ).hexdigest(),
                     }
                 )
+                row["helper_comparisons"] = compare_helpers(
+                    row["direct_callees"]["ordinary"]
+                    + row["direct_callees"]["candidate"],
+                    reference,
+                    definitions,
+                    reference_attributes,
+                    attributes,
+                )
+                if equal and any(
+                    helper["state"] != "matched" for helper in row["helper_comparisons"]
+                ):
+                    row["state"] = "helper_incomplete_or_different"
                 if not equal:
                     row["first_token_difference"] = next(
                         (
@@ -151,11 +227,21 @@ def compare_ir(module):
     return {
         "state": (
             "normalized_ir_matches"
-            if all(p["state"] == "matched" for p in pairs)
+            if all(p["state"] == "matched" for p in pairs) and not reference_changes
             else "diagnostic_incomplete_or_different"
         ),
         "pairs": pairs,
         "parsed_functions": len(definitions),
+        "reference_scope": (
+            "separate_original_module"
+            if reference_module is not None
+            else "same_shader_module"
+        ),
+        "reference_functions": len(reference),
+        "all_reference_functions_match": (
+            not reference_changes if reference_module is not None else None
+        ),
+        "reference_function_changes": reference_changes,
         "gpu_execution": False,
         "performance_claim": None,
         "normalization": "Invert grid-coordinate extracts or cancel an exact (1,0,2) shuffle on candidate; reject other whole-grid uses; rename SSA/labels and kernel symbol; resolve attribute groups; ignore metadata attachments and whitespace.",
@@ -167,11 +253,25 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ir", type=Path, required=True)
     parser.add_argument("--source", type=Path, required=True)
+    parser.add_argument("--reference-ir", type=Path)
+    parser.add_argument("--reference-source", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     if args.out.exists():
         parser.error("Output must be fresh")
-    result = compare_ir(args.ir.read_text())
+    if bool(args.reference_ir) != bool(args.reference_source):
+        parser.error("Reference IR and source must be provided together")
+    result = compare_ir(
+        args.ir.read_text(),
+        args.reference_ir.read_text() if args.reference_ir else None,
+    )
+    if args.reference_ir:
+        result["reference_ir_sha256"] = hashlib.sha256(
+            args.reference_ir.read_bytes()
+        ).hexdigest()
+        result["reference_source_sha256"] = hashlib.sha256(
+            args.reference_source.read_bytes()
+        ).hexdigest()
     result["ir_sha256"] = hashlib.sha256(args.ir.read_bytes()).hexdigest()
     result["shader_source_sha256"] = hashlib.sha256(
         args.source.read_bytes()

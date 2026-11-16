@@ -27,3 +27,12 @@ include("${root}/cmake/metal-interleave.cmake")
 tokenomics_metal_interleave("${root}")
 set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/tokenomics-metal-embed-mul_mv.s"
   PROPERTIES HEADER_FILE_ONLY TRUE)
+# The prefix is the unchanged upstream program, before appended wrappers.
+file(READ "${CMAKE_CURRENT_BINARY_DIR}/tokenomics-metal-embed-mul_mv.metal" modified)
+set(marker "[[host_name(\"kernel_mul_mv_q4_K_f32_interleaved\")]]")
+string(FIND "${modified}" "${marker}" wrapper_position)
+if(wrapper_position EQUAL -1)
+  message(FATAL_ERROR "Missing owned wrapper boundary")
+endif()
+string(SUBSTRING "${modified}" 0 ${wrapper_position} reference)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/tokenomics-metal-reference-mul_mv.metal" "${reference}")

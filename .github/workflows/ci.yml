@@ -183,11 +183,16 @@ jobs:
           xcrun -sdk macosx metal -std=metal3.1 -DGGML_METAL_EMBED_LIBRARY -O3 \
             -S -emit-llvm build-metal-ir-source/tokenomics-metal-embed-mul_mv.metal \
             -o results/local/metal-ir/mul_mv.ll
+          xcrun -sdk macosx metal -std=metal3.1 -DGGML_METAL_EMBED_LIBRARY -O3 \
+            -S -emit-llvm build-metal-ir-source/tokenomics-metal-reference-mul_mv.metal \
+            -o results/local/metal-ir/reference.ll
       - name: Compare textual IR with coordinate permutation
         run: |
           .venv/bin/python scripts/compare_metal_ir.py \
             --ir results/local/metal-ir/mul_mv.ll \
             --source build-metal-ir-source/tokenomics-metal-embed-mul_mv.metal \
+            --reference-ir results/local/metal-ir/reference.ll \
+            --reference-source build-metal-ir-source/tokenomics-metal-reference-mul_mv.metal \
             --out results/local/metal-ir/comparison.json
       - name: Retain compiler diagnostics only
         if: always()

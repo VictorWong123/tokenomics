@@ -653,3 +653,19 @@ The standard macOS26 runner also exposes an Apple Paravirtual device without
 SIMD reduction. A newer OS does not provide the missing execution capability;
 no GPU graph was attempted. [Original compiler diagnostic](../results/verification/metal-ir-20261116/initial-diagnostic.json)
 and [device probe](../results/verification/metal-ir-20261116/macos26-device.json).
+
+The corrected within-module IR job matches all four forwarding wrappers after
+cancelling the exact coordinate shuffle. Each wrapper calls the same named
+arithmetic helper as its original kernel.
+[Within-module result](../results/verification/metal-ir-20261116/forwarding-diagnostic.json).
+This comparison alone cannot establish agreement with the separately compiled
+original library: helper bodies could be optimized differently across modules.
+
+Extended the job to compile the unchanged original shader prefix separately.
+The checker now compares reachable helper definitions across modules and all
+original function definitions, in addition to wrapper forwarding. A missing or
+changed helper cannot pass merely because its call site looks identical. Five
+unit tests pass, including identical call sites whose helper body changes.
+The original source prefix is checked locally to contain the complete pinned
+kernel body and no added wrapper. This remains a textual compiler diagnostic;
+metadata, later specialization and actual GPU behavior remain outside its proof.

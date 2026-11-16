@@ -32,3 +32,11 @@ cancels only that exact inverse permutation; other whole-grid uses are rejected
 as unsupported. This avoids mistaking an untouched raw-grid forwarding call
 for a coordinate-adjusted match. Helper callee names remain significant.
 The original incomplete/different report is retained separately.
+
+The corrected within-module check matches all four wrappers, including identical
+callee symbols. The stronger job also compiles a separate original-kernel
+module. It compares reachable helper bodies and every original function
+definition across the two modules. Matching call sites with changed or missing
+helpers are rejected. Reports distinguish `same_shader_module` from
+`separate_original_module`; a same-module result does not validate original
+library optimization choices.

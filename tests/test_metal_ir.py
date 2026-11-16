@@ -58,6 +58,7 @@ def forwarding_module(*, wrong_mask=False, wrong_callee=False, raw_use=False):
                 + "\n".join(instructions)
                 + "\n}"
             )
+    functions.append("define void @same_impl(<3 x i32> %position) {\n  ret void\n}")
     return "\n".join(functions)
 
 
@@ -75,6 +76,27 @@ class MetalIRTests(unittest.TestCase):
             )
         result = compare_ir(forwarding_module(wrong_callee=True))
         self.assertTrue(all(row["state"] == "different" for row in result["pairs"]))
+
+    def test_separate_module_compares_reachable_helper_bodies(self):
+        reference = forwarding_module()
+        same = compare_ir(reference, reference_module=reference)
+        self.assertEqual(same["state"], "normalized_ir_matches")
+        self.assertEqual(same["reference_scope"], "separate_original_module")
+        changed = reference.replace(
+            "define void @same_impl(<3 x i32> %position) {\n  ret void\n}",
+            "define void @same_impl(<3 x i32> %position) {\n  %changed = fadd fast float 1.0, 2.0\n  ret void\n}",
+        )
+        result = compare_ir(changed, reference_module=reference)
+        self.assertNotEqual(result["state"], "normalized_ir_matches")
+        self.assertTrue(all(row["normalized_text_equal"] for row in result["pairs"]))
+        self.assertTrue(
+            all(
+                any(h["state"] == "different" for h in row["helper_comparisons"])
+                for row in result["pairs"]
+            )
+        )
+        missing = reference[: reference.index("define void @same_impl")]
+        self.assertNotEqual(compare_ir(missing)["state"], "normalized_ir_matches")
 
     def test_coordinate_permutation_and_ssa_renaming_match(self):
         result = compare_ir(module())
