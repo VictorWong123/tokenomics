@@ -7,7 +7,14 @@ import platform
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from analysis.matvec_component import PROFILES, summarize
+from analysis.matvec_component import (
+    BLOCKS,
+    PROFILES_BY_MODEL,
+    SHAPES_BY_MODEL,
+    summarize,
+    encoded_weight_bytes,
+)
+from bench.model_identity import model_identity
 from bench.common import (
     ROOT,
     atomic_json,
@@ -23,11 +30,20 @@ from scripts.metal_short_mv_study import command, tool
 def study(args):
     if platform.system() != "Darwin" or platform.machine() != "arm64":
         raise RuntimeError("Run natively on the Apple Silicon Mac")
+    model_id = getattr(args, "model_id", "qwen25-05")
+    if model_id not in PROFILES_BY_MODEL:
+        raise ValueError("Unsupported component model geometry")
+    profiles = PROFILES_BY_MODEL[model_id]
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=False)
     source = source_fingerprint()
     report = {
         "state": "building",
+        "model_id": model_id,
+        "model_identity": model_identity(model_id),
+        "model_weights_loaded": False,
+        "profiles": list(profiles),
+        "blocks": BLOCKS,
         "source": source,
         "harness_source_sha256": sha256(ROOT / "tests/test_matvec_component.cpp"),
         "hardware": hardware(),
@@ -36,7 +52,7 @@ def study(args):
     atomic_json(out / "manifest.json", report)
     try:
         binaries = {}
-        for profile in PROFILES:
+        for profile in profiles:
             build = ROOT / f"build-metal-{profile}"
             print(f"Matrix component: building {profile}; logs in {out}", flush=True)
             flags = {
@@ -88,6 +104,23 @@ def study(args):
                 out / f"{profile}-compile.log",
             )
             binaries[profile] = build / "test_matvec_component"
+        for profile, binary in binaries.items():
+            shape_log = out / f"{profile}-shapes.jsonl"
+            command([binary, "--shapes", "--model-id", model_id], shape_log)
+            expected_shapes = [
+                {
+                    "model_id": model_id,
+                    "type": kind,
+                    "width": width,
+                    "outputs": outputs,
+                    "weight_bytes": encoded_weight_bytes(kind, width, outputs),
+                }
+                for kind, width, outputs in SHAPES_BY_MODEL[model_id]
+            ]
+            if read_jsonl_lines(shape_log) != expected_shapes:
+                raise ValueError(
+                    "Native component geometry differs from the pinned model"
+                )
         report["binaries"] = {
             profile: {
                 "sha256": sha256(binary),
@@ -114,16 +147,17 @@ def study(args):
 
         check_identities()
         records = []
-        for block in range(len(PROFILES)):
-            order = PROFILES[block:] + PROFILES[:block]
+        for block in range(BLOCKS):
+            offset = block % len(profiles)
+            order = profiles[offset:] + profiles[:offset]
             for profile in order:
                 print(
-                    f"Matrix component: block{block + 1}/{len(PROFILES)} {profile}",
+                    f"Matrix component: block{block + 1}/{BLOCKS} {profile}",
                     flush=True,
                 )
                 check_identities()
                 raw = out / f"{profile}-{block}.jsonl"
-                command([binaries[profile], "--metal"], raw)
+                command([binaries[profile], "--metal", "--model-id", model_id], raw)
                 check_identities()
                 # Backend diagnostics go to the same raw log. Only explicit JSON
                 # lines are data; the original unfiltered file remains retained.
@@ -133,7 +167,7 @@ def study(args):
                         "Executable profile marker differs from requested build"
                     )
                 records.extend(dict(row, block=block) for row in rows)
-        summary = summarize(records)
+        summary = summarize(records, model_id)
         write_jsonl(out / "records.jsonl", records)
         atomic_json(out / "summary.json", summary)
         report["state"] = "passed"
@@ -157,5 +191,8 @@ def read_jsonl_lines(path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--model-id", choices=tuple(PROFILES_BY_MODEL), default="qwen25-05"
+    )
     parser.add_argument("--out", type=Path, required=True)
     study(parser.parse_args())

@@ -18,6 +18,7 @@
 #include <memory>
 #include <random>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 using Json = nlohmann::ordered_json;
@@ -51,8 +52,8 @@ struct Plan {
     ggml_cgraph *batch_graph, *serial_graph;
     std::vector<ggml_tensor *> singles;
 };
-static void run_shape(ggml_backend_t backend, ggml_type type, int width, int outputs,
-                      bool fixture) {
+static void run_shape(ggml_backend_t backend, ggml_type type, int width, int outputs, bool fixture,
+                      const std::string &model_id) {
     std::unique_ptr<ggml_context, decltype(&ggml_free)> ctx(
         ggml_init({8 * 1024 * 1024, nullptr, true}), ggml_free);
     require(bool(ctx), "context allocation failed");
@@ -96,6 +97,7 @@ static void run_shape(ggml_backend_t backend, ggml_type type, int width, int out
     }
     ggml_backend_tensor_set(weights, packed.data(), 0, ggml_nbytes(weights));
     Json identity = {{"profile", profile()},
+                     {"model_id", model_id},
                      {"backend", ggml_backend_name(backend)},
                      {"type", ggml_type_name(type)},
                      {"width", width},
@@ -188,9 +190,39 @@ static void run_shape(ggml_backend_t backend, ggml_type type, int width, int out
 }
 int main(int argc, char **argv) {
     try {
-        require(argc == 2, "usage: test_matvec_component --cpu-fixture | --metal");
-        const bool fixture = std::string(argv[1]) == "--cpu-fixture";
-        require(fixture || std::string(argv[1]) == "--metal", "unknown component mode");
+        require(
+            argc == 2 || argc == 4,
+            "usage: test_matvec_component --cpu-fixture | --metal | --shapes [--model-id MODEL]");
+        const std::string mode = argv[1];
+        const bool fixture = mode == "--cpu-fixture";
+        require(fixture || mode == "--metal" || mode == "--shapes", "unknown component mode");
+        const std::string model_id = argc == 4 ? argv[3] : "qwen25-05";
+        require(argc == 2 || std::string(argv[2]) == "--model-id", "expected --model-id");
+        require(model_id == "qwen25-05" || model_id == "qwen25-15", "unknown model geometry");
+        struct Shape {
+            ggml_type type;
+            int width, outputs;
+        };
+        const std::vector<Shape> shapes = model_id == "qwen25-05"
+                                              ? std::vector<Shape>{{GGML_TYPE_Q8_0, 896, 151936},
+                                                                   {GGML_TYPE_Q5_0, 896, 896},
+                                                                   {GGML_TYPE_Q4_K, 4864, 896},
+                                                                   {GGML_TYPE_Q6_K, 4864, 896}}
+                                              : std::vector<Shape>{{GGML_TYPE_Q6_K, 1536, 151936},
+                                                                   {GGML_TYPE_Q4_K, 1536, 1536},
+                                                                   {GGML_TYPE_Q6_K, 8960, 1536}};
+        if (mode == "--shapes") {
+            for (const auto &shape : shapes)
+                std::cout << Json{{"model_id", model_id},
+                                  {"type", ggml_type_name(shape.type)},
+                                  {"width", shape.width},
+                                  {"outputs", shape.outputs},
+                                  {"weight_bytes", shape.width / ggml_blck_size(shape.type) *
+                                                       ggml_type_size(shape.type) * shape.outputs}}
+                                 .dump()
+                          << std::endl;
+            return 0;
+        }
         ggml_backend_t raw = nullptr;
         if (fixture)
             raw = ggml_backend_cpu_init();
@@ -202,15 +234,15 @@ int main(int argc, char **argv) {
         require(bool(backend), "requested backend unavailable; CPU fallback prohibited");
         if (fixture)
             ggml_backend_cpu_set_n_threads(backend.get(), 2);
-        for (auto type : {GGML_TYPE_Q8_0, GGML_TYPE_Q5_0, GGML_TYPE_Q4_K, GGML_TYPE_Q6_K}) {
-            if (fixture)
-                run_shape(backend.get(), type, 256, 128, true);
-            else if (type == GGML_TYPE_Q8_0)
-                run_shape(backend.get(), type, 896, 151936, false);
-            else if (type == GGML_TYPE_Q5_0)
-                run_shape(backend.get(), type, 896, 896, false);
-            else
-                run_shape(backend.get(), type, 4864, 896, false);
+        if (fixture) {
+            for (auto type : {GGML_TYPE_Q8_0, GGML_TYPE_Q5_0, GGML_TYPE_Q4_K, GGML_TYPE_Q6_K}) {
+                if (model_id == "qwen25-15" && (type == GGML_TYPE_Q8_0 || type == GGML_TYPE_Q5_0))
+                    continue;
+                run_shape(backend.get(), type, 256, 128, true, model_id);
+            }
+        } else {
+            for (const auto &shape : shapes)
+                run_shape(backend.get(), shape.type, shape.width, shape.outputs, false, model_id);
         }
     } catch (const std::exception &error) {
         std::cerr << error.what() << '\n';

@@ -57,3 +57,28 @@ never records timings. CPU fixture success is not a Metal arithmetic result.
 also passes for the component executable, its small CPU fixture and the grouped
 shader libraries. The hosted virtual GPU cannot run the large Metal matrices;
 those results are pending on the M3.
+
+## Optional1.5B geometry
+
+```bash
+.venv/bin/python scripts/metal_matvec_study.py --model-id qwen25-15 \
+  --out results/local/metal-matrix-15-01
+```
+
+This selects only plain short-MV and interleaving: the pinned1.5B model contains
+no Q8 weights. It uses three header-confirmed projections: Q6_K[1536,151936]
+output, Q4_K[1536,1536] attention query, and Q6_K[8960,1536] FFN down. The output
+head occupies191439360 encoded bytes. These are model shapes with synthetic
+values; neither weights nor a model download are needed.
+
+Two profiles rotate over four blocks, covering15 query/shape cells,120 arithmetic
+gates and1920 timing pairs. Each profile runs in each order position twice.
+This is a separate geometry/protocol; its results cannot be pooled with0.5B.
+The analyzer checks model identity, exact quantized byte counts, complete trial
+coverage and cross-profile data/output fingerprints. Before allocating a large
+matrix, the runner checks each native executable's `--shapes --model-id` output
+against the frozen Python geometry. Wrong model geometry rejects the run.
+
+The small CPU fixture for1.5B covers Q4_K/Q6_K with ten gates/5120 compared values;
+it does not execute the large matrices or predict their throughput. As with0.5B,
+a passing component is followed by actual GPU/backend and trained-model gates.

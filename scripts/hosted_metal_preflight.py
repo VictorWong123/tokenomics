@@ -206,6 +206,24 @@ def main():
                 f"{profile}-cpu-component-fixture",
                 [str(build / "test_matvec_component"), "--cpu-fixture"],
             )
+            run(
+                f"{profile}-15-component-shapes",
+                [
+                    str(build / "test_matvec_component"),
+                    "--shapes",
+                    "--model-id",
+                    "qwen25-15",
+                ],
+            )
+            run(
+                f"{profile}-15-cpu-component-fixture",
+                [
+                    str(build / "test_matvec_component"),
+                    "--cpu-fixture",
+                    "--model-id",
+                    "qwen25-15",
+                ],
+            )
             if shared == "ON":
                 arithmetic = ROOT / "build-hosted-q8-shared-arithmetic"
                 run(
