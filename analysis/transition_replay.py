@@ -191,7 +191,11 @@ def analyze(collection, out, family="transition"):
                     "family": (
                         "linear-transition"
                         if row["id"].startswith("recent-transition")
-                        else "control"
+                        else (
+                            "suffix-priority"
+                            if row["id"].startswith("suffix5-priority-")
+                            else "control"
+                        )
                     ),
                 }
                 for row in totals

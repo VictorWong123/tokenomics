@@ -114,6 +114,16 @@ class TransitionCollectionTest(unittest.TestCase):
             ):
                 report = analyze(root, root / "out", family="priority")
             self.assertEqual(len(report["totals"]), 16)
+            aliases = [
+                alias
+                for point in report["work_frontier"]
+                for alias in point["aliases"]
+                if alias["id"].startswith("suffix5-priority-")
+            ]
+            self.assertTrue(aliases)
+            self.assertTrue(
+                all(alias["family"] == "suffix-priority" for alias in aliases)
+            )
             traces = [
                 json.loads(line)
                 for line in gzip.decompress(
