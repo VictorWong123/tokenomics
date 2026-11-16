@@ -110,3 +110,10 @@ a just-outside-top64 source token is rescanned nine times. At vocabulary151936,
 that stress case takes roughly1.4ms on this Linux CPU. The prototype is not yet
 called by inference. The next optimization caches repeated membership checks;
 this negative cost result is retained with its original source/binary hashes.
+
+The collector/importer now distinguish the frozen fit and validation protocols
+by explicit phase and separate SHA pins. Validation collects six prompts and
+replays exactly three guided cap settings, six fixed retrieval controls, and
+ordinary decoding; it does not rerun the exploratory parameter grid. A synthetic
+phase test checks384 rank rows,60 per-prompt records,10 totals and ordinary
+zero-waste accounting. Old fit receipts remain readable and preserve their grid.

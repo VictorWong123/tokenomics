@@ -15,7 +15,7 @@ from analysis.frequency_copy import frontier
 from analysis.proposal_replay import replay, suffix_draft, upstream_ngram
 from bench.common import ROOT, atomic_json, read_jsonl, sha256, source_fingerprint
 from bench.model_identity import model_identity
-from scripts.collect_logit_fit import PROTOCOL, PROTOCOL_SHA256
+from scripts.collect_logit_fit import PROTOCOL, PROTOCOL_SHA256, collection_protocol
 
 WORK = ("tokens", "cycles", "drafted", "accepted", "verified_rows", "wasted_rows")
 
@@ -91,9 +91,12 @@ def import_collection(log, out, run_url, source_commit, *, allow_synthetic=False
         raise ValueError("Expected exactly one completed collection receipt")
     receipt = receipts[0]
     identity = model_identity(receipt["model_id"])
+    protocol_path, protocol_sha = collection_protocol(
+        receipt.get("collection_phase", "fit")
+    )
     if (
         receipt.get("state") != "passed"
-        or receipt.get("protocol_sha256") != PROTOCOL_SHA256
+        or receipt.get("protocol_sha256") != protocol_sha
         or receipt["source"]["revision"] != source_commit
         or (receipt.get("synthetic_fixture") and not allow_synthetic)
         or (
@@ -102,9 +105,9 @@ def import_collection(log, out, run_url, source_commit, *, allow_synthetic=False
         )
     ):
         raise ValueError("Wrong collection identity or synthetic/learned scope")
-    if sha256(PROTOCOL) != PROTOCOL_SHA256:
-        raise ValueError("Fit protocol changed")
-    protocol = json.loads(PROTOCOL.read_text())
+    if sha256(protocol_path) != protocol_sha:
+        raise ValueError("Collection protocol changed")
+    protocol = json.loads(protocol_path.read_text())
     records = {}
     for line in lines:
         if "LOGIT_FIT_DATA=" not in line:
@@ -160,9 +163,12 @@ def load_collection(directory):
     ):
         raise ValueError("Imported collection changed")
     receipt = json.loads((directory / "receipt.json").read_text())
+    protocol_path, protocol_sha = collection_protocol(
+        receipt.get("collection_phase", "fit")
+    )
     if (
         sha256(directory / "data.jsonl") != receipt["payload_sha256"]["data.jsonl"]
-        or receipt["protocol_sha256"] != PROTOCOL_SHA256
+        or receipt["protocol_sha256"] != protocol_sha
     ):
         raise ValueError("Wrong sealed data/protocol")
     identity = model_identity(receipt["model_id"])
@@ -177,7 +183,7 @@ def load_collection(directory):
     ):
         raise ValueError("Imported collection identity differs")
     rows = read_jsonl(directory / "data.jsonl")
-    protocol = json.loads(PROTOCOL.read_text())
+    protocol = json.loads(protocol_path.read_text())
     if [row["prompt_id"] for row in rows] != protocol["prompt_ids"]:
         raise ValueError("Wrong development-fit prompts")
     for row in rows:
@@ -203,9 +209,11 @@ def load_collection(directory):
 
 def analyze(directory, out):
     targets, receipt = load_collection(directory)
-    protocol = json.loads(PROTOCOL.read_text())
-    if sha256(PROTOCOL) != PROTOCOL_SHA256:
-        raise ValueError("Fit protocol changed")
+    phase = receipt.get("collection_phase", "fit")
+    protocol_path, protocol_sha = collection_protocol(phase)
+    protocol = json.loads(protocol_path.read_text())
+    if sha256(protocol_path) != protocol_sha:
+        raise ValueError("Collection protocol changed")
     source = source_fingerprint()
     configurations = [
         {
@@ -217,22 +225,30 @@ def analyze(directory, out):
             "cap": cap,
         }
         for minimum, cutoff, fallback, cap in itertools.product(
-            protocol["minimum_match_lengths"],
-            protocol["hint_rank_cutoffs"],
-            protocol["fallback_to_plain_copy"],
+            protocol.get(
+                "minimum_match_lengths", [protocol.get("minimum_match_length")]
+            ),
+            protocol.get("hint_rank_cutoffs", [protocol.get("hint_rank_cutoff")]),
+            (
+                protocol["fallback_to_plain_copy"]
+                if phase == "fit"
+                else [protocol["fallback_to_plain_copy"]]
+            ),
             protocol["caps"],
         )
     ]
     configurations += [
         {"family": "control", "id": f"suffix{minimum}", "minimum": minimum, "cap": cap}
         for minimum, cap in itertools.product(
-            protocol["minimum_match_lengths"], protocol["caps"]
+            protocol.get("minimum_match_lengths", [5]), protocol["caps"]
         )
     ]
     configurations += [
         {"family": "control", "id": "upstream-ngram3", "cap": cap}
         for cap in protocol["caps"]
     ]
+    if phase == "validation":
+        configurations.append({"family": "control", "id": "ordinary", "cap": 0})
     results, traces = [], []
     for config in configurations:
         for target in targets:
@@ -267,9 +283,32 @@ def analyze(directory, out):
                 used_hints.append(cursor - 1 if hint is not None else None)
                 return value
 
-            counts, cycles = replay(
-                target["prompt_ids"], target["token_ids"], config["cap"], propose
-            )
+            if config["id"] == "ordinary":
+                tokens = len(target["token_ids"])
+                counts = {
+                    "tokens": tokens,
+                    "cycles": tokens,
+                    "drafted": 0,
+                    "accepted": 0,
+                    "verified_rows": tokens,
+                    "wasted_rows": 0,
+                }
+                cycles = [
+                    {
+                        "output_index": i,
+                        "cap": 0,
+                        "drafted": 0,
+                        "accepted": 0,
+                        "committed": 1,
+                    }
+                    for i in range(tokens)
+                ]
+                proposals = [[] for _ in cycles]
+                used_hints = [None for _ in cycles]
+            else:
+                counts, cycles = replay(
+                    target["prompt_ids"], target["token_ids"], config["cap"], propose
+                )
             histogram = dict(sorted(Counter(c["drafted"] + 1 for c in cycles).items()))
             if (
                 sum(histogram.values()) != counts["cycles"]
@@ -321,9 +360,14 @@ def analyze(directory, out):
         "model_id": receipt["model_id"],
         "collection_source": receipt["source"],
         "dataset_sha256": sha256(Path(directory) / "data.jsonl"),
-        "protocol_sha256": PROTOCOL_SHA256,
+        "protocol_sha256": protocol_sha,
+        "collection_phase": phase,
         "synthetic_fixture": receipt["synthetic_fixture"],
-        "scope": "Exploratory canonical-logit chain work replay, not published tree algorithms, latency, validation or held-out evidence",
+        "scope": (
+            "Exploratory canonical-logit chain work replay, not published tree algorithms, latency, validation or held-out evidence"
+            if phase == "fit"
+            else "Predeclared development-validation canonical-logit chain work replay; no latency or reserved held-out evidence"
+        ),
         "per_prompt": results,
         "totals": totals,
         "work_frontier": frontier(totals),

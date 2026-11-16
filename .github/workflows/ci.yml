@@ -27,6 +27,11 @@ on:
         type: choice
         options: [qwen25-05, qwen25-15]
         default: qwen25-05
+      logit_phase:
+        description: Predeclared canonical-rank collection phase
+        type: choice
+        options: [fit, validation]
+        default: fit
       metadata_model:
         description: Pinned public model header to inspect
         type: choice
@@ -260,6 +265,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
+      TOKENOMICS_LOGIT_PHASE: ${{ inputs.logit_phase || 'fit' }}
       TOKENOMICS_FIT_MODEL: ${{ inputs.trained_model || 'qwen25-05' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -291,12 +297,12 @@ jobs:
         run: .venv/bin/python -m unittest discover -s tests -p test_logit_collection.py
       - name: Download and verify the selected pinned public model
         run: .venv/bin/python scripts/download_models.py --model "$TOKENOMICS_FIT_MODEL" --lock configs/metal-model-header-pins-v1.json --directory models
-      - name: Collect only the predeclared development-fit ranks
+      - name: Collect only the predeclared development ranks
         run: |
           TOKENOMICS_MODEL_PATH="$(.venv/bin/python -c 'import json,os; from pathlib import Path; pins=json.loads(Path("configs/metal-model-header-pins-v1.json").read_text())["models"]; print("models/"+pins[os.environ["TOKENOMICS_FIT_MODEL"]]["file"])')"
           .venv/bin/python scripts/collect_logit_fit.py \
             --binary build-logit-fit/collect_target_logits --model "$TOKENOMICS_MODEL_PATH" \
-            --model-id "$TOKENOMICS_FIT_MODEL" --out results/local/logit-fit
+            --model-id "$TOKENOMICS_FIT_MODEL" --phase "$TOKENOMICS_LOGIT_PHASE" --out results/local/logit-fit
       - name: Retain explicit diagnostic data without weights or executables
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

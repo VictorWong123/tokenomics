@@ -121,6 +121,48 @@ class LogitCopyTests(unittest.TestCase):
     os.getenv("TOKENOMICS_LOGIT_BINARY"), "requires CPU rank collector"
 )
 class LogitCopyBundleTests(unittest.TestCase):
+    def test_validation_phase_uses_only_the_six_frozen_prompts_and_ten_cells(self):
+        from make_fixtures import create
+        from scripts.collect_logit_fit import collection_protocol
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            model = root / "fixture.gguf"
+            create(model, 100, ngram_cycle=True)
+            protocol, _ = collection_protocol("validation")
+            ids = json.loads(protocol.read_text())["prompt_ids"]
+            corpus = root / "corpus.jsonl"
+            write_jsonl(corpus, [{"id": pid, "prompt": "abcdefghi" * 2} for pid in ids])
+            args = SimpleNamespace(
+                binary=Path(os.environ["TOKENOMICS_LOGIT_BINARY"]).resolve(),
+                model=model,
+                model_id="qwen25-05",
+                phase="validation",
+                out=root / "collected",
+            )
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                status = collect(args, expected_sha=sha256(model), corpus_path=corpus)
+            self.assertEqual(status["ranking_rows"], 384)
+            log = root / "workflow.log"
+            log.write_text(output.getvalue())
+            receipt = json.loads((args.out / "manifest.json").read_text())
+            import_collection(
+                log,
+                root / "imported",
+                "https://github.com/VictorWong123/tokenomics/actions/runs/1",
+                receipt["source"]["revision"],
+                allow_synthetic=True,
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                result = analyze(root / "imported", root / "replay")
+            self.assertEqual(result["collection_phase"], "validation")
+            self.assertEqual(len(result["totals"]), 10)
+            self.assertEqual(len(result["per_prompt"]), 60)
+            self.assertEqual(sum(c["family"] == "guided" for c in result["totals"]), 3)
+            ordinary = next(c for c in result["totals"] if c["id"] == "ordinary")
+            self.assertEqual((ordinary["cycles"], ordinary["wasted_rows"]), (384, 0))
+
     def test_public_log_transport_replay_and_mutation_rejection(self):
         from make_fixtures import create
 

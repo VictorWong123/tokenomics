@@ -25,25 +25,46 @@ PROTOCOL = ROOT / "configs/logit-copy-fit-v1.json"
 PROTOCOL_SHA256 = "028018e39653338e2454c6d3a7e61ad01fabd314afed6cf5ee4d972b637f1cec"
 
 
+VALIDATION_PROTOCOL = ROOT / "configs/logit-copy-validation-v1.json"
+VALIDATION_PROTOCOL_SHA256 = (
+    "99148b182a20c8e8805252542c55638e181d4e236646aed3cd69849c6a7d9124"
+)
+
+
+def collection_protocol(phase):
+    if phase == "fit":
+        return PROTOCOL, PROTOCOL_SHA256
+    if phase == "validation":
+        return VALIDATION_PROTOCOL, VALIDATION_PROTOCOL_SHA256
+    raise ValueError("Unsupported canonical collection phase")
+
+
 def collect(args, *, expected_sha=None, corpus_path=None):
-    if sha256(PROTOCOL) != PROTOCOL_SHA256:
+    phase = getattr(args, "phase", "fit")
+    protocol_path, protocol_sha = collection_protocol(phase)
+    if sha256(protocol_path) != protocol_sha:
         raise ValueError("Logit-copy fit protocol changed")
-    protocol = json.loads(PROTOCOL.read_text())
+    protocol = json.loads(protocol_path.read_text())
     identity = model_identity(args.model_id)
     synthetic = expected_sha is not None
     expected_sha = expected_sha or identity["sha256"]
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=False)
     report = {
-        "purpose": "Canonical CPU target rankings for exploratory work replay; no speed claim",
+        "purpose": "Canonical CPU target rankings for predeclared development work replay; no speed claim",
+        "collection_phase": phase,
         "synthetic_fixture": synthetic,
         "source": source_fingerprint(),
         "binary_sha256": sha256(args.binary),
         "model_id": args.model_id,
         "model_sha256": sha256(args.model),
-        "protocol_sha256": sha256(PROTOCOL),
+        "protocol_sha256": protocol_sha,
         "platform": {"platform": platform.platform(), "machine": platform.machine()},
-        "scope": "Three development-fit prompts only; no validation or held-out data",
+        "scope": (
+            "Three development-fit prompts only; no validation or held-out data"
+            if phase == "fit"
+            else "Six predeclared development-validation prompts; no reserved held-out data"
+        ),
     }
     atomic_json(out / "manifest.json", report)
     if report["model_sha256"] != expected_sha:
@@ -104,8 +125,9 @@ def collect(args, *, expected_sha=None, corpus_path=None):
             ):
                 if (
                     logits["output_index"] != index
-                    or len(logits["top_ids"]) != protocol["top_k_collected"]
-                    or len(set(logits["top_ids"])) != protocol["top_k_collected"]
+                    or len(logits["top_ids"]) != protocol.get("top_k_collected", 64)
+                    or len(set(logits["top_ids"]))
+                    != protocol.get("top_k_collected", 64)
                     or logits["top_ids"][0] != token
                 ):
                     raise ValueError("Malformed canonical rank row")
@@ -113,7 +135,7 @@ def collect(args, *, expected_sha=None, corpus_path=None):
             source_fingerprint() != report["source"]
             or sha256(args.binary) != report["binary_sha256"]
             or sha256(args.model) != report["model_sha256"]
-            or sha256(PROTOCOL) != report["protocol_sha256"]
+            or sha256(protocol_path) != report["protocol_sha256"]
         ):
             raise ValueError(
                 "Source, model, binary or protocol changed during collection"
@@ -173,6 +195,7 @@ def main():
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--model-id", choices=tuple(MODEL_PINS), default=DEFAULT_MODEL)
+    parser.add_argument("--phase", choices=("fit", "validation"), default="fit")
     parser.add_argument("--out", type=Path, required=True)
     collect(parser.parse_args())
 
