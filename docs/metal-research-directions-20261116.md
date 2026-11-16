@@ -90,3 +90,11 @@ only metadata. It did not download or hash the full491400032-byte model, so its
 report explicitly marks full-model SHA256 verification false. The immutable
 repository revision, total byte count, HTTP content range and prefix hash are
 retained with [selected header evidence](../results/verification/hosted-metal-20261116/qwen05-header-summary.json).
+
+The [Thinking Machines batch-invariant operations library](https://github.com/thinking-machines-lab/batch_invariant_ops)
+provides another useful comparison: it replaces matrix, normalization/reduction
+and log-softmax operations to make its chosen implementation invariant across
+batch sizes. This reinforces auditing the complete graph rather than GEMM
+alone. Replacing both one-row and batched arithmetic with a new canonical kernel
+still differs from this project's requirement to preserve its existing ordinary
+reference; our candidate must pass against that reference explicitly.

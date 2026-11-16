@@ -1,0 +1,30 @@
+{
+  "machine": "arm64",
+  "metal_device": {
+    "available": true,
+    "name": "Apple Paravirtual device",
+    "simdgroup_reduction": false
+  },
+  "metal_execution": "not_requested",
+  "platform": "macOS-26.7.2-arm64-arm-64bit",
+  "probe_only": true,
+  "profile_selection": "all",
+  "purpose": "Apple compilation and correctness only; no M3 speed claim",
+  "shader_compilation": "not_requested",
+  "source_commit": "92bc0c1a6479327ad50e5bbb8202baa536b85064",
+  "stages": [
+    {
+      "command": [
+        "swift",
+        "-e",
+        "import Metal; import Foundation; let d = MTLCreateSystemDefaultDevice(); let r: [String: Any] = [\"available\": d != nil, \"name\": d?.name ?? \"\", \"simdgroup_reduction\": d.map { $0.supportsFamily(.apple7) || $0.supportsFamily(.metal3) } ?? false]; let b = try JSONSerialization.data(withJSONObject: r, options: [.sortedKeys]); print(String(data: b, encoding: .utf8)!)"
+      ],
+      "exit_code": 0,
+      "log_sha256": "7a227b900a3fb1db1c6818898b36a72e9e5a95b49d0ad004fa75c53339af5a96",
+      "name": "device-probe"
+    }
+  ],
+  "state": "device_probe_complete",
+  "synthetic_only": true,
+  "run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43816361455"
+}

@@ -639,3 +639,17 @@ arithmetic/flag/address/coordinate changes and missing functions. Source-only
 CMake generation also passes locally without building or linking a backend.
 The newer runner gets a device-only SIMD capability probe; no paid larger
 runner or Codespaces operation is involved. [Diagnostic contract](metal-ir-diagnostic.md).
+
+The first IR job succeeds in emitting266 functions. All four wrapper pairs show
+an explicit(1,0,2) `shufflevector` before a helper call, which the initial
+extract-only text normalizer correctly reports as different/incomplete. Added
+strict cancellation of exactly that observed inverse shuffle and rejection of
+any unmodeled whole-grid use; direct callee names remain part of comparison.
+Four unit tests pass, including wrong shuffle masks, raw-grid forwarding and
+different helper callees. The original report remains retained rather than
+being relabeled as a match.
+
+The standard macOS26 runner also exposes an Apple Paravirtual device without
+SIMD reduction. A newer OS does not provide the missing execution capability;
+no GPU graph was attempted. [Original compiler diagnostic](../results/verification/metal-ir-20261116/initial-diagnostic.json)
+and [device probe](../results/verification/metal-ir-20261116/macos26-device.json).

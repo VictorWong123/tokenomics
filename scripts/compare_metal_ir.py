@@ -27,19 +27,45 @@ def normalize(body, attributes, *, swap=False):
     grids = re.findall(r"<[34] x i32>[^,%]*\s+(%[-\w.$]+)", header)
     if len(grids) != 1:
         raise ValueError("Expected one integer grid-coordinate argument")
+    # Metadata is deliberately outside this textual diagnostic's claim.
+    body = re.sub(r",?\s*![\w.]+\s+!\d+", "", body)
     if swap:
         grid = re.escape(grids[0])
-        pattern = rf"(extractelement\s+<[34] x i32>\s+{grid},\s+i(?:32|64)\s+)([012])\b"
-        body = re.sub(
-            pattern, lambda m: m[1] + {"0": "1", "1": "0", "2": "2"}[m[2]], body
+        pattern = (
+            rf"(extractelement\s+<[34] x i32>\s+{grid},\s+i(?:32|64)\s+)([0123])\b"
         )
+        shuffle = re.compile(
+            rf"^\s*(%[-\w.$]+) = shufflevector <3 x i32> {grid}, <3 x i32> (?:undef|poison), "
+            r"<3 x i32> <i32 1, i32 0, i32 2>\s*$",
+            re.M,
+        )
+        shuffles = list(shuffle.finditer(body))
+        # A whole-vector use cannot be inverted by changing scalar extracts.
+        # Recognize only the exact inverse shuffle observed in the compiler,
+        # and reject any other use rather than claiming textual equivalence.
+        remaining = "\n".join(body.splitlines()[1:])
+        remaining = shuffle.sub("", remaining)
+        remaining = re.sub(
+            rf"^.*extractelement\s+<[34] x i32>\s+{grid},\s+i(?:32|64)\s+[0123]\b.*$",
+            "",
+            remaining,
+            flags=re.M,
+        )
+        if re.search(grid + r"(?![-\w.$])", remaining):
+            raise ValueError("Unmodeled direct use of the grid coordinate")
+        body = re.sub(
+            pattern,
+            lambda m: m[1] + {"0": "1", "1": "0", "2": "2", "3": "3"}[m[2]],
+            body,
+        )
+        body = shuffle.sub("", body)
+        for match in shuffles:
+            body = re.sub(re.escape(match[1]) + r"(?![-\w.$])", grids[0], body)
     body = re.sub(r'(@)("[^"\n]+"|[-\w.$]+)(\()', r"\1KERNEL\3", body, count=1)
     # Resolve attribute groups, preserving floating-point optimization flags.
     body = re.sub(
         r"#(\d+)\b", lambda m: attributes.get(m[1], "UNKNOWN_ATTRIBUTE_" + m[1]), body
     )
-    # Metadata is deliberately outside this textual diagnostic's claim.
-    body = re.sub(r",?\s*![\w.]+\s+!\d+", "", body)
     names = {}
 
     def name(value):
@@ -81,6 +107,12 @@ def compare_ir(module):
             row["state"] = "missing_or_ambiguous_function"
         else:
             try:
+                row["direct_callees"] = {
+                    label: re.findall(
+                        r'\bcall\b[^\n]*?@("[^"\n]+"|[-\w.$]+)\(', definitions[symbol]
+                    )
+                    for label, symbol in zip(("ordinary", "candidate"), names)
+                }
                 ordinary = normalize(definitions[names[0]], attributes)
                 candidate = normalize(definitions[names[1]], attributes, swap=True)
                 equal = ordinary == candidate
@@ -126,7 +158,7 @@ def compare_ir(module):
         "parsed_functions": len(definitions),
         "gpu_execution": False,
         "performance_claim": None,
-        "normalization": "Swap grid-coordinate extracts on candidate; rename SSA/labels and kernel symbol; resolve attribute groups; ignore metadata attachments and whitespace.",
+        "normalization": "Invert grid-coordinate extracts or cancel an exact (1,0,2) shuffle on candidate; reject other whole-grid uses; rename SSA/labels and kernel symbol; resolve attribute groups; ignore metadata attachments and whitespace.",
         "limitation": "Textual compiler-IR diagnostic only. Ignored metadata and later function-constant/GPU specialization can matter. It cannot replace actual M3 arithmetic/token gates.",
     }
 

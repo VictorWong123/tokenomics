@@ -34,7 +34,48 @@ entry:
     return "\n".join(result)
 
 
+def forwarding_module(*, wrong_mask=False, wrong_callee=False, raw_use=False):
+    functions = []
+    for kind in KINDS:
+        for candidate in (False, True):
+            name = f"kernel_mul_mv_{kind}_f32" + ("_interleaved" if candidate else "")
+            grid = "%9" if candidate else "%0"
+            callee = "different_impl" if candidate and wrong_callee else "same_impl"
+            instructions = []
+            argument = grid
+            if candidate:
+                mask = "0, i32 1" if wrong_mask else "1, i32 0"
+                instructions.append(
+                    f"  %10 = shufflevector <3 x i32> {grid}, <3 x i32> undef, <3 x i32> <i32 {mask}, i32 2>"
+                )
+                argument = grid if raw_use else "%10"
+            instructions += [
+                f"  tail call void @{callee}(<3 x i32> {argument})",
+                "  ret void",
+            ]
+            functions.append(
+                f"define void @{name}(<3 x i32> {grid}) {{\n"
+                + "\n".join(instructions)
+                + "\n}"
+            )
+    return "\n".join(functions)
+
+
 class MetalIRTests(unittest.TestCase):
+    def test_forwarding_wrappers_cancel_only_the_exact_grid_swap(self):
+        result = compare_ir(forwarding_module())
+        self.assertEqual(result["state"], "normalized_ir_matches")
+        for row in result["pairs"]:
+            self.assertEqual(row["direct_callees"]["ordinary"], ["same_impl"])
+            self.assertEqual(row["direct_callees"]["candidate"], ["same_impl"])
+        for kwargs in ({"wrong_mask": True}, {"raw_use": True}):
+            result = compare_ir(forwarding_module(**kwargs))
+            self.assertTrue(
+                all(row["state"] == "unsupported_ir_layout" for row in result["pairs"])
+            )
+        result = compare_ir(forwarding_module(wrong_callee=True))
+        self.assertTrue(all(row["state"] == "different" for row in result["pairs"]))
+
     def test_coordinate_permutation_and_ssa_renaming_match(self):
         result = compare_ir(module())
         self.assertEqual(len(functions(module())), 8)

@@ -25,3 +25,10 @@ The newer standard runner also runs a device-only capability probe to determine
 whether its virtual Metal device advertises the SIMD reduction features missing
 from the macOS15 runner. This does not start a benchmark, use Codespaces or
 select a paid larger runner.
+
+The initial compiler output retains shared implementation calls and adds an
+explicit `(1,0,2)` coordinate `shufflevector` in each wrapper. The checker now
+cancels only that exact inverse permutation; other whole-grid uses are rejected
+as unsupported. This avoids mistaking an untouched raw-grid forwarding call
+for a coordinate-adjusted match. Helper callee names remain significant.
+The original incomplete/different report is retained separately.
