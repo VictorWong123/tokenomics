@@ -2,6 +2,7 @@
 """Build and gate the opt-in Metal profile, then run a small paired local screen."""
 
 import argparse
+from functools import partial
 from pathlib import Path
 import platform
 import shutil
@@ -23,9 +24,9 @@ from bench.common import (
     sha256,
     source_fingerprint,
 )
+from bench.model_identity import DEFAULT_MODEL, MODEL_PINS, require_model_variant
 from bench.run import run
 from scripts.check_metal_profile import (
-    MODEL_SHA256,
     direct_profile,
     gate,
     interleaved_profile,
@@ -60,15 +61,21 @@ def study(args):
         raise RuntimeError(
             "Run this study natively on the Apple Silicon Mac, not Linux or Rosetta"
         )
-    if sha256(args.model) != MODEL_SHA256:
+    model_id = getattr(args, "model_id", DEFAULT_MODEL)
+    identity = require_model_variant(
+        model_id,
+        grouped_q8=getattr(args, "group_q8", False) or getattr(args, "share_q8", False),
+    )
+    if sha256(args.model) != identity["sha256"]:
         raise ValueError(
-            "Requires the pinned Qwen2.5 0.5B Q4_K_M model; model identity differs"
+            f"Requires the pinned {model_id} Q4_K_M model; model identity differs"
         )
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=False)
     source = source_fingerprint()
     atomic_json(out / "environment-before.json", hardware())
     atomic_json(out / "source.json", source)
+    atomic_json(out / "model-identity.json", identity)
     interleaved = getattr(args, "interleave", False)
     group_q8 = getattr(args, "group_q8", False)
     shared_q8 = getattr(args, "share_q8", False)
@@ -81,6 +88,8 @@ def study(args):
         "q8-group": q8_group_profile,
         "q8-shared": q8_shared_profile,
     }[candidate]
+    if model_id != DEFAULT_MODEL:
+        profile_check = partial(profile_check, model_id=model_id)
     builds = {
         "guarded": ROOT / "build-metal-reference",
         candidate: ROOT / f"build-metal-{candidate}",
@@ -219,6 +228,7 @@ def study(args):
             args.model.resolve(),
             out / "gate",
             profile_validator=profile_check,
+            model_id=model_id,
         )
         check_binaries()
         screen = getattr(args, "screen", "ngram")
@@ -231,6 +241,7 @@ def study(args):
                 out / "gate-suffix",
                 drafter="suffix",
                 profile_validator=profile_check,
+                model_id=model_id,
             )
             check_binaries()
         if args.gate_only:
@@ -238,7 +249,7 @@ def study(args):
         else:
             state = "development_screen"
             config = screen_configuration(
-                screen, interleaved, group_q8, shared_q8, direct
+                screen, interleaved, group_q8, shared_q8, direct, model_id
             )
             prompts = [
                 p
@@ -270,6 +281,7 @@ def study(args):
                 group_q8=group_q8,
                 shared_q8=shared_q8,
                 direct=direct,
+                model_id=model_id,
             )
             state = "complete"
         if source_fingerprint() != source:
@@ -281,6 +293,7 @@ def study(args):
                 "state": state,
                 "gate": "passed",
                 "screen": screen,
+                "model_id": model_id,
                 "kernel_variant": "guarded-single-row" if direct else candidate,
                 "sampler_variant": "direct" if direct else "original",
                 "gate_drafters": (
@@ -335,6 +348,7 @@ def main():
         help="Retrieval adds suffix caps1/4/8 and a separate suffix correctness gate",
     )
     parser.add_argument("--model", type=Path, required=True)
+    parser.add_argument("--model-id", choices=tuple(MODEL_PINS), default=DEFAULT_MODEL)
     parser.add_argument(
         "--out",
         type=Path,

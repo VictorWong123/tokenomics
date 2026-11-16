@@ -249,3 +249,27 @@ callback without reading tensors or introducing synchronization: each fixture
 observes2772 marked and13335 unmarked nodes, with no mark leaking into prefills
 or ordinary one-row graphs. This proves scope propagation on that CPU path;
 the complete trained M3 gate still decides whole-graph correctness.
+
+## Optional pinned1.5B model
+
+The study and cross-profile gate also accept `--model-id qwen25-15` with the
+pinned `qwen2.5-1.5b-instruct-q4_k_m.gguf`. The header-confirmed28 transformer
+layers require `offloaded29/29 layers to GPU`; a0.5B25/25 marker fails this gate.
+The complete file SHA is checked before the study. The model ID is frozen into
+the configuration and gate manifest, with separate phase names; existing0.5B
+protocol configurations remain unchanged.
+
+```bash
+.venv/bin/python scripts/download_models.py --model qwen25-15 \
+  --lock configs/metal-model-header-pins-v1.json --directory models
+.venv/bin/python scripts/metal_short_mv_study.py --interleave \
+  --model-id qwen25-15 --screen retrieval \
+  --model models/qwen2.5-1.5b-instruct-q4_k_m.gguf \
+  --out results/local/metal-15-interleaved-01
+```
+
+Plain short-MV and isolated `--direct-greedy` are also supported. Q8 grouping
+and shared-Q8 experiments are rejected for this model: its weights are F32,
+Q4_K and Q6_K, including a Q6_K output projection. A compiled Q8 marker would
+not establish applicable kernel execution. All learned Metal exactness and
+local speed results remain unmeasured until the Mac runs these gates.

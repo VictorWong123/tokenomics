@@ -2,6 +2,7 @@
 """Cross-binary Metal gate. Raw failures are retained; this is not a benchmark."""
 
 import argparse
+from functools import partial
 import json
 import re
 from pathlib import Path
@@ -10,11 +11,17 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from bench.common import ROOT, atomic_json, read_jsonl, sha256, source_fingerprint
+from bench.model_identity import (
+    DEFAULT_MODEL,
+    MODEL_PINS,
+    model_identity,
+    require_model_variant,
+)
 from scripts.check_models import check_cycles, compare, execute, validate_record
 
 REFERENCE_MARKER = "TOKENOMICS_METAL_VERIFY_SINGLE_ROW=ON"
 CANDIDATE_MARKER = "TOKENOMICS_METAL_SHORT_MV=ON"
-MODEL_SHA256 = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+MODEL_SHA256 = model_identity()["sha256"]
 INTERLEAVE_MARKER = "TOKENOMICS_METAL_INTERLEAVE=ON"
 Q8_GROUP_MARKER = "TOKENOMICS_METAL_Q8_GROUP=ON"
 Q8_SHARED_MARKER = "TOKENOMICS_METAL_Q8_SHARED=ON"
@@ -31,7 +38,10 @@ def metal_profile(
     shared_q8=False,
     greedy=False,
     direct=False,
+    model_id=DEFAULT_MODEL,
 ):
+    identity = require_model_variant(model_id, grouped_q8=group_q8 or shared_q8)
+    offloaded = identity["layers"] + 1
     info = row["system_info"]
     marker, excluded = (
         (CANDIDATE_MARKER, REFERENCE_MARKER)
@@ -47,28 +57,28 @@ def metal_profile(
         or marker not in info
         or excluded in info
         or "devices=MTL0" not in info
-        or "offloaded 25/25 layers to GPU" not in info
+        or f"offloaded {offloaded}/{offloaded} layers to GPU" not in info
         or row["settings"]["gpu_layers"] != 99
     ):
         raise ValueError(
-            "Expected fully offloaded Qwen 0.5B Metal profile was not executed"
+            f"Expected fully offloaded {model_id} Metal profile was not executed"
         )
 
 
-def interleaved_profile(row, candidate):
-    metal_profile(row, candidate, interleave=True)
+def interleaved_profile(row, candidate, *, model_id=DEFAULT_MODEL):
+    metal_profile(row, candidate, interleave=True, model_id=model_id)
 
 
-def q8_group_profile(row, candidate):
-    metal_profile(row, candidate, group_q8=True)
+def q8_group_profile(row, candidate, *, model_id=DEFAULT_MODEL):
+    metal_profile(row, candidate, group_q8=True, model_id=model_id)
 
 
-def q8_shared_profile(row, candidate):
-    metal_profile(row, candidate, group_q8=True, shared_q8=True)
+def q8_shared_profile(row, candidate, *, model_id=DEFAULT_MODEL):
+    metal_profile(row, candidate, group_q8=True, shared_q8=True, model_id=model_id)
 
 
-def greedy_profile(row, candidate):
-    metal_profile(row, False, greedy=candidate)
+def greedy_profile(row, candidate, *, model_id=DEFAULT_MODEL):
+    metal_profile(row, False, greedy=candidate, model_id=model_id)
     if (GREEDY_MARKER in row["system_info"]) != candidate:
         raise ValueError("Greedy sampler marker differs from expected profile")
 
@@ -92,8 +102,8 @@ def check_direct_execution(row):
         raise ValueError("Direct greedy call count differs from verified work")
 
 
-def direct_profile(row, candidate):
-    metal_profile(row, False, greedy=candidate, direct=candidate)
+def direct_profile(row, candidate, *, model_id=DEFAULT_MODEL):
+    metal_profile(row, False, greedy=candidate, direct=candidate, model_id=model_id)
     if candidate:
         check_direct_execution(row)
 
@@ -223,7 +233,9 @@ def gate(
     gpu_layers=99,
     profile_validator=metal_profile,
     drafter="ngram",
+    model_id=DEFAULT_MODEL,
 ):
+    model_identity(model_id)
     if drafter not in ("ngram", "suffix"):
         raise ValueError("This model-free gate supports ngram or suffix drafting")
     out = Path(out)
@@ -253,6 +265,7 @@ def gate(
                 "candidate": sha256(candidate),
             },
             "model_sha256": sha256(model),
+            "model_id": model_id,
             "drafter": drafter,
             "settings": {
                 "context": context,
@@ -469,6 +482,7 @@ def main():
     parser.add_argument("--reference", type=Path, required=True)
     parser.add_argument("--candidate", type=Path, required=True)
     parser.add_argument("--model", type=Path, required=True)
+    parser.add_argument("--model-id", choices=tuple(MODEL_PINS), default=DEFAULT_MODEL)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument(
         "--candidate-profile",
@@ -483,21 +497,28 @@ def main():
         default="short-mv",
     )
     args = parser.parse_args()
-    if sha256(args.model) != MODEL_SHA256:
-        parser.error("Requires the pinned Qwen2.5 0.5B Q4_K_M model")
+    identity = require_model_variant(
+        args.model_id, grouped_q8=args.candidate_profile in ("q8-group", "q8-shared")
+    )
+    if sha256(args.model) != identity["sha256"]:
+        parser.error(f"Requires the pinned {args.model_id} Q4_K_M model")
     gate(
         args.reference.resolve(),
         args.candidate.resolve(),
         args.model.resolve(),
         args.out,
-        profile_validator={
-            "short-mv": metal_profile,
-            "interleaved": interleaved_profile,
-            "q8-group": q8_group_profile,
-            "q8-shared": q8_shared_profile,
-            "greedy": greedy_profile,
-            "direct": direct_profile,
-        }[args.candidate_profile],
+        model_id=args.model_id,
+        profile_validator=partial(
+            {
+                "short-mv": metal_profile,
+                "interleaved": interleaved_profile,
+                "q8-group": q8_group_profile,
+                "q8-shared": q8_shared_profile,
+                "greedy": greedy_profile,
+                "direct": direct_profile,
+            }[args.candidate_profile],
+            model_id=args.model_id,
+        ),
     )
 
 

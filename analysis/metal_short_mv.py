@@ -1,5 +1,6 @@
 """Audited, paired M3 development screen; no held-out claim."""
 
+from functools import partial
 import json
 from pathlib import Path
 import statistics
@@ -7,6 +8,7 @@ import statistics
 from analysis.controller import verify
 from analysis.report import cells, paired_summary
 from bench.common import ROOT, atomic_json, read_jsonl
+from bench.model_identity import DEFAULT_MODEL, model_identity, require_model_variant
 from scripts.check_metal_profile import (
     MODEL_SHA256,
     direct_profile,
@@ -36,8 +38,14 @@ def kernel_variant(interleaved=False, group_q8=False, shared_q8=False, direct=Fa
 
 
 def screen_configuration(
-    screen, interleaved=False, group_q8=False, shared_q8=False, direct=False
+    screen,
+    interleaved=False,
+    group_q8=False,
+    shared_q8=False,
+    direct=False,
+    model_id=DEFAULT_MODEL,
 ):
+    require_model_variant(model_id, grouped_q8=group_q8 or shared_q8)
     config = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
     variant = kernel_variant(interleaved, group_q8, shared_q8, direct)
     if variant != "short-mv":
@@ -52,6 +60,11 @@ def screen_configuration(
             if condition["kernel_profile"] == "short-mv":
                 condition["kernel_profile"] = variant
                 condition["id"] = condition["id"].replace("short-mv", variant)
+    if model_id != DEFAULT_MODEL:
+        config["model_id"] = model_id
+        config["phase"] = config["phase"].replace(
+            "metal_", f"metal_{model_id.replace('-', '_')}_", 1
+        )
     return config
 
 
@@ -63,11 +76,14 @@ def analyze(
     group_q8=False,
     shared_q8=False,
     direct=False,
+    model_id=DEFAULT_MODEL,
 ):
     directory = Path(directory)
     verify(directory)
     frozen = json.loads((directory / "run_manifest.json").read_text())["frozen"]
-    expected = screen_configuration(screen, interleaved, group_q8, shared_q8, direct)
+    expected = screen_configuration(
+        screen, interleaved, group_q8, shared_q8, direct, model_id
+    )
     candidate = kernel_variant(interleaved, group_q8, shared_q8, direct)
     profile_check = {
         "direct": direct_profile,
@@ -76,10 +92,17 @@ def analyze(
         "q8-group": q8_group_profile,
         "q8-shared": q8_shared_profile,
     }[candidate]
+    if model_id != DEFAULT_MODEL:
+        profile_check = partial(profile_check, model_id=model_id)
+    expected_sha = (
+        MODEL_SHA256
+        if model_id == DEFAULT_MODEL
+        else model_identity(model_id)["sha256"]
+    )
     corpus = {p["id"]: p for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")}
     if (
         frozen["config"] != expected
-        or frozen["target_sha256"] != MODEL_SHA256
+        or frozen["target_sha256"] != expected_sha
         or frozen["draft_sha256"] is not None
         or {p["id"] for p in frozen["prompts"]} != set(expected["prompt_ids"])
         or any(p != corpus.get(p["id"]) for p in frozen["prompts"])
@@ -196,5 +219,7 @@ def analyze(
     if direct:
         summary["sampler_variant"] = "direct"
         summary["experiment_kind"] = "target_host_sampler"
+    if model_id != DEFAULT_MODEL:
+        summary["model_id"] = model_id
     atomic_json(directory / "analysis/summary.json", summary)
     return summary

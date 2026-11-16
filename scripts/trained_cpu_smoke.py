@@ -15,6 +15,7 @@ from bench.common import (
     sha256,
     source_fingerprint,
 )
+from bench.model_identity import MODEL_PINS
 from scripts.check_metal_profile import (
     DIRECT_MARKER,
     GREEDY_MARKER,
@@ -22,9 +23,6 @@ from scripts.check_metal_profile import (
 )
 from scripts.check_models import check_cycles, compare, execute
 
-MODEL_PINS = json.loads((ROOT / "configs/metal-model-header-pins-v1.json").read_text())[
-    "models"
-]
 
 WORK = ("cycles", "drafted", "accepted", "verified_rows", "synced_tokens")
 

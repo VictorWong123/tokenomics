@@ -1000,3 +1000,14 @@ model, executable hashes and sealed payload hashes. It contains no environment
 variables, model weights or generated text. A fixture check validates its hashes.
 This avoids relying solely on expiring artifacts for provenance; it does not
 replace raw-record verification.
+
+### 10:36 UTC — model-bound local M3 studies
+
+The local study/gate now accepts the pinned1.5B identity and validates29/29
+GPU-offloaded layers. Its model ID and distinct phase names bind the frozen
+screen and model-identity receipt. Q8-only experiments reject this model because
+none of its weights use Q8; plain short-MV, interleaving and isolated direct
+sampling remain applicable candidates. Ten existing0.5B screen configurations
+are unchanged. All120 Python tests pass (eight optional skips), including a
+second-model orchestration fixture, wrong-offload and unsupported-kernel checks.
+No1.5B Metal execution or M3 timing has been claimed.

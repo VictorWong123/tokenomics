@@ -30,6 +30,44 @@ from scripts.check_metal_profile import (
 
 
 class MetalProfileIdentityTests(unittest.TestCase):
+    def test_model_specific_offload_and_q8_applicability_fail_closed(self):
+        from analysis.metal_short_mv import screen_configuration
+        from bench.model_identity import model_identity
+
+        identity = model_identity("qwen25-15")
+        self.assertEqual(identity["layers"], 28)
+        self.assertEqual(identity["output_type"], "Q6_K")
+        self.assertEqual(
+            identity["sha256"],
+            "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+        )
+        row = {
+            "system_info": CANDIDATE_MARKER
+            + "; devices=MTL0; offloaded 29/29 layers to GPU",
+            "settings": {"gpu_layers": 99},
+        }
+        metal_profile(row, True, model_id="qwen25-15")
+        with self.assertRaises(ValueError):
+            metal_profile(row, True)
+        row["system_info"] = row["system_info"].replace("29/29", "25/25")
+        with self.assertRaises(ValueError):
+            metal_profile(row, True, model_id="qwen25-15")
+        for kwargs in ({"group_q8": True}, {"shared_q8": True}):
+            with self.assertRaisesRegex(ValueError, "no Q8 weights"):
+                screen_configuration("retrieval", model_id="qwen25-15", **kwargs)
+        config = screen_configuration(
+            "retrieval", interleaved=True, model_id="qwen25-15"
+        )
+        self.assertEqual(config["model_id"], "qwen25-15")
+        self.assertEqual(
+            config["phase"], "metal_qwen25_15_interleaved_retrieval_comparison"
+        )
+        self.assertNotIn(
+            "model_id", screen_configuration("retrieval", interleaved=True)
+        )
+        with self.assertRaisesRegex(ValueError, "Unsupported pinned model"):
+            model_identity("unknown")
+
     def test_direct_sampler_requires_execution_evidence_and_isolated_identity(self):
         row = {
             "system_info": REFERENCE_MARKER
@@ -206,8 +244,17 @@ class MetalGateOrchestrationTests(unittest.TestCase):
     def test_direct_sampler_screen_keeps_original_and_optimized_ordinary_controls(self):
         self._screen_analysis("retrieval", direct=True)
 
+    def test_second_model_screen_binds_model_identity_and_geometry(self):
+        self._screen_analysis("retrieval", interleaved=True, model_id="qwen25-15")
+
     def _screen_analysis(
-        self, screen, interleaved=False, group_q8=False, shared_q8=False, direct=False
+        self,
+        screen,
+        interleaved=False,
+        group_q8=False,
+        shared_q8=False,
+        direct=False,
+        model_id="qwen25-05",
     ):
         from analysis.metal_short_mv import (
             SCREENS,
@@ -237,10 +284,16 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             ]
             write_jsonl(root / "bench/prompts-v1.jsonl", prompts)
             (root / "configs" / SCREENS[screen]).write_text(json.dumps(config))
-            if interleaved or group_q8 or shared_q8 or direct:
+            if (
+                interleaved
+                or group_q8
+                or shared_q8
+                or direct
+                or model_id != "qwen25-05"
+            ):
                 with patch("analysis.metal_short_mv.ROOT", root):
                     config = screen_configuration(
-                        screen, interleaved, group_q8, shared_q8, direct
+                        screen, interleaved, group_q8, shared_q8, direct, model_id
                     )
             candidate_profile = kernel_variant(interleaved, group_q8, shared_q8, direct)
             model = root / "repeat.gguf"
@@ -267,6 +320,9 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             with patch("analysis.metal_short_mv.ROOT", root), patch(
                 "analysis.metal_short_mv.MODEL_SHA256", sha256(model)
             ), patch(
+                "analysis.metal_short_mv.model_identity",
+                return_value={"sha256": sha256(model)},
+            ), patch(
                 "analysis.metal_short_mv.direct_profile"
                 if direct
                 else (
@@ -290,6 +346,7 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                     group_q8=group_q8,
                     shared_q8=shared_q8,
                     direct=direct,
+                    model_id=model_id,
                 )
                 self.assertEqual(result["records"], len(config["configurations"]) * 9)
                 self.assertEqual(profile.call_count, result["records"])
@@ -310,6 +367,7 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                         group_q8=group_q8,
                         shared_q8=shared_q8,
                         direct=direct,
+                        model_id=model_id,
                     )
 
     def test_cross_binary_gate_retains_success_and_first_failure(self):
