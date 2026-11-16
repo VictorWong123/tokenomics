@@ -13,26 +13,31 @@ from scripts.experiment_workload import measurement_directory
 
 
 class Q4PairStudyTests(unittest.TestCase):
-    def test_kernel_include_participates_in_resume_fingerprint(self):
+    def test_kernel_and_verification_sources_participate_in_resume_fingerprint(self):
         from bench.common import source_fingerprint
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "src").mkdir()
             (root / "CMakeLists.txt").write_text("project(test)")
             (root / "requirements.txt").write_text("")
-            kernel = root / "src/kernel.inc"
-            kernel.write_text("first implementation")
             with patch("bench.common.ROOT", root), patch(
                 "bench.common.command", return_value={"output": "fixed-revision"}
             ):
-                before = source_fingerprint()
-                kernel.write_text("changed implementation")
-                after = source_fingerprint()
-            self.assertEqual(before["revision"], after["revision"])
-            self.assertNotEqual(
-                before["owned_source_sha256"], after["owned_source_sha256"]
-            )
+                for relative in (
+                    "src/kernel.inc",
+                    "tests/native.cpp",
+                    "tests/native/CMakeLists.txt",
+                ):
+                    source = root / relative
+                    source.parent.mkdir(parents=True, exist_ok=True)
+                    source.write_text("first implementation")
+                    before = source_fingerprint()
+                    source.write_text("changed implementation")
+                    after = source_fingerprint()
+                    self.assertEqual(before["revision"], after["revision"])
+                    self.assertNotEqual(
+                        before["owned_source_sha256"], after["owned_source_sha256"]
+                    )
 
     def test_workflow_selects_the_fixed_study(self):
         import yaml

@@ -1,0 +1,4 @@
+{
+  "log_utf8": "backend=CPU\n96 normalization/activation cases; 1124544 bitwise comparisons passed\n160 positional RoPE cases; 638976 bitwise comparisons passed\n48 masked softmax cases; 1053696 bitwise comparisons passed\n500 backend matrix cases; 1364480 bitwise row comparisons passed\n",
+  "sha256": "cd75cc177cdee9b3511cd2cf8ef418c6e5c0cb915a42cb3e9f94ade821f9213a"
+}

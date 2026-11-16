@@ -21,14 +21,15 @@ def sha256(path):
 
 
 def source_fingerprint():
-    """Freeze owned executable/analysis source, including uncommitted edits."""
+    """Freeze owned executable/analysis/verification source, including local edits."""
     h = hashlib.sha256()
     paths = [ROOT / "CMakeLists.txt", ROOT / "requirements.txt"]
-    for folder in ("src", "bench", "analysis", "scripts", "cmake"):
+    for folder in ("src", "bench", "analysis", "scripts", "cmake", "tests"):
         paths += [
             p
             for p in (ROOT / folder).rglob("*")
             if p.suffix in (".py", ".cpp", ".h", ".inc", ".sh", ".cmake")
+            or p.name == "CMakeLists.txt"
         ]
     for path in sorted(paths):
         h.update(str(path.relative_to(ROOT)).encode())

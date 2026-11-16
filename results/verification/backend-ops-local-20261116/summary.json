@@ -1,0 +1,48 @@
+{
+  "asan_binary_sha256": "909c978a8c299d023f6bb0b05c24073a5f6261a000bdfa9f81c64b263dd96c97",
+  "asan_profile": {
+    "cpu_q4_pair": true,
+    "greedy_no_temp": true,
+    "sanitize": true,
+    "stage_timing": false
+  },
+  "asan_scope": "Raw backend test; no sampler/model runtime invoked. Paired Q4 backend path remains enabled.",
+  "backend": "Linux CPU",
+  "bitwise_comparisons": 4181696,
+  "case_groups": {
+    "matrix": {
+      "cases": 500,
+      "values": 1364480
+    },
+    "normalization_activation": {
+      "cases": 96,
+      "values": 1124544
+    },
+    "rope": {
+      "cases": 160,
+      "values": 638976
+    },
+    "softmax": {
+      "cases": 48,
+      "values": 1053696
+    }
+  },
+  "cases": 804,
+  "harness_source_sha256": "3ca72993cd29cdae05af71fc507356cd659b9c60c0255295272938c707c7009f",
+  "metal_execution": false,
+  "native_updated_harness_compilation": "pending",
+  "performance_claim": null,
+  "release_binary_sha256": "7428166c37ffd9c364fddf72e1ad16168ad78bd8a777c9ea2783ddaba541ca63",
+  "source": {
+    "owned_source_sha256": "235f89e859fa576eabc50dac2dbdcebe53fb4773a5eb8f59e7daa319f544d9c3",
+    "revision": "b981e356b7ec30a992ea9d927e3fce3d1fc69993"
+  },
+  "state": "passed",
+  "tooling_unittests": {
+    "reported": 115,
+    "seconds": 38.783,
+    "skipped": 8,
+    "state": "passed"
+  },
+  "verification_source_now_fingerprinted": true
+}

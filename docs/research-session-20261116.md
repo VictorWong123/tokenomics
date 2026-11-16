@@ -870,3 +870,22 @@ fit-only counts do not establish throughput or generalization, so no additional
 runtime drafter is selected. Retained all120 grid cells/operating point and46905
 computed proposal/cycle records, with query-shape histograms and Pareto aliases.
 [Protocol/results](frequency-copy-fit-protocol.md).
+
+### Broader per-row arithmetic audit
+
+Audited normalization and elementwise dispatch beyond matrix/softmax. Pinned
+RMS-normalization reduction geometry depends on width/pipeline capacity, not
+query-row count; no normalization patch is needed. Unary contiguous dispatch
+changes at32768 elements, crossed by4864-wide FFN batches between six and seven
+rows. Expanded the raw backend gate with96 normalization/activation and160
+absolute-position RoPE cases, including both head counts2/14, normal/NeoX layouts
+and position prefixes0/248/255/511. These nodes stay unmarked, matching the actual
+owned graph scope. Full-model exactness remains a separate gate.
+
+The expanded804-case gate passes4181696 bitwise value comparisons in Linux
+Release and ASAN/UBSAN. The sanitizer raw-backend profile retains Q4-pair and
+greedy flags; no sampler/model runtime is invoked. All115 Python tooling tests
+report success with8 skips in38.783 seconds. Experiment source fingerprints now
+include verification files and nested CMakeLists; changing a gate during a run
+is detected, while older receipts retain their original scope.
+[Coverage and local command](backend-row-coverage.md).
