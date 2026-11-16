@@ -210,6 +210,9 @@ std::string Engine::system_info() const {
 #ifdef TOKENOMICS_VERIFY_STAGE_TIMING
     info += "; TOKENOMICS_VERIFY_STAGE_TIMING=ON";
 #endif
+#ifdef TOKENOMICS_GREEDY_NO_TEMP
+    info += "; TOKENOMICS_GREEDY_NO_TEMP=ON";
+#endif
 #ifdef TOKENOMICS_CPU_BATCH_INVARIANT
     info += "; TOKENOMICS_CPU_BATCH_INVARIANT=ON; GGML_CPU_TILED_MM=1; tiled_min_rows=10";
 #endif
@@ -295,6 +298,20 @@ Result Engine::generate(const Request &r) {
     sampling.samplers = {COMMON_SAMPLER_TYPE_TEMPERATURE};
     common_sampler_ptr smpl(common_sampler_init(e.target.get(), sampling));
     require(bool(smpl), "sampler initialization failed");
+#ifdef TOKENOMICS_GREEDY_NO_TEMP
+    // This adapter fixes temperature=0, no dynamic temperature, no grammar and
+    // no probability output. Preserve optional model suppression before the
+    // final argmax and retain upstream sample/accept verification unchanged.
+    auto *chain = common_sampler_get(smpl.get());
+    const int count = llama_sampler_chain_n(chain);
+    require(count >= 2 &&
+                std::strcmp(llama_sampler_name(llama_sampler_chain_get(chain, count - 2)),
+                            "temp-ext") == 0 &&
+                std::strcmp(llama_sampler_name(llama_sampler_chain_get(chain, count - 1)),
+                            "greedy") == 0,
+            "pinned target sampler chain changed; review greedy-only experiment");
+    llama_sampler_free(llama_sampler_chain_remove(chain, count - 2));
+#endif
     common_params_speculative sp;
     sp.types = {r.drafter == "model" ? COMMON_SPECULATIVE_TYPE_DRAFT_SIMPLE
                                      : COMMON_SPECULATIVE_TYPE_NGRAM_SIMPLE};

@@ -308,3 +308,37 @@ stops and work counters; default output omits the optional timing fields.
 includes raw synthetic cycle/request records, compiled identities, successful
 suite logs and the invalid overlapping-run hash. No trained/Metal execution or
 speed gain is claimed.
+
+### Redundant target sampler pass
+
+Identified a removable temperature-zero filter before the target's greedy
+argmax. Added default-OFF `TOKENOMICS_GREEDY_NO_TEMP`, with pinned-chain shape
+checks and a distinct runtime marker. Model suppression remains earlier in the
+chain, and upstream sampling/acceptance still owns verification. Draft samplers
+are untouched. The main Metal short-MV runner explicitly disables this option
+for both profiles to isolate its kernel experiment.
+
+Actual upstream sampler tests pass384 cases through151936 vocabulary entries,
+including ties, infinities, NaNs and repeated maxima. Candidate CPU runtime
+passes all eight suites in38.64 seconds (including1134 runtime fixture cases).
+A separate330-request cross-profile synthetic gate passes336 comparisons,
+exercising3840 drafted/accepted tokens. An initial attempt used real corpus
+text with a64-token byte-tokenizer fixture context and stopped at the ordinary
+reference with a prompt-too-long error; the retained passing gate explicitly
+uses synthetic periodic prompts. No trained cross-profile result is claimed.
+
+Cache-warm CPU component tests include candidate construction and alternate
+order over16 trials,32 calls each. Median original/candidate times at151936
+entries are244.4µs/158.7µs (paired ratio1.54); at32768 entries52.7µs/35.0µs.
+This excludes inference, backend synchronization and model suppression and is
+not M3 or end-to-end throughput evidence. Both ordinary and speculative target
+sampling can benefit. [Design and M3 gate](greedy-sampler.md).
+
+Greedy-profile address/undefined sanitizer checks with leak detection pass the
+sampler equivalence, fixture setup and1134-case runtime suites in286.84 seconds.
+The standalone final equivalence binary also passes after adding the optional
+component benchmark. Default build configuration is restored with the option
+OFF. [Retained evidence](../results/verification/greedy-sampler-local-20261116/summary.json)
+includes raw component trials, a complete hashed synthetic cross-profile gate,
+source/binary identities and original/candidate compilation settings. The
+reserved held-out set remains untouched.

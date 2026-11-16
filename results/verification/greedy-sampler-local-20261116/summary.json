@@ -1,0 +1,21 @@
+{
+  "component_claim": "1.535 median paired ratio at151936 vocabulary entries, including candidate construction; excludes inference, synchronization and model suppression",
+  "cross_profile_comparisons": 336,
+  "cross_profile_drafted_accepted": 3840,
+  "cross_profile_requests": 330,
+  "end_to_end_speed_claim": null,
+  "equivalence_cases": 384,
+  "metal_executed": false,
+  "negative_attempt": {
+    "reason": "First gate attempt used real text with byte-tokenizer fixture context64; ordinary reference rejected overlong prompt before candidate execution. Corrected gate uses explicitly synthetic periodic prompts.",
+    "status_sha256": "3f17b86fb01b582109f512a20f63300bdeba0b4d85641ad5a1c4ab5d04543e37"
+  },
+  "release_seconds": 38.64,
+  "release_suites": 8,
+  "runtime_fixture_cases": 1134,
+  "sanitizer_seconds": 286.84,
+  "sanitizer_suites": 3,
+  "state": "cpu_greedy_equivalence_and_runtime_checks_passed",
+  "synthetic_prompts": true,
+  "trained_inference_executed": false
+}

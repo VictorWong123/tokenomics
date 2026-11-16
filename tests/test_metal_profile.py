@@ -15,10 +15,28 @@ from scripts.check_metal_profile import (
     gate,
     metal_profile,
     verify_gate,
+    greedy_profile,
 )
 
 
 class MetalProfileIdentityTests(unittest.TestCase):
+    def test_greedy_profile_requires_guarded_metal_and_distinct_sampler_marker(self):
+        row = {
+            "system_info": REFERENCE_MARKER
+            + "; devices=MTL0; offloaded 25/25 layers to GPU",
+            "settings": {"gpu_layers": 99},
+        }
+        greedy_profile(row, False)
+        with self.assertRaises(ValueError):
+            greedy_profile(row, True)
+        row["system_info"] += "; TOKENOMICS_GREEDY_NO_TEMP=ON"
+        greedy_profile(row, True)
+        with self.assertRaises(ValueError):
+            greedy_profile(row, False)
+        row["system_info"] += CANDIDATE_MARKER
+        with self.assertRaises(ValueError):
+            greedy_profile(row, True)
+
     def test_rejects_cpu_fallback_and_conflicting_profile(self):
         row = {
             "system_info": CANDIDATE_MARKER

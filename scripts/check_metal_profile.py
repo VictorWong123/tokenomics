@@ -14,6 +14,7 @@ from scripts.check_models import check_cycles, compare, execute, validate_record
 REFERENCE_MARKER = "TOKENOMICS_METAL_VERIFY_SINGLE_ROW=ON"
 CANDIDATE_MARKER = "TOKENOMICS_METAL_SHORT_MV=ON"
 MODEL_SHA256 = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+GREEDY_MARKER = "TOKENOMICS_GREEDY_NO_TEMP=ON"
 
 
 def metal_profile(row, candidate):
@@ -33,6 +34,12 @@ def metal_profile(row, candidate):
         raise ValueError(
             "Expected fully offloaded Qwen 0.5B Metal profile was not executed"
         )
+
+
+def greedy_profile(row, candidate):
+    metal_profile(row, False)
+    if (GREEDY_MARKER in row["system_info"]) != candidate:
+        raise ValueError("Greedy sampler marker differs from expected profile")
 
 
 def variants(drafter="ngram"):
@@ -394,6 +401,9 @@ def main():
     parser.add_argument("--candidate", type=Path, required=True)
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument(
+        "--candidate-profile", choices=("short-mv", "greedy"), default="short-mv"
+    )
     args = parser.parse_args()
     if sha256(args.model) != MODEL_SHA256:
         parser.error("Requires the pinned Qwen2.5 0.5B Q4_K_M model")
@@ -402,6 +412,9 @@ def main():
         args.candidate.resolve(),
         args.model.resolve(),
         args.out,
+        profile_validator=(
+            greedy_profile if args.candidate_profile == "greedy" else metal_profile
+        ),
     )
 
 

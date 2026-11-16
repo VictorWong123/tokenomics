@@ -1,0 +1,90 @@
+{
+  "archive_sha256": "0e4591a5ed26535462e4e197a79c7ad6f226aeef587cabd31c8dae5fbb8be702",
+  "binary_sha256": {
+    "candidate": "9265fdf784575158b43b8e49184be6f412055d6050c513da01f0b57bc10d2694",
+    "component_test": "fa48323339527d8ace8fec1bdb3631336e5755684d0198d27d673d73e18835fc",
+    "original": "dd2413a514c5fb57fbdee294c097172e6a65da52e820f9bddb403e301c1a688d",
+    "sanitizer": "771bb90713750c6f039d2395b3e0fdb551e2a1250b46d9c1fd126c08107fbe7d"
+  },
+  "configuration": {
+    "candidate": {
+      "cache_available": true,
+      "values": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_AVX": "ON",
+        "GGML_AVX2": "ON",
+        "GGML_BLAS": "OFF",
+        "GGML_CPU_REPACK": "OFF",
+        "GGML_CUDA": "OFF",
+        "GGML_F16C": "ON",
+        "GGML_FMA": "ON",
+        "GGML_LLAMAFILE": "OFF",
+        "GGML_METAL": "OFF",
+        "GGML_NATIVE": "OFF",
+        "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+        "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
+        "TOKENOMICS_CPU_Q4_PAIR": "OFF",
+        "TOKENOMICS_GREEDY_NO_TEMP": "ON",
+        "TOKENOMICS_METAL_SHORT_MV": "OFF",
+        "TOKENOMICS_VERIFY_STAGE_TIMING": "OFF"
+      }
+    },
+    "original": {
+      "cache_available": true,
+      "values": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_AVX": "ON",
+        "GGML_AVX2": "ON",
+        "GGML_BLAS": "OFF",
+        "GGML_CPU_REPACK": "OFF",
+        "GGML_CUDA": "OFF",
+        "GGML_F16C": "ON",
+        "GGML_FMA": "ON",
+        "GGML_LLAMAFILE": "OFF",
+        "GGML_METAL": "OFF",
+        "GGML_NATIVE": "OFF",
+        "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+        "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
+        "TOKENOMICS_CPU_Q4_PAIR": "OFF",
+        "TOKENOMICS_GREEDY_NO_TEMP": null,
+        "TOKENOMICS_METAL_SHORT_MV": "OFF",
+        "TOKENOMICS_VERIFY_STAGE_TIMING": "OFF"
+      }
+    },
+    "sanitizer": {
+      "cache_available": true,
+      "values": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "GGML_AVX": "ON",
+        "GGML_AVX2": "ON",
+        "GGML_BLAS": "OFF",
+        "GGML_CPU_REPACK": "OFF",
+        "GGML_CUDA": "OFF",
+        "GGML_F16C": "ON",
+        "GGML_FMA": "ON",
+        "GGML_LLAMAFILE": "OFF",
+        "GGML_METAL": "OFF",
+        "GGML_NATIVE": "OFF",
+        "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+        "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
+        "TOKENOMICS_CPU_Q4_PAIR": "ON",
+        "TOKENOMICS_GREEDY_NO_TEMP": "ON",
+        "TOKENOMICS_METAL_SHORT_MV": "OFF",
+        "TOKENOMICS_VERIFY_STAGE_TIMING": "OFF"
+      }
+    }
+  },
+  "owned_files_sha256": {
+    "CMakeLists.txt": "eacaf2c8a921a9b73e8483f37d4a1ba6ac218cd08692c1c98cd454fb850cabf8",
+    "scripts/check_metal_profile.py": "11e96d0d9fa333e349a2f943e4d42872aee3184e6f66400286496087b50b37f3",
+    "scripts/diagnose_models.py": "c2d6f7cfe368110c2323b1e90ed5f31f1b8466069cac220f45e04557a81f25d3",
+    "scripts/metal_short_mv_study.py": "f4ee61dd59e81faaa4e79d392eed3122c07d0e6d92e7f70d56904b5b99550b59",
+    "src/runtime.cpp": "b8d6796051fb2677b1fcf8b28cb62274e701585f64ebed0e46f8428de7ab97a0",
+    "tests/test_greedy_equivalence.cpp": "84de14ad9d763ba8306cb31d276339344610fa98ce25fddcb2b309f8c851826c",
+    "tests/test_metal_profile.py": "41f4567e86e8aa07c292227ced3f1dd9f40bcc946b7021c261aa2c019be08634"
+  },
+  "source": {
+    "owned_source_sha256": "6281a5ead7bb2aad76963a566253faf596efaa1d95ffbf2876c16be996cfded9",
+    "revision": "401a4d1919dd5b8df9bb36392f2d98d13defc764"
+  }
+}

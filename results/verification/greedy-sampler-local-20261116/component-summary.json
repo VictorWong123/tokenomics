@@ -1,0 +1,23 @@
+{
+  "alternating_order": true,
+  "by_vocabulary": {
+    "151936": {
+      "candidate_median_ns": 158692.5,
+      "median_paired_ratio": 1.5352009067654422,
+      "reference_median_ns": 244398.0
+    },
+    "263": {
+      "candidate_median_ns": 253.812,
+      "median_paired_ratio": 1.577533511291036,
+      "reference_median_ns": 401.6875
+    },
+    "32768": {
+      "candidate_median_ns": 35041.2,
+      "median_paired_ratio": 1.5077713127358332,
+      "reference_median_ns": 52738.2
+    }
+  },
+  "calls_per_trial": 32,
+  "scope": "Synthetic cache-warm CPU candidate construction plus sampler application, not model/M3 throughput",
+  "trials": 16
+}

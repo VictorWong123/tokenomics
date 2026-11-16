@@ -91,3 +91,12 @@ It uses `build-metal/tokenomics` unless `--binary` is supplied. See
 [the suffix design, fit evidence and commands](../docs/suffix-drafter.md).
 `python -m analysis.proposal_replay --out FRESH_DIRECTORY` reproduces the
 archived development-fit proposal comparison without loading models.
+
+## Target greedy sampler experiment
+
+The opt-in `TOKENOMICS_GREEDY_NO_TEMP` profile removes the redundant target
+zero-temperature filter while preserving upstream greedy verification.
+`check_metal_profile.py --candidate-profile greedy` gates it against the saved
+guarded reference. `test_greedy_equivalence` checks the upstream selection rule;
+its optional `--bench` mode measures synthetic host candidate/sampler cost.
+See [profile scope and local commands](../docs/greedy-sampler.md).
