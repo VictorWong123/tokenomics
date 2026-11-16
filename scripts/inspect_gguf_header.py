@@ -140,9 +140,9 @@ def main():
     args = parser.parse_args()
     if args.out.exists():
         parser.error("Output must be fresh")
-    entry = json.loads((ROOT / "models/models.lock.json").read_text())["models"][
-        args.model
-    ]
+    entry = json.loads((ROOT / "configs/metal-model-header-pins-v1.json").read_text())[
+        "models"
+    ][args.model]
     url = f"https://huggingface.co/{entry['repo']}/resolve/{entry['revision']}/{entry['file']}"
     request = urllib.request.Request(url, headers={"Range": f"bytes=0-{LIMIT-1}"})
     report = {

@@ -500,3 +500,21 @@ Ubuntu runner with a five-minute timeout and the same public-research-branch
 restriction. It runs no benchmark and uploads only header-derived JSON. Its
 purpose is to establish which tensor types and shapes the M3 candidate must
 cover, rather than assuming coverage from the model filename.
+
+[Run43807666479](https://github.com/VictorWong123/tokenomics/actions/runs/43807666479)
+provides actual Apple Silicon compilation for both guarded and short-MV profiles:
+native executables, offline Metal3.1 mat-vec/softmax shaders, CTest suites, CPU
+row comparisons and embedded-library initialization all pass. The orchestration
+then failed because the capability probe still omitted a newly required key;
+the capability-source replacement had not applied. Fixed the actual Swift
+source and added an immediate schema check. A profile selector permits checking
+only the not-yet-built interleaving prototype without repeating passed builds.
+The original failed state and18 successful-stage hashes remain in
+[two-profile evidence](../results/verification/hosted-metal-20261116/two-profile-partial.json).
+No GPU graph or M3 throughput result follows from these compilation passes.
+
+The first metadata dispatch stopped before network access because its model
+lock is deliberately local/ignored. Added an explicit tracked JSON containing
+only the two public Qwen revisions, filenames, licenses, byte counts and hashes
+already used by the session. Header inspection now reads that public pin file,
+so a clean checkout does not depend on a developer's ignored model directory.

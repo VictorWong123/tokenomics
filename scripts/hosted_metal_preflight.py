@@ -14,6 +14,11 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument(
+        "--profiles",
+        choices=("all", "reference", "short-mv", "interleaved"),
+        default="all",
+    )
     args = parser.parse_args()
     if platform.system() != "Darwin" or platform.machine() != "arm64":
         parser.error("Requires native Apple Silicon macOS")
@@ -27,6 +32,7 @@ def main():
         "platform": platform.platform(),
         "machine": platform.machine(),
         "synthetic_only": True,
+        "profile_selection": args.profiles,
         "stages": [],
     }
 
@@ -60,12 +66,19 @@ def main():
                 "swift",
                 "-e",
                 "import Metal; import Foundation; let d = MTLCreateSystemDefaultDevice(); "
-                'let r: [String: Any] = ["available": d != nil, "name": d?.name ?? ""]; '
+                'let r: [String: Any] = ["available": d != nil, "name": d?.name ?? "", '
+                '"simdgroup_reduction": d.map { $0.supportsFamily(.apple7) || '
+                "$0.supportsFamily(.metal3) } ?? false]; "
                 "let b = try JSONSerialization.data(withJSONObject: r, options: [.sortedKeys]); "
                 "print(String(data: b, encoding: .utf8)!)",
             ],
         )
         report["metal_device"] = json.loads((out / "device-probe.log").read_text())
+        if (
+            not {"available", "name", "simdgroup_reduction"}
+            <= report["metal_device"].keys()
+        ):
+            raise RuntimeError("Device probe omitted required capability fields")
         metal_compiler = (
             run("shader-compiler-probe", ["xcrun", "--find", "metal"], required=False)
             == 0
@@ -76,6 +89,8 @@ def main():
             ("short-mv", "ON", "OFF"),
             ("interleaved", "ON", "ON"),
         ):
+            if args.profiles != "all" and profile != args.profiles:
+                continue
             build = ROOT / f"build-hosted-{profile}"
             run(
                 f"{profile}-configure",

@@ -7,6 +7,11 @@ on:
         type: choice
         options: [portable, metal-research, model-metadata]
         default: portable
+      metal_profiles:
+        description: Apple profiles (use interleaved to check only the remaining prototype)
+        type: choice
+        options: [all, interleaved]
+        default: all
 permissions:
   contents: read
 jobs:
@@ -53,7 +58,7 @@ jobs:
           python -m venv .venv
           .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
       - name: Compile profiles and check device availability
-        run: .venv/bin/python scripts/hosted_metal_preflight.py --out results/local/hosted-metal
+        run: .venv/bin/python scripts/hosted_metal_preflight.py --profiles "${{ inputs.metal_profiles || 'all' }}" --out results/local/hosted-metal
       - name: Retain explicit diagnostic files
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
