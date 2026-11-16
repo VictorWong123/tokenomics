@@ -21,3 +21,8 @@ No single grid cell is selected for deployment. The report retains all cells,
 unique cycle/wasted-row Pareto points and aliases; grid cells sharing the same
 trajectory are not independent experiments. There is no model inference,
 latency estimate, validation result or held-out claim.
+
+The trace retains actual proposed token IDs, effective budgets and accepted
+counts. Histograms of verification query-row counts remain available alongside
+aggregate work: equal cycle/waste counts can still have different kernel/KV
+costs. These histograms are descriptive, without a fitted latency model.
