@@ -80,6 +80,7 @@ GATE_STAGES = (
     "candidate",
 )
 KV_BOUNDARY_LENGTHS = (248, 255, 256, 504, 511, 512)
+PREFILL_SHAPE_LENGTHS = (3, 4, 9, 10, 515, 521, 522)
 
 
 def verify_gate(directory):
@@ -99,11 +100,12 @@ def verify_gate(directory):
             raise ValueError(f"Gate payload changed: {name}")
     status = json.loads((directory / "status.json").read_text())
     manifest = json.loads((directory / "manifest.json").read_text())
+    gate_version = manifest.get("gate_version", 1)
+    if gate_version not in (1, 2):
+        raise ValueError("Unsupported gate coverage version")
+    lengths = KV_BOUNDARY_LENGTHS + (PREFILL_SHAPE_LENGTHS if gate_version == 2 else ())
     expected_count = (
-        11
-        + sum(
-            length < manifest["settings"]["context"] for length in KV_BOUNDARY_LENGTHS
-        )
+        11 + sum(length < manifest["settings"]["context"] for length in lengths)
     ) * 30
     if (
         status.get("state") != "passed"
@@ -148,6 +150,7 @@ def verify_gate(directory):
     return {
         "state": "verified",
         "candidate_cases": expected_count,
+        "gate_version": gate_version,
         "receipt_sha256": sha256(directory / "complete.json"),
         "manifest": manifest,
     }
@@ -187,6 +190,7 @@ def gate(
         {
             "schema_version": 1,
             "purpose": "cross-profile correctness, not performance",
+            "gate_version": 2,
             "source": source,
             "binary_sha256": {
                 "reference": sha256(reference),
@@ -313,6 +317,15 @@ def gate(
                     "max_tokens": 16,
                 }
                 for length in KV_BOUNDARY_LENGTHS
+                if length < context
+            ]
+            boundary += [
+                {
+                    "prompt_id": f"prefill-shape-{length}",
+                    "prefix_tokens": (seed * (length // len(seed) + 1))[:length],
+                    "max_tokens": 16,
+                }
+                for length in PREFILL_SHAPE_LENGTHS
                 if length < context
             ]
             rows = execute(

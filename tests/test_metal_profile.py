@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import shlex
+import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -20,6 +21,26 @@ from scripts.check_metal_profile import (
 
 
 class MetalProfileIdentityTests(unittest.TestCase):
+    def test_legacy_receipt_preserves_its_original_coverage(self):
+        archive_path = (
+            ROOT
+            / "results/verification/greedy-sampler-local-20261116/synthetic-gate.tar.gz"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with tarfile.open(archive_path) as archive:
+                for member in archive.getmembers():
+                    parts = Path(member.name).parts
+                    self.assertTrue(
+                        member.isfile() and len(parts) == 2 and parts[0] == "gate"
+                    )
+                    target = root / "gate" / parts[1]
+                    target.parent.mkdir(exist_ok=True)
+                    target.write_bytes(archive.extractfile(member).read())
+            result = verify_gate(root / "gate")
+            self.assertEqual(result["gate_version"], 1)
+            self.assertEqual(result["candidate_cases"], 330)
+
     def test_greedy_profile_requires_guarded_metal_and_distinct_sampler_marker(self):
         row = {
             "system_info": REFERENCE_MARKER
@@ -153,10 +174,10 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                     gpu_layers=0,
                     profile_validator=cpu_fixture,
                 )
-                self.assertEqual(result["candidate_cases"], 330)
+                self.assertEqual(result["candidate_cases"], 450)
                 self.assertGreater(result["coverage"]["accepted"], 0)
                 self.assertEqual(result["state"], "passed")
-                self.assertEqual(verify_gate(root / "passed")["candidate_cases"], 330)
+                self.assertEqual(verify_gate(root / "passed")["candidate_cases"], 450)
                 saved = root / "passed/candidate.jsonl"
                 original = saved.read_bytes()
                 saved.write_bytes(original + b"\n")
@@ -174,9 +195,9 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                     profile_validator=cpu_fixture,
                     drafter="suffix",
                 )
-                self.assertEqual(suffix_result["candidate_cases"], 480)
+                self.assertEqual(suffix_result["candidate_cases"], 600)
                 self.assertEqual(
-                    verify_gate(root / "suffix-passed")["candidate_cases"], 480
+                    verify_gate(root / "suffix-passed")["candidate_cases"], 600
                 )
                 boundary_jobs = read_jsonl(
                     root / "suffix-passed/boundary-reference.jobs.jsonl"

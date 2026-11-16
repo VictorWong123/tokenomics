@@ -27,3 +27,18 @@ target_link_libraries(test_metal_dispatch PRIVATE ggml-metal "${base}" OpenMP::O
 target_link_options(test_metal_dispatch PRIVATE -Wl,--gc-sections)
 enable_testing()
 add_test(NAME metal_host_dispatch COMMAND test_metal_dispatch)
+
+include("${root}/cmake/metal-context.cmake")
+foreach(mode single-row short-mv)
+  set(generated "${CMAKE_CURRENT_BINARY_DIR}/tokenomics-context-${mode}.cpp")
+  tokenomics_write_metal_context("${root}" "${generated}" "${mode}")
+  add_library(context-${mode}-compile OBJECT "${generated}")
+  target_include_directories(context-${mode}-compile PRIVATE
+    "${root}/third_party/llama.cpp/src"
+    "${root}/third_party/llama.cpp/include"
+    "${root}/third_party/llama.cpp/ggml/include"
+    "${root}/third_party/llama.cpp/ggml/src")
+endforeach()
+add_executable(test_metal_verification "${root}/tests/test_metal_verification.cpp")
+target_include_directories(test_metal_verification PRIVATE "${root}/src")
+add_test(NAME metal_verification_split COMMAND test_metal_verification)

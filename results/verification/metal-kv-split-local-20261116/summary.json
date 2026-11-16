@@ -1,0 +1,33 @@
+{
+  "bitwise_logit_comparisons_per_model": 99560,
+  "context_cases_per_model": 40,
+  "context_models": [
+    "periodic synthetic",
+    "random Q4_K synthetic"
+  ],
+  "default_context_unchanged": true,
+  "default_ctest_seconds": 38.5,
+  "default_ctest_suites": 7,
+  "default_gate_requests": 720,
+  "fixture_gate_counts": [
+    450,
+    600
+  ],
+  "gate_coverage_version": 2,
+  "host_dispatch_cases": 320,
+  "includes_rejected_suffix_rollback_and_reentry": true,
+  "initial_probe_issue": "Periodic fixture has sparse logits; initial majority-nonzero assertion was too strict. Corrected to require nondegenerate sparse output before passing.",
+  "legacy_receipt_version1_test": "passed",
+  "limitations": [
+    "CPU context probe activates the split condition via offload flag, but weights and execution remain CPU.",
+    "Padded extent reasoning assumes the adapter contiguous single-sequence full-attention contract.",
+    "Short-prefill dispatch can still differ from the original; version2 gates expose that risk."
+  ],
+  "metal_executed": false,
+  "release_and_sanitizer_pass": true,
+  "sanitizers": "address,undefined; detect_leaks=1",
+  "speed_claim": null,
+  "split_property_cases": 589896,
+  "state": "host_and_cpu_context_split_checks_passed",
+  "trained_inference_executed": false
+}

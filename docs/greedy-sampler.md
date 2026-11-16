@@ -51,7 +51,7 @@ binaries to isolate its own change.
 
 The runtime marker is `TOKENOMICS_GREEDY_NO_TEMP=ON`. The sampler-specific
 gate requires it only in the candidate and rejects the short-MV profile.
-The default context2048 gate checks510 candidate requests, including KV
+The default context 2048 gate checks 720 candidate requests, including KV
 padding boundaries. Keep original and candidate ordinary decoding as separate
 conditions in any later paired performance grid; within-candidate policy ratios
 do not establish improvement over the saved original decoder.

@@ -360,3 +360,41 @@ also confirms that an incorrect expected acceptance count fails. The driver
 freezes executable/source identity and refuses mutation during checking.
 [Evidence](../results/verification/native-suffix-validation-20261116/summary.json)
 includes canonical input IDs, native results, binary identities and hashes.
+
+### Padding-safe verification microbatches
+
+The pinned cache applies each microbatch before deriving its padded KV extent.
+For the adapter's contiguous sequence0, a short batch can therefore end its
+first chunk exactly at a256-cell boundary, preserving the padded width seen by
+ordinary rows. Added this split to the short-MV candidate without discarding
+proposals or changing logical work counts. Defaults retain the previous
+single-row guard; its generated context copy is byte-identical to the earlier
+integration. Prefills/catch-up retain their original behavior.
+
+Host tests check589896 split cases, consuming every row within the same padded
+extent as its one-row counterpart. Both generated context translation units
+compile. An optional Linux CPU probe links the generated context implementation,
+sets the offload flag solely to activate its split condition, and runs actual
+synthetic transformer graphs. Periodic and random Q4_K fixtures each pass40
+boundary cases and49780 bitwise logit comparisons, with final cache positions
+preserved. The first periodic probe incorrectly required most logits to be
+nonzero, despite its intentionally sparse output weights; the nondegeneracy
+check was corrected to allow sparse valid outputs. No Metal result is claimed.
+
+The audit also identified short-prefill coverage gaps: the short-MV selector
+changes matrix kernels for short prefixes or small final prefill chunks, even
+when ordinary generation remains one-row. Added seven explicit prefix lengths
+3/4/9/10/515/521/522 to coverage version2. The default context2048 gate now has
+720 candidate requests; context64/512 fixture grids have450/600. Legacy gate
+receipts without a version remain verifiable as version1 under their original
+coverage, with a retained-archive regression test. The extra cases can reveal
+an unsafe candidate rather than hiding its prefill differences.
+
+Extended the context probe to reject a speculative suffix, retain one row and
+verify again, exercising slot reuse and re-entry at boundaries. Each model now
+passes99560 bitwise logit comparisons across40 context/rollback cases, in both
+Release and sanitizer builds. The589896-case split property test also passes
+address/undefined sanitizers with leak detection. Default Release passes all
+seven suites in38.50 seconds; five gate tests pass, covering version2 grids and
+legacy version1 receipts.
+[Retained evidence](../results/verification/metal-kv-split-local-20261116/summary.json).

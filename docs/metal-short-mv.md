@@ -7,14 +7,15 @@ and CPU fixture checks cannot establish Metal correctness or speed.
 The existing Metal guard splits verification into one-row microbatches. It
 repaired a Qwen2.5 0.5B divergence on `development-code-03` at output token 47,
 but serializes work that speculative decoding needs to amortize. The opt-in
-`TOKENOMICS_METAL_SHORT_MV=ON` removes that split and routes two-to-nine-row
+`TOKENOMICS_METAL_SHORT_MV=ON` retains batching away from KV-padding boundaries
+and routes two-to-nine-row
 ordinary matrix multiplications through the existing mat-vec dispatcher. Each
 GPU threadgroup retains the ordinary per-row arithmetic. It also disables
 MMA/MM selection and runtime MMA+ADD fusion for these shapes. The structural
 fusion planner remains shape-independent, as required upstream.
 
-The integration generates owned copies of `ggml-metal-common.cpp` and
-`ggml-metal-ops.cpp`; it does not modify the upstream pin or Metal shaders.
+The integration generates owned copies of `ggml-metal-common.cpp`,
+`ggml-metal-ops.cpp` and `llama-context.cpp`; it does not modify the upstream pin or Metal shaders.
 Ordinary one-row dispatch and batches above nine rows remain upstream paths.
 The selector also affects short prefills and attention matmuls. Attention KV
 padding, other fused operations and the rest of the graph may still cause a
@@ -43,7 +44,7 @@ python3 -m venv .venv
 The command builds separate guarded and candidate binaries with two compiler
 jobs, runs their test suites, and starts with the original M3 failure case.
 It then compares the candidate with the unchanged ordinary decoder across
-510 requests: fixed caps 1/2/4/6/8, scripted fallback/re-entry, both cache modes,
+720 requests: fixed caps 1/2/4/6/8, scripted fallback/re-entry, both cache modes,
 repeated requests, minimal logs, token budgets and context boundaries. Marker,
 GPU device and complete layer-offload checks reject silent CPU fallback. The
 gate retains raw requests, cycles and first mismatch and stops immediately on
@@ -124,9 +125,47 @@ unverified. The direct backend test now includes 48 masked-softmax cases at
 widths256/512/768/2048, head counts1/2/4/14 and batches2/3/9, checking bitwise
 results and probability sums.
 
-The default context2048 gate includes prefix lengths248/255/256/504/511/512 to
+The default context 2048 gate includes prefix lengths248/255/256/504/511/512 to
 exercise crossing the KV cache's 256-token padding boundaries. Smaller contexts
 include only eligible lengths, so fixture gate counts vary. These tests matter
 because increasing padded KV width can change attention's per-row reduction
 order even after batch-dependent kernel dispatch is removed. No claim of
 whole-graph invariance follows from the softmax change alone.
+
+
+## Preserve per-row KV padding at boundary crossings
+
+The short-MV context now limits a verification microbatch to the cells remaining
+before the next 256-cell KV boundary. For a cached prefix of 254 tokens, a
+nine-row verification is split into chunks 2/2/2/2/1. Its first two rows see 256
+KV cells and later rows see 512, matching their ordinary one-row decodes. A
+prefix of 256 can verify all nine rows together. Proposals are retained, so
+logical cycles/drafts/acceptances can still match the guarded baseline.
+
+This relies on the adapter's contiguous, full-attention sequence0 and the pinned
+cache's per-microbatch state update. Multi-sequence or unexpectedly small
+configured microbatches fall back to one-row verification. Prefill/catch-up
+batches requesting only their final output keep the original split. The code
+guards the pinned 256-cell padding constant during configuration.
+
+A host test checks 589,896 prefix/batch combinations, including every prefix
+length 0–8192, and verifies that every row is consumed in a chunk with its
+ordinary padded KV extent. Both generated context translation units compile
+on Linux. The default single-row source copy is byte-identical to the old
+integration.
+
+The optional Linux `test_metal_context_cpu` target links the generated context
+copy over the pinned context implementation and executes it on a CPU backend.
+It sets the offload flag only to exercise the splitting condition; model weights
+and computation stay on CPU. Across 40 boundary/row-count cases per fixture,
+periodic and Q4_K random transformers each produce 99,560 bitwise-identical
+logits against sequential one-row decoding, preserving cache positions and checking rejection rollback/re-entry.
+These are context-lifecycle checks, not Metal arithmetic results.
+
+Coverage version2 also tests short prefills and long-prefill remainders with
+prefix lengths3/4/9/10/515/521/522. These can select different matrix kernels
+before generation starts. The current default context2048 gate has720 requests;
+context64 fixture gates have450 and context512 gates have600. Older version1
+receipts remain verifiable under their original, narrower coverage, and the
+verifier reports their version. Passing an older gate does not imply coverage
+of the newer prefill shapes.
