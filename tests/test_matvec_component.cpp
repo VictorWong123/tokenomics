@@ -207,10 +207,13 @@ int main(int argc, char **argv) {
                                               ? std::vector<Shape>{{GGML_TYPE_Q8_0, 896, 151936},
                                                                    {GGML_TYPE_Q5_0, 896, 896},
                                                                    {GGML_TYPE_Q4_K, 4864, 896},
-                                                                   {GGML_TYPE_Q6_K, 4864, 896}}
+                                                                   {GGML_TYPE_Q6_K, 4864, 896},
+                                                                   {GGML_TYPE_Q5_0, 896, 4864}}
                                               : std::vector<Shape>{{GGML_TYPE_Q6_K, 1536, 151936},
                                                                    {GGML_TYPE_Q4_K, 1536, 1536},
-                                                                   {GGML_TYPE_Q6_K, 8960, 1536}};
+                                                                   {GGML_TYPE_Q6_K, 8960, 1536},
+                                                                   {GGML_TYPE_Q4_K, 1536, 8960},
+                                                                   {GGML_TYPE_Q4_K, 8960, 1536}};
         if (mode == "--shapes") {
             for (const auto &shape : shapes)
                 std::cout << Json{{"model_id", model_id},

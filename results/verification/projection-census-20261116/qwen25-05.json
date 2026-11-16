@@ -1,0 +1,269 @@
+{
+  "content_range": "bytes 0-16777215/491400032",
+  "full_model_sha256_verified": false,
+  "header_bytes_parsed": 5947741,
+  "http_status": 206,
+  "lock": {
+    "bytes": 491400032,
+    "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "license": "Apache-2.0",
+    "repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+  },
+  "metadata": {
+    "general.architecture": "qwen2",
+    "general.file_type": 15,
+    "general.quantization_version": 2,
+    "qwen2.attention.head_count": 14,
+    "qwen2.attention.head_count_kv": 2,
+    "qwen2.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+    "qwen2.block_count": 24,
+    "qwen2.context_length": 32768,
+    "qwen2.embedding_length": 896,
+    "qwen2.feed_forward_length": 4864,
+    "qwen2.rope.freq_base": 1000000.0
+  },
+  "model": "qwen25-05",
+  "prefix_bytes_read": 16777216,
+  "prefix_sha256": "28b2136968798fdd915c64a63f7f1e0a418393447359fcd73a78aa5d67dddd47",
+  "projection_census": {
+    "embedding_tensor_bytes": 93592576,
+    "other_tensor_bytes": 286208,
+    "projection_by_role": {
+      "attn_k": {
+        "encoded_bytes": 1892352,
+        "tensors": 24,
+        "variants": [
+          {
+            "encoded_bytes": 1892352,
+            "shape": [
+              896,
+              128
+            ],
+            "tensors": 24,
+            "type": "Q5_0"
+          }
+        ]
+      },
+      "attn_output": {
+        "encoded_bytes": 13246464,
+        "tensors": 24,
+        "variants": [
+          {
+            "encoded_bytes": 13246464,
+            "shape": [
+              896,
+              896
+            ],
+            "tensors": 24,
+            "type": "Q5_0"
+          }
+        ]
+      },
+      "attn_q": {
+        "encoded_bytes": 13246464,
+        "tensors": 24,
+        "variants": [
+          {
+            "encoded_bytes": 13246464,
+            "shape": [
+              896,
+              896
+            ],
+            "tensors": 24,
+            "type": "Q5_0"
+          }
+        ]
+      },
+      "attn_v": {
+        "encoded_bytes": 2408448,
+        "tensors": 24,
+        "variants": [
+          {
+            "encoded_bytes": 946176,
+            "shape": [
+              896,
+              128
+            ],
+            "tensors": 12,
+            "type": "Q5_0"
+          },
+          {
+            "encoded_bytes": 1462272,
+            "shape": [
+              896,
+              128
+            ],
+            "tensors": 12,
+            "type": "Q8_0"
+          }
+        ]
+      },
+      "ffn_down": {
+        "encoded_bytes": 72317952,
+        "tensors": 24,
+        "variants": [
+          {
+            "encoded_bytes": 29417472,
+            "shape": [
+              4864,
+              896
+            ],
+            "tensors": 12,
+            "type": "Q4_K"
+          },
+          {
+            "encoded_bytes": 42900480,
+            "shape": [
+              4864,
+              896
+            ],
+            "tensors": 12,
+            "type": "Q6_K"
+          }
+        ]
+      },
+      "ffn_gate": {
+        "encoded_bytes": 71909376,
+        "tensors": 24,
+        "variants": [
+          {
+            "encoded_bytes": 71909376,
+            "shape": [
+              896,
+              4864
+            ],
+            "tensors": 24,
+            "type": "Q5_0"
+          }
+        ]
+      },
+      "ffn_up": {
+        "encoded_bytes": 71909376,
+        "tensors": 24,
+        "variants": [
+          {
+            "encoded_bytes": 71909376,
+            "shape": [
+              896,
+              4864
+            ],
+            "tensors": 24,
+            "type": "Q5_0"
+          }
+        ]
+      },
+      "output": {
+        "encoded_bytes": 144643072,
+        "tensors": 1,
+        "variants": [
+          {
+            "encoded_bytes": 144643072,
+            "shape": [
+              896,
+              151936
+            ],
+            "tensors": 1,
+            "type": "Q8_0"
+          }
+        ]
+      }
+    },
+    "projection_by_type": {
+      "Q4_K": {
+        "encoded_bytes": 29417472,
+        "tensors": 12
+      },
+      "Q5_0": {
+        "encoded_bytes": 173150208,
+        "tensors": 132
+      },
+      "Q6_K": {
+        "encoded_bytes": 42900480,
+        "tensors": 12
+      },
+      "Q8_0": {
+        "encoded_bytes": 146105344,
+        "tensors": 13
+      }
+    },
+    "projection_bytes": 391573504,
+    "scope": "Logical encoded dense projection payloads; excludes embedding lookups, vector operations, activations, KV, repeated loads and cache effects. Not measured traffic, bandwidth or speed.",
+    "total_encoded_tensor_bytes": 485452288
+  },
+  "projection_examples": [
+    {
+      "name": "output.weight",
+      "relative_data_offset": 0,
+      "shape": [
+        896,
+        151936
+      ],
+      "type": "Q8_0",
+      "type_code": 8
+    },
+    {
+      "name": "token_embd.weight",
+      "relative_data_offset": 144643072,
+      "shape": [
+        896,
+        151936
+      ],
+      "type": "Q5_0",
+      "type_code": 6
+    },
+    {
+      "name": "blk.0.ffn_down.weight",
+      "relative_data_offset": 238239232,
+      "shape": [
+        4864,
+        896
+      ],
+      "type": "Q6_K",
+      "type_code": 14
+    },
+    {
+      "name": "blk.0.ffn_gate.weight",
+      "relative_data_offset": 241814272,
+      "shape": [
+        896,
+        4864
+      ],
+      "type": "Q5_0",
+      "type_code": 6
+    },
+    {
+      "name": "blk.0.ffn_up.weight",
+      "relative_data_offset": 244810496,
+      "shape": [
+        896,
+        4864
+      ],
+      "type": "Q5_0",
+      "type_code": 6
+    },
+    {
+      "name": "blk.0.attn_q.weight",
+      "relative_data_offset": 248445184,
+      "shape": [
+        896,
+        896
+      ],
+      "type": "Q5_0",
+      "type_code": 6
+    }
+  ],
+  "state": "header_inspected",
+  "tensor_types": {
+    "F32": 121,
+    "Q4_K": 12,
+    "Q5_0": 133,
+    "Q6_K": 12,
+    "Q8_0": 13
+  },
+  "version": 3,
+  "weights_saved": false,
+  "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43869598344",
+  "source_commit": "703f53ee12b5007251eccdf01b98e8088c59f0e3"
+}

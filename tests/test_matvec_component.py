@@ -15,6 +15,7 @@ from analysis.matvec_component import (
     SHAPES_BY_MODEL,
     summarize,
     encoded_weight_bytes,
+    verify,
 )
 from bench.common import ROOT
 from scripts import metal_matvec_study
@@ -65,8 +66,8 @@ def fixture(model_id="qwen25-05"):
 class MatvecComponentTests(unittest.TestCase):
     def test_component_ratios_are_separate_from_serial_control(self):
         result = summarize(fixture())
-        self.assertEqual(result["trial_pairs"], 5120)
-        self.assertEqual(len(result["cells"]), 20)
+        self.assertEqual(result["trial_pairs"], 6400)
+        self.assertEqual(len(result["cells"]), 25)
         values = result["cells"][0]["profiles"]
         self.assertEqual(values["interleaved"]["median_ratio_vs_short_mv"], 2)
         self.assertEqual(
@@ -106,8 +107,8 @@ class MatvecComponentTests(unittest.TestCase):
 class MatvecModelGeometryTests(unittest.TestCase):
     def test_15_grid_and_exact_header_shapes(self):
         report = summarize(fixture("qwen25-15"), "qwen25-15")
-        self.assertEqual(report["trial_pairs"], 1920)
-        self.assertEqual(len(report["cells"]), 15)
+        self.assertEqual(report["trial_pairs"], 3200)
+        self.assertEqual(len(report["cells"]), 25)
         self.assertEqual(report["profiles"], ["short-mv", "interleaved"])
         header = json.loads(
             (
@@ -123,13 +124,40 @@ class MatvecModelGeometryTests(unittest.TestCase):
                 "blk.0.ffn_down.weight",
             )
         ]
-        self.assertEqual(
-            list(SHAPES_BY_MODEL["qwen25-15"]),
-            [
+        selected = set(SHAPES_BY_MODEL["qwen25-15"])
+        self.assertTrue(
+            {
                 (row["type"].lower().replace("_k", "_K"), *row["shape"])
                 for row in expected
-            ],
+            }.issubset(selected)
         )
+        for model_id, shapes in SHAPES_BY_MODEL.items():
+            census = json.loads(
+                (
+                    ROOT
+                    / f"results/verification/projection-census-20261116/{model_id}.json"
+                ).read_text()
+            )["projection_census"]
+            variants = [
+                variant
+                for role in census["projection_by_role"].values()
+                for variant in role["variants"]
+            ]
+            observed = {
+                (
+                    variant["type"].lower().replace("_k", "_K"),
+                    *variant["shape"],
+                ): variant["encoded_bytes"]
+                for variant in variants
+            }
+            self.assertTrue(set(shapes).issubset(observed))
+            covered = sum(
+                variant["encoded_bytes"]
+                for variant in variants
+                if (variant["type"].lower().replace("_k", "_K"), *variant["shape"])
+                in shapes
+            )
+            self.assertGreater(covered / census["projection_bytes"], 0.98)
         with self.assertRaises(ValueError):
             summarize(fixture("qwen25-15"))
         with self.assertRaises(ValueError):
@@ -205,6 +233,25 @@ class MatvecModelGeometryTests(unittest.TestCase):
             manifest = json.loads((root / "out/manifest.json").read_text())
             self.assertEqual(manifest["state"], "passed")
             self.assertFalse(manifest["model_weights_loaded"])
+            audit = verify(root / "out")
+            self.assertEqual(audit["trial_pairs"], 3200)
+            summary_path = root / "out/summary.json"
+            original = summary_path.read_text()
+            summary_path.write_text(original + " ")
+            with self.assertRaisesRegex(ValueError, "seal"):
+                verify(root / "out")
+            summary_path.write_text(original)
+            records_path = root / "out/records.jsonl"
+            rows = records_path.read_text()
+            records_path.write_text(rows.replace('"batch_us": 10', '"batch_us": 11', 1))
+            from bench.common import sha256
+
+            seal_path = root / "out/complete.json"
+            seal = json.loads(seal_path.read_text())
+            seal["sha256"]["records.jsonl"] = sha256(records_path)
+            seal_path.write_text(json.dumps(seal))
+            with self.assertRaisesRegex(ValueError, "Aggregate"):
+                verify(root / "out")
             self.assertEqual(set(manifest["binaries"]), {"short-mv", "interleaved"})
             self.assertEqual(sum("--metal" in cmd for cmd in commands), 8)
             self.assertTrue(

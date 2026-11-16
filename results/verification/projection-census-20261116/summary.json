@@ -1,0 +1,78 @@
+{
+  "scope": "Header-derived logical projection payload sizes and shape coverage, not memory traffic or speed",
+  "source_checkpoint": "703f53ee12b5007251eccdf01b98e8088c59f0e3",
+  "models": {
+    "qwen25-05": {
+      "projection_bytes": 391573504,
+      "output_head_bytes": 144643072,
+      "output_head_fraction": 0.3693893241561104,
+      "ffn_gate_up_fraction": 0.36728417661272605,
+      "component_shapes": [
+        [
+          "q8_0",
+          896,
+          151936
+        ],
+        [
+          "q5_0",
+          896,
+          896
+        ],
+        [
+          "q4_K",
+          4864,
+          896
+        ],
+        [
+          "q6_K",
+          4864,
+          896
+        ],
+        [
+          "q5_0",
+          896,
+          4864
+        ]
+      ],
+      "selected_shape_class_covered_bytes": 387272704,
+      "selected_shape_class_fraction": 0.9890166215127774,
+      "prefix_hash_matches_earlier_inspection": true
+    },
+    "qwen25-15": {
+      "projection_bytes": 979517952,
+      "output_head_bytes": 191439360,
+      "output_head_fraction": 0.1954424210491652,
+      "ffn_gate_up_fraction": 0.44258570158395627,
+      "component_shapes": [
+        [
+          "q6_K",
+          1536,
+          151936
+        ],
+        [
+          "q4_K",
+          1536,
+          1536
+        ],
+        [
+          "q6_K",
+          8960,
+          1536
+        ],
+        [
+          "q4_K",
+          1536,
+          8960
+        ],
+        [
+          "q4_K",
+          8960,
+          1536
+        ]
+      ],
+      "selected_shape_class_covered_bytes": 965712384,
+      "selected_shape_class_fraction": 0.9859057529555109,
+      "prefix_hash_matches_earlier_inspection": true
+    }
+  }
+}

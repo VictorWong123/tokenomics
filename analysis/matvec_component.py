@@ -10,6 +10,7 @@ SHAPES = (
     ("q5_0", 896, 896),
     ("q4_K", 4864, 896),
     ("q6_K", 4864, 896),
+    ("q5_0", 896, 4864),
 )
 
 PROFILES_BY_MODEL = {"qwen25-05": PROFILES, "qwen25-15": PROFILES[:2]}
@@ -19,6 +20,8 @@ SHAPES_BY_MODEL = {
         ("q6_K", 1536, 151936),
         ("q4_K", 1536, 1536),
         ("q6_K", 8960, 1536),
+        ("q4_K", 1536, 8960),
+        ("q4_K", 8960, 1536),
     ),
 }
 BLOCKS = 4
@@ -179,3 +182,91 @@ def summarize(records, model_id="qwen25-05"):
         ],
         "cells": cells,
     }
+
+
+def verify(directory):
+    """Recompute a sealed actual-Metal component result without executing it."""
+    import json
+    from pathlib import Path
+    from bench.common import read_jsonl, sha256
+
+    directory = Path(directory)
+    complete = json.loads((directory / "complete.json").read_text())["sha256"]
+    manifest = json.loads((directory / "manifest.json").read_text())
+    model_id = manifest["model_id"]
+    profiles = PROFILES_BY_MODEL[model_id]
+    names = {"manifest.json", "records.jsonl", "summary.json"}
+    names.update(
+        f"{profile}-{suffix}.log"
+        for profile in profiles
+        for suffix in ("configure", "compile")
+    )
+    names.update(f"{profile}-shapes.jsonl" for profile in profiles)
+    names.update(
+        f"{profile}-{block}.jsonl" for profile in profiles for block in range(BLOCKS)
+    )
+    if (
+        set(complete) != names
+        or any(sha256(directory / name) != digest for name, digest in complete.items())
+        or manifest["state"] != "passed"
+        or manifest["model_weights_loaded"] is not False
+        or manifest["profiles"] != list(profiles)
+        or manifest["blocks"] != BLOCKS
+        or set(manifest["binaries"]) != set(profiles)
+    ):
+        raise ValueError("Component payload seal or completed protocol differs")
+
+    def raw_records(path):
+        return [
+            json.loads(line)
+            for line in path.read_text().splitlines()
+            if line.startswith("{")
+        ]
+
+    for profile in profiles:
+        expected_shapes = [
+            {
+                "model_id": model_id,
+                "type": kind,
+                "width": width,
+                "outputs": outputs,
+                "weight_bytes": encoded_weight_bytes(kind, width, outputs),
+            }
+            for kind, width, outputs in SHAPES_BY_MODEL[model_id]
+        ]
+        if raw_records(directory / f"{profile}-shapes.jsonl") != expected_shapes:
+            raise ValueError("Sealed native component geometry differs")
+    reconstructed = []
+    for block in range(BLOCKS):
+        offset = block % len(profiles)
+        for profile in profiles[offset:] + profiles[:offset]:
+            rows = raw_records(directory / f"{profile}-{block}.jsonl")
+            if any(row["profile"] != profile for row in rows):
+                raise ValueError("Sealed native profile marker differs")
+            reconstructed.extend(dict(row, block=block) for row in rows)
+    records = read_jsonl(directory / "records.jsonl")
+    if reconstructed != records:
+        raise ValueError("Aggregate component records differ from raw logs")
+    report = summarize(records, model_id)
+    if report != json.loads((directory / "summary.json").read_text()):
+        raise ValueError("Component summary differs from raw measurements")
+    return {
+        "state": "passed",
+        "model_id": model_id,
+        "trial_pairs": report["trial_pairs"],
+        "cells": len(report["cells"]),
+        "checked_payloads": len(names),
+        "performance_claim": "Synthetic matrix component only; no generation claim",
+    }
+
+
+if __name__ == "__main__":
+    import argparse
+    import json
+
+    parser = argparse.ArgumentParser(
+        description="Audit a sealed Metal matrix study without inference"
+    )
+    parser.add_argument("directory")
+    args = parser.parse_args()
+    print(json.dumps(verify(args.directory), indent=2))

@@ -168,6 +168,7 @@ def study(args):
                     )
                 records.extend(dict(row, block=block) for row in rows)
         summary = summarize(records, model_id)
+        check_identities()
         write_jsonl(out / "records.jsonl", records)
         atomic_json(out / "summary.json", summary)
         report["state"] = "passed"
@@ -177,6 +178,17 @@ def study(args):
         raise
     finally:
         atomic_json(out / "manifest.json", report)
+    # The final manifest is now stable; seal all raw/configuration/derived files.
+    atomic_json(
+        out / "complete.json",
+        {
+            "sha256": {
+                path.name: sha256(path)
+                for path in sorted(out.iterdir())
+                if path.is_file()
+            }
+        },
+    )
 
 
 def read_jsonl_lines(path):
