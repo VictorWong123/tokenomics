@@ -842,3 +842,31 @@ failed run; later backend/source-partial/library stages were not reached.
 Raised that bounded suite allowance to600 seconds for the hosted ARM runner;
 the workflow remains capped at45 minutes. This is a timeout correction, not a
 numerical failure being waived.
+
+The corrected [full native shared-Q8 run](https://github.com/VictorWong123/tokenomics/actions/runs/43835253840)
+passes all14 stages, including nine native suites, direct CPU rows, component
+fixtures, source-derived strict/contracted partials and Metal library compilation.
+Its executable is byte-identical to the earlier timeout run. GPU graph execution
+remains unavailable. [Native receipt](../results/verification/q8-shared-integration-20261116/native-compilation.json).
+
+### Frequency-filtered copy fit investigation
+
+Predeclared a24-setting causal frequency-copy grid with five caps in commit2cf2be3.
+It uses only observed request-local suffix continuations, joint prefix-support
+ratios, deterministic recent-occurrence ties and shorter-context backoff. Five
+unit tests include18360 binary sequences checked against independent prefix
+enumeration. The replay re-audits15 measured upstream aggregate counts per
+operating point (30 total); no detailed measured cycles exist in the minimal
+archives. Added matched raw-copy controls to separate filtering from lowering
+the minimum match. No validation or reserved held-out trajectories are read.
+
+Across192 M3 fit tokens, minimum-three frequency filtering at cap8 gives133
+cycles/23 wasted rows, versus raw minimum-three133/27 and upstream ngram133/25.
+The existing minimum-five cap4 point remains142/1. On Linux3B, minimum-two
+frequency/cap2 gives141/13, versus raw141/17 and upstream ngram cap4 at142/34.
+No new grid cell improves the zero-waste minimum-five cap1 point on either
+operating point. Larger cycle savings require substantial rejected work. These
+fit-only counts do not establish throughput or generalization, so no additional
+runtime drafter is selected. Retained all120 grid cells/operating point and46905
+computed proposal/cycle records, with query-shape histograms and Pareto aliases.
+[Protocol/results](frequency-copy-fit-protocol.md).

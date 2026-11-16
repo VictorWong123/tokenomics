@@ -1,0 +1,23 @@
+{
+  "baseline_aggregate_checks": 30,
+  "computed_cycle_records": 46905,
+  "grid_cells_per_operating_point": 120,
+  "independent_binary_sequence_cases": 18360,
+  "measured_detailed_cycle_checks": 0,
+  "measured_speedup": null,
+  "per_prompt_grid_records": 720,
+  "protocol_sha256": "77d47a56f6078e91bc290be68b14b6af33cd5bf9b22e539264ab83fc9abefa33",
+  "runtime_implementation_added": false,
+  "scope": "Three development-fit prompts/192 canonical tokens per operating point; archived M3 0.5B and Linux CPU 3B. No validation/held-out inference or timing. Raw suffix ablations separate match-length effects from filtering.",
+  "selection": null,
+  "source": {
+    "owned_source_sha256": "535c0ac5f6e79c40e0905687d3980d1c0bdde293142712cdc710effe7eba02fd",
+    "revision": "98a3dc8b30b1405048513ab7043c32de14b74b05"
+  },
+  "state": "exploratory_fit_replay_complete",
+  "unique_frequency_work_points": {
+    "linux-cpu-3b": 41,
+    "m3-metal-05b": 49
+  },
+  "unit_tests": 5
+}
