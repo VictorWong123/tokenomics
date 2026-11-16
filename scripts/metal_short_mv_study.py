@@ -97,6 +97,32 @@ def study(args):
                 out / f"{profile}-tests.log",
             )
             binaries[profile] = build / "tokenomics"
+        state = "direct_backend_rows"
+        candidate_build = builds["short-mv"]
+        command(
+            [
+                tool("cmake"),
+                "--build",
+                candidate_build,
+                "--target",
+                "test_backend_rows",
+                "-j2",
+            ],
+            out / "backend-rows-compile.log",
+        )
+        command(
+            [candidate_build / "test_backend_rows", "--metal"], out / "backend-rows.log"
+        )
+        atomic_json(
+            out / "backend-rows.json",
+            {
+                "state": "passed",
+                "backend": "Metal",
+                "binary_sha256": sha256(candidate_build / "test_backend_rows"),
+                "log_sha256": sha256(out / "backend-rows.log"),
+                "limitation": "Matrix row arithmetic only; trained exactness gate still required",
+            },
+        )
         atomic_json(
             out / "compilation.json",
             {

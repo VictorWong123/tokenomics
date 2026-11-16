@@ -1,0 +1,21 @@
+{
+  "backend": "CPU",
+  "bitwise_comparisons": 419328,
+  "cases": 210,
+  "limitation": "Actual backend graphs evaluated on CPU. No Metal shader or whole-model correctness claim.",
+  "metal_executed": false,
+  "negative_attempt": {
+    "log_sha256": "e13d44a8b3bc3c664f35459ccaa6dcde655813806402e2556c2e5f361126b607",
+    "reason": "Broadcast-head expansion initially used activation head count for weight quantization; aborted. Corrected to weight head count before successful Release/sanitizer runs."
+  },
+  "release_binary_sha256": "5f39e006003fe4566ed7287a4c1681acbc5230ab892185293769aaa516ea0a84",
+  "sanitizer_binary_sha256": "3ae3a957eb922d8fd6073488705a1db8a0b0dda05c9534a987f66027fd01bfb6",
+  "sanitizers": "address,undefined; detect_leaks=1",
+  "source": {
+    "owned_source_sha256": "a094efba7cf0d4e4e48ea4348cd407e607dbdb261a2d71f849b857e42ef6c9ad",
+    "revision": "6450f373bcfe480d3d3aa9bcfada9d3c795cdb09"
+  },
+  "source_sha256": "d8140fb341707fb21f9f1f7c70a2bd427427f205ef7435e473256e6d412fc09c",
+  "speed_claim": null,
+  "state": "cpu_matrix_rows_passed"
+}

@@ -223,3 +223,23 @@ coverage. A CPU fixture test verifies a passing gate and rejects a changed raw
 output. The paired Metal and suffix gates remain hardware-unverified. The Metal
 build command now explicitly disables sanitizers to prevent cached diagnostic
 flags from contaminating a future timing run.
+
+### Direct backend row diagnostics
+
+Added an optional native matrix-row test and wired it into the Metal runner
+before trained inference. The test evaluates actual backend graphs for batched
+and independent one-row inputs, comparing finite F32 results bitwise. It covers
+F32/F16/Q4_K/Q6_K, widths 64–1536, batches 2/3/5/7/9 and independent/broadcast
+weight heads. CPU execution passes; Metal remains unexecuted here.
+
+During expansion to broadcast heads, the first harness version passed the input
+head count instead of weight head count to weight quantization. The CPU run
+aborted; the quantization count is corrected. This was a diagnostic-harness bug,
+not an inference speed result. The corrected grid and sanitizer result are
+retained separately. No failed timing is reported as a gain.
+
+Corrected direct-backend checks pass 210 CPU matrix cases and 419,328 bitwise
+comparisons in both Release and address/undefined sanitizer builds with leak
+detection. [Evidence](../results/verification/backend-rows-local-20261116/verification.json)
+records source/binary hashes and the failed harness-attempt hash. The test is an
+explicit optional target; it does not add GPU requirements to default CTest.

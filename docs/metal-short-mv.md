@@ -94,3 +94,24 @@ This checks accidental payload changes, execution settings, saved exact outputs,
 cycle accounting and comparison coverage. It does not recreate GPU execution or
 authenticate an artifact whose payload and receipt were both replaced. Older
 gates without this receipt need to be rerun to use this check.
+
+## Direct matrix-row check
+
+The local runner first builds `test_backend_rows` for the candidate and executes
+it with `--metal`. It compares each row of a batched matrix multiplication with
+an independent one-row multiplication using identical weights and activations.
+The grid includes F32/F16/Q4_K/Q6_K, short batches through nine rows, widths
+64–1536 where supported, and both independent and broadcast weight heads.
+Outputs must be finite, nondegenerate and bitwise identical. A first mismatch
+prints its shape and values and prevents the trained gate/timing stages.
+
+```bash
+.venv/bin/cmake --build build-metal-short-mv --target test_backend_rows -j2
+build-metal-short-mv/test_backend_rows --metal
+```
+
+Linux can run the same harness with `--cpu`; that checks the harness and CPU
+backend only. `--metal` rejects a build without Metal and never falls back to
+CPU. This test covers matrix operations, not the complete attention graph, KV
+padding, normalization or end-to-end model behavior. The trained gate is still
+required even when direct row comparisons pass.
