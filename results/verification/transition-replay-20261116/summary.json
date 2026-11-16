@@ -1,0 +1,45 @@
+{
+  "scope": "Post-hoc work replay on already observed development CPU trajectories; no new validation, inference, speed or held-out claim",
+  "source_checkpoint": "a5318a9c7cab68fe62fb11198127c370cdec3d0d",
+  "collections": 5,
+  "per_prompt_cells": 336,
+  "computed_cycles": 17416,
+  "decision": "Do not add a native transition or previous-second-logit drafter. Preserve kernel-first M3 priorities.",
+  "previous_second_logit": {
+    "validation-x86-05": {
+      "tokens": 384,
+      "cycles": 366,
+      "drafted": 354,
+      "accepted": 18,
+      "wasted_rows": 336
+    },
+    "fit-x86-05": {
+      "tokens": 192,
+      "cycles": 184,
+      "drafted": 178,
+      "accepted": 8,
+      "wasted_rows": 170
+    },
+    "validation-x86-15": {
+      "tokens": 384,
+      "cycles": 364,
+      "drafted": 352,
+      "accepted": 20,
+      "wasted_rows": 332
+    },
+    "validation-arm-05": {
+      "tokens": 384,
+      "cycles": 365,
+      "drafted": 354,
+      "accepted": 19,
+      "wasted_rows": 335
+    },
+    "fit-x86-15": {
+      "tokens": 192,
+      "cycles": 181,
+      "drafted": 175,
+      "accepted": 11,
+      "wasted_rows": 164
+    }
+  }
+}

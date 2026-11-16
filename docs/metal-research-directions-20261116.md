@@ -147,3 +147,21 @@ kernel transitions. Its CPU sampling arithmetic is a small share of its runtime,
 so our direct-host-argmax component gain should not be expected to repair the
 main batching bottleneck by itself. It remains an isolated, separately gated
 inference-driver optimization, including an equally optimized ordinary control.
+
+## Quantization and tree-verification limits
+
+[Zhang et al., May2025](https://arxiv.org/html/2505.22179v1) tests quantized
+EAGLE integration with optimized native C/CUDA kernels on A100/RTX3090.
+For four-bit targets, tree verification's additional computation can consume
+the bandwidth savings. Its hierarchical method uses an intermediate model to
+turn trees into sequences. This supports measuring verification cost separately
+from acceptance; its large Llama models, CUDA kernels and extra model do not
+supply an M3 implementation or a forecast for0.5B/1.5B GGUF.
+
+Token Recycling's appendixA.1 explicitly allows tree/ordinary argmax differences
+and evaluates their quality effect. That published criterion is weaker than our
+existing exact token-ID contract. Its small adjacency table is not the12GB
+external datastore discussed above; tree masking, prefix arithmetic and KV
+rollback are the relevant implementation costs. Our [linear transition check](transition-replay.md)
+is a separate, negative exploratory approximation, not evidence against the
+paper's tree method.

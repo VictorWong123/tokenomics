@@ -41,3 +41,11 @@ rejects misaligned pending tokens.
   --collection results/verification/logit-copy-fit-20261116/qwen25-05/collection \
   --out results/local/transition-fit-05
 ```
+
+The complete exploratory result is negative for further implementation. On
+0.5B x86 validation, context-two/cap8 uses266 cycles and234 wasted rows versus
+ngram's267/38; on ARM it uses256/230 versus257/42. On1.5B the corresponding
+tradeoff is301/257 versus311/93. One-token graphs produce still more waste,
+and direct previous-second-logit proposals accept only about5% of drafts on
+validation inputs. The kernel-first M3 plan remains unchanged. All336 records
+and17416 computed cycles are [retained](../results/verification/transition-replay-20261116).

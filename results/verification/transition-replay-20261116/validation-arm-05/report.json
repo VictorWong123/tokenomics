@@ -1,0 +1,1742 @@
+{
+  "collection_complete_sha256": "35b01cd006d70fcad34963a6afbaab8e625280deb8856d2cf309934b16e903cb",
+  "collection_phase": "validation",
+  "computed_cycles": 4206,
+  "model_id": "qwen25-05",
+  "per_prompt": [
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 60,
+      "drafted": 28,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 32,
+        "2": 28
+      },
+      "tokens": 64,
+      "verified_rows": 88,
+      "wasted_rows": 24
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 60,
+      "drafted": 108,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 32,
+        "2": 1,
+        "4": 1,
+        "5": 26
+      },
+      "tokens": 64,
+      "verified_rows": 168,
+      "wasted_rows": 104
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 60,
+      "drafted": 210,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 32,
+        "2": 1,
+        "4": 1,
+        "7": 1,
+        "9": 25
+      },
+      "tokens": 64,
+      "verified_rows": 270,
+      "wasted_rows": 206
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 64,
+      "drafted": 5,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 59,
+        "2": 5
+      },
+      "tokens": 64,
+      "verified_rows": 69,
+      "wasted_rows": 5
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 64,
+      "drafted": 20,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 59,
+        "5": 5
+      },
+      "tokens": 64,
+      "verified_rows": 84,
+      "wasted_rows": 20
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 64,
+      "drafted": 40,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 59,
+        "9": 5
+      },
+      "tokens": 64,
+      "verified_rows": 104,
+      "wasted_rows": 40
+    },
+    {
+      "accepted": 3,
+      "configuration": {
+        "cap": 1,
+        "id": "previous-second-logit"
+      },
+      "cycles": 61,
+      "drafted": 59,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 59
+      },
+      "tokens": 64,
+      "verified_rows": 120,
+      "wasted_rows": 56
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-03",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 3,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 61,
+      "drafted": 22,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 39,
+        "2": 22
+      },
+      "tokens": 64,
+      "verified_rows": 83,
+      "wasted_rows": 19
+    },
+    {
+      "accepted": 3,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 61,
+      "drafted": 84,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 39,
+        "2": 1,
+        "4": 1,
+        "5": 20
+      },
+      "tokens": 64,
+      "verified_rows": 145,
+      "wasted_rows": 81
+    },
+    {
+      "accepted": 3,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 61,
+      "drafted": 159,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 39,
+        "2": 1,
+        "4": 1,
+        "5": 1,
+        "8": 1,
+        "9": 18
+      },
+      "tokens": 64,
+      "verified_rows": 220,
+      "wasted_rows": 156
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 64,
+      "drafted": 3,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 61,
+        "2": 3
+      },
+      "tokens": 64,
+      "verified_rows": 67,
+      "wasted_rows": 3
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 64,
+      "drafted": 12,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 61,
+        "5": 3
+      },
+      "tokens": 64,
+      "verified_rows": 76,
+      "wasted_rows": 12
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 64,
+      "drafted": 24,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 61,
+        "9": 3
+      },
+      "tokens": 64,
+      "verified_rows": 88,
+      "wasted_rows": 24
+    },
+    {
+      "accepted": 3,
+      "configuration": {
+        "cap": 1,
+        "id": "previous-second-logit"
+      },
+      "cycles": 61,
+      "drafted": 59,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 59
+      },
+      "tokens": 64,
+      "verified_rows": 120,
+      "wasted_rows": 56
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-04",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 15,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 49,
+      "drafted": 29,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 20,
+        "2": 29
+      },
+      "tokens": 64,
+      "verified_rows": 78,
+      "wasted_rows": 14
+    },
+    {
+      "accepted": 22,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 42,
+      "drafted": 83,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 20,
+        "2": 1,
+        "3": 1,
+        "5": 20
+      },
+      "tokens": 64,
+      "verified_rows": 125,
+      "wasted_rows": 61
+    },
+    {
+      "accepted": 23,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 41,
+      "drafted": 152,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 20,
+        "2": 1,
+        "3": 1,
+        "7": 1,
+        "8": 1,
+        "9": 17
+      },
+      "tokens": 64,
+      "verified_rows": 193,
+      "wasted_rows": 129
+    },
+    {
+      "accepted": 13,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 51,
+      "drafted": 17,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 34,
+        "2": 17
+      },
+      "tokens": 64,
+      "verified_rows": 68,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 19,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 45,
+      "drafted": 41,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 34,
+        "2": 1,
+        "5": 10
+      },
+      "tokens": 64,
+      "verified_rows": 86,
+      "wasted_rows": 22
+    },
+    {
+      "accepted": 21,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 43,
+      "drafted": 62,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 34,
+        "2": 1,
+        "6": 1,
+        "9": 7
+      },
+      "tokens": 64,
+      "verified_rows": 105,
+      "wasted_rows": 41
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 1,
+        "id": "previous-second-logit"
+      },
+      "cycles": 60,
+      "drafted": 59,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 1,
+        "2": 59
+      },
+      "tokens": 64,
+      "verified_rows": 119,
+      "wasted_rows": 55
+    },
+    {
+      "accepted": 9,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 55,
+      "drafted": 13,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 42,
+        "2": 13
+      },
+      "tokens": 64,
+      "verified_rows": 68,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 15,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 49,
+      "drafted": 25,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 42,
+        "4": 3,
+        "5": 4
+      },
+      "tokens": 64,
+      "verified_rows": 74,
+      "wasted_rows": 10
+    },
+    {
+      "accepted": 15,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 49,
+      "drafted": 37,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 42,
+        "4": 3,
+        "5": 1,
+        "9": 3
+      },
+      "tokens": 64,
+      "verified_rows": 86,
+      "wasted_rows": 22
+    },
+    {
+      "accepted": 6,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 58,
+      "drafted": 7,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 51,
+        "2": 7
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 9,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 55,
+      "drafted": 16,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 51,
+        "5": 4
+      },
+      "tokens": 64,
+      "verified_rows": 71,
+      "wasted_rows": 7
+    },
+    {
+      "accepted": 10,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 54,
+      "drafted": 24,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 51,
+        "9": 3
+      },
+      "tokens": 64,
+      "verified_rows": 78,
+      "wasted_rows": 14
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-code-03",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 9,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 55,
+      "drafted": 25,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 30,
+        "2": 25
+      },
+      "tokens": 64,
+      "verified_rows": 80,
+      "wasted_rows": 16
+    },
+    {
+      "accepted": 12,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 52,
+      "drafted": 90,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 29,
+        "3": 1,
+        "5": 22
+      },
+      "tokens": 64,
+      "verified_rows": 142,
+      "wasted_rows": 78
+    },
+    {
+      "accepted": 12,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 52,
+      "drafted": 175,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 29,
+        "3": 1,
+        "6": 1,
+        "9": 21
+      },
+      "tokens": 64,
+      "verified_rows": 227,
+      "wasted_rows": 163
+    },
+    {
+      "accepted": 6,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 58,
+      "drafted": 9,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 49,
+        "2": 9
+      },
+      "tokens": 64,
+      "verified_rows": 67,
+      "wasted_rows": 3
+    },
+    {
+      "accepted": 8,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 56,
+      "drafted": 25,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 49,
+        "2": 1,
+        "5": 6
+      },
+      "tokens": 64,
+      "verified_rows": 81,
+      "wasted_rows": 17
+    },
+    {
+      "accepted": 9,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 55,
+      "drafted": 37,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 49,
+        "2": 1,
+        "5": 1,
+        "9": 4
+      },
+      "tokens": 64,
+      "verified_rows": 92,
+      "wasted_rows": 28
+    },
+    {
+      "accepted": 1,
+      "configuration": {
+        "cap": 1,
+        "id": "previous-second-logit"
+      },
+      "cycles": 63,
+      "drafted": 61,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 61
+      },
+      "tokens": 64,
+      "verified_rows": 124,
+      "wasted_rows": 60
+    },
+    {
+      "accepted": 3,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 61,
+      "drafted": 5,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 56,
+        "2": 5
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 5,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 59,
+      "drafted": 12,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 56,
+        "5": 3
+      },
+      "tokens": 64,
+      "verified_rows": 71,
+      "wasted_rows": 7
+    },
+    {
+      "accepted": 5,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 59,
+      "drafted": 24,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 56,
+        "9": 3
+      },
+      "tokens": 64,
+      "verified_rows": 83,
+      "wasted_rows": 19
+    },
+    {
+      "accepted": 1,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 63,
+      "drafted": 2,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 61,
+        "2": 2
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 62,
+      "drafted": 4,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 61,
+        "5": 1
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 62,
+      "drafted": 8,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 61,
+        "9": 1
+      },
+      "tokens": 64,
+      "verified_rows": 70,
+      "wasted_rows": 6
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-code-04",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 16,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 48,
+      "drafted": 48,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "2": 48
+      },
+      "tokens": 64,
+      "verified_rows": 96,
+      "wasted_rows": 32
+    },
+    {
+      "accepted": 20,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 44,
+      "drafted": 171,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "2": 1,
+        "3": 1,
+        "5": 42
+      },
+      "tokens": 64,
+      "verified_rows": 215,
+      "wasted_rows": 151
+    },
+    {
+      "accepted": 20,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 44,
+      "drafted": 333,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "2": 1,
+        "3": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 39
+      },
+      "tokens": 64,
+      "verified_rows": 377,
+      "wasted_rows": 313
+    },
+    {
+      "accepted": 27,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 37,
+      "drafted": 35,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 35
+      },
+      "tokens": 64,
+      "verified_rows": 72,
+      "wasted_rows": 8
+    },
+    {
+      "accepted": 45,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 19,
+      "drafted": 68,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 2,
+        "5": 17
+      },
+      "tokens": 64,
+      "verified_rows": 87,
+      "wasted_rows": 23
+    },
+    {
+      "accepted": 47,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 17,
+      "drafted": 112,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 3,
+        "9": 14
+      },
+      "tokens": 64,
+      "verified_rows": 129,
+      "wasted_rows": 65
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 1,
+        "id": "previous-second-logit"
+      },
+      "cycles": 60,
+      "drafted": 58,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 58
+      },
+      "tokens": 64,
+      "verified_rows": 118,
+      "wasted_rows": 54
+    },
+    {
+      "accepted": 29,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 35,
+      "drafted": 30,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 5,
+        "2": 30
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 47,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 17,
+      "drafted": 50,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 4,
+        "3": 1,
+        "5": 12
+      },
+      "tokens": 64,
+      "verified_rows": 67,
+      "wasted_rows": 3
+    },
+    {
+      "accepted": 53,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 11,
+      "drafted": 54,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 4,
+        "7": 1,
+        "9": 6
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 27,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 37,
+      "drafted": 28,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 9,
+        "2": 28
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 44,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 20,
+      "drafted": 44,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 9,
+        "5": 11
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 49,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 15,
+      "drafted": 52,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 8,
+        "5": 1,
+        "9": 6
+      },
+      "tokens": 64,
+      "verified_rows": 67,
+      "wasted_rows": 3
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-summary-03",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 19,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 45,
+      "drafted": 44,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 1,
+        "2": 44
+      },
+      "tokens": 64,
+      "verified_rows": 89,
+      "wasted_rows": 25
+    },
+    {
+      "accepted": 24,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 40,
+      "drafted": 150,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 36
+      },
+      "tokens": 64,
+      "verified_rows": 190,
+      "wasted_rows": 126
+    },
+    {
+      "accepted": 24,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 40,
+      "drafted": 288,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 33
+      },
+      "tokens": 64,
+      "verified_rows": 328,
+      "wasted_rows": 264
+    },
+    {
+      "accepted": 29,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 35,
+      "drafted": 33,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 33
+      },
+      "tokens": 64,
+      "verified_rows": 68,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 48,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 16,
+      "drafted": 55,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 2,
+        "4": 1,
+        "5": 13
+      },
+      "tokens": 64,
+      "verified_rows": 71,
+      "wasted_rows": 7
+    },
+    {
+      "accepted": 51,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 13,
+      "drafted": 83,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 2,
+        "4": 1,
+        "9": 10
+      },
+      "tokens": 64,
+      "verified_rows": 96,
+      "wasted_rows": 32
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 1,
+        "id": "previous-second-logit"
+      },
+      "cycles": 60,
+      "drafted": 58,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 58
+      },
+      "tokens": 64,
+      "verified_rows": 118,
+      "wasted_rows": 54
+    },
+    {
+      "accepted": 30,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 34,
+      "drafted": 30,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 4,
+        "2": 30
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 48,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 16,
+      "drafted": 48,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 4,
+        "5": 12
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 54,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 10,
+      "drafted": 54,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 3,
+        "7": 1,
+        "9": 6
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 29,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 35,
+      "drafted": 29,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 6,
+        "2": 29
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 47,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 17,
+      "drafted": 47,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 5,
+        "4": 1,
+        "5": 11
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 52,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 12,
+      "drafted": 52,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 5,
+        "5": 1,
+        "9": 6
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-summary-04",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    }
+  ],
+  "performance_claim": null,
+  "platform": {
+    "machine": "arm64",
+    "platform": "macOS-15.8.2-arm64-arm-64bit"
+  },
+  "protocol_sha256": "07f2a640e2569049a89792a54214040fcd513a0616216ba7e2a9ced2b7dd0b85",
+  "scope": "Post-hoc exploratory development work replay on already observed CPU fit/validation collections; not a new validation, published tree reproduction, deployment or speed claim",
+  "source": {
+    "owned_source_sha256": "8a3c207de36ce0f3e5fd01daf0fab705cce0b919b6927849a5f56c81c8503af8",
+    "revision": "a5318a9c7cab68fe62fb11198127c370cdec3d0d"
+  },
+  "totals": [
+    {
+      "accepted": 66,
+      "cap": 1,
+      "cycles": 318,
+      "drafted": 196,
+      "id": "recent-transition1",
+      "order": 1,
+      "tokens": 384,
+      "verified_rows": 514,
+      "wasted_rows": 130
+    },
+    {
+      "accepted": 85,
+      "cap": 4,
+      "cycles": 299,
+      "drafted": 686,
+      "id": "recent-transition1",
+      "order": 1,
+      "tokens": 384,
+      "verified_rows": 985,
+      "wasted_rows": 601
+    },
+    {
+      "accepted": 86,
+      "cap": 8,
+      "cycles": 298,
+      "drafted": 1317,
+      "id": "recent-transition1",
+      "order": 1,
+      "tokens": 384,
+      "verified_rows": 1615,
+      "wasted_rows": 1231
+    },
+    {
+      "accepted": 75,
+      "cap": 1,
+      "cycles": 309,
+      "drafted": 102,
+      "id": "recent-transition2",
+      "order": 2,
+      "tokens": 384,
+      "verified_rows": 411,
+      "wasted_rows": 27
+    },
+    {
+      "accepted": 120,
+      "cap": 4,
+      "cycles": 264,
+      "drafted": 221,
+      "id": "recent-transition2",
+      "order": 2,
+      "tokens": 384,
+      "verified_rows": 485,
+      "wasted_rows": 101
+    },
+    {
+      "accepted": 128,
+      "cap": 8,
+      "cycles": 256,
+      "drafted": 358,
+      "id": "recent-transition2",
+      "order": 2,
+      "tokens": 384,
+      "verified_rows": 614,
+      "wasted_rows": 230
+    },
+    {
+      "accepted": 19,
+      "cap": 1,
+      "cycles": 365,
+      "drafted": 354,
+      "id": "previous-second-logit",
+      "tokens": 384,
+      "verified_rows": 719,
+      "wasted_rows": 335
+    },
+    {
+      "accepted": 71,
+      "cap": 1,
+      "cycles": 313,
+      "drafted": 78,
+      "id": "upstream-ngram3",
+      "tokens": 384,
+      "verified_rows": 391,
+      "wasted_rows": 7
+    },
+    {
+      "accepted": 115,
+      "cap": 4,
+      "cycles": 269,
+      "drafted": 135,
+      "id": "upstream-ngram3",
+      "tokens": 384,
+      "verified_rows": 404,
+      "wasted_rows": 20
+    },
+    {
+      "accepted": 127,
+      "cap": 8,
+      "cycles": 257,
+      "drafted": 169,
+      "id": "upstream-ngram3",
+      "tokens": 384,
+      "verified_rows": 426,
+      "wasted_rows": 42
+    },
+    {
+      "accepted": 63,
+      "cap": 1,
+      "cycles": 321,
+      "drafted": 66,
+      "id": "suffix5",
+      "tokens": 384,
+      "verified_rows": 387,
+      "wasted_rows": 3
+    },
+    {
+      "accepted": 102,
+      "cap": 4,
+      "cycles": 282,
+      "drafted": 111,
+      "id": "suffix5",
+      "tokens": 384,
+      "verified_rows": 393,
+      "wasted_rows": 9
+    },
+    {
+      "accepted": 113,
+      "cap": 8,
+      "cycles": 271,
+      "drafted": 136,
+      "id": "suffix5",
+      "tokens": 384,
+      "verified_rows": 407,
+      "wasted_rows": 23
+    },
+    {
+      "accepted": 0,
+      "cap": 0,
+      "cycles": 384,
+      "drafted": 0,
+      "id": "ordinary",
+      "tokens": 384,
+      "verified_rows": 384,
+      "wasted_rows": 0
+    }
+  ],
+  "work_frontier": [
+    {
+      "aliases": [
+        {
+          "cap": 8,
+          "family": "linear-transition",
+          "id": "recent-transition2"
+        }
+      ],
+      "cycles": 256,
+      "wasted_rows": 230
+    },
+    {
+      "aliases": [
+        {
+          "cap": 8,
+          "family": "control",
+          "id": "upstream-ngram3"
+        }
+      ],
+      "cycles": 257,
+      "wasted_rows": 42
+    },
+    {
+      "aliases": [
+        {
+          "cap": 4,
+          "family": "control",
+          "id": "upstream-ngram3"
+        }
+      ],
+      "cycles": 269,
+      "wasted_rows": 20
+    },
+    {
+      "aliases": [
+        {
+          "cap": 4,
+          "family": "control",
+          "id": "suffix5"
+        }
+      ],
+      "cycles": 282,
+      "wasted_rows": 9
+    },
+    {
+      "aliases": [
+        {
+          "cap": 1,
+          "family": "control",
+          "id": "upstream-ngram3"
+        }
+      ],
+      "cycles": 313,
+      "wasted_rows": 7
+    },
+    {
+      "aliases": [
+        {
+          "cap": 1,
+          "family": "control",
+          "id": "suffix5"
+        }
+      ],
+      "cycles": 321,
+      "wasted_rows": 3
+    },
+    {
+      "aliases": [
+        {
+          "cap": 0,
+          "family": "control",
+          "id": "ordinary"
+        }
+      ],
+      "cycles": 384,
+      "wasted_rows": 0
+    }
+  ]
+}

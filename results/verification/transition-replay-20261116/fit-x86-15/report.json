@@ -1,0 +1,1001 @@
+{
+  "collection_complete_sha256": "3d7f5195aae8616bd263f1cac6ff766e61d7b959d777f1d500d422167702a4aa",
+  "collection_phase": "fit",
+  "computed_cycles": 2113,
+  "model_id": "qwen25-15",
+  "per_prompt": [
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 60,
+      "drafted": 19,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 41,
+        "2": 19
+      },
+      "tokens": 64,
+      "verified_rows": 79,
+      "wasted_rows": 15
+    },
+    {
+      "accepted": 7,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 57,
+      "drafted": 61,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 41,
+        "2": 1,
+        "5": 15
+      },
+      "tokens": 64,
+      "verified_rows": 118,
+      "wasted_rows": 54
+    },
+    {
+      "accepted": 7,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 57,
+      "drafted": 118,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 41,
+        "2": 1,
+        "6": 1,
+        "9": 14
+      },
+      "tokens": 64,
+      "verified_rows": 175,
+      "wasted_rows": 111
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 60,
+      "drafted": 5,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 55,
+        "2": 5
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 5,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 59,
+      "drafted": 16,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 55,
+        "5": 4
+      },
+      "tokens": 64,
+      "verified_rows": 75,
+      "wasted_rows": 11
+    },
+    {
+      "accepted": 6,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 58,
+      "drafted": 24,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 55,
+        "9": 3
+      },
+      "tokens": 64,
+      "verified_rows": 82,
+      "wasted_rows": 18
+    },
+    {
+      "accepted": 1,
+      "configuration": {
+        "cap": 1,
+        "id": "previous-second-logit"
+      },
+      "cycles": 63,
+      "drafted": 61,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 61
+      },
+      "tokens": 64,
+      "verified_rows": 124,
+      "wasted_rows": 60
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 62,
+      "drafted": 4,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 58,
+        "2": 4
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 60,
+      "drafted": 8,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 58,
+        "5": 2
+      },
+      "tokens": 64,
+      "verified_rows": 68,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 60,
+      "drafted": 16,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 58,
+        "9": 2
+      },
+      "tokens": 64,
+      "verified_rows": 76,
+      "wasted_rows": 12
+    },
+    {
+      "accepted": 1,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 63,
+      "drafted": 2,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 61,
+        "2": 2
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 62,
+      "drafted": 4,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 61,
+        "5": 1
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 62,
+      "drafted": 8,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 61,
+        "9": 1
+      },
+      "tokens": 64,
+      "verified_rows": 70,
+      "wasted_rows": 6
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 18,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 46,
+      "drafted": 27,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 19,
+        "2": 27
+      },
+      "tokens": 64,
+      "verified_rows": 73,
+      "wasted_rows": 9
+    },
+    {
+      "accepted": 26,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 38,
+      "drafted": 75,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 19,
+        "4": 1,
+        "5": 18
+      },
+      "tokens": 64,
+      "verified_rows": 113,
+      "wasted_rows": 49
+    },
+    {
+      "accepted": 27,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 37,
+      "drafted": 139,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 19,
+        "4": 1,
+        "9": 17
+      },
+      "tokens": 64,
+      "verified_rows": 176,
+      "wasted_rows": 112
+    },
+    {
+      "accepted": 14,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 50,
+      "drafted": 19,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 31,
+        "2": 19
+      },
+      "tokens": 64,
+      "verified_rows": 69,
+      "wasted_rows": 5
+    },
+    {
+      "accepted": 23,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 41,
+      "drafted": 38,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 31,
+        "3": 1,
+        "5": 9
+      },
+      "tokens": 64,
+      "verified_rows": 79,
+      "wasted_rows": 15
+    },
+    {
+      "accepted": 26,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 38,
+      "drafted": 50,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 31,
+        "3": 1,
+        "9": 6
+      },
+      "tokens": 64,
+      "verified_rows": 88,
+      "wasted_rows": 24
+    },
+    {
+      "accepted": 5,
+      "configuration": {
+        "cap": 1,
+        "id": "previous-second-logit"
+      },
+      "cycles": 59,
+      "drafted": 57,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 57
+      },
+      "tokens": 64,
+      "verified_rows": 116,
+      "wasted_rows": 52
+    },
+    {
+      "accepted": 13,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 51,
+      "drafted": 14,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "2": 14
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 19,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 45,
+      "drafted": 32,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "5": 8
+      },
+      "tokens": 64,
+      "verified_rows": 77,
+      "wasted_rows": 13
+    },
+    {
+      "accepted": 22,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 42,
+      "drafted": 40,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "9": 5
+      },
+      "tokens": 64,
+      "verified_rows": 82,
+      "wasted_rows": 18
+    },
+    {
+      "accepted": 9,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 55,
+      "drafted": 10,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 45,
+        "2": 10
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 15,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 49,
+      "drafted": 16,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 45,
+        "5": 4
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 16,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 48,
+      "drafted": 24,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 45,
+        "9": 3
+      },
+      "tokens": 64,
+      "verified_rows": 72,
+      "wasted_rows": 8
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 16,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 48,
+      "drafted": 41,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 7,
+        "2": 41
+      },
+      "tokens": 64,
+      "verified_rows": 89,
+      "wasted_rows": 25
+    },
+    {
+      "accepted": 24,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 40,
+      "drafted": 127,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 7,
+        "2": 1,
+        "3": 1,
+        "5": 31
+      },
+      "tokens": 64,
+      "verified_rows": 167,
+      "wasted_rows": 103
+    },
+    {
+      "accepted": 24,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition1",
+        "order": 1
+      },
+      "cycles": 40,
+      "drafted": 248,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 7,
+        "2": 1,
+        "3": 1,
+        "6": 1,
+        "9": 30
+      },
+      "tokens": 64,
+      "verified_rows": 288,
+      "wasted_rows": 224
+    },
+    {
+      "accepted": 19,
+      "configuration": {
+        "cap": 1,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 45,
+      "drafted": 28,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 17,
+        "2": 28
+      },
+      "tokens": 64,
+      "verified_rows": 73,
+      "wasted_rows": 9
+    },
+    {
+      "accepted": 32,
+      "configuration": {
+        "cap": 4,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 32,
+      "drafted": 59,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 17,
+        "4": 1,
+        "5": 14
+      },
+      "tokens": 64,
+      "verified_rows": 91,
+      "wasted_rows": 27
+    },
+    {
+      "accepted": 35,
+      "configuration": {
+        "cap": 8,
+        "id": "recent-transition2",
+        "order": 2
+      },
+      "cycles": 29,
+      "drafted": 92,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 17,
+        "5": 1,
+        "9": 11
+      },
+      "tokens": 64,
+      "verified_rows": 121,
+      "wasted_rows": 57
+    },
+    {
+      "accepted": 5,
+      "configuration": {
+        "cap": 1,
+        "id": "previous-second-logit"
+      },
+      "cycles": 59,
+      "drafted": 57,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 2,
+        "2": 57
+      },
+      "tokens": 64,
+      "verified_rows": 116,
+      "wasted_rows": 52
+    },
+    {
+      "accepted": 18,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 46,
+      "drafted": 23,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 23,
+        "2": 23
+      },
+      "tokens": 64,
+      "verified_rows": 69,
+      "wasted_rows": 5
+    },
+    {
+      "accepted": 28,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 36,
+      "drafted": 51,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 23,
+        "4": 1,
+        "5": 12
+      },
+      "tokens": 64,
+      "verified_rows": 87,
+      "wasted_rows": 23
+    },
+    {
+      "accepted": 32,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 32,
+      "drafted": 72,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 23,
+        "9": 9
+      },
+      "tokens": 64,
+      "verified_rows": 104,
+      "wasted_rows": 40
+    },
+    {
+      "accepted": 14,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 50,
+      "drafted": 16,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 34,
+        "2": 16
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 22,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 42,
+      "drafted": 32,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 34,
+        "5": 8
+      },
+      "tokens": 64,
+      "verified_rows": 74,
+      "wasted_rows": 10
+    },
+    {
+      "accepted": 24,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 40,
+      "drafted": 48,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 34,
+        "9": 6
+      },
+      "tokens": 64,
+      "verified_rows": 88,
+      "wasted_rows": 24
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    }
+  ],
+  "performance_claim": null,
+  "platform": {
+    "machine": "x86_64",
+    "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39"
+  },
+  "protocol_sha256": "07f2a640e2569049a89792a54214040fcd513a0616216ba7e2a9ced2b7dd0b85",
+  "scope": "Post-hoc exploratory development work replay on already observed CPU fit/validation collections; not a new validation, published tree reproduction, deployment or speed claim",
+  "source": {
+    "owned_source_sha256": "8a3c207de36ce0f3e5fd01daf0fab705cce0b919b6927849a5f56c81c8503af8",
+    "revision": "a5318a9c7cab68fe62fb11198127c370cdec3d0d"
+  },
+  "totals": [
+    {
+      "accepted": 38,
+      "cap": 1,
+      "cycles": 154,
+      "drafted": 87,
+      "id": "recent-transition1",
+      "order": 1,
+      "tokens": 192,
+      "verified_rows": 241,
+      "wasted_rows": 49
+    },
+    {
+      "accepted": 57,
+      "cap": 4,
+      "cycles": 135,
+      "drafted": 263,
+      "id": "recent-transition1",
+      "order": 1,
+      "tokens": 192,
+      "verified_rows": 398,
+      "wasted_rows": 206
+    },
+    {
+      "accepted": 58,
+      "cap": 8,
+      "cycles": 134,
+      "drafted": 505,
+      "id": "recent-transition1",
+      "order": 1,
+      "tokens": 192,
+      "verified_rows": 639,
+      "wasted_rows": 447
+    },
+    {
+      "accepted": 37,
+      "cap": 1,
+      "cycles": 155,
+      "drafted": 52,
+      "id": "recent-transition2",
+      "order": 2,
+      "tokens": 192,
+      "verified_rows": 207,
+      "wasted_rows": 15
+    },
+    {
+      "accepted": 60,
+      "cap": 4,
+      "cycles": 132,
+      "drafted": 113,
+      "id": "recent-transition2",
+      "order": 2,
+      "tokens": 192,
+      "verified_rows": 245,
+      "wasted_rows": 53
+    },
+    {
+      "accepted": 67,
+      "cap": 8,
+      "cycles": 125,
+      "drafted": 166,
+      "id": "recent-transition2",
+      "order": 2,
+      "tokens": 192,
+      "verified_rows": 291,
+      "wasted_rows": 99
+    },
+    {
+      "accepted": 11,
+      "cap": 1,
+      "cycles": 181,
+      "drafted": 175,
+      "id": "previous-second-logit",
+      "tokens": 192,
+      "verified_rows": 356,
+      "wasted_rows": 164
+    },
+    {
+      "accepted": 33,
+      "cap": 1,
+      "cycles": 159,
+      "drafted": 41,
+      "id": "upstream-ngram3",
+      "tokens": 192,
+      "verified_rows": 200,
+      "wasted_rows": 8
+    },
+    {
+      "accepted": 51,
+      "cap": 4,
+      "cycles": 141,
+      "drafted": 91,
+      "id": "upstream-ngram3",
+      "tokens": 192,
+      "verified_rows": 232,
+      "wasted_rows": 40
+    },
+    {
+      "accepted": 58,
+      "cap": 8,
+      "cycles": 134,
+      "drafted": 128,
+      "id": "upstream-ngram3",
+      "tokens": 192,
+      "verified_rows": 262,
+      "wasted_rows": 70
+    },
+    {
+      "accepted": 24,
+      "cap": 1,
+      "cycles": 168,
+      "drafted": 28,
+      "id": "suffix5",
+      "tokens": 192,
+      "verified_rows": 196,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 39,
+      "cap": 4,
+      "cycles": 153,
+      "drafted": 52,
+      "id": "suffix5",
+      "tokens": 192,
+      "verified_rows": 205,
+      "wasted_rows": 13
+    },
+    {
+      "accepted": 42,
+      "cap": 8,
+      "cycles": 150,
+      "drafted": 80,
+      "id": "suffix5",
+      "tokens": 192,
+      "verified_rows": 230,
+      "wasted_rows": 38
+    },
+    {
+      "accepted": 0,
+      "cap": 0,
+      "cycles": 192,
+      "drafted": 0,
+      "id": "ordinary",
+      "tokens": 192,
+      "verified_rows": 192,
+      "wasted_rows": 0
+    }
+  ],
+  "work_frontier": [
+    {
+      "aliases": [
+        {
+          "cap": 8,
+          "family": "linear-transition",
+          "id": "recent-transition2"
+        }
+      ],
+      "cycles": 125,
+      "wasted_rows": 99
+    },
+    {
+      "aliases": [
+        {
+          "cap": 4,
+          "family": "linear-transition",
+          "id": "recent-transition2"
+        }
+      ],
+      "cycles": 132,
+      "wasted_rows": 53
+    },
+    {
+      "aliases": [
+        {
+          "cap": 4,
+          "family": "control",
+          "id": "upstream-ngram3"
+        }
+      ],
+      "cycles": 141,
+      "wasted_rows": 40
+    },
+    {
+      "aliases": [
+        {
+          "cap": 8,
+          "family": "control",
+          "id": "suffix5"
+        }
+      ],
+      "cycles": 150,
+      "wasted_rows": 38
+    },
+    {
+      "aliases": [
+        {
+          "cap": 4,
+          "family": "control",
+          "id": "suffix5"
+        }
+      ],
+      "cycles": 153,
+      "wasted_rows": 13
+    },
+    {
+      "aliases": [
+        {
+          "cap": 1,
+          "family": "control",
+          "id": "upstream-ngram3"
+        }
+      ],
+      "cycles": 159,
+      "wasted_rows": 8
+    },
+    {
+      "aliases": [
+        {
+          "cap": 1,
+          "family": "control",
+          "id": "suffix5"
+        }
+      ],
+      "cycles": 168,
+      "wasted_rows": 4
+    },
+    {
+      "aliases": [
+        {
+          "cap": 0,
+          "family": "control",
+          "id": "ordinary"
+        }
+      ],
+      "cycles": 192,
+      "wasted_rows": 0
+    }
+  ]
+}
