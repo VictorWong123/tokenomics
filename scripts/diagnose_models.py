@@ -27,6 +27,7 @@ def build_configuration(binary):
         "TOKENOMICS_CPU_PACKED_VERIFY",
         "TOKENOMICS_CPU_Q4_PAIR",
         "TOKENOMICS_METAL_SHORT_MV",
+        "TOKENOMICS_VERIFY_STAGE_TIMING",
         "GGML_NATIVE",
         "GGML_CPU_REPACK",
         "GGML_LLAMAFILE",

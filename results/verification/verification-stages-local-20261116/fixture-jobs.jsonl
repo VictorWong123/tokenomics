@@ -1,0 +1,4 @@
+{"prompt_id": "synthetic-repeat", "configuration_id": "target", "prompt": "a b", "policy": "target", "drafter": "model", "k": 8, "max_tokens": 40, "detailed": true, "repetition": 0}
+{"prompt_id": "synthetic-repeat", "configuration_id": "ngram", "prompt": "a b", "policy": "fixed", "drafter": "ngram", "k": 8, "max_tokens": 40, "detailed": true, "repetition": 0}
+{"prompt_id": "synthetic-repeat", "configuration_id": "suffix", "prompt": "a b", "policy": "fixed", "drafter": "suffix", "k": 8, "max_tokens": 40, "detailed": true, "repetition": 0}
+{"prompt_id": "synthetic-repeat", "configuration_id": "minimal", "prompt": "a b", "policy": "fixed", "drafter": "suffix", "k": 8, "max_tokens": 40, "detailed": false, "repetition": 0}

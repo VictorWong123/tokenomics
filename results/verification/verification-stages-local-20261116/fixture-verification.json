@@ -1,0 +1,14 @@
+{
+  "binary_sha256": "f4ef9db0cec9f34a3683cd82871a195a3105a8e2bfe770aaa3f036b5670576ee",
+  "cycles": 73,
+  "exact_outputs": true,
+  "model_sha256": "fd5b73bfe9c544471d83d38044c055db6f8de4f762f5625ffe22c2475f095c53",
+  "purpose": "Stage accounting correctness; no throughput claim",
+  "requests": 4,
+  "source": {
+    "owned_source_sha256": "8dceb19ac49633a53e3fc2a09be7d5684ac64c5e4b290beede1df8b7b1817d12",
+    "revision": "c0f549400697b5aedc5a021a50bfd6f12401085b"
+  },
+  "stage_accounting": true,
+  "synthetic_fixture": true
+}

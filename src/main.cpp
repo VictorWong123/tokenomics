@@ -51,6 +51,10 @@ static json cycle_json(const Cycle &c) {
                    {"switched", c.switched}};
     if (c.controller)
         result["controller"] = controller_trace_json(*c.controller);
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+    result["target_compute_ms"] = c.target_compute_ms;
+    result["target_sampling_ms"] = c.target_sampling_ms;
+#endif
     if (!c.logits.empty()) {
         result["diagnostic_logits"] = json::array();
         for (const auto &probe : c.logits)
@@ -70,21 +74,26 @@ static json execution_json(const ExecutionTotals &e) {
                               {"cycles", e.actions[i].cycles},
                               {"committed_tokens", e.actions[i].committed_tokens},
                               {"wall_ms", e.actions[i].wall_ms}});
-    return {{"cycles", e.cycles},
-            {"drafted", e.drafted},
-            {"accepted", e.accepted},
-            {"verified_rows", e.verified_rows},
-            {"synced_tokens", e.synced_tokens},
-            {"draft_replay_tokens", e.draft_replay_tokens},
-            {"switches", e.switches},
-            {"decision_ms", e.decision_ms},
-            {"policy_update_ms", e.policy_update_ms},
-            {"sync_ms", e.sync_ms},
-            {"draft_ms", e.draft_ms},
-            {"verify_ms", e.verify_ms},
-            {"cache_ms", e.cache_ms},
-            {"cycle_wall_ms", e.cycle_wall_ms},
-            {"actions", per_action}};
+    json result = {{"cycles", e.cycles},
+                   {"drafted", e.drafted},
+                   {"accepted", e.accepted},
+                   {"verified_rows", e.verified_rows},
+                   {"synced_tokens", e.synced_tokens},
+                   {"draft_replay_tokens", e.draft_replay_tokens},
+                   {"switches", e.switches},
+                   {"decision_ms", e.decision_ms},
+                   {"policy_update_ms", e.policy_update_ms},
+                   {"sync_ms", e.sync_ms},
+                   {"draft_ms", e.draft_ms},
+                   {"verify_ms", e.verify_ms},
+                   {"cache_ms", e.cache_ms},
+                   {"cycle_wall_ms", e.cycle_wall_ms},
+                   {"actions", per_action}};
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+    result["target_compute_ms"] = e.target_compute_ms;
+    result["target_sampling_ms"] = e.target_sampling_ms;
+#endif
+    return result;
 }
 static json controller_totals_json(const ControllerTotals &c) {
     return {{"probes", c.probes},

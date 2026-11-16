@@ -28,6 +28,10 @@ static void check_totals(const Result &r) {
         CHECK(c.controller.has_value());
         CHECK(c.action == c.controller->selected && c.effective_cap == c.action);
         CHECK(c.wall_ms >= c.observation_ms && c.policy_update_ms >= 0);
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+        CHECK(c.target_compute_ms > 0 && c.target_sampling_ms > 0);
+        CHECK(c.target_compute_ms + c.target_sampling_ms <= c.verify_ms);
+#endif
         CHECK(c.controller->learning_applied && !c.controller->tail_limited);
         tokens += c.committed;
         drafted += c.actual;
@@ -37,6 +41,9 @@ static void check_totals(const Result &r) {
     CHECK(tokens == r.tokens.size() && drafted == r.execution.drafted);
     CHECK(accepted == r.execution.accepted && synced == r.execution.synced_tokens);
     CHECK(r.execution.verified_rows == r.execution.cycles + drafted);
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+    CHECK(r.execution.target_compute_ms + r.execution.target_sampling_ms <= r.execution.verify_ms);
+#endif
     CHECK(r.controller.learning_updates == r.execution.cycles);
     std::uint64_t by_action = 0;
     for (const auto &a : r.execution.actions)

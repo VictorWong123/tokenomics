@@ -278,3 +278,33 @@ ngram1's920 cycles,232/273 acceptance and41 wasted rows. Linux: suffix requires
 fit-set zero-rejection finding does not persist in validation. Proposal quality
 improves at the cost of fewer saved cycles; no speed conclusion follows.
 The reserved90-prompt held-out evaluation remains untouched.
+
+### Verification stage instrumentation
+
+Historical `verify_ms` combines target execution and upstream CPU sampling.
+A per-prompt least-squares decomposition into fixed cycle cost and per-row cost
+on the six M3 fit conditions estimates fixed cost1.47ms (code),1.39ms (QA) and
+−0.79ms (summary). This inconsistent fit does not support a suffix speed forecast.
+
+Added default-OFF `TOKENOMICS_VERIFY_STAGE_TIMING`: explicit completed-target
+synchronization before the unchanged upstream sampling call, with nested
+compute/sampling cycle and request totals. The build marks its identity and
+the main Metal comparison explicitly disables it. These diagnostic timings
+include host launch/graph work and must not be labeled GPU-kernel measurements.
+[Meaning and local M3 commands](verification-timing.md).
+
+The first instrumented full-test invocation overlapped the final executable
+relink. Benchmark tests observed an executable permission/fingerprint change,
+so that run is invalid for suite validation. After the build completed, the
+specific stage-accounting test and the updated runtime suite passed. A fresh
+full CTest run is performed only after build completion. Default-OFF Release
+already passed all seven suites in39.84 seconds.
+
+Final validation: instrumented CPU build passes all seven suites in38.81
+seconds, including1134 runtime cases and explicit stage-accounting checks.
+Four separate cross-profile fixture requests preserve prompt IDs, output IDs,
+stops and work counters; default output omits the optional timing fields.
+[Retained evidence](../results/verification/verification-stages-local-20261116/summary.json)
+includes raw synthetic cycle/request records, compiled identities, successful
+suite logs and the invalid overlapping-run hash. No trained/Metal execution or
+speed gain is claimed.

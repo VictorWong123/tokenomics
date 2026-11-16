@@ -1,0 +1,20 @@
+Internal ctest changing into directory: /workspace/tokenomics/build-cpu
+Test project /workspace/tokenomics/build-cpu
+    Start 1: core
+1/7 Test #1: core .............................   Passed    0.00 sec
+    Start 2: suffix
+2/7 Test #2: suffix ...........................   Passed    0.20 sec
+    Start 3: controller
+3/7 Test #3: controller .......................   Passed    0.00 sec
+    Start 4: controller_io
+4/7 Test #4: controller_io ....................   Passed    0.00 sec
+    Start 5: fixtures
+5/7 Test #5: fixtures .........................   Passed    0.42 sec
+    Start 6: runtime
+6/7 Test #6: runtime ..........................   Passed    7.37 sec
+    Start 7: tooling
+7/7 Test #7: tooling ..........................   Passed   31.85 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  39.84 sec

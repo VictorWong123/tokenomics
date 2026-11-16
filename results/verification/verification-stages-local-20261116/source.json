@@ -1,0 +1,42 @@
+{
+  "binary_sha256": {
+    "default": "dd2413a514c5fb57fbdee294c097172e6a65da52e820f9bddb403e301c1a688d",
+    "instrumented": "f4ef9db0cec9f34a3683cd82871a195a3105a8e2bfe770aaa3f036b5670576ee"
+  },
+  "configuration": {
+    "cache_available": true,
+    "values": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "GGML_AVX": "ON",
+      "GGML_AVX2": "ON",
+      "GGML_BLAS": "OFF",
+      "GGML_CPU_REPACK": "OFF",
+      "GGML_CUDA": "OFF",
+      "GGML_F16C": "ON",
+      "GGML_FMA": "ON",
+      "GGML_LLAMAFILE": "OFF",
+      "GGML_METAL": "OFF",
+      "GGML_NATIVE": "OFF",
+      "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+      "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
+      "TOKENOMICS_CPU_Q4_PAIR": "OFF",
+      "TOKENOMICS_METAL_SHORT_MV": "OFF",
+      "TOKENOMICS_VERIFY_STAGE_TIMING": "ON"
+    }
+  },
+  "files_sha256": {
+    "CMakeLists.txt": "7e2ebc757ba2633de64d6704f3bf8c57b40f24d44adc6f9ea94e7657428d0006",
+    "analysis/verification_cost_fit.py": "e1523f51dfe67142d7cb633242c5aa8e79a7e8a7ac5e29df2cb2dcd344dbc691",
+    "scripts/diagnose_models.py": "11cc7154eee0bdd1eeb01cd7292922e56521b8dd9b5a0bb45d3f4f78c9db0467",
+    "scripts/metal_short_mv_study.py": "3c37eadbd4c708f51776e95931e54ddfee9224edbdac4110c3264259ee9993dc",
+    "src/main.cpp": "eaae96880bae9c886163af9a86b13fea1f75c16628a727f093aeb3e334e9b27e",
+    "src/runtime.cpp": "39d4d4769a1311af197715cf3f04774918be9598a029125eedc30f3dc642ceb4",
+    "src/runtime.h": "695268b205c6f7350415c317e4b9105bd0f626a9a319a607d1ebf58981115c49",
+    "tests/test_runtime.cpp": "4429c3170eaf4b0d42f6d3ff9a9b4b0c1523154baf2d44da4d605c070a2769d0",
+    "tests/test_verify_stages.py": "e4459565fa0d1025e4de8307e976111fd7f557e474e4473a3da975970490d621"
+  },
+  "source": {
+    "owned_source_sha256": "8dceb19ac49633a53e3fc2a09be7d5684ac64c5e4b290beede1df8b7b1817d12",
+    "revision": "c0f549400697b5aedc5a021a50bfd6f12401085b"
+  }
+}

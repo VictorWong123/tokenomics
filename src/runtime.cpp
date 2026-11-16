@@ -207,6 +207,9 @@ Engine::~Engine() = default;
 double Engine::load_ms() const { return impl_->loading; }
 std::string Engine::system_info() const {
     auto info = std::string(llama_print_system_info()) + impl_->execution_evidence;
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+    info += "; TOKENOMICS_VERIFY_STAGE_TIMING=ON";
+#endif
 #ifdef TOKENOMICS_CPU_BATCH_INVARIANT
     info += "; TOKENOMICS_CPU_BATCH_INVARIANT=ON; GGML_CPU_TILED_MM=1; tiled_min_rows=10";
 #endif
@@ -451,8 +454,18 @@ Result Engine::generate(const Request &r) {
                                     values[second]});
             }
         }
+        // Optional diagnostic boundary; ordinary sampling also synchronizes
+        // before reading logits. Preserve the original combined timer below.
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+        llama_synchronize(tgt);
+        c.target_compute_ms = elapsed(t);
+        const auto sampling_start = Clock::now();
+#endif
         // Upstream sampler owns verification, including correction and bonus.
         const auto ids = common_sampler_sample_and_accept_n(smpl.get(), tgt, proposed);
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+        c.target_sampling_ms = elapsed(sampling_start);
+#endif
         c.verify_ms = elapsed(t); // reading logits synchronizes target backend work
         t = Clock::now();
         if (use_model && r.cache == "upstream" && cap > 0) {
@@ -504,6 +517,10 @@ Result Engine::generate(const Request &r) {
         sum.sync_ms += c.sync_ms;
         sum.draft_ms += c.draft_ms;
         sum.verify_ms += c.verify_ms;
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+        sum.target_compute_ms += c.target_compute_ms;
+        sum.target_sampling_ms += c.target_sampling_ms;
+#endif
         sum.cache_ms += c.cache_ms;
         sum.cycle_wall_ms += c.wall_ms;
         auto &action_sum = sum.actions[action_index(c.action)];

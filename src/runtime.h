@@ -39,6 +39,9 @@ struct Cycle {
     bool switched = false;
     int effective_cap = 0, draft_replay_tokens = 0;
     double observation_ms = 0, policy_update_ms = 0;
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+    double target_compute_ms = 0, target_sampling_ms = 0;
+#endif
     std::optional<DecisionTrace> controller;
     std::vector<LogitProbe> logits;
 };
@@ -51,6 +54,9 @@ struct ExecutionTotals {
     std::uint64_t synced_tokens = 0, draft_replay_tokens = 0, switches = 0;
     double decision_ms = 0, policy_update_ms = 0, sync_ms = 0, draft_ms = 0;
     double verify_ms = 0, cache_ms = 0, cycle_wall_ms = 0;
+#ifdef TOKENOMICS_VERIFY_STAGE_TIMING
+    double target_compute_ms = 0, target_sampling_ms = 0;
+#endif
     std::array<ActionTotals, 6> actions{};
 };
 struct ControllerTotals {

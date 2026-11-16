@@ -1,0 +1,16 @@
+{
+  "cross_profile_fixture_requests": 4,
+  "default_seconds": 39.84,
+  "default_suites": 7,
+  "instrumented_seconds": 38.81,
+  "instrumented_suites": 7,
+  "invalid_first_test_run": {
+    "reason": "Full CTest overlapped final relink; executable permission/fingerprint failures. Rebuilt, then reran full suite after build completion.",
+    "sha256": "eb25c6966a5f415c482c8500fa7b92e0203026712af950307741421b3039966f"
+  },
+  "runtime_fixture_cases": 1134,
+  "speed_claim": null,
+  "split_accounting_test": "passed for target, ngram, suffix and minimal logging",
+  "state": "default_and_instrumented_cpu_suites_passed",
+  "trained_or_metal_inference": false
+}

@@ -1,0 +1,349 @@
+{
+  "cpu_3b": {
+    "fits": [
+      {
+        "fixed_cycle_ms": 16.948316681006826,
+        "nonnegative_coefficients": true,
+        "observations": 6,
+        "observed": [
+          {
+            "configuration_id": "fixed6",
+            "cycles": 42,
+            "residual_ms": 73.12431120427027,
+            "verified_rows": 78,
+            "verify_ms": 9286.849060999997
+          },
+          {
+            "configuration_id": "fixed4",
+            "cycles": 44,
+            "residual_ms": -26.36353432094802,
+            "verified_rows": 76,
+            "verify_ms": 9198.486255999998
+          },
+          {
+            "configuration_id": "fixed2",
+            "cycles": 47,
+            "residual_ms": -68.92393688323682,
+            "verified_rows": 69,
+            "verify_ms": 8515.776115
+          },
+          {
+            "configuration_id": "fixed1",
+            "cycles": 50,
+            "residual_ms": 78.27278944170666,
+            "verified_rows": 64,
+            "verify_ms": 7865.056129000002
+          },
+          {
+            "configuration_id": "fixed8",
+            "cycles": 41,
+            "residual_ms": -34.20836364589377,
+            "verified_rows": 81,
+            "verify_ms": 9709.854344999998
+          },
+          {
+            "configuration_id": "target",
+            "cycles": 64,
+            "residual_ms": -18.4827670241948,
+            "verified_rows": 64,
+            "verify_ms": 8199.088119
+          }
+        ],
+        "per_row_ms": 110.87364194361513,
+        "prompt_id": "development-code-01",
+        "rank": 2,
+        "relative_rmse": 0.006301194176980291
+      },
+      {
+        "fixed_cycle_ms": 16.613942717509307,
+        "nonnegative_coefficients": true,
+        "observations": 6,
+        "observed": [
+          {
+            "configuration_id": "fixed8",
+            "cycles": 56,
+            "residual_ms": 55.21720519139126,
+            "verified_rows": 80,
+            "verify_ms": 9743.065851000005
+          },
+          {
+            "configuration_id": "target",
+            "cycles": 64,
+            "residual_ms": 81.52747012929376,
+            "verified_rows": 64,
+            "verify_ms": 8076.0866750000005
+          },
+          {
+            "configuration_id": "fixed6",
+            "cycles": 56,
+            "residual_ms": 36.3037553905815,
+            "verified_rows": 74,
+            "verify_ms": 9096.886630999998
+          },
+          {
+            "configuration_id": "fixed4",
+            "cycles": 56,
+            "residual_ms": -149.11318041023515,
+            "verified_rows": 68,
+            "verify_ms": 8617.210896999999
+          },
+          {
+            "configuration_id": "fixed2",
+            "cycles": 58,
+            "residual_ms": 3.2460480247846135,
+            "verified_rows": 68,
+            "verify_ms": 8498.079553999998
+          },
+          {
+            "configuration_id": "fixed1",
+            "cycles": 59,
+            "residual_ms": -36.96380615811813,
+            "verified_rows": 65,
+            "verify_ms": 8222.357016000002
+          }
+        ],
+        "per_row_ms": 110.84877830013592,
+        "prompt_id": "development-qa-01",
+        "rank": 2,
+        "relative_rmse": 0.008722782216744893
+      },
+      {
+        "fixed_cycle_ms": 14.881503840394018,
+        "nonnegative_coefficients": true,
+        "observations": 6,
+        "observed": [
+          {
+            "configuration_id": "target",
+            "cycles": 64,
+            "residual_ms": 122.09617708957558,
+            "verified_rows": 64,
+            "verify_ms": 8506.824839999996
+          },
+          {
+            "configuration_id": "fixed6",
+            "cycles": 42,
+            "residual_ms": 61.92037325308411,
+            "verified_rows": 96,
+            "verify_ms": 12077.859944999998
+          },
+          {
+            "configuration_id": "fixed4",
+            "cycles": 42,
+            "residual_ms": 63.544756530254745,
+            "verified_rows": 82,
+            "verify_ms": 10397.000143
+          },
+          {
+            "configuration_id": "fixed2",
+            "cycles": 47,
+            "residual_ms": -88.00581252592929,
+            "verified_rows": 77,
+            "verify_ms": 10023.231296
+          },
+          {
+            "configuration_id": "fixed1",
+            "cycles": 50,
+            "residual_ms": -178.58180546941912,
+            "verified_rows": 68,
+            "verify_ms": 9078.943316999997
+          },
+          {
+            "configuration_id": "fixed8",
+            "cycles": 41,
+            "residual_ms": -0.44700786448629515,
+            "verified_rows": 110,
+            "verify_ms": 13804.581241000002
+          }
+        ],
+        "per_row_ms": 119.94538705163055,
+        "prompt_id": "development-summary-01",
+        "rank": 2,
+        "relative_rmse": 0.009578601379015277
+      }
+    ],
+    "identity": {
+      "gpu_layers": 0,
+      "requests_sha256": "05601f36c096eef76dbe3dca97899dc251a65ff3be3caaa4c0cb349a30f50f27",
+      "run_manifest_sha256": "edd9c1153089aa60bfa0e29e12dfee2b0417010083e6735ea492d4c30ed72523",
+      "target_sha256": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d"
+    }
+  },
+  "limitation": "Six conditions per prompt, one timing observation per condition. Noise, context, graph shapes and paths are not isolated. Negative coefficients and residuals expose model limitations; coefficients do not identify hardware costs or forecast new-policy speed.",
+  "m3_metal_05b": {
+    "fits": [
+      {
+        "fixed_cycle_ms": 1.474411853440797,
+        "nonnegative_coefficients": true,
+        "observations": 6,
+        "observed": [
+          {
+            "configuration_id": "fixed6",
+            "cycles": 59,
+            "residual_ms": -1.1843070474642445,
+            "verified_rows": 71,
+            "verify_ms": 547.7226210000002
+          },
+          {
+            "configuration_id": "fixed4",
+            "cycles": 60,
+            "residual_ms": -8.572878450380927,
+            "verified_rows": 74,
+            "verify_ms": 576.0031259999998
+          },
+          {
+            "configuration_id": "fixed2",
+            "cycles": 60,
+            "residual_ms": -26.18696293766527,
+            "verified_rows": 68,
+            "verify_ms": 554.782167
+          },
+          {
+            "configuration_id": "fixed1",
+            "cycles": 61,
+            "residual_ms": 25.469682420014124,
+            "verified_rows": 66,
+            "verify_ms": 491.65491899999995
+          },
+          {
+            "configuration_id": "fixed8",
+            "cycles": 59,
+            "residual_ms": 15.455662448297517,
+            "verified_rows": 73,
+            "verify_ms": 544.0276659999998
+          },
+          {
+            "configuration_id": "target",
+            "cycles": 64,
+            "residual_ms": -4.844845515424879,
+            "verified_rows": 64,
+            "verify_ms": 513.447668
+          }
+        ],
+        "per_row_ms": 6.4725072478806895,
+        "prompt_id": "development-code-01",
+        "rank": 2,
+        "relative_rmse": 0.031029235263227723
+      },
+      {
+        "fixed_cycle_ms": 1.3888980147478147,
+        "nonnegative_coefficients": true,
+        "observations": 6,
+        "observed": [
+          {
+            "configuration_id": "fixed8",
+            "cycles": 64,
+            "residual_ms": 2.6176363122807516,
+            "verified_rows": 80,
+            "verify_ms": 596.8047919999999
+          },
+          {
+            "configuration_id": "target",
+            "cycles": 64,
+            "residual_ms": 3.0725892385964357,
+            "verified_rows": 64,
+            "verify_ms": 494.2432480000001
+          },
+          {
+            "configuration_id": "fixed6",
+            "cycles": 64,
+            "residual_ms": 12.988948543859692,
+            "verified_rows": 76,
+            "verify_ms": 560.906832
+          },
+          {
+            "configuration_id": "fixed4",
+            "cycles": 64,
+            "residual_ms": -30.98907122456137,
+            "verified_rows": 72,
+            "verify_ms": 579.358204
+          },
+          {
+            "configuration_id": "fixed2",
+            "cycles": 64,
+            "residual_ms": 12.771606007017681,
+            "verified_rows": 68,
+            "verify_ms": 510.0708789999999
+          },
+          {
+            "configuration_id": "fixed1",
+            "cycles": 64,
+            "residual_ms": -0.46170887719301845,
+            "verified_rows": 66,
+            "verify_ms": 510.5408700000001
+          }
+        ],
+        "per_row_ms": 6.381661942105256,
+        "prompt_id": "development-qa-01",
+        "rank": 2,
+        "relative_rmse": 0.027248823251278823
+      },
+      {
+        "fixed_cycle_ms": -0.788282999676583,
+        "nonnegative_coefficients": false,
+        "observations": 6,
+        "observed": [
+          {
+            "configuration_id": "target",
+            "cycles": 64,
+            "residual_ms": 7.070653845407492,
+            "verified_rows": 64,
+            "verify_ms": 546.853878
+          },
+          {
+            "configuration_id": "fixed6",
+            "cycles": 12,
+            "residual_ms": -35.48879217141018,
+            "verified_rows": 64,
+            "verify_ms": 630.40404
+          },
+          {
+            "configuration_id": "fixed4",
+            "cycles": 16,
+            "residual_ms": 19.474823829883576,
+            "verified_rows": 64,
+            "verify_ms": 572.287292
+          },
+          {
+            "configuration_id": "fixed2",
+            "cycles": 24,
+            "residual_ms": -24.519438167529188,
+            "verified_rows": 64,
+            "verify_ms": 609.9752900000001
+          },
+          {
+            "configuration_id": "fixed1",
+            "cycles": 34,
+            "residual_ms": -3.517272164294809,
+            "verified_rows": 64,
+            "verify_ms": 581.0902939999999
+          },
+          {
+            "configuration_id": "fixed8",
+            "cycles": 10,
+            "residual_ms": 36.980024827943,
+            "verified_rows": 64,
+            "verify_ms": 559.511789
+          }
+        ],
+        "per_row_ms": 9.443353809761076,
+        "prompt_id": "development-summary-01",
+        "rank": 2,
+        "relative_rmse": 0.042394973820866745
+      }
+    ],
+    "identity": {
+      "gpu_layers": 99,
+      "requests_sha256": "0efb5cc60927657b1bfa3cd4cd5b12aceebcdf3b72f2394adbe33fdc0bb71535",
+      "run_manifest_sha256": "4e34e4c9f75f7be492a7ceebb26eaf85999d1dbc0dc3e99789ee1def20c97179",
+      "target_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+    }
+  },
+  "mac_archive_sha256": "8d658228aabdc793d26f0fc43ad58c62756fae58bd5e0987513616131f6624c8",
+  "model": "verify_ms = H * cycles + R * verified_rows; unconstrained least squares, separately per fit prompt",
+  "schema_version": 1,
+  "source": {
+    "owned_source_sha256": "8dceb19ac49633a53e3fc2a09be7d5684ac64c5e4b290beede1df8b7b1817d12",
+    "revision": "c0f549400697b5aedc5a021a50bfd6f12401085b"
+  },
+  "speed_claim": null
+}

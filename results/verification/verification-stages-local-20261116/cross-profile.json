@@ -1,0 +1,9 @@
+{
+  "comparisons": 4,
+  "default_has_no_split_fields": true,
+  "same_prompt_ids_output_ids_stops": true,
+  "same_work_counts": true,
+  "speed_claim": null,
+  "state": "passed",
+  "synthetic_fixture": true
+}
