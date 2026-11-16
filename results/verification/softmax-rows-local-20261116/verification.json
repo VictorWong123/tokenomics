@@ -1,0 +1,35 @@
+{
+  "binary_sha256": {
+    "release": "802ae8b6f9c5aada9a50ea29237b3cc0f307d2e3f1f46c2a4d7488b3da9eb14a",
+    "sanitizer": "c3bea389732226688836fd100c5943fd9700c892020a3764b752ee7af686dd48"
+  },
+  "default_m3_gate_requests": 510,
+  "files_sha256": {
+    "cmake/metal-short-mv.cmake": "6011367ad22d328605696b67f60031795fce5c9f4793ed3918f6ed729c0ff8ed",
+    "scripts/check_metal_profile.py": "e1d621909829d914f5098e8520b257b57693a2c4b5dd884006d635d798ea6fec",
+    "tests/test_backend_rows.cpp": "83528038f9c87fb133b9051511cac5504e42a487048883512e73e22df0c83f4d",
+    "tests/test_metal_profile.py": "d564d24090af6ccbca676eeb38949c1638751aa7bf17e39c109095e0419685c9"
+  },
+  "fixture_gate_with_kv_boundaries": 480,
+  "generated_sources_sha256": {
+    "tokenomics-metal-common.cpp": "2df15e10db263679ad855cda83b50afe54f9c958047370748a91c1caa4b9c4e8",
+    "tokenomics-metal-ops.cpp": "d2169ead98d61e02480794b2f3871d5cc0d9f1cf5ec2efdf0906ef0616eb9576"
+  },
+  "limitations": [
+    "CPU arithmetic and host compile checks do not establish Metal behavior.",
+    "KV width padding remains a possible whole-graph numerical source; new gates test it.",
+    "Initial broad softmax integration anchor check rejected configure; replacement was restricted to the unique full selector block."
+  ],
+  "masked_softmax_cases": 48,
+  "matrix_bitwise_comparisons": 419328,
+  "matrix_cases": 210,
+  "metal_executed": false,
+  "sanitizers": "address,undefined; detect_leaks=1",
+  "softmax_bitwise_comparisons": 1053696,
+  "source": {
+    "owned_source_sha256": "3aec9f0abf2a22ed4e61f352438da65bdbe8472a657eb049e9c2c2b47ebe3756",
+    "revision": "070f2665022ad400d234775261c2aefe277b5ce5"
+  },
+  "speed_claim": null,
+  "state": "host_and_cpu_checks_passed"
+}

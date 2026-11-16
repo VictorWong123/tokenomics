@@ -1,0 +1,3 @@
+backend=CPU
+48 masked softmax cases; 1053696 bitwise comparisons passed
+210 backend matrix cases; 419328 bitwise row comparisons passed

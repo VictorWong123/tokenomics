@@ -27,6 +27,28 @@ function(tokenomics_metal_short_mv root)
       string(REPLACE "${anchor}"
         "    // Preserve ordinary per-row mat-vec arithmetic across short batches.\n    if (tokenomics_metal_short_mv(op)) {\n        return ggml_metal_op_mul_mat_mv(ctx, idx);\n    }\n\n${anchor}"
         source "${source}")
+      # Softmax also changes its reduction geometry with the query-row count.
+      # Match ordinary one-row decode for short batches, retaining head count.
+      set(softmax_anchor [=[
+    int nth = 32; // SIMD width
+
+    if (ne00%4 == 0) {
+        while (nth < ne00/4 && nth*ne01*ne02*ne03 < 256) {
+            nth *= 2;
+        }
+    } else {
+        while (nth < ne00 && nth*ne01*ne02*ne03 < 256) {
+            nth *= 2;
+        }
+    }
+]=])
+      string(FIND "${source}" "${softmax_anchor}" softmax_position)
+      if(softmax_position EQUAL -1)
+        message(FATAL_ERROR "Pinned Metal softmax thread selection changed")
+      endif()
+      string(REPLACE "nth*ne01*ne02*ne03 < 256"
+        "nth*(ne01 <= 9 ? 1 : ne01)*ne02*ne03 < 256" softmax_replacement "${softmax_anchor}")
+      string(REPLACE "${softmax_anchor}" "${softmax_replacement}" source "${source}")
     endif()
     set(generated "${CMAKE_CURRENT_BINARY_DIR}/tokenomics-metal-${unit}.cpp")
     file(WRITE "${generated}" "${source}")

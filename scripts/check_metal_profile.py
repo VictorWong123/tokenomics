@@ -72,6 +72,7 @@ GATE_STAGES = (
     "boundary-reference",
     "candidate",
 )
+KV_BOUNDARY_LENGTHS = (248, 255, 256, 504, 511, 512)
 
 
 def verify_gate(directory):
@@ -91,8 +92,19 @@ def verify_gate(directory):
             raise ValueError(f"Gate payload changed: {name}")
     status = json.loads((directory / "status.json").read_text())
     manifest = json.loads((directory / "manifest.json").read_text())
-    if status.get("state") != "passed" or status.get("candidate_cases") != 330:
-        raise ValueError("Expected a complete passing 330-request gate")
+    expected_count = (
+        11
+        + sum(
+            length < manifest["settings"]["context"] for length in KV_BOUNDARY_LENGTHS
+        )
+    ) * 30
+    if (
+        status.get("state") != "passed"
+        or status.get("candidate_cases") != expected_count
+    ):
+        raise ValueError(
+            "Expected a complete passing gate including KV padding boundaries"
+        )
     settings = SimpleNamespace(**manifest["settings"])
     rows = {}
     for stage in GATE_STAGES:
@@ -111,7 +123,7 @@ def verify_gate(directory):
         for row in rows[stage]:
             if compare(expected_rows[row["prompt_id"]], row) is not None:
                 raise ValueError("Saved gate output differs from ordinary reference")
-    if len(rows["candidate"]) != 330:
+    if len(rows["candidate"]) != expected_count:
         raise ValueError("Missing candidate gate requests")
     check_cycles(
         [
@@ -128,7 +140,7 @@ def verify_gate(directory):
         raise ValueError("Gate comparison audit is incomplete or failing")
     return {
         "state": "verified",
-        "candidate_cases": 330,
+        "candidate_cases": expected_count,
         "receipt_sha256": sha256(directory / "complete.json"),
         "manifest": manifest,
     }
@@ -286,6 +298,15 @@ def gate(
                     "max_tokens": 16,
                 }
                 for room in (0, 3, 9)
+            ]
+            boundary += [
+                {
+                    "prompt_id": f"kv-padding-{length}",
+                    "prefix_tokens": (seed * (length // len(seed) + 1))[:length],
+                    "max_tokens": 16,
+                }
+                for length in KV_BOUNDARY_LENGTHS
+                if length < context
             ]
             rows = execute(
                 a,

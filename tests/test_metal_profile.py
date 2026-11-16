@@ -150,13 +150,27 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                     binary,
                     model,
                     root / "suffix-passed",
-                    context=64,
+                    context=512,
                     threads=1,
                     gpu_layers=0,
                     profile_validator=cpu_fixture,
                     drafter="suffix",
                 )
-                self.assertEqual(suffix_result["candidate_cases"], 330)
+                self.assertEqual(suffix_result["candidate_cases"], 480)
+                self.assertEqual(
+                    verify_gate(root / "suffix-passed")["candidate_cases"], 480
+                )
+                boundary_jobs = read_jsonl(
+                    root / "suffix-passed/boundary-reference.jobs.jsonl"
+                )
+                self.assertEqual(
+                    {
+                        len(job["prefix_tokens"])
+                        for job in boundary_jobs
+                        if job["prompt_id"].startswith("kv-padding-")
+                    },
+                    {248, 255, 256, 504, 511},
+                )
                 self.assertGreater(suffix_result["coverage"]["accepted"], 0)
 
                 # Simulate a genuine output divergence at the comparison boundary.

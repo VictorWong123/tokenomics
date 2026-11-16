@@ -100,6 +100,70 @@ static int run_case(ggml_backend_t backend, ggml_type type, int width, int rows,
     return outputs * rows * heads;
 }
 
+static int run_softmax(ggml_backend_t backend, int width, int rows, int heads) {
+    std::unique_ptr<ggml_context, decltype(&ggml_free)> ctx(
+        ggml_init({8 * 1024 * 1024, nullptr, true}), ggml_free);
+    check(bool(ctx), "softmax context allocation failed");
+    auto *input = ggml_new_tensor_3d(ctx.get(), GGML_TYPE_F32, width, rows, heads);
+    auto *mask = ggml_new_tensor_2d(ctx.get(), GGML_TYPE_F32, width, rows);
+    auto *batch = ggml_soft_max_ext(ctx.get(), input, mask, 0.125f, 0.0f);
+    auto *graph = ggml_new_graph_custom(ctx.get(), 1024, false);
+    ggml_build_forward_expand(graph, batch);
+    std::vector<ggml_tensor *> inputs, masks, results;
+    for (int row = 0; row < rows; ++row) {
+        inputs.push_back(ggml_new_tensor_3d(ctx.get(), GGML_TYPE_F32, width, 1, heads));
+        masks.push_back(ggml_new_tensor_2d(ctx.get(), GGML_TYPE_F32, width, 1));
+        results.push_back(ggml_soft_max_ext(ctx.get(), inputs.back(), masks.back(), 0.125f, 0.0f));
+        ggml_build_forward_expand(graph, results.back());
+    }
+    std::unique_ptr<ggml_backend_buffer, decltype(&ggml_backend_buffer_free)> buffer(
+        ggml_backend_alloc_ctx_tensors(ctx.get(), backend), ggml_backend_buffer_free);
+    check(bool(buffer), "softmax backend allocation failed");
+    std::mt19937 rng(12345 + width + rows + heads);
+    std::uniform_real_distribution<float> uniform(-8.0f, 8.0f);
+    std::vector<float> values(size_t(width) * rows * heads), masking(size_t(width) * rows);
+    for (auto &value : values)
+        value = uniform(rng);
+    for (int row = 0; row < rows; ++row)
+        for (int col = 0; col < width; ++col)
+            masking[row * width + col] = col < std::min(width, 249 + row) ? 0.0f : -INFINITY;
+    ggml_backend_tensor_set(input, values.data(), 0, ggml_nbytes(input));
+    ggml_backend_tensor_set(mask, masking.data(), 0, ggml_nbytes(mask));
+    for (int row = 0; row < rows; ++row) {
+        std::vector<float> single(size_t(width) * heads);
+        for (int head = 0; head < heads; ++head)
+            std::copy_n(values.data() + (head * rows + row) * width, width,
+                        single.data() + head * width);
+        ggml_backend_tensor_set(inputs[row], single.data(), 0, ggml_nbytes(inputs[row]));
+        ggml_backend_tensor_set(masks[row], masking.data() + row * width, 0,
+                                ggml_nbytes(masks[row]));
+    }
+    check(ggml_backend_graph_compute(backend, graph) == GGML_STATUS_SUCCESS,
+          "softmax compute failed");
+    ggml_backend_synchronize(backend);
+    std::vector<float> batched(values.size()), single(size_t(width) * heads);
+    ggml_backend_tensor_get(batch, batched.data(), 0, ggml_nbytes(batch));
+    for (int row = 0; row < rows; ++row) {
+        ggml_backend_tensor_get(results[row], single.data(), 0, ggml_nbytes(results[row]));
+        for (int head = 0; head < heads; ++head) {
+            double sum = 0;
+            for (int col = 0; col < width; ++col) {
+                const float a = batched[(head * rows + row) * width + col];
+                const float b = single[head * width + col];
+                if (!std::isfinite(a) || !std::isfinite(b) ||
+                    std::bit_cast<uint32_t>(a) != std::bit_cast<uint32_t>(b)) {
+                    std::cerr << "softmax mismatch width=" << width << " rows=" << rows
+                              << " heads=" << heads << " row=" << row << " col=" << col << '\n';
+                    throw std::runtime_error("softmax rows are not bitwise invariant");
+                }
+                sum += a;
+            }
+            check(std::abs(sum - 1.0) < 1e-5, "invalid softmax probability sum");
+        }
+    }
+    return int(values.size());
+}
+
 int main(int argc, char **argv) {
     try {
         check(argc == 2 && (std::string(argv[1]) == "--cpu" || std::string(argv[1]) == "--metal"),
@@ -136,6 +200,15 @@ int main(int argc, char **argv) {
                             ++cases;
                         }
                     }
+        int softmax_cases = 0, softmax_values = 0;
+        for (int width : {256, 512, 768, 2048})
+            for (int rows : {2, 3, 9})
+                for (int heads : {1, 2, 4, 14}) {
+                    softmax_values += run_softmax(backend.get(), width, rows, heads);
+                    ++softmax_cases;
+                }
+        std::cout << softmax_cases << " masked softmax cases; " << softmax_values
+                  << " bitwise comparisons passed\n";
         std::cout << cases << " backend matrix cases; " << values
                   << " bitwise row comparisons passed\n";
     } catch (const std::exception &error) {

@@ -43,7 +43,7 @@ python3 -m venv .venv
 The command builds separate guarded and candidate binaries with two compiler
 jobs, runs their test suites, and starts with the original M3 failure case.
 It then compares the candidate with the unchanged ordinary decoder across
-330 requests: fixed caps 1/2/4/6/8, scripted fallback/re-entry, both cache modes,
+510 requests: fixed caps 1/2/4/6/8, scripted fallback/re-entry, both cache modes,
 repeated requests, minimal logs, token budgets and context boundaries. Marker,
 GPU device and complete layer-offload checks reject silent CPU fallback. The
 gate retains raw requests, cycles and first mismatch and stops immediately on
@@ -115,3 +115,18 @@ backend only. `--metal` rejects a build without Metal and never falls back to
 CPU. This test covers matrix operations, not the complete attention graph, KV
 padding, normalization or end-to-end model behavior. The trained gate is still
 required even when direct row comparisons pass.
+
+The short-MV profile also fixes softmax reduction geometry for two-to-nine query
+rows: it chooses thread count as ordinary one-row decoding would, while keeping
+the head and KV-width dimensions. Upstream softmax otherwise includes query-row
+count in that decision. The host C++ integration compiles; GPU behavior is still
+unverified. The direct backend test now includes 48 masked-softmax cases at
+widths256/512/768/2048, head counts1/2/4/14 and batches2/3/9, checking bitwise
+results and probability sums.
+
+The default context2048 gate includes prefix lengths248/255/256/504/511/512 to
+exercise crossing the KV cache's 256-token padding boundaries. Smaller contexts
+include only eligible lengths, so fixture gate counts vary. These tests matter
+because increasing padded KV width can change attention's per-row reduction
+order even after batch-dependent kernel dispatch is removed. No claim of
+whole-graph invariance follows from the softmax change alone.

@@ -74,7 +74,7 @@ TOKENOMICS_BUILD_JOBS=2 bash scripts/bootstrap.sh metal
 
 Use `--gate-only` to stop after correctness checks. The runner requires native
 Apple Silicon, the pinned model, and the default guarded Metal marker. The
-330-request gate exercises suffix proposals against ordinary decoding before
+510-request gate exercises suffix proposals against ordinary decoding before
 any timing. The 72-record screen uses the same executable for target-only,
 ngram cap1, ngram cap8 and suffix cap1, with three development-fit prompts,
 caps64/128 and three repetitions. Every block must emit identical IDs/stops.

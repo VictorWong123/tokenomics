@@ -243,3 +243,23 @@ comparisons in both Release and address/undefined sanitizer builds with leak
 detection. [Evidence](../results/verification/backend-rows-local-20261116/verification.json)
 records source/binary hashes and the failed harness-attempt hash. The test is an
 explicit optional target; it does not add GPU requirements to default CTest.
+
+
+### Softmax reduction and KV padding audit
+
+A further native Metal audit found that softmax thread count depends on the
+number of query rows as well as width and heads. Extended the opt-in generated
+host dispatch to use ordinary one-row reduction geometry for short softmax
+batches. The first broad text-anchor check correctly refused configuration
+because the same expression appears in another operation; narrowed the patch
+to the complete unique softmax selector block. Both generated C++ files compile
+and 320 host-dispatch cases pass.
+
+Added 48 direct masked-softmax cases (1,053,696 bitwise outputs) to the backend
+harness. CPU Release passes them plus the earlier 419,328 matrix comparisons.
+The trained M3 gate now includes six KV-padding boundary prefixes, raising its
+default context2048 grid to 510 requests. A context512 fixture exercises five
+boundaries and therefore480 requests. This targets another possible numerical
+source: larger padded attention widths can alter reduction order even when
+matmul uses the same kernel. The Metal candidate remains default-OFF and no
+Metal numerical or speed claim is made.
