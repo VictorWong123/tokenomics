@@ -92,3 +92,12 @@ The new0.5B CPU canonical IDs match the archived M3 fit on code/summary but
 differ on QA despite matching prompt IDs. Its top64 distributions have not been
 compared with Metal. No cross-hardware rank equivalence or speed transfer is
 claimed. [Evidence and raw numeric data](../results/verification/logit-copy-fit-20261116).
+
+A separate post-fit development-validation protocol now freezes the conservative
+minimum-three/top64/no-fallback candidate at caps1/4/8 on six other development
+prompts. This selects a candidate for further testing, not deployment. Before
+inference integration, a native prototype must reproduce the Python proposals
+and measure host membership cost. The proposed implementation tests whether the
+best source token at each match length is globally top64, instead of sorting
+all151936 vocabulary entries. This preserves ranking semantics while allowing
+quick rejection after64 better entries. No extra model forward is required.

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "phase": "logit_copy_development_validation",
+  "selection_basis": "Post-fit conservative minimum-three/top64/no-fallback candidate from the complete logged CPU fit; not selected for deployment",
+  "prompt_ids": ["development-qa-03", "development-qa-04", "development-code-03", "development-code-04", "development-summary-03", "development-summary-04"],
+  "output_cap": 64,
+  "repetitions": 1,
+  "minimum_match_length": 3,
+  "maximum_match_length": 32,
+  "hint_rank_cutoff": 64,
+  "fallback_to_plain_copy": false,
+  "caps": [1, 4, 8],
+  "controls": ["ordinary", "upstream_ngram3", "minimum_five_suffix"],
+  "scope": "Development validation only, reserved90-prompt held-out set untouched; exactness/work before any local M3 speed claim"
+}
