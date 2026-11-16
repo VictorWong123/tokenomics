@@ -1,0 +1,13 @@
+{
+  "scope": "Six predeclared development-validation prompts,64 tokens apiece per model; canonical CPU replay only, no measured generation speed or reserved held-out result",
+  "tokens_per_model": 384,
+  "cells_per_model": 10,
+  "computed_cycle_records": 6447,
+  "decision": "Do not promote guided copying as a general replacement. The runtime prototype stays default-OFF.",
+  "observations": {
+    "qwen25-05": "Guided cap4 C297/W10 and cap8 C283/W27 are both dominated by minimum-five suffix cap4 C289/W4 and cap8 C279/W15.",
+    "qwen25-15": "Guided cap4 C326/W26 improves on suffix cap4 C342/W30 but trades11 more cycles for10 fewer wasted rows versus ngram cap4 C315/W36."
+  },
+  "ranking_cost_included": false,
+  "performance_claim": null
+}

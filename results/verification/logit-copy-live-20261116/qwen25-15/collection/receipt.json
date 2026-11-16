@@ -1,0 +1,30 @@
+{
+  "binary_sha256": "85b66976ac14cffbe54d0063e4d5b94b01420c085d418b900b8fa76dfbc6ce05",
+  "collection_phase": "validation",
+  "complete_sha256": "579a6b13c6fd40d607fa150e8288db16d3680b044f1dbc8debb8dcc0f9286f99",
+  "model_id": "qwen25-15",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "payload_sha256": {
+    "collector.log": "f54250f301b3db99078c93ca4482044102fd4e9efda2ac9af370255cb75c019c",
+    "data.jsonl": "8f4236a0ec77c9ad50d13cbe2db45012b1d776d83303da6a17ced41ca4b7c91b",
+    "jobs.jsonl": "66c3cc5b5d9999d454ba75f4009b8a790f940803e7a8b710336c5cfd75041db3",
+    "manifest.json": "2bd6fd69230af7a16d106fbd89c69bd1ea515b7ed801aa45d9f66dbb3ae21484",
+    "status.json": "0c2d9a88f3e19339ba0f9ab52cf84972f64b246e7fa844ec79cda1f81c17ae08"
+  },
+  "performance_claim": null,
+  "platform": {
+    "machine": "x86_64",
+    "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39"
+  },
+  "protocol_sha256": "99148b182a20c8e8805252542c55638e181d4e236646aed3cd69849c6a7d9124",
+  "purpose": "Canonical CPU target rankings for predeclared development work replay; no speed claim",
+  "ranking_rows": 384,
+  "requests": 6,
+  "scope": "Six predeclared development-validation prompts; no reserved held-out data",
+  "source": {
+    "owned_source_sha256": "7492ddca593287722184cb45f95c7689166233e6f2b6511544c5f8032eb8314a",
+    "revision": "f9ecb4691306a8b1172b654136e58724e47432e4"
+  },
+  "state": "passed",
+  "synthetic_fixture": false
+}

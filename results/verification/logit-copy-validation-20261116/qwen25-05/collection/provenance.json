@@ -1,0 +1,6 @@
+{
+  "limitation": "Original collector stdout/jobs/manifest files are not independently re-downloaded; their sealed hashes are retained in receipt.json",
+  "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43857302654",
+  "scope": "Selected numeric rank data and workflow-reported sealed hashes recovered from public logs",
+  "source_commit": "fc72a3a7902706d3606b9eac7058f9289c6605d4"
+}

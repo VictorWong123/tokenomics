@@ -1,0 +1,30 @@
+{
+  "binary_sha256": "6316e90b40236211ba266e4e6644d3955e6b0266544089d66f2eb05b050e9424",
+  "collection_phase": "validation",
+  "complete_sha256": "1b595fef031f0219e0c6ba7deef5fa03d849147a0006d0ad9c0f3a79e618ec6c",
+  "model_id": "qwen25-05",
+  "model_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+  "payload_sha256": {
+    "collector.log": "f54250f301b3db99078c93ca4482044102fd4e9efda2ac9af370255cb75c019c",
+    "data.jsonl": "7c2a43ff53bbc5b26d7c2b227ef613f25f6870c75bf35005f80a4797274f4909",
+    "jobs.jsonl": "66c3cc5b5d9999d454ba75f4009b8a790f940803e7a8b710336c5cfd75041db3",
+    "manifest.json": "4f7e73ef8ae83585bedc5be77941ab794e8093de166466cdf6df2d5924514fd2",
+    "status.json": "0c2d9a88f3e19339ba0f9ab52cf84972f64b246e7fa844ec79cda1f81c17ae08"
+  },
+  "performance_claim": null,
+  "platform": {
+    "machine": "arm64",
+    "platform": "macOS-15.8.2-arm64-arm-64bit"
+  },
+  "protocol_sha256": "99148b182a20c8e8805252542c55638e181d4e236646aed3cd69849c6a7d9124",
+  "purpose": "Canonical CPU target rankings for predeclared development work replay; no speed claim",
+  "ranking_rows": 384,
+  "requests": 6,
+  "scope": "Six predeclared development-validation prompts; no reserved held-out data",
+  "source": {
+    "owned_source_sha256": "7492ddca593287722184cb45f95c7689166233e6f2b6511544c5f8032eb8314a",
+    "revision": "f9ecb4691306a8b1172b654136e58724e47432e4"
+  },
+  "state": "passed",
+  "synthetic_fixture": false
+}

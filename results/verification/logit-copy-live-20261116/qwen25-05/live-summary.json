@@ -1,0 +1,89 @@
+{
+  "binary_sha256": "81a877f4f146f6d110298dfa62cc34568287447aadedda957f211018442c641b",
+  "causal_hint_audit": "passed",
+  "checked_comparisons": 60,
+  "complete_sha256": "84238d00e79eeba41513035669d8d3100f11f17db5bdf04fc37b9bd2b19fd09a",
+  "local_recomputed_work_matches": true,
+  "model_id": "qwen25-05",
+  "model_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+  "payload_sha256": {
+    "correctness.json": "69fee1832a6fb455b22badd512db8fcdcabad648f95a530b9b9bbb9460e66812",
+    "live.cycles.jsonl": "82e8f6fee603eac9fc48edaa1fbafa78de5dbd95c93ff7a260e25e1a2dc80453",
+    "live.jobs.jsonl": "e35f79ec32f50e06d0c32714a60cbc5158f762d0ab788c2cbde1305e96ea22fa",
+    "live.jsonl": "02401d1107bbce69b608ab503263b33c2ab206f534009e23d0097f2e90a32e71",
+    "live.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "manifest.json": "7cae39be288560d6daa5ca6eabdf41e179f024769d50dee31e8b886417594e46",
+    "status.json": "cdab06fb4c14d79b5587601565ddfbafd685d9dd0a324cdbd2f6254c356b6cb5"
+  },
+  "performance_claim": null,
+  "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43861391090",
+  "same_work_as_canonical_replay": true,
+  "source": {
+    "owned_source_sha256": "7492ddca593287722184cb45f95c7689166233e6f2b6511544c5f8032eb8314a",
+    "revision": "f9ecb4691306a8b1172b654136e58724e47432e4"
+  },
+  "state": "passed",
+  "synthetic_fixture": false,
+  "totals": {
+    "hint-m3-k64-f0-k1": {
+      "accepted": 52,
+      "cycles": 332,
+      "drafted": 52,
+      "verified_rows": 384
+    },
+    "hint-m3-k64-f0-k4": {
+      "accepted": 94,
+      "cycles": 290,
+      "drafted": 105,
+      "verified_rows": 395
+    },
+    "hint-m3-k64-f0-k8": {
+      "accepted": 109,
+      "cycles": 275,
+      "drafted": 138,
+      "verified_rows": 413
+    },
+    "ordinary-k0": {
+      "accepted": 0,
+      "cycles": 384,
+      "drafted": 0,
+      "verified_rows": 384
+    },
+    "suffix5-k1": {
+      "accepted": 63,
+      "cycles": 321,
+      "drafted": 66,
+      "verified_rows": 387
+    },
+    "suffix5-k4": {
+      "accepted": 102,
+      "cycles": 282,
+      "drafted": 111,
+      "verified_rows": 393
+    },
+    "suffix5-k8": {
+      "accepted": 113,
+      "cycles": 271,
+      "drafted": 136,
+      "verified_rows": 407
+    },
+    "upstream-ngram3-k1": {
+      "accepted": 71,
+      "cycles": 313,
+      "drafted": 78,
+      "verified_rows": 391
+    },
+    "upstream-ngram3-k4": {
+      "accepted": 115,
+      "cycles": 269,
+      "drafted": 135,
+      "verified_rows": 404
+    },
+    "upstream-ngram3-k8": {
+      "accepted": 127,
+      "cycles": 257,
+      "drafted": 169,
+      "verified_rows": 426
+    }
+  }
+}

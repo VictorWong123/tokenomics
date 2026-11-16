@@ -1,0 +1,149 @@
+{
+  "scope": "Two predeclared six-prompt learned CPU validation runs,60 live requests per model; exact IDs/stops/work and causal hints, no speed/held-out result",
+  "decision": "Keep guided copying default-OFF; suffix cap4/8 dominates guided copying on both retained 0.5B CPU platforms.",
+  "raw_archives": "../research-raw-20261116",
+  "platforms": {
+    "qwen25-05": {
+      "platform": {
+        "machine": "arm64",
+        "platform": "macOS-15.8.2-arm64-arm-64bit"
+      },
+      "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43861391090",
+      "comparisons": 60,
+      "tokens": 384,
+      "totals": {
+        "hint-m3-k64-f0-k1": {
+          "accepted": 52,
+          "cycles": 332,
+          "drafted": 52,
+          "verified_rows": 384
+        },
+        "hint-m3-k64-f0-k4": {
+          "accepted": 94,
+          "cycles": 290,
+          "drafted": 105,
+          "verified_rows": 395
+        },
+        "hint-m3-k64-f0-k8": {
+          "accepted": 109,
+          "cycles": 275,
+          "drafted": 138,
+          "verified_rows": 413
+        },
+        "ordinary-k0": {
+          "accepted": 0,
+          "cycles": 384,
+          "drafted": 0,
+          "verified_rows": 384
+        },
+        "suffix5-k1": {
+          "accepted": 63,
+          "cycles": 321,
+          "drafted": 66,
+          "verified_rows": 387
+        },
+        "suffix5-k4": {
+          "accepted": 102,
+          "cycles": 282,
+          "drafted": 111,
+          "verified_rows": 393
+        },
+        "suffix5-k8": {
+          "accepted": 113,
+          "cycles": 271,
+          "drafted": 136,
+          "verified_rows": 407
+        },
+        "upstream-ngram3-k1": {
+          "accepted": 71,
+          "cycles": 313,
+          "drafted": 78,
+          "verified_rows": 391
+        },
+        "upstream-ngram3-k4": {
+          "accepted": 115,
+          "cycles": 269,
+          "drafted": 135,
+          "verified_rows": 404
+        },
+        "upstream-ngram3-k8": {
+          "accepted": 127,
+          "cycles": 257,
+          "drafted": 169,
+          "verified_rows": 426
+        }
+      }
+    },
+    "qwen25-15": {
+      "platform": {
+        "machine": "x86_64",
+        "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39"
+      },
+      "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43861395334",
+      "comparisons": 60,
+      "tokens": 384,
+      "totals": {
+        "hint-m3-k64-f0-k1": {
+          "accepted": 32,
+          "cycles": 352,
+          "drafted": 33,
+          "verified_rows": 385
+        },
+        "hint-m3-k64-f0-k4": {
+          "accepted": 58,
+          "cycles": 326,
+          "drafted": 84,
+          "verified_rows": 410
+        },
+        "hint-m3-k64-f0-k8": {
+          "accepted": 64,
+          "cycles": 320,
+          "drafted": 145,
+          "verified_rows": 465
+        },
+        "ordinary-k0": {
+          "accepted": 0,
+          "cycles": 384,
+          "drafted": 0,
+          "verified_rows": 384
+        },
+        "suffix5-k1": {
+          "accepted": 26,
+          "cycles": 358,
+          "drafted": 34,
+          "verified_rows": 392
+        },
+        "suffix5-k4": {
+          "accepted": 42,
+          "cycles": 342,
+          "drafted": 72,
+          "verified_rows": 414
+        },
+        "suffix5-k8": {
+          "accepted": 45,
+          "cycles": 339,
+          "drafted": 120,
+          "verified_rows": 459
+        },
+        "upstream-ngram3-k1": {
+          "accepted": 42,
+          "cycles": 342,
+          "drafted": 54,
+          "verified_rows": 396
+        },
+        "upstream-ngram3-k4": {
+          "accepted": 69,
+          "cycles": 315,
+          "drafted": 105,
+          "verified_rows": 420
+        },
+        "upstream-ngram3-k8": {
+          "accepted": 73,
+          "cycles": 311,
+          "drafted": 166,
+          "verified_rows": 477
+        }
+      }
+    }
+  }
+}

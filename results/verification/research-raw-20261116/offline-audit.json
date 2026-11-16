@@ -1,0 +1,53 @@
+{
+  "runs": {
+    "43848978979": {
+      "audited_cycles": 4638,
+      "checked_comparisons": 160,
+      "instruction_set_markers": [
+        "NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | ACCELERATE = 1 | "
+      ],
+      "model_id": "qwen25-05",
+      "performance_claim": null,
+      "source_commit": "3fdfa8cff29264f4bceb92c0d15ca23e24a8aed4",
+      "state": "passed",
+      "zip_sha256": "9c5c296f01582d4f1af2f1813a0eb0f4aeefc6d0bd0168a2018794af0e18d9d9"
+    },
+    "43849593799": {
+      "audited_cycles": 4934,
+      "checked_comparisons": 160,
+      "instruction_set_markers": [
+        "NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | ACCELERATE = 1 | "
+      ],
+      "model_id": "qwen25-15",
+      "performance_claim": null,
+      "source_commit": "1af7b53e21090e661334263f263ff3febabe66e3",
+      "state": "passed",
+      "zip_sha256": "8beb4658aa6b30bf06d610e668cd2fcff3cbdcbe35fd0a7245bfee6624748774"
+    },
+    "43861391090": {
+      "audited_cycles": 2994,
+      "checked_comparisons": 60,
+      "instruction_set_markers": [
+        "neon"
+      ],
+      "model_id": "qwen25-05",
+      "performance_claim": null,
+      "source_commit": "f9ecb4691306a8b1172b654136e58724e47432e4",
+      "state": "passed",
+      "zip_sha256": "c20b6ecadcd4dbba7c639ca94b1033a19dafda1ad6a44e677fcfbcf4abbda67e"
+    },
+    "43861395334": {
+      "audited_cycles": 3389,
+      "checked_comparisons": 60,
+      "instruction_set_markers": [
+        "sse2"
+      ],
+      "model_id": "qwen25-15",
+      "performance_claim": null,
+      "source_commit": "f9ecb4691306a8b1172b654136e58724e47432e4",
+      "state": "passed",
+      "zip_sha256": "07b420dbb0b30bfadcc1a241993a0ff7ad313c3f9c6e82ca4e55caada57ffd12"
+    }
+  },
+  "scope": "Offline recheck of original GitHub ZIP hashes/seals, learned IDs/stops, per-cycle work and causal guided hints; no rerun or speed claim"
+}

@@ -1,0 +1,21 @@
+{
+  "artifact_id": 14219471171,
+  "artifact_name": "trained-cpu-smoke",
+  "bytes": 258966,
+  "chunks": 22,
+  "conclusion": "success",
+  "run_id": 43849593799,
+  "run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43849593799",
+  "source_commit": "1af7b53e21090e661334263f263ff3febabe66e3",
+  "validation": {
+    "files": 27,
+    "seals": {
+      "smoke/complete.json": {
+        "checked_payloads": 19,
+        "sha256": "32d32a67379013a9ce736c8548f829fb0039154055d9a611abb74d088a5d6aa0"
+      }
+    },
+    "uncompressed_bytes": 3597647
+  },
+  "zip_sha256": "8beb4658aa6b30bf06d610e668cd2fcff3cbdcbe35fd0a7245bfee6624748774"
+}

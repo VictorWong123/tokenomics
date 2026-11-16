@@ -1,0 +1,29 @@
+{
+  "artifact_id": 14223094442,
+  "artifact_name": "canonical-logit-fit",
+  "bytes": 247245,
+  "chunks": 21,
+  "conclusion": "success",
+  "run_id": 43861395334,
+  "run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43861395334",
+  "source_commit": "f9ecb4691306a8b1172b654136e58724e47432e4",
+  "validation": {
+    "files": 17,
+    "seals": {
+      "complete.json": {
+        "checked_payloads": 5,
+        "sha256": "579a6b13c6fd40d607fa150e8288db16d3680b044f1dbc8debb8dcc0f9286f99"
+      },
+      "live/canonical-replay/complete.json": {
+        "checked_payloads": 2,
+        "sha256": "d160e6310a13e2f8b4724dfa7804387c0eee67465840f07f3c1ea093e8113bac"
+      },
+      "live/complete.json": {
+        "checked_payloads": 7,
+        "sha256": "67852bb74a60d32ee76406a06cdfe7a38b991be6cc8d530ec84a57bfc09eb100"
+      }
+    },
+    "uncompressed_bytes": 2561789
+  },
+  "zip_sha256": "07b420dbb0b30bfadcc1a241993a0ff7ad313c3f9c6e82ca4e55caada57ffd12"
+}
