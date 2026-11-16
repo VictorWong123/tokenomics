@@ -1,0 +1,18 @@
+{
+  "state": "partial_compilation_gpu_unavailable_for_required_ops",
+  "run_id": 43806416345,
+  "source_commit": "50749c9",
+  "reference_native_compile": "passed",
+  "reference_ctest": "passed before failing GPU stage",
+  "reference_cpu_rows": "passed before failing GPU stage",
+  "embedded_libraries_compiled": 36,
+  "device": "Apple Paravirtual device",
+  "simdgroup_reduction": false,
+  "simdgroup_matrix": false,
+  "failure": "reference direct GPU MUL_MAT unsupported; process aborted (-6)",
+  "candidate_execution": "not reached",
+  "correction": "preflight separately reports compiler success and missing GPU features; reference raw backend test removed because context splitting does not promise backend row invariance",
+  "artifact_id": 14199190550,
+  "local_artifact_download": "unavailable through execution workspace proxy; successful-stage counts inferred only from fail-fast stage order, not invented raw logs",
+  "performance_claim": null
+}

@@ -433,3 +433,22 @@ OFF. Hosted preflight now also compiles this third profile and separately probes
 the offline shader compiler. No Metal execution or M3 speedup is claimed.
 [Host evidence](../results/verification/metal-interleave-host-20261116/summary.json)
 and [research rationale](metal-research-directions-20261116.md).
+
+The first hosted dispatch failed during action resolution because two action
+commit pins were assigned to the wrong action names; corrected before retry.
+[Run43806416345](https://github.com/VictorWong123/tokenomics/actions/runs/43806416345)
+then compiled the native default profile, passed its fixture suites and CPU row
+checks, and compiled36 embedded Metal libraries. Its GPU is an **Apple
+Paravirtual device**, advertising neither simdgroup reduction nor matrix
+support. Direct GPU MUL_MAT execution aborted as unsupported before reaching
+the candidate. This is a compute capability limit, not a correctness pass.
+
+Updated preflight to probe the same Apple7/Metal3 reduction families as the
+pinned backend, explicitly distinguish compilation from graph execution, and
+compile embedded libraries without executing graphs on limited devices. The
+reference context guard does not apply to raw backend graphs; the strict row
+invariance execution test belongs to candidate profiles. A missing required GPU
+feature is reported as unavailable. Artifact bytes could not be downloaded into
+this execution workspace through its proxy; the public failure excerpt and
+fail-fast stage ordering are retained without claiming absent successful logs.
+[Retained negative evidence](../results/verification/hosted-metal-20261116/summary.json).

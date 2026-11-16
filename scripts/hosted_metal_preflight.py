@@ -164,7 +164,12 @@ def main():
                 ],
             )
             run(f"{profile}-cpu-rows", [str(build / "test_backend_rows"), "--cpu"])
-            if profile != "reference" and report["metal_device"]["available"]:
+            if report["metal_device"]["available"]:
+                run(
+                    f"{profile}-metal-library-compile",
+                    [str(build / "test_backend_rows"), "--metal-compile-only"],
+                )
+            if profile != "reference" and report["metal_device"]["simdgroup_reduction"]:
                 # The default context guard splits model verification, not raw
                 # backend graphs. Only the candidate promises row-invariant
                 # dispatch for this direct backend test.
@@ -176,7 +181,9 @@ def main():
         if metal_compiler:
             report["shader_compilation"] = "passed"
         report["metal_execution"] = (
-            "passed" if report["metal_device"]["available"] else "unavailable"
+            "passed"
+            if report["metal_device"]["simdgroup_reduction"]
+            else "unavailable_missing_simdgroup_reduction"
         )
     except Exception as exc:
         report["state"] = "failed"
@@ -184,6 +191,9 @@ def main():
         raise
     finally:
         save()
+        print(
+            "HOSTED_PREFLIGHT_SUMMARY=" + json.dumps(report, sort_keys=True), flush=True
+        )
 
 
 if __name__ == "__main__":

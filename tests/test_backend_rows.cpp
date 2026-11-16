@@ -166,10 +166,11 @@ static int run_softmax(ggml_backend_t backend, int width, int rows, int heads) {
 
 int main(int argc, char **argv) {
     try {
-        check(argc == 2 && (std::string(argv[1]) == "--cpu" || std::string(argv[1]) == "--metal"),
-              "usage: test_backend_rows --cpu|--metal");
+        check(argc == 2 && (std::string(argv[1]) == "--cpu" || std::string(argv[1]) == "--metal" ||
+                            std::string(argv[1]) == "--metal-compile-only"),
+              "usage: test_backend_rows --cpu|--metal|--metal-compile-only");
         ggml_backend_t raw = nullptr;
-        if (std::string(argv[1]) == "--metal") {
+        if (std::string(argv[1]) != "--cpu") {
 #ifdef TOKENOMICS_HAS_METAL
             raw = ggml_backend_metal_init();
             check(raw && ggml_backend_is_metal(raw), "requested Metal backend unavailable");
@@ -184,6 +185,10 @@ int main(int argc, char **argv) {
         std::unique_ptr<ggml_backend, decltype(&ggml_backend_free)> backend(raw, ggml_backend_free);
         check(bool(backend), "requested backend unavailable");
         std::cout << "backend=" << ggml_backend_name(backend.get()) << '\n';
+        if (std::string(argv[1]) == "--metal-compile-only") {
+            std::cout << "Metal libraries compiled; GPU graph execution skipped\n";
+            return 0;
+        }
         int cases = 0, values = 0;
         for (auto type : {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_Q4_K, GGML_TYPE_Q6_K})
             for (int width : {64, 128, 256, 896, 1536})
