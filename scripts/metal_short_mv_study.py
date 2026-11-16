@@ -75,6 +75,7 @@ def study(args):
                     "-B",
                     build,
                     "-DCMAKE_BUILD_TYPE=Release",
+                    "-DTOKENOMICS_SANITIZE=OFF",
                     "-DGGML_METAL=ON",
                     "-DGGML_CUDA=OFF",
                     "-DGGML_NATIVE=ON",

@@ -82,3 +82,15 @@ Reproduce the Linux host check after building `build-cpu`:
 
 This target deliberately links only the host predicates; unused GPU runtime
 functions are discarded. It is not a usable inference backend.
+
+New gate runs write `gate/complete.json` with hashes of the manifest, jobs,
+outputs, cycles, logs and pass status. Verify a saved gate without inference:
+
+```bash
+.venv/bin/python scripts/verify_metal_gate.py results/local/metal-short-mv-01/gate
+```
+
+This checks accidental payload changes, execution settings, saved exact outputs,
+cycle accounting and comparison coverage. It does not recreate GPU execution or
+authenticate an artifact whose payload and receipt were both replaced. Older
+gates without this receipt need to be rerun to use this check.

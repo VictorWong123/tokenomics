@@ -136,3 +136,7 @@ Audit any completed calibration without inference:
 
 The audit rechecks immutable records, original checkpoint states and calibration
 identity, and distinguishes repeated timing samples from distinct contexts.
+
+The suffix correctness gate also writes a complete hashed receipt. Run
+`python scripts/verify_metal_gate.py results/local/suffix-study-01/gate`
+to check saved payload integrity and exact outputs without inference.

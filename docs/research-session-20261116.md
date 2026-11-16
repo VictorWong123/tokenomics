@@ -214,3 +214,12 @@ Validation: five calibration/pipeline tests and five replay tests pass, includin
 four-state suffix calibration. CTest fixture/tooling suites pass in 24.93
 seconds. [Retained coverage reports](../results/verification/calibration-coverage-20261116/)
 record per-action contexts, proposal availability and immutable source identities.
+
+### Local runner evidence audit
+
+Added complete correctness-gate receipts and an offline verifier for saved
+request settings, exact output IDs/stops, cycle accounting and comparison
+coverage. A CPU fixture test verifies a passing gate and rejects a changed raw
+output. The paired Metal and suffix gates remain hardware-unverified. The Metal
+build command now explicitly disables sanitizers to prevent cached diagnostic
+flags from contaminating a future timing run.

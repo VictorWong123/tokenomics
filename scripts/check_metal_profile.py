@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from bench.common import ROOT, atomic_json, read_jsonl, sha256, source_fingerprint
-from scripts.check_models import check_cycles, compare, execute
+from scripts.check_models import check_cycles, compare, execute, validate_record
 
 REFERENCE_MARKER = "TOKENOMICS_METAL_VERIFY_SINGLE_ROW=ON"
 CANDIDATE_MARKER = "TOKENOMICS_METAL_SHORT_MV=ON"
@@ -62,6 +62,76 @@ def variants(drafter="ngram"):
             "k": k,
             "detailed": False,
         }
+
+
+GATE_STAGES = (
+    "smoke-reference",
+    "smoke-guarded",
+    "smoke-candidate",
+    "reference",
+    "boundary-reference",
+    "candidate",
+)
+
+
+def verify_gate(directory):
+    """Check a completed gate's saved payload without running inference."""
+    directory = Path(directory)
+    receipt = json.loads((directory / "complete.json").read_text())
+    expected = {"manifest.json", "correctness.jsonl", "status.json"}
+    expected |= {
+        f"{stage}.{suffix}"
+        for stage in GATE_STAGES
+        for suffix in ("jobs.jsonl", "jsonl", "cycles.jsonl", "stderr.log")
+    }
+    if receipt.get("schema_version") != 1 or set(receipt.get("sha256", {})) != expected:
+        raise ValueError("Missing or unexpected gate receipt payload")
+    for name, digest in receipt["sha256"].items():
+        if sha256(directory / name) != digest:
+            raise ValueError(f"Gate payload changed: {name}")
+    status = json.loads((directory / "status.json").read_text())
+    manifest = json.loads((directory / "manifest.json").read_text())
+    if status.get("state") != "passed" or status.get("candidate_cases") != 330:
+        raise ValueError("Expected a complete passing 330-request gate")
+    settings = SimpleNamespace(**manifest["settings"])
+    rows = {}
+    for stage in GATE_STAGES:
+        jobs = read_jsonl(directory / f"{stage}.jobs.jsonl")
+        rows[stage] = read_jsonl(directory / f"{stage}.jsonl")
+        if len(jobs) != len(rows[stage]):
+            raise ValueError("Gate request/output count mismatch")
+        for job, row in zip(jobs, rows[stage]):
+            validate_record(settings, job, row)
+    expected_rows = {
+        row["prompt_id"]: row
+        for stage in ("reference", "boundary-reference")
+        for row in rows[stage]
+    }
+    for stage in ("smoke-reference", "smoke-guarded", "smoke-candidate", "candidate"):
+        for row in rows[stage]:
+            if compare(expected_rows[row["prompt_id"]], row) is not None:
+                raise ValueError("Saved gate output differs from ordinary reference")
+    if len(rows["candidate"]) != 330:
+        raise ValueError("Missing candidate gate requests")
+    check_cycles(
+        [
+            row
+            for row in rows["candidate"]
+            if not row["configuration_id"].startswith("minimal-")
+        ],
+        read_jsonl(directory / "candidate.cycles.jsonl"),
+    )
+    audit = read_jsonl(directory / "correctness.jsonl")
+    if len(audit) != status["checked_comparisons"] or any(
+        row["mismatch"] is not None for row in audit
+    ):
+        raise ValueError("Gate comparison audit is incomplete or failing")
+    return {
+        "state": "verified",
+        "candidate_cases": 330,
+        "receipt_sha256": sha256(directory / "complete.json"),
+        "manifest": manifest,
+    }
 
 
 def gate(
@@ -267,6 +337,20 @@ def gate(
             "limitation": "Only this model, inputs, settings and observed paths are covered. No speed claim.",
         }
         atomic_json(out / "status.json", result)
+        payload = {"manifest.json", "correctness.jsonl", "status.json"}
+        payload |= {
+            f"{stage}.{suffix}"
+            for stage in GATE_STAGES
+            for suffix in ("jobs.jsonl", "jsonl", "cycles.jsonl", "stderr.log")
+        }
+        atomic_json(
+            out / "complete.json",
+            {
+                "schema_version": 1,
+                "sha256": {name: sha256(out / name) for name in sorted(payload)},
+            },
+        )
+        verify_gate(out)
         return result
     except Exception as exc:
         atomic_json(

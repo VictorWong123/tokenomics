@@ -14,6 +14,7 @@ from scripts.check_metal_profile import (
     REFERENCE_MARKER,
     gate,
     metal_profile,
+    verify_gate,
 )
 
 
@@ -137,6 +138,13 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                 self.assertEqual(result["candidate_cases"], 330)
                 self.assertGreater(result["coverage"]["accepted"], 0)
                 self.assertEqual(result["state"], "passed")
+                self.assertEqual(verify_gate(root / "passed")["candidate_cases"], 330)
+                saved = root / "passed/candidate.jsonl"
+                original = saved.read_bytes()
+                saved.write_bytes(original + b"\n")
+                with self.assertRaisesRegex(ValueError, "Gate payload changed"):
+                    verify_gate(root / "passed")
+                saved.write_bytes(original)
                 suffix_result = gate(
                     binary,
                     binary,
