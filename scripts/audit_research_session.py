@@ -1,6 +1,7 @@
-"""Recheck retained16 November research evidence offline; no models or GPU."""
+"""Recheck retained CPU proposal, sampler and projection evidence offline."""
 
 import argparse
+import contextlib
 import gzip
 import json
 from pathlib import Path
@@ -85,7 +86,9 @@ def audit(out):
         "performance_claim": None,
     }
     try:
-        with tempfile.TemporaryDirectory(dir=out) as tmp:
+        with tempfile.TemporaryDirectory(dir=out) as tmp, (out / "replay.log").open(
+            "w"
+        ) as replay_log:
             temporary = Path(tmp)
             raw = raw_audit(
                 EVIDENCE / "research-raw-20261116", temporary / "raw-audit.json"
@@ -116,7 +119,8 @@ def audit(out):
                 destination = temporary / (
                     collection.parent.parent.name + "-" + collection.parent.name
                 )
-                guided_replay(collection, destination)
+                with contextlib.redirect_stdout(replay_log):
+                    guided_replay(collection, destination)
                 current = json.loads((destination / "fit.json").read_text())
                 retained = json.loads((prior / "fit.json").read_text())
                 for field in ("totals", "per_prompt", "work_frontier"):
@@ -149,7 +153,8 @@ def audit(out):
                         EVIDENCE / base / ("qwen25-" + label[-2:]) / "collection"
                     )
                     destination = temporary / (folder + "-" + label)
-                    exploratory_replay(collection, destination, family)
+                    with contextlib.redirect_stdout(replay_log):
+                        exploratory_replay(collection, destination, family)
                     current = json.loads((destination / "report.json").read_text())
                     retained = json.loads(prior.read_text())
                     for field in ("totals", "per_prompt", "work_frontier"):
