@@ -203,8 +203,11 @@ class MetalGateOrchestrationTests(unittest.TestCase):
     def test_q8_shared_retrieval_screen_keeps_distinct_profile_identity(self):
         self._screen_analysis("retrieval", shared_q8=True)
 
+    def test_direct_sampler_screen_keeps_original_and_optimized_ordinary_controls(self):
+        self._screen_analysis("retrieval", direct=True)
+
     def _screen_analysis(
-        self, screen, interleaved=False, group_q8=False, shared_q8=False
+        self, screen, interleaved=False, group_q8=False, shared_q8=False, direct=False
     ):
         from analysis.metal_short_mv import (
             SCREENS,
@@ -234,12 +237,12 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             ]
             write_jsonl(root / "bench/prompts-v1.jsonl", prompts)
             (root / "configs" / SCREENS[screen]).write_text(json.dumps(config))
-            if interleaved or group_q8 or shared_q8:
+            if interleaved or group_q8 or shared_q8 or direct:
                 with patch("analysis.metal_short_mv.ROOT", root):
                     config = screen_configuration(
-                        screen, interleaved, group_q8, shared_q8
+                        screen, interleaved, group_q8, shared_q8, direct
                     )
-            candidate_profile = kernel_variant(interleaved, group_q8, shared_q8)
+            candidate_profile = kernel_variant(interleaved, group_q8, shared_q8, direct)
             model = root / "repeat.gguf"
             create(model, 100, ngram_cycle=True)
             # Distinct executable identity; same actual CPU runtime. This tests
@@ -264,15 +267,19 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             with patch("analysis.metal_short_mv.ROOT", root), patch(
                 "analysis.metal_short_mv.MODEL_SHA256", sha256(model)
             ), patch(
-                "analysis.metal_short_mv.q8_shared_profile"
-                if shared_q8
+                "analysis.metal_short_mv.direct_profile"
+                if direct
                 else (
-                    "analysis.metal_short_mv.q8_group_profile"
-                    if group_q8
+                    "analysis.metal_short_mv.q8_shared_profile"
+                    if shared_q8
                     else (
-                        "analysis.metal_short_mv.interleaved_profile"
-                        if interleaved
-                        else "analysis.metal_short_mv.metal_profile"
+                        "analysis.metal_short_mv.q8_group_profile"
+                        if group_q8
+                        else (
+                            "analysis.metal_short_mv.interleaved_profile"
+                            if interleaved
+                            else "analysis.metal_short_mv.metal_profile"
+                        )
                     )
                 )
             ) as profile:
@@ -282,10 +289,16 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                     interleaved=interleaved,
                     group_q8=group_q8,
                     shared_q8=shared_q8,
+                    direct=direct,
                 )
                 self.assertEqual(result["records"], len(config["configurations"]) * 9)
                 self.assertEqual(profile.call_count, result["records"])
                 self.assertTrue(result["same_work_within_each_policy"])
+                if direct:
+                    self.assertEqual(result["kernel_variant"], "guarded-single-row")
+                    self.assertEqual(result["sampler_variant"], "direct")
+                    self.assertIn("direct-target/target", result["comparisons"])
+                    self.assertIn("direct-fixed8/direct-target", result["comparisons"])
                 rows = read_jsonl(root / "screen/requests.jsonl")
                 rows[0]["generation_ms"] *= 0.5
                 write_jsonl(root / "screen/requests.jsonl", rows)
@@ -296,6 +309,7 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                         interleaved=interleaved,
                         group_q8=group_q8,
                         shared_q8=shared_q8,
+                        direct=direct,
                     )
 
     def test_cross_binary_gate_retains_success_and_first_failure(self):

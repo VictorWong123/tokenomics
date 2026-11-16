@@ -974,3 +974,13 @@ an orchestration omission: the targeted build did not produce the eligibility
 executable before CTest invoked it. The workflow now explicitly builds that
 target in the direct-only branch before running it. The canceled job provides
 no inference evidence; the corrected source is dispatched separately.
+
+### 10:29 UTC — local direct-sampler comparison runner
+
+`metal_short_mv_study.py --direct-greedy --screen retrieval` now builds and gates
+the strict sampler separately from kernel changes. Both profiles retain guarded
+one-row Metal verification. It checks the host sampler, two full trained gates,
+then126 development records with original/optimized ordinary and both retrieval
+drafters. The paired analyzer requires equal work and distinct executable hashes.
+All14 profile/orchestration tests pass, including a CPU-fixture version of this
+screen. That fixture validates orchestration, not Metal or throughput.

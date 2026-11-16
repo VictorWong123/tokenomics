@@ -115,3 +115,20 @@ ordinary decoder and the direct candidate's ordinary decoder in later timing
 comparisons. The synthetic component measurements in
 [the sampler contract](backend-sampling-contract.md) do not establish generation
 throughput. The verification batching bottleneck remains separate.
+
+For a complete local M3 comparison, the shared study runner now isolates this
+sampler with guarded one-row Metal verification in both binaries:
+
+```bash
+.venv/bin/python scripts/metal_short_mv_study.py --direct-greedy \
+  --screen retrieval --model models/qwen2.5-0.5b-instruct-q4_k_m.gguf \
+  --out results/local/direct-sampler-m3-01
+```
+
+It builds/tests the original and candidate, checks host selection, then runs
+separate full trained ngram and suffix gates before timing126 paired development
+records. Original and optimized ordinary decoding, ngram caps1/4/8 and suffix
+caps1/4/8 are retained as distinct conditions. The analyzer requires equal
+logical work for each policy across binaries. Metadata identifies a host-sampler
+experiment with unchanged guarded verification. Do not combine this command
+with the kernel locality options, and run studies sequentially on the Mac.

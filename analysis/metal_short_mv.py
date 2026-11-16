@@ -9,6 +9,7 @@ from analysis.report import cells, paired_summary
 from bench.common import ROOT, atomic_json, read_jsonl
 from scripts.check_metal_profile import (
     MODEL_SHA256,
+    direct_profile,
     interleaved_profile,
     metal_profile,
     q8_group_profile,
@@ -22,9 +23,11 @@ SCREENS = {
 }
 
 
-def kernel_variant(interleaved=False, group_q8=False, shared_q8=False):
-    if sum(bool(value) for value in (interleaved, group_q8, shared_q8)) > 1:
-        raise ValueError("Select only one kernel locality experiment")
+def kernel_variant(interleaved=False, group_q8=False, shared_q8=False, direct=False):
+    if sum(bool(value) for value in (interleaved, group_q8, shared_q8, direct)) > 1:
+        raise ValueError("Select only one isolated Metal/sampler experiment")
+    if direct:
+        return "direct"
     return (
         "q8-shared"
         if shared_q8
@@ -32,11 +35,16 @@ def kernel_variant(interleaved=False, group_q8=False, shared_q8=False):
     )
 
 
-def screen_configuration(screen, interleaved=False, group_q8=False, shared_q8=False):
+def screen_configuration(
+    screen, interleaved=False, group_q8=False, shared_q8=False, direct=False
+):
     config = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
-    variant = kernel_variant(interleaved, group_q8, shared_q8)
+    variant = kernel_variant(interleaved, group_q8, shared_q8, direct)
     if variant != "short-mv":
-        config["kernel_variant"] = variant
+        config["kernel_variant"] = "guarded-single-row" if direct else variant
+        if direct:
+            config["sampler_variant"] = "direct"
+            config["experiment_kind"] = "target_host_sampler"
         config["phase"] = config["phase"].replace(
             "metal_", f"metal_{variant.replace('-', '_')}_", 1
         )
@@ -48,14 +56,21 @@ def screen_configuration(screen, interleaved=False, group_q8=False, shared_q8=Fa
 
 
 def analyze(
-    directory, *, screen="ngram", interleaved=False, group_q8=False, shared_q8=False
+    directory,
+    *,
+    screen="ngram",
+    interleaved=False,
+    group_q8=False,
+    shared_q8=False,
+    direct=False,
 ):
     directory = Path(directory)
     verify(directory)
     frozen = json.loads((directory / "run_manifest.json").read_text())["frozen"]
-    expected = screen_configuration(screen, interleaved, group_q8, shared_q8)
-    candidate = kernel_variant(interleaved, group_q8, shared_q8)
+    expected = screen_configuration(screen, interleaved, group_q8, shared_q8, direct)
+    candidate = kernel_variant(interleaved, group_q8, shared_q8, direct)
     profile_check = {
+        "direct": direct_profile,
         "short-mv": metal_profile,
         "interleaved": interleaved_profile,
         "q8-group": q8_group_profile,
@@ -169,7 +184,7 @@ def analyze(
             )
         ),
         "screen": screen,
-        "kernel_variant": candidate,
+        "kernel_variant": "guarded-single-row" if direct else candidate,
         "records": len(rows),
         "comparisons": {f"{a}/{b}": paired_summary(table, a, b) for a, b in pairs},
         "warm_comparisons": {f"{a}/{b}": paired_summary(warm, a, b) for a, b in pairs},
@@ -178,5 +193,8 @@ def analyze(
         "same_work_within_each_policy": True,
         "limitation": "Three development prompts, cap128, three repeats. These fit prompts informed suffix threshold/cap exploration. This is a component screen, not held-out or controller evidence.",
     }
+    if direct:
+        summary["sampler_variant"] = "direct"
+        summary["experiment_kind"] = "target_host_sampler"
     atomic_json(directory / "analysis/summary.json", summary)
     return summary

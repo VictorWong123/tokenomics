@@ -26,6 +26,7 @@ from bench.common import (
 from bench.run import run
 from scripts.check_metal_profile import (
     MODEL_SHA256,
+    direct_profile,
     gate,
     interleaved_profile,
     metal_profile,
@@ -71,8 +72,10 @@ def study(args):
     interleaved = getattr(args, "interleave", False)
     group_q8 = getattr(args, "group_q8", False)
     shared_q8 = getattr(args, "share_q8", False)
-    candidate = kernel_variant(interleaved, group_q8, shared_q8)
+    direct = getattr(args, "direct_greedy", False)
+    candidate = kernel_variant(interleaved, group_q8, shared_q8, direct)
     profile_check = {
+        "direct": direct_profile,
         "short-mv": metal_profile,
         "interleaved": interleaved_profile,
         "q8-group": q8_group_profile,
@@ -86,7 +89,8 @@ def study(args):
     try:
         binaries = {}
         for profile, build in builds.items():
-            enabled = "ON" if profile == candidate else "OFF"
+            enabled = "ON" if profile == candidate and not direct else "OFF"
+            direct_flag = "ON" if profile == candidate and direct else "OFF"
             locality = "ON" if interleaved and profile == candidate else "OFF"
             grouped = (
                 "ON" if (group_q8 or shared_q8) and profile == candidate else "OFF"
@@ -103,8 +107,8 @@ def study(args):
                     "-DCMAKE_BUILD_TYPE=Release",
                     "-DTOKENOMICS_SANITIZE=OFF",
                     "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
-                    "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
-                    "-DTOKENOMICS_GREEDY_DIRECT=OFF",
+                    f"-DTOKENOMICS_GREEDY_NO_TEMP={direct_flag}",
+                    f"-DTOKENOMICS_GREEDY_DIRECT={direct_flag}",
                     f"-DTOKENOMICS_METAL_INTERLEAVE={locality}",
                     f"-DTOKENOMICS_METAL_Q8_GROUP={grouped}",
                     f"-DTOKENOMICS_METAL_Q8_SHARED={shared}",
@@ -130,32 +134,51 @@ def study(args):
                 out / f"{profile}-tests.log",
             )
             binaries[profile] = build / "tokenomics"
-        state = "direct_backend_rows"
-        candidate_build = builds[candidate]
-        command(
-            [
-                tool("cmake"),
-                "--build",
-                candidate_build,
-                "--target",
-                "test_backend_rows",
-                "-j2",
-            ],
-            out / "backend-rows-compile.log",
-        )
-        command(
-            [candidate_build / "test_backend_rows", "--metal"], out / "backend-rows.log"
-        )
-        atomic_json(
-            out / "backend-rows.json",
-            {
-                "state": "passed",
-                "backend": "Metal",
-                "binary_sha256": sha256(candidate_build / "test_backend_rows"),
-                "log_sha256": sha256(out / "backend-rows.log"),
-                "limitation": "Matrix row arithmetic only; trained exactness gate still required",
-            },
-        )
+        if direct:
+            state = "host_sampler_equivalence"
+            command(
+                [builds[candidate] / "test_greedy_equivalence"],
+                out / "sampler-equivalence.log",
+            )
+            atomic_json(
+                out / "sampler-checks.json",
+                {
+                    "state": "passed",
+                    "scope": "Host strict sampler equivalence; trained Metal gate follows",
+                    "binary_sha256": sha256(
+                        builds[candidate] / "test_greedy_equivalence"
+                    ),
+                    "log_sha256": sha256(out / "sampler-equivalence.log"),
+                },
+            )
+        else:
+            state = "direct_backend_rows"
+            candidate_build = builds[candidate]
+            command(
+                [
+                    tool("cmake"),
+                    "--build",
+                    candidate_build,
+                    "--target",
+                    "test_backend_rows",
+                    "-j2",
+                ],
+                out / "backend-rows-compile.log",
+            )
+            command(
+                [candidate_build / "test_backend_rows", "--metal"],
+                out / "backend-rows.log",
+            )
+            atomic_json(
+                out / "backend-rows.json",
+                {
+                    "state": "passed",
+                    "backend": "Metal",
+                    "binary_sha256": sha256(candidate_build / "test_backend_rows"),
+                    "log_sha256": sha256(out / "backend-rows.log"),
+                    "limitation": "Matrix row arithmetic only; trained exactness gate still required",
+                },
+            )
         atomic_json(
             out / "compilation.json",
             {
@@ -214,7 +237,9 @@ def study(args):
             state = "gate_passed_no_timings"
         else:
             state = "development_screen"
-            config = screen_configuration(screen, interleaved, group_q8, shared_q8)
+            config = screen_configuration(
+                screen, interleaved, group_q8, shared_q8, direct
+            )
             prompts = [
                 p
                 for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")
@@ -244,6 +269,7 @@ def study(args):
                 interleaved=interleaved,
                 group_q8=group_q8,
                 shared_q8=shared_q8,
+                direct=direct,
             )
             state = "complete"
         if source_fingerprint() != source:
@@ -255,7 +281,8 @@ def study(args):
                 "state": state,
                 "gate": "passed",
                 "screen": screen,
-                "kernel_variant": candidate,
+                "kernel_variant": "guarded-single-row" if direct else candidate,
+                "sampler_variant": "direct" if direct else "original",
                 "gate_drafters": (
                     ["ngram", "suffix"] if screen == "retrieval" else ["ngram"]
                 ),
@@ -281,6 +308,11 @@ def study(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     locality = parser.add_mutually_exclusive_group()
+    locality.add_argument(
+        "--direct-greedy",
+        action="store_true",
+        help="Isolate strict direct-logit target sampling with guarded one-row Metal verification",
+    )
     locality.add_argument(
         "--share-q8",
         action="store_true",
