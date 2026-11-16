@@ -5,13 +5,13 @@ on:
       scope:
         description: Checks to run
         type: choice
-        options: [portable, metal-research]
+        options: [portable, metal-research, model-metadata]
         default: portable
 permissions:
   contents: read
 jobs:
   cpu:
-    if: inputs.scope != 'metal-research'
+    if: inputs.scope == 'portable' || inputs.scope == ''
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
       - run: clang-format --dry-run --Werror src/*.cpp src/*.h tests/*.cpp
       - run: .venv/bin/python scripts/run_all.py --backend cpu --fixtures-only --run-dir results/local/ci
   macos:
-    if: inputs.scope != 'metal-research'
+    if: inputs.scope == 'portable' || inputs.scope == ''
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
@@ -62,5 +62,26 @@ jobs:
           path: |
             results/local/hosted-metal/*.json
             results/local/hosted-metal/*.log
+          if-no-files-found: warn
+          retention-days: 7
+  model-metadata:
+    if: >-
+      inputs.scope == 'model-metadata' &&
+      github.ref == 'refs/heads/research/speculative-throughput-20261116' &&
+      !github.event.repository.private
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Inspect pinned public GGUF header
+        run: python3 scripts/inspect_gguf_header.py --out results/local/model-header/qwen05.json
+      - name: Retain header metadata only
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pinned-model-header
+          path: results/local/model-header/*.json
           if-no-files-found: warn
           retention-days: 7
