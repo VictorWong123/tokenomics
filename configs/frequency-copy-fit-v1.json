@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "purpose": "Exploratory causal frequency-filtered request-local copy replay; no runtime or speed claim",
+  "minimum_match_lengths": [1, 2, 3, 5],
+  "minimum_support_counts": [1, 2],
+  "joint_confidence_fractions": [[1, 2], [3, 4], [1, 1]],
+  "maximum_match_length": 32,
+  "caps": [1, 2, 4, 6, 8],
+  "fit_prompt_ids": ["development-qa-01", "development-code-01", "development-summary-01"],
+  "output_cap": 64,
+  "repetition": 0,
+  "search": "Longest matching suffix with a nonempty confident proposal; back off to shorter suffixes only when no first token qualifies",
+  "confidence": "Each proposed prefix occurrence count divided by the original matched-suffix occurrence count; censored continuations cannot increase this joint ratio",
+  "tie_break": "Most recent supporting occurrence among equally frequent next tokens",
+  "selection": "None. Report unique cycle/wasted-row Pareto points and all grid cells alongside ordinary/ngram/suffix controls",
+  "data_scope": "Existing three-prompt development-fit trajectories on archived M3 0.5B and Linux CPU 3B operating points only; no validation or reserved held-out data"
+}
