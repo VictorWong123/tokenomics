@@ -126,7 +126,7 @@ def analyze(collection, out):
         "scope": protocol["scope"],
         "source": source,
         "model_id": receipt["model_id"],
-        "collection_phase": receipt["collection_phase"],
+        "collection_phase": receipt.get("collection_phase", "fit"),
         "platform": receipt["platform"],
         "collection_complete_sha256": sha256(Path(collection) / "complete.json"),
         "protocol_sha256": sha256(PROTOCOL),
