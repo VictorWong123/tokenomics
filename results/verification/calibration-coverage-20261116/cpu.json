@@ -1,0 +1,169 @@
+{
+  "actions": [
+    {
+      "accepted": 0,
+      "action": 0,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 0,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 0,
+      "states_with_proposals": 0,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 6,
+      "action": 1,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 6,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 2,
+      "states_with_proposals": 2,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 9,
+      "action": 2,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 12,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 2,
+      "states_with_proposals": 2,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 15,
+      "action": 4,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 24,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 2,
+      "states_with_proposals": 2,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 21,
+      "action": 6,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 36,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 2,
+      "states_with_proposals": 2,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 27,
+      "action": 8,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 48,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 2,
+      "states_with_proposals": 2,
+      "timing_samples": 9
+    }
+  ],
+  "drafter": "ngram",
+  "fit_manifest_sha256": "edd9c1153089aa60bfa0e29e12dfee2b0417010083e6735ea492d4c30ed72523",
+  "interpretation": "Timing repetitions at one checkpoint are repeated observations of one state. They do not supply independent proposal contexts. Missing proposal/acceptance states limit what an unconditional action mean can describe.",
+  "prior_id": "controller-v1-6545c963efb5508c4410aa57a638bde58e1ae66d8007a7ff78ad9166592b43ac",
+  "replay_manifest_sha256": "7ff9fea25b5848a7d73090d6af458ecbbe35f29177ed55fbb2feec234de6fecc",
+  "schema_version": 1,
+  "speed_claim": null,
+  "state": "calibration_coverage_audited",
+  "synthetic_fixture": false
+}

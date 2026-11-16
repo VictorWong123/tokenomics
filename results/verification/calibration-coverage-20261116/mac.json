@@ -1,0 +1,169 @@
+{
+  "actions": [
+    {
+      "accepted": 0,
+      "action": 0,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 0,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 0,
+      "states_with_proposals": 0,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 3,
+      "action": 1,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 3,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 1,
+      "states_with_proposals": 1,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 6,
+      "action": 2,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 6,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 1,
+      "states_with_proposals": 1,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 12,
+      "action": 4,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 12,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 1,
+      "states_with_proposals": 1,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 18,
+      "action": 6,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 18,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 1,
+      "states_with_proposals": 1,
+      "timing_samples": 9
+    },
+    {
+      "accepted": 24,
+      "action": 8,
+      "checkpoints": [
+        32
+      ],
+      "distinct_states": 3,
+      "drafted": 24,
+      "states": [
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-code-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-qa-01"
+        },
+        {
+          "checkpoint": 32,
+          "prompt_id": "development-summary-01"
+        }
+      ],
+      "states_with_acceptance": 1,
+      "states_with_proposals": 1,
+      "timing_samples": 9
+    }
+  ],
+  "drafter": "ngram",
+  "fit_manifest_sha256": "4e34e4c9f75f7be492a7ceebb26eaf85999d1dbc0dc3e99789ee1def20c97179",
+  "interpretation": "Timing repetitions at one checkpoint are repeated observations of one state. They do not supply independent proposal contexts. Missing proposal/acceptance states limit what an unconditional action mean can describe.",
+  "prior_id": "controller-v1-5edcd703ab259b718df5ea1027ea1ea1cb6287767b40463560824f01ed8ae3ed",
+  "replay_manifest_sha256": "301143c82284e6fdf9fb9d439d2fc26a9bd9f1ab75e1cda491d4a028e7e89b84",
+  "schema_version": 1,
+  "speed_claim": null,
+  "state": "calibration_coverage_audited",
+  "synthetic_fixture": false
+}

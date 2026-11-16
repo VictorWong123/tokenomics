@@ -192,3 +192,25 @@ next candidate targets the existing Metal one-row verification split.
 - Added the guarded-M3 suffix study runner: a 330-request correctness gate before
   a 72-record paired screen against ordinary, ngram1 and ngram8. The synthetic
   gate, full screen, immutable-record audit and tamper rejection pass on CPU.
+
+### Calibration context coverage
+
+The runtime confirmed the user's requested model switch to `gpt-6.1-sol`.
+Work continues on the same research branch and deadline.
+
+Auditing historical fit priors found nine timing observations but only three
+independent prompt/checkpoint states per action. Only one M3 state and two CPU
+states produced proposals. Added an offline coverage audit and an optional
+frozen `replay_checkpoints` schedule. A denser cap64 fit can sample checkpoints
+9/16/32/48 without changing held-out reservations or simultaneous snapshot
+storage. The default schedule is preserved. Replay rejects a drafter or
+schedule that differs from the fit manifest before launching inference.
+
+The first coverage-audit fixture test exposed missing synthetic labeling in the
+audit's call to calibration. It now derives that label from the frozen fit and
+includes it in the report; trained and synthetic evidence remain distinguished.
+
+Validation: five calibration/pipeline tests and five replay tests pass, including
+four-state suffix calibration. CTest fixture/tooling suites pass in 24.93
+seconds. [Retained coverage reports](../results/verification/calibration-coverage-20261116/)
+record per-action contexts, proposal availability and immutable source identities.

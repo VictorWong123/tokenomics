@@ -38,6 +38,22 @@ def infer_drafter(frozen):
     return drafter
 
 
+def replay_checkpoints(config, output_tokens):
+    schedule = config.get("replay_checkpoints", [32, 96, 224, 400])
+    if (
+        not isinstance(schedule, list)
+        or not schedule
+        or len(schedule) > 16
+        or any(type(value) is not int or value < 9 for value in schedule)
+        or schedule != sorted(set(schedule))
+    ):
+        raise ValueError(
+            "Replay checkpoints must be 1–16 increasing unique integers >=9"
+        )
+    # The full action8 continuation needs nine canonical tokens after capture.
+    return [checkpoint for checkpoint in schedule if checkpoint + 9 < output_tokens]
+
+
 def run_jobs(exe, target, draft, jobs, directory, cfg, gpu_layers):
     directory.mkdir(parents=True, exist_ok=True)
     jobpath = directory / "jobs.jsonl"
@@ -136,6 +152,15 @@ def investigate(
     if not (pathlib.Path(pilot_dir) / "complete.json").exists():
         raise RuntimeError("Pilot A must be complete before checkpoint replay")
     operating_point = manifest["frozen"]
+    if infer_drafter(operating_point) != drafter:
+        raise ValueError("Replay drafter differs from the frozen fit configurations")
+    if cfg.get("replay_checkpoints") != operating_point["config"].get(
+        "replay_checkpoints"
+    ):
+        raise ValueError("Replay checkpoint schedule differs from the frozen fit")
+    replay_checkpoints(
+        cfg, 0
+    )  # Validate before writing artifacts or launching inference.
     if (
         sha256(exe) != operating_point["binary_sha256"]
         or sha256(target) != operating_point["target_sha256"]
@@ -200,7 +225,7 @@ def investigate(
         prompt_ids = ref["prompt_ids"]
         jobs = []
         # No checkpoint after the final target trace token, which might be EOG.
-        checkpoints = [x for x in (32, 96, 224, 400) if x + 9 < len(tokens)]
+        checkpoints = replay_checkpoints(cfg, len(tokens))
         for cp in checkpoints:
             for rep in range(3):
                 order = list(replay_actions)

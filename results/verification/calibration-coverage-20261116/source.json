@@ -1,0 +1,13 @@
+{
+  "mac_archive_sha256": "8d658228aabdc793d26f0fc43ad58c62756fae58bd5e0987513616131f6624c8",
+  "owned_files_sha256": {
+    "analysis/calibration_coverage.py": "2ecf0dfaeb3d39ee7900a10bfeb4cdfc2779d7f43c8e161fac1933884ee13923",
+    "bench/replay.py": "d9504fe7644aa03fd97772d363265c403b6e053a6603c1422873ab921d386f34",
+    "tests/test_controller_calibration.py": "d6d24cb96728d0e5eb37d18a9cfca76ddf4e47ffb1aac2f7eb3da79f3fb94bf9",
+    "tests/test_proposal_replay.py": "b0a24403266fa7719b86bacd46aa0862fba0d50ace197d789c0e95db44d9e779"
+  },
+  "source": {
+    "owned_source_sha256": "50ab4417595b6b35ec4e9985deeebdcaba6759590a53e99876977bcbb82e9b07",
+    "revision": "ce2e032c931c758186cd0a01b60d09e1ac7caa4f"
+  }
+}

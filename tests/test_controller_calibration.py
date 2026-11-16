@@ -88,6 +88,8 @@ class Calibration(unittest.TestCase):
                 id="development-qa-01", category="qa", split="development", prompt="a b"
             )
         ]
+        if drafter == "suffix":
+            cfg["replay_checkpoints"] = [9, 16, 32, 48]
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             run(
@@ -105,6 +107,16 @@ class Calibration(unittest.TestCase):
             prior = calibrate(
                 root / "fit", root / "replay", drafter, synthetic_fixture=True
             )
+            if drafter == "suffix":
+                from analysis.calibration_coverage import audit
+
+                coverage = audit(root / "fit", root / "replay", drafter)
+                self.assertTrue(
+                    all(a["distinct_states"] == 4 for a in coverage["actions"])
+                )
+                self.assertTrue(
+                    all(a["timing_samples"] == 12 for a in coverage["actions"])
+                )
             self.assertTrue(prior["synthetic"])
             self.assertEqual(len(prior["priors"]), 6)
             self.assertTrue(all(p["base_ms"] > 0 for p in prior["priors"]))

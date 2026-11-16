@@ -10,10 +10,21 @@ from analysis.proposal_replay import (
     suffix_draft,
     upstream_ngram,
 )
-from bench.replay import infer_drafter
+from bench.replay import infer_drafter, replay_checkpoints
 
 
 class ProposalReplayTests(unittest.TestCase):
+    def test_checkpoint_schedule_keeps_full_action_room(self):
+        self.assertEqual(replay_checkpoints({}, 64), [32])
+        self.assertEqual(
+            replay_checkpoints({"replay_checkpoints": [9, 16, 32, 48]}, 64),
+            [9, 16, 32, 48],
+        )
+        self.assertEqual(replay_checkpoints({"replay_checkpoints": [9, 16]}, 25), [9])
+        for schedule in ([], [8], [True], [16, 9], [9, 9], "32", list(range(9, 26))):
+            with self.subTest(schedule=schedule), self.assertRaises(ValueError):
+                replay_checkpoints({"replay_checkpoints": schedule}, 64)
+
     def test_replay_passes_only_committed_history(self):
         prompt, output = [9, 8, 7], list(range(1, 18))
         visits = []

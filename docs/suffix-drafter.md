@@ -107,3 +107,32 @@ and provenance check. These are CPU checks. The pinned trained-model download
 was blocked by the Cloud network proxy (HTTP 403), so they do not establish
 trained-model or Metal execution results. The existing Metal guard remains the
 default unless its separate experimental option is explicitly selected.
+
+## Calibration coverage
+
+A fit configuration may declare `"replay_checkpoints": [9, 16, 32, 48]` before
+measurements start. The schedule is frozen with the fit configuration and must
+match during replay; it cannot be changed while resuming. Each checkpoint is
+captured and replayed in its own process group, retaining only the same two
+snapshots as before. The original default `[32, 96, 224, 400]` is preserved for
+historical compatibility. Only checkpoints with room for a complete nine-token
+continuation are eligible. A short fit run with no eligible checkpoints cannot
+produce a valid calibration.
+
+The historical cap64 fits provide only checkpoint32: three distinct states per
+action, repeated three times. Only one M3 state and two Linux states produced
+ngram proposals. Averages over these states cannot establish behavior across
+all repetition patterns. The optional denser schedule improves observed-state
+coverage; it does not guarantee a faster controller. It requires a new fit run
+and newly frozen priors.
+
+Audit any completed calibration without inference:
+
+```bash
+.venv/bin/python -m analysis.calibration_coverage \
+  --fit PATH/fit --replay PATH/replay --drafter suffix \
+  --out results/local/suffix-calibration-coverage.json
+```
+
+The audit rechecks immutable records, original checkpoint states and calibration
+identity, and distinguishes repeated timing samples from distinct contexts.
