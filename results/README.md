@@ -4,7 +4,25 @@ This directory separates observed execution evidence from derived reports and
 local experiments. The completed controller result is a bounded Linux CPU
 **development** study, not a held-out or Mac result.
 
-## Current engineering checkpoint
+## 16 November research branch
+
+New candidates remain opt-in. No new M3 speedup or held-out win is established.
+Use the [local M3 handoff](../docs/m3-research-handoff-20261116.md) to run them.
+
+| Evidence | Scope |
+|---|---|
+| [Final local/offline audit](verification/session-final-20261116/README.md) |141 Python tests,16 replay collections, raw learned records and projection reconciliation |
+| [Expanded matrix checks](verification/matvec-15-local-20261116/README.md) | Native Apple13-stage compile/CPU proof and local Release/sanitizers; no actual Metal timing |
+| [Projection census](verification/projection-census-20261116/README.md) | Header-confirmed sizes and mixed quantization; expanded component classes cover over 98% of logical projection bytes |
+| [Suffix-priority follow-up](verification/retrieval-priority-20261116/README.md) | 384 post-hoc records; tradeoffs, no new native mode |
+| [Original learned CPU archives and offline audit](verification/research-raw-20261116/README.md) | 440 exact comparisons and 15955 cycle records; direct sampler ARM and guided ARM/x86 |
+| [Frozen guided development validation](verification/logit-copy-validation-20261116/README.md) | Negative 0.5B suffix comparison; mixed 1.5B work tradeoff, no latency |
+| [Live guided checks](verification/logit-copy-live-20261116/README.md) | Actual IDs/stops/work and causal hints on both models; NEON/SSE2 execution |
+| [Guided native component](verification/logit-copy-native-simd-20261116/README.md) | Synthetic host proposal cost and 5546 exact Python/native proposal records |
+| [Linear transition follow-up](verification/transition-replay-20261116/README.md) | Complete negative exploratory result; no new runtime drafter |
+| [Session research record](../docs/research-session-20261116.md) | Paper hypotheses, source checkpoints, compiled Metal variants and bounded compute |
+
+## Historical controller checkpoint
 
 | Evidence | What it establishes |
 |---|---|

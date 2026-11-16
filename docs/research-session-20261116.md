@@ -1093,3 +1093,46 @@ match outputs and work exactly;129 Python tests pass with eight optional skips.
 All retained learned fit/validation trajectories are full64-token cases, so
 this fix leaves those work comparisons unchanged. The native rank-embedding
 harness explicitly restricts its replay mode to full-budget fit trajectories.
+
+### 12:15–13:27 UTC — learned proof, projection census and final replay checks
+
+Learned guided live checks pass60 requests per model:0.5B Apple ARM/NEON and
+1.5B Linux/SSE2, with exact IDs/stops/work and causal hint ages. The0.5B ARM
+canonical trajectory differs from x86, but suffix still dominates guided caps4/8.
+Four original public diagnostic ZIPs are recovered with GitHub digests and all
+completion seals. Independent offline checks cover440 learned comparisons and
+15955 actual cycle records; raw evidence no longer depends on artifact expiry.
+
+The remaining linear approximations do not justify more runtime modes. Five
+already observed collections produce336 transition/stale-logit records and
+17416 computed cycles: context-two chaining saves few cycles at much greater
+waste, while direct previous-second-logit guesses accept about5% on validation.
+A separate post-hoc suffix-priority comparison retains384 records/19616 cycles.
+Strong suffix before ngram mostly reproduces ngram; before guidance it creates
+work tradeoffs. These are exploration on seen development data, not another
+validation or a change to the reserved90-prompt evaluation.
+
+Two16MiB header-prefix censuses quantify391573504/979517952 logical projection
+bytes for0.5B/1.5B. Output heads represent36.9%/19.5%, while FFN gate/up represent
+36.7%/44.3%. Both models mix Q4_K/Q6_K down projections. These size fractions
+are not traffic, runtime shares or speed forecasts. They exposed missing FFN
+shape classes in the original component. The expanded five-class grids cover
+98.9%/98.6% of logical projection payload, with25 query/shape cells per model.
+The0.5B study requires6400 timing pairs/400 gates;1.5B uses only applicable
+short-MV/interleaved profiles and requires3200 pairs/200 gates.
+
+Current component runs check native geometry before allocation, exact encoded
+byte sizes, full raw trial coverage and cross-profile fingerprints. They seal
+all payloads after the final manifest is stable. An offline verifier reconstructs
+the aggregate from raw logs and recomputes the summary; corruption and wrong
+geometry fail. Expanded native Apple run43870311106 passes13 stages at5ce28cf,
+including Metal compilation, CPU backend math and model-aware tiny fixtures.
+Its inference binary remains byte-identical to the prior component checkpoint.
+The virtual GPU still cannot execute the required Metal graphs.
+
+Final local checks pass141 Python tests (eight optional skips), Release and
+ASAN/UBSAN component fixtures, five fresh C++-only suites, Black108-file and
+clang-format checks. The offline audit reproduces all16 retained proposal
+collections exactly and rechecks raw learned evidence/census. The default-OFF
+runtime features, current local commands, negative results and actual-M3
+requirements are collected in `docs/m3-research-handoff-20261116.md`.

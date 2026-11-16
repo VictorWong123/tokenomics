@@ -10,6 +10,10 @@ Python supports offline calibration, tests, benchmark orchestration and analysis
 The model and online controller execute in C/C++; Python is not in the token
 generation loop. See the [source and language map](docs/development.md#source-and-language-map).
 
+Current research is isolated on `research/speculative-throughput-20261116`.
+The [M3 handoff](docs/m3-research-handoff-20261116.md) lists candidate gates,
+local commands and completed/negative results. New Metal throughput is unmeasured.
+
 ## Build the C++ executable
 
 Requires Git, a C++20 compiler, CMake 3.24+ and Ninja. This build does not require
@@ -40,7 +44,7 @@ licenses are recorded in [the model catalog](configs/models-v1.json).
 
 The full development environment additionally needs Python 3.12+, venv support
 and curl. The bootstrap installs pinned tooling, builds the runtime and runs
-all seven default CTest suites:
+all eight default CTest suites:
 
 ```bash
 bash scripts/bootstrap.sh cpu

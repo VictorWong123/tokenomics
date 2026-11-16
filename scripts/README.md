@@ -75,7 +75,11 @@ does not change the default profile or establish a held-out/controller gain.
 
 `metal_short_mv_study.py --model PATH --out FRESH_DIRECTORY` builds the guarded
 and opt-in short-MV profiles on native Apple Silicon, runs correctness checks,
-and enables the 72-record development screen only after cross-profile equality.
+and enables the default 72-record development screen only after cross-profile equality.
+`--screen retrieval` selects 126 records with ngram/suffix caps 1/4/8 and both
+ordinary controls. `--share-q8`, `--interleave` and `--direct-greedy` are isolated
+candidates. `--model-id qwen25-15` supports the larger pinned target; Q8-only
+flags are rejected for it.
 Use `--gate-only` to omit timings. `check_metal_profile.py` runs that gate against
 already-built binaries. See [M3 instructions and limitations](../docs/metal-short-mv.md).
 For the 16 November research session, the user's no-Codespaces instruction
@@ -104,3 +108,23 @@ See [profile scope and local commands](../docs/greedy-sampler.md).
 `check_suffix_replay.py` executes the production C++ suffix function on archived
 canonical validation IDs, using the optional `test_suffix_replay` target. It
 loads no model and checks the native counts against the frozen Python replay.
+
+
+## Additional 16 November research tools
+
+| Tool | Responsibility |
+|---|---|
+| `metal_matvec_study.py` | No-model actual-Metal component comparison; 0.5B four profiles or `--model-id qwen25-15` two applicable profiles |
+| `hosted_metal_preflight.py` | Native host/shader/CPU correctness on a standard public Apple runner; no virtual-GPU throughput claim |
+| `collect_logit_fit.py` | Opt-in guarded CPU top64 diagnostic for separately pinned fit/validation protocols; exact observer/ordinary checks |
+| `check_logit_copy.py` | 60 actual CPU validation requests against canonical IDs/stops/work and causal hint ages |
+| `trained_cpu_smoke.py` | Bounded pinned-model sampler comparison; optional direct profile with eligibility/call checks |
+| `audit_research_session.py` | Recheck 16 retained proposal collections, original learned CPU records and projection census without model inference |
+| `recover_research_evidence.py` | Preserve four allowlisted public diagnostic ZIPs, with original GitHub digest and internal seals; no inference |
+
+Offline modules `analysis.logit_copy`, `analysis.frequency_copy` and
+`analysis.transition_replay` retain all exploratory/frozen work cells without
+loading weights. `analysis.research_archive` audits preserved raw CPU records.
+The [M3 handoff](../docs/m3-research-handoff-20261116.md) gives the current
+experiment order and commands. Negative proposal results remain explicit;
+reserved held-out prompts are not used by these exploratory tools.

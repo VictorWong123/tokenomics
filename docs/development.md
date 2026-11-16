@@ -10,6 +10,8 @@ compute neural-network layers in the generation loop.
 | Owned C++ source | Responsibility |
 |---|---|
 | `src/runtime.cpp`, `runtime.h` | Engine/model lifecycle, generation, KV retention/rollback, synchronization, snapshots and stage timers |
+| `src/logit_copy.cpp`, `logit_copy.h` | Default-OFF past-logit guided proposals, strict rank membership and causal telemetry |
+| `src/greedy_direct.h` | Default-OFF strict host argmax with earliest-index ties and original NaN behavior |
 | `src/suffix.cpp`, `suffix.h` | Optional request-local longest-suffix proposals; five-token minimum, no learned model |
 | `src/policy.cpp`, `policy.h` | Online action scores, EWMA, probes, hysteresis, fallback and reset; fixed/acceptance/script policies |
 | `src/commit.cpp`, `commit.h` | Draft budgets and accepted/correction/bonus token commitment |
@@ -43,13 +45,13 @@ submodule with `git submodule update --init --recursive`.
 cmake -S . -B build-native -G Ninja -DCMAKE_BUILD_TYPE=Release \
   -DGGML_NATIVE=OFF -DGGML_METAL=OFF -DGGML_CUDA=OFF \
   -DBUILD_TESTING=ON -DTOKENOMICS_PYTHON_TESTS=OFF
-cmake --build build-native --target tokenomics test_core test_suffix test_controller test_controller_io -j2
+cmake --build build-native --target tokenomics test_core test_suffix test_controller test_controller_io test_logit_copy -j2
 ctest --test-dir build-native --output-on-failure
 build-native/tokenomics --help
 ```
 
-This registers the four pure C++ suites: `core`, `suffix`, `controller` and
-`controller_io`. It does not discover Python. `test_runtime` remains a buildable
+This registers five pure C++ suites: `core`, `suffix`, `controller`,
+`controller_io` and `logit_copy`. It does not discover Python. `test_runtime` remains a buildable
 C++ target, but its automatic fixture setup and CTest registration require full
 development mode. A native-only pass is not a runtime/model gate.
 
@@ -72,7 +74,7 @@ Ninja and Python analysis/test dependencies, builds `build-cpu` and runs CTest.
 Set `TOKENOMICS_BUILD_JOBS=2` to limit compilation parallelism. Python packages
 are development/experiment dependencies, not native runtime dependencies.
 
-`TOKENOMICS_PYTHON_TESTS` defaults to `ON`, enabling seven default suites.
+`TOKENOMICS_PYTHON_TESTS` defaults to `ON`, enabling eight default suites.
 In a reused build directory, enable it explicitly if it was disabled:
 
 ```bash
@@ -85,6 +87,7 @@ In a reused build directory, enable it explicitly if it was disabled:
 | Suite | Coverage |
 |---|---|
 | `core` | C++ commit/budget and baseline policy rules |
+| `logit_copy` | Pure guided-proposal sorted-reference cases; the inference feature remains disabled by default |
 | `suffix` | Causal suffix retrieval against an independent reference, overlap and cap checks |
 | `controller` | C++ scores, EWMA, probes, holds, transitions, reset and allocation-free valid decisions/updates |
 | `controller_io` | C++ strict configuration and trace JSON |

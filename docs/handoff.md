@@ -1,5 +1,11 @@
 # Tokenomics continuation handoff
 
+## Research branch (16 November 2026)
+
+The [current M3 handoff](m3-research-handoff-20261116.md) lists the isolated
+branch, completed research, negative results and exact local experiment commands.
+No Codespace is used. The older sections below describe historical checkpoints.
+
 ## Repository cleanup (9 November 2026)
 
 The root README now leads with the C++ executable and measured scope. Build/test

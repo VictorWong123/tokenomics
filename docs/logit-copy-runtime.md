@@ -1,7 +1,7 @@
 # Experimental past-logit copy drafter
 
 The frozen development validation does not support replacing the existing
-retrieval drafters generally. In0.5B, guided caps4/8 are dominated by the
+retrieval drafters generally. In0.5B, guided caps 4/8 are dominated by the
 minimum-five suffix controls in cycles and wasted rows. In1.5B, guided cap4
 improves on suffix copying but trades more cycles for fewer wasted rows than
 ngram. Ranking cost is additional. This prototype therefore defaults OFF as
@@ -35,10 +35,13 @@ matches5546 individual proposal/hint records across both fit collections.
 Enabled runtime fixtures cover1362 cases, including injected zero/partial/full
 acceptance, action0 re-entry, request reset, EOS and context limits. Release and
 ASAN/UBSAN suites pass. These local native checks use Linux x86_64; ARM/NEON execution is checked
-separately on the hosted runner. Separate live synthetic validation matches all60
-requests' IDs/stops and exact work counts to the canonical replay. Learned CPU
-live validation and native ARM checks are separate bounded workflow steps;
-these fixture results do not establish trained Metal or M3 speed.
+separately on the hosted runner. Two live synthetic suites cover full-budget
+and early-EOG trajectories. Learned CPU live validation also passes 60 requests
+per model: 0.5B ARM/NEON and 1.5B x86/SSE2, with exact IDs/stops/work and causal
+hint ages. The 0.5B ARM trajectory differs from x86, but suffix still dominates
+guided caps 4/8. Original diagnostic ZIPs and an independent offline audit are
+[retained](../results/verification/research-raw-20261116/README.md).
+These results do not establish trained Metal or M3 speed.
 
 The host component benchmark compares complete proposal construction with a
 sorted-vocabulary/prefix-enumeration reference. Its synthetic cache-warm results
@@ -50,6 +53,6 @@ For CPU research, build a separate directory with
 stage-timing experiments OFF. The ordinary executable then accepts
 `--drafter logit-copy --policy fixed --k 4`. `scripts/check_logit_copy.py` compares
 live decoding against a sealed, predeclared validation rank collection; it
-checks all60 ordinary/ngram/suffix/guided requests and audits hint ages. The
+checks all 60 ordinary/ngram/suffix/guided requests and audits hint ages. The
 `logit-live` workflow collects and checks the same frozen validation on a bounded
 standard public CPU runner. Reserved held-out prompts remain untouched.

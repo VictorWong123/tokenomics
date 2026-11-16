@@ -20,7 +20,7 @@ select a CPU fallback for the Metal run.
 The five shapes are Q8_0[896,151936], Q5_0[896,896], Q4_K[4864,896],
 Q6_K[4864,896] and Q5_0[896,4864], each with 1/2/3/5/9 activation rows. Shapes reflect the pinned
 Qwen0.5B architecture and tensor-type inventory; values are deterministic random
-inputs, not learned weights. The Q8 matrix occupies144643072 encoded bytes,
+inputs, not learned weights. The Q8 matrix occupies 144643072 encoded bytes,
 matching the large output head. The float setup copy is released before timing.
 
 For every shape, all five row counts must match separately executed one-row
@@ -30,11 +30,11 @@ blocks, the analyzer also requires matching input, quantized-weight and output
 fingerprints. A missing gate, missing/duplicate trial, failed comparison, CPU
 backend or invalid duration rejects the report.
 
-Each cell has four warmup pairs and16 alternating batch/serial timing pairs,
+Each cell has four warmup pairs and 16 alternating batch/serial timing pairs,
 with eight completed graph computations per measurement. Every computation
 explicitly synchronizes the selected backend. Four blocks rotate the order
 short/interleaved/grouped/shared so each profile occupies each position once.
-Raw5120 timing pairs and 320 gate records remain available. Summary reports
+Raw 6400 timing pairs and 400 gate records remain available. Summary reports
 per-block medians and candidate ratios against plain short-MV. Inspect one-row
 controls and block variation alongside any apparent improvement; four blocks
 are not a confidence interval.
@@ -49,8 +49,8 @@ cross-profile token gates in `metal_short_mv_study.py`, then paired generation
 measurements. A component pass cannot replace those gates.
 
 The portable `test_matvec_component --cpu-fixture` mode checks the harness's
-allocation, view layout, quantization and comparisons using four small256×128
-matrices. It records20 arithmetic gates and10240 exact value comparisons and
+allocation, view layout, quantization and comparisons using four small 256×128
+matrices. It records 20 arithmetic gates and 10240 exact value comparisons and
 never records timings. CPU fixture success is not a Metal arithmetic result.
 
 [Native Apple compilation](https://github.com/VictorWong123/tokenomics/actions/runs/43827839125)
@@ -80,18 +80,18 @@ coverage and cross-profile data/output fingerprints. Before allocating a large
 matrix, the runner checks each native executable's `--shapes --model-id` output
 against the frozen Python geometry. Wrong model geometry rejects the run.
 
-The small CPU fixture for1.5B covers Q4_K/Q6_K with ten gates/5120 compared values;
+The small CPU fixture for 1.5B covers Q4_K/Q6_K with ten gates/5120 compared values;
 it does not execute the large matrices or predict their throughput. As with 0.5B,
 a passing component is followed by actual GPU/backend and trained-model gates.
 
 
 The expanded grids follow the complete pinned header census: the selected
-shape/type classes cover over98% of each model's logical encoded projection
+shape/type classes cover over 98% of each model's logical encoded projection
 payload. The omitted K/V projection shapes are small; every selected shape still
 has its own actual GPU gate. These percentages are not measured memory traffic
 or an Amdahl speed estimate. [Census and provenance](../results/verification/projection-census-20261116).
-Earlier four-shape0.5B/three-shape1.5B compilation receipts remain historical;
-the current runner requires all25 query/shape cells for its selected model.
+Earlier four-shape 0.5B/three-shape 1.5B compilation receipts remain historical;
+the current runner requires all 25 query/shape cells for its selected model.
 
 Completed local runs now seal `manifest.json`, raw configure/compile/shape and
 timing logs, aggregate records and the derived summary in `complete.json`.

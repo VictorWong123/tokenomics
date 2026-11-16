@@ -1,0 +1,6 @@
+{
+  "black": "All done! \u2728 \ud83c\udf70 \u2728\n108 files would be left unchanged.\n",
+  "black_log_sha256": "ab1e9d411f4a736e14db69c1343bb4db25c2947b3d8b56b00659900c715425de",
+  "clang_format": "passed: src/*.cpp src/*.h tests/*.cpp",
+  "clang_format_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

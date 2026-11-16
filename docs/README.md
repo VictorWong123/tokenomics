@@ -15,6 +15,7 @@
 
 | Document | Purpose |
 |---|---|
+| [M3 research handoff](m3-research-handoff-20261116.md) | Current branch, candidate order and exact local commands |
 | [Benchmarking](benchmarking.md) | Model download, smoke/pilot commands, resume and analysis |
 | [Model correctness](model-correctness.md) | Exact token-ID/stop gate and observed coverage |
 | [Experiment protocol](experiment.md) | Workloads, timing, baseline selection and scientific gates |
@@ -39,4 +40,6 @@
 [Handoff](handoff.md) records current continuation status. [Decisions](decisions.md)
 and [engineering history](engineering-history.md) retain older choices and session
 snapshots. Historical queue/access states are not instructions to restart runs.
-Full held-out, Metal and CUDA model execution remain unperformed.
+The full held-out and CUDA evaluations remain unperformed. Historical M3 Metal
+execution is retained in the evidence index; the new 16 November kernel profiles
+still require actual M3 correctness and timing.
