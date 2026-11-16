@@ -833,3 +833,12 @@ pass in45.79 seconds. Strict/contracted Release and ASAN partial checks also pas
 with an added finite-value/poison-read rejection. The full native runtime profile
 is pending; actual M3 graphs/tokens/timing remain unmeasured.
 [Integration host evidence](../results/verification/q8-shared-integration-20261116/host-summary.json).
+
+The first full native shared-Q8 run compiles the runtime, both direct harnesses
+and both Metal shader sources. Eight native suites pass, including dispatch,
+split geometry and runtime fixtures. The ninth, Python tooling, reaches the
+240-second per-suite timeout without a reported assertion failure. Retained the
+failed run; later backend/source-partial/library stages were not reached.
+Raised that bounded suite allowance to600 seconds for the hosted ARM runner;
+the workflow remains capped at45 minutes. This is a timeout correction, not a
+numerical failure being waived.

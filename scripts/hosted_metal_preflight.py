@@ -194,7 +194,7 @@ def main():
                     str(build),
                     "--output-on-failure",
                     "--timeout",
-                    "240",
+                    "600",
                 ],
             )
             run(f"{profile}-cpu-rows", [str(build / "test_backend_rows"), "--cpu"])
