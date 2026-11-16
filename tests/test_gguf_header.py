@@ -3,7 +3,7 @@
 import struct
 import unittest
 
-from scripts.inspect_gguf_header import LIMIT, parse_prefix
+from scripts.inspect_gguf_header import LIMIT, parse_prefix, projection_census
 
 
 def text(value):
@@ -62,6 +62,59 @@ class GGUFHeaderTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 parse_prefix(raw)
+
+
+class ProjectionCensusTests(unittest.TestCase):
+    def test_real_head_sizes_and_embedding_exclusion(self):
+        for code, kind, width, expected in (
+            (8, "Q8_0", 896, 144643072),
+            (14, "Q6_K", 1536, 191439360),
+        ):
+            rows = [
+                {
+                    "name": "output.weight",
+                    "shape": [width, 151936],
+                    "type_code": code,
+                    "type": kind,
+                },
+                {
+                    "name": "token_embd.weight",
+                    "shape": [256, 10],
+                    "type_code": 12,
+                    "type": "Q4_K",
+                },
+                {
+                    "name": "blk.0.attn_norm.weight",
+                    "shape": [width],
+                    "type_code": 0,
+                    "type": "F32",
+                },
+            ]
+            result = projection_census(rows)
+            self.assertEqual(result["projection_bytes"], expected)
+            self.assertEqual(result["embedding_tensor_bytes"], 1440)
+            self.assertEqual(result["other_tensor_bytes"], width * 4)
+            self.assertEqual(
+                result["total_encoded_tensor_bytes"], expected + 1440 + width * 4
+            )
+            self.assertEqual(result["projection_by_role"]["output"]["tensors"], 1)
+
+    def test_rejects_unknown_or_invalid_tensor_accounting(self):
+        row = {
+            "name": "blk.0.ffn_down.weight",
+            "shape": [8960, 1536],
+            "type_code": 14,
+            "type": "Q6_K",
+        }
+        self.assertEqual(projection_census([row])["projection_bytes"], 11289600)
+        for rows in (
+            [row, row],
+            [{**row, "shape": [8959, 1536]}],
+            [{**row, "name": "unknown.weight"}],
+            [{**row, "type_code": 99}],
+        ):
+            with self.assertRaises(ValueError):
+                projection_census(rows)
 
 
 if __name__ == "__main__":

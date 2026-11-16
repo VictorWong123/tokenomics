@@ -5,6 +5,7 @@ from collections import Counter
 import hashlib
 import io
 import json
+import math
 import re
 from pathlib import Path
 import struct
@@ -131,6 +132,63 @@ def parse_prefix(data):
     }
 
 
+def projection_census(records):
+    """Encoded payload accounting, not measured memory traffic or latency."""
+    sizes = {
+        0: (1, 4),
+        1: (1, 2),
+        6: (32, 22),
+        8: (32, 34),
+        12: (256, 144),
+        14: (256, 210),
+        30: (1, 2),
+    }
+    total = embedding = other = 0
+    by_type, by_role = {}, {}
+    names = set()
+    for row in records:
+        name, shape = row["name"], row["shape"]
+        if name in names or row["type_code"] not in sizes:
+            raise ValueError("Duplicate tensor or unsupported census quantization")
+        names.add(name)
+        block, size = sizes[row["type_code"]]
+        if not shape or any(value <= 0 for value in shape) or shape[0] % block:
+            raise ValueError("Invalid census tensor geometry")
+        encoded = math.prod(shape) // block * size
+        total += encoded
+        if name == "token_embd.weight":
+            embedding += encoded
+            continue
+        if len(shape) != 2:
+            other += encoded
+            continue
+        match = re.fullmatch(
+            r"blk\.[0-9]+\.(attn_q|attn_k|attn_v|attn_output|ffn_gate|ffn_up|ffn_down)\.weight",
+            name,
+        )
+        if name != "output.weight" and match is None:
+            raise ValueError("Unclassified dense-model matrix")
+        role = "output" if name == "output.weight" else match[1]
+        for table, key in ((by_type, row["type"]), (by_role, role)):
+            cell = table.setdefault(key, {"tensors": 0, "encoded_bytes": 0})
+            cell["tensors"] += 1
+            cell["encoded_bytes"] += encoded
+    projected = sum(row["encoded_bytes"] for row in by_type.values())
+    if projected + embedding + other != total or projected != sum(
+        row["encoded_bytes"] for row in by_role.values()
+    ):
+        raise ValueError("Projection census does not reconcile")
+    return {
+        "scope": "Logical encoded dense projection payloads; excludes embedding lookups, vector operations, activations, KV, repeated loads and cache effects. Not measured traffic, bandwidth or speed.",
+        "total_encoded_tensor_bytes": total,
+        "embedding_tensor_bytes": embedding,
+        "other_tensor_bytes": other,
+        "projection_bytes": projected,
+        "projection_by_type": dict(sorted(by_type.items())),
+        "projection_by_role": dict(sorted(by_role.items())),
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -168,6 +226,7 @@ def main():
             report["http_status"] = response.status
             report["content_range"] = response.headers.get("Content-Range")
         report.update(parse_prefix(prefix))
+        report["projection_census"] = projection_census(report["tensors"])
         report["prefix_sha256"] = hashlib.sha256(prefix).hexdigest()
         report["prefix_bytes_read"] = len(prefix)
         report["state"] = "header_inspected"
