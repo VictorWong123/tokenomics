@@ -82,7 +82,33 @@ Minimal logging still takes stage timestamps. Its comparison measures cycle
 retention/bookkeeping; serialization is outside decode and inside whole-process
 latency. Noise can make estimated logging overhead negative.
 
-## Rejected alternatives
+## Q4 pair verification: research branch experiment
+
+`TOKENOMICS_CPU_Q4_PAIR=ON` is an opt-in x86-64 AVX2 experiment, requiring the
+guarded profile. It shares Q4_K weight unpacking across two activation rows while
+preserving the pinned single-row kernel's integer accumulation, FMA and final
+reduction order. Other quantization types, ordinary one-row decode, attention
+planes and batches larger than nine retain the existing path. The upstream
+submodule stays unchanged; CMake generates source copies in the build directory.
+
+Configure a separate build with the normal Release CPU options and
+`-DTOKENOMICS_CPU_Q4_PAIR=ON`. It adds the `q4_pair` CTest suite and optional
+`bench_q4_pair` build target. The latter takes matrix width, output rows and
+repetitions; it measures a synthetic matrix component, not model throughput.
+It explicitly initializes the CPU conversion tables and rejects all-zero
+checksums. An initial harness run without that initialization was invalid and
+is excluded from accepted evidence.
+
+The frozen `configs/q4-pair-screen-v1.json` compares guarded/pair target-only
+and ngram fixed1/4/8 on three development prompts, cap128, three repetitions
+(72 records). Every block must match the unchanged guarded ordinary decoder;
+each matched policy must also do identical work. `scripts/q4_pair_study.py`
+runs the unchanged 272-comparison within-profile trained gate first. The
+`q4-pair` workflow-dispatch phase uses the existing owned lifecycle on the
+research branch. No trained result or default-profile change is established
+by adding that route. See [session evidence](research-session-20261116.md).
+
+## Earlier rejected alternatives
 
 `results/verification/kernel-study-20261108` retains the forced-all-tiled study.
 Its apparent speculation ratio came from a much slower ordinary baseline;

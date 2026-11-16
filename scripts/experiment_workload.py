@@ -58,6 +58,8 @@ def pack(results, destination, owner):
 
 
 def measurement_directory(phase, results, point):
+    if phase == "q4-pair":
+        return results / "q4-pair"
     if phase in ("controller", "controller-packed"):
         return results / "validation"
     if phase == "profiles":
@@ -101,6 +103,7 @@ def workload():
             "controller-packed",
             "profiles",
             "profile-diagnosis",
+            "q4-pair",
         ),
         "Unsupported fixed experiment",
     )
@@ -121,6 +124,7 @@ def workload():
             "controller-packed",
             "profiles",
             "profile-diagnosis",
+            "q4-pair",
         )
         or (selected == "qwen25-05-3-q4" and drafter == "ngram"),
         "Confirmation/kernel/controller/profile experiments require the 3B target and ngram drafter",
@@ -234,7 +238,7 @@ def workload():
                 "--budget-seconds",
                 "6600",
             ]
-        elif phase in ("kernel", "profiles", "profile-diagnosis"):
+        elif phase in ("kernel", "profiles", "profile-diagnosis", "q4-pair"):
             args = [
                 "timeout",
                 "--signal=TERM",
@@ -246,6 +250,7 @@ def workload():
                         "kernel": "scripts/check_kernel_profile.py",
                         "profiles": "scripts/compare_cpu_profiles.py",
                         "profile-diagnosis": "scripts/profile_diagnosis.py",
+                        "q4-pair": "scripts/q4_pair_study.py",
                     }[phase]
                 ),
                 "--model-dir",
@@ -289,6 +294,7 @@ def workload():
             "controller-packed": {0: "controller_study_complete", 11: "paused"},
             "profiles": {0: "profile_comparison_complete"},
             "profile-diagnosis": {0: "profile_diagnosis_complete"},
+            "q4-pair": {0: "q4_pair_comparison_complete"},
             "timing": {10: "timing_complete"},
             "pilot": {
                 11: "paused",
@@ -348,7 +354,11 @@ def workload():
                         == (
                             54
                             if phase == "profiles"
-                            else (18 if drafter == "ngram" else 21)
+                            else (
+                                72
+                                if phase == "q4-pair"
+                                else (18 if drafter == "ngram" else 21)
+                            )
                         )
                     )
                 )
@@ -461,6 +471,7 @@ def workload():
                 ("kernel_screen", results / point / "analysis/measurements.json"),
                 ("cpu_profiles", results / "profiles/analysis/summary.json"),
                 ("profile_diagnosis", results / "diagnosis.json"),
+                ("q4_pair", results / "q4-pair/analysis/summary.json"),
             ):
                 if path.exists():
                     report[label] = json.loads(path.read_text())
@@ -479,6 +490,7 @@ def workload():
             "controller_study_complete",
             "profile_comparison_complete",
             "profile_diagnosis_complete",
+            "q4_pair_comparison_complete",
             "paused",
             "proceed_controller_implementation",
             "narrow_or_investigate",

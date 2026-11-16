@@ -1,0 +1,14 @@
+tmpsvszr8bq: 1/9 blocks complete (development-qa-01-n128-r1)
+tmpsvszr8bq: 2/9 blocks complete (development-qa-01-n128-r0)
+tmpsvszr8bq: 3/9 blocks complete (development-summary-01-n128-r0)
+tmpsvszr8bq: 4/9 blocks complete (development-code-01-n128-r1)
+tmpsvszr8bq: 5/9 blocks complete (development-qa-01-n128-r2)
+tmpsvszr8bq: 6/9 blocks complete (development-summary-01-n128-r1)
+tmpsvszr8bq: 7/9 blocks complete (development-code-01-n128-r2)
+tmpsvszr8bq: 8/9 blocks complete (development-summary-01-n128-r2)
+tmpsvszr8bq: 9/9 blocks complete (development-code-01-n128-r0)
+...
+----------------------------------------------------------------------
+Ran 3 tests in 4.303s
+
+OK

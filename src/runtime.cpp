@@ -212,6 +212,9 @@ std::string Engine::system_info() const {
 #ifdef TOKENOMICS_CPU_PACKED_VERIFY
     info += "; TOKENOMICS_CPU_PACKED_VERIFY=ON; packed_gemv_max_rows=9; tiled_min_rows=10";
 #endif
+#ifdef TOKENOMICS_CPU_Q4_PAIR
+    info += "; TOKENOMICS_CPU_Q4_PAIR=ON; q4_pair_max_rows=9";
+#endif
 #ifdef TOKENOMICS_METAL_VERIFY_SINGLE_ROW
     if (impl_->cfg.gpu_layers > 0)
         info += "; TOKENOMICS_METAL_VERIFY_SINGLE_ROW=ON; verification_ubatch=1";

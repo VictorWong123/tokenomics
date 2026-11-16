@@ -25,6 +25,7 @@ def build_configuration(binary):
         "CMAKE_BUILD_TYPE",
         "TOKENOMICS_CPU_BATCH_INVARIANT",
         "TOKENOMICS_CPU_PACKED_VERIFY",
+        "TOKENOMICS_CPU_Q4_PAIR",
         "GGML_NATIVE",
         "GGML_CPU_REPACK",
         "GGML_LLAMAFILE",

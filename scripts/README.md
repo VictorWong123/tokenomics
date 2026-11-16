@@ -62,3 +62,11 @@ Use the [owned lifecycle](codespaces/README.md) and
 [environment guide](../docs/environments.md). Do not invoke fixed workloads as
 ordinary benchmark CLIs or copy lifecycle credentials into the development shell.
 The workflow YAML is orchestration; the self-hosted executable performs inference.
+
+## Q4 pair research experiment
+
+`q4_pair_study.py` builds the opt-in guarded Q4_K paired verification path,
+runs the existing 272-case trained gate, and collects the fixed 72-record
+development comparison in `configs/q4-pair-screen-v1.json`. Use the explicit
+`q4-pair` phase of the owned experiment workflow on the research branch. It
+does not change the default profile or establish a held-out/controller gain.

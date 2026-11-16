@@ -1,0 +1,16 @@
+{
+  "base_revision": "2260c1d3ebc5c8e01224914202c9879f34304f1e",
+  "branch": "research/speculative-throughput-20261116",
+  "generated_sources": {
+    "tokenomics-ggml-cpu.c": "88d2e8d8ff6493a55566a46e93f94e96583fa9fb656eb9e12d7d96b9f0b39931",
+    "tokenomics-tiled.cpp": "29eb6d6805be81da81e1af7ecd79b5081e0b968c7fb222b2bf0fc845be6c0220",
+    "tokenomics-x86-quants.c": "23cfc378a82ebd3bda1615f7566ea1eb0640c9e1422f2ecb8b969943b97bbb64"
+  },
+  "sources": {
+    "bench/q4_pair.cpp": "624f006c93790394bc0190611abe7c0e40db2d3e0027ec2f54e1c8bd44c1d469",
+    "cmake/q4-pair.cmake": "757bb59a37a9adafc3d74f5152e88daf02cedfdb27f19ccd8fb877bd9d8471be",
+    "src/cpu_q4_pair.inc": "79e5dbde93a7f65fb747d9a2a31dfe5578cd1198861ff2708287cb71efe4a16f",
+    "tests/test_q4_pair.cpp": "ac6c2e340ff698935a6946e297beba7a394ef900fa0e505a43771b1affaa050b"
+  },
+  "uncommitted_prototype": true
+}

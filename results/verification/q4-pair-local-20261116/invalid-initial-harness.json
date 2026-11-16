@@ -1,0 +1,8 @@
+{
+  "accepted": false,
+  "raw_hashes": {
+    "matrix-2048.jsonl": "b816b459f2403e73aea261649a0b74f66b1c605d731385d883aa69fccc813ae5",
+    "matrix-4096.jsonl": "0c392ceae7f7b9fe8f101168c73b887781fba291a565df53f9b58b998fba84ff"
+  },
+  "reason": "Missing ggml_cpu_init left half conversion table zero; all checksums zero. Replaced by initialized harness with nonzero checks. No initial speed result is accepted."
+}

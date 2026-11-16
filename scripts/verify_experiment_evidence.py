@@ -569,6 +569,10 @@ def verify_run(run_id, out, publish=False):
             from scripts.verify_profile_evidence import check
 
             checked = check(evidence, EXPECTED[run_id])
+        elif state == "q4_pair_comparison_complete":
+            from scripts.verify_q4_pair_evidence import check
+
+            checked = check(evidence, EXPECTED[run_id])
         else:
             require(state == "kernel_profile_passed", "Experimental CPU profile failed")
             checked = verify_kernel(evidence, EXPECTED[run_id])

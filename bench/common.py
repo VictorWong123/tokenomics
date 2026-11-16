@@ -28,7 +28,7 @@ def source_fingerprint():
         paths += [
             p
             for p in (ROOT / folder).rglob("*")
-            if p.suffix in (".py", ".cpp", ".h", ".sh", ".cmake")
+            if p.suffix in (".py", ".cpp", ".h", ".inc", ".sh", ".cmake")
         ]
     for path in sorted(paths):
         h.update(str(path.relative_to(ROOT)).encode())
