@@ -5,7 +5,7 @@ on:
       scope:
         description: Checks to run
         type: choice
-        options: [portable, metal-research, model-metadata, trained-cpu, metal-ir, logit-fit, logit-live]
+        options: [portable, metal-research, model-metadata, trained-cpu, metal-ir, logit-fit, logit-live, research-evidence]
         default: portable
       metal_profiles:
         description: Apple correctness profiles (all or one candidate)
@@ -330,3 +330,24 @@ jobs:
             results/local/logit-fit/live/canonical-replay/*.gz
           if-no-files-found: warn
           retention-days: 7
+
+  research-evidence:
+    if: >-
+      inputs.scope == 'research-evidence' &&
+      github.ref == 'refs/heads/research/speculative-throughput-20261116' &&
+      !github.event.repository.private
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Preserve allowlisted public diagnostic artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -m unittest discover -s tests -p test_research_evidence.py
+          python scripts/recover_research_evidence.py
