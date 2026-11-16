@@ -1,0 +1,18 @@
+{
+  "default_cpu_suites": 6,
+  "default_cpu_test_seconds": 18.56,
+  "fixture_candidate_gate_cases": 330,
+  "fixture_paired_screen_records": 72,
+  "fixture_tests": 3,
+  "host_dispatch_cases": 320,
+  "initial_host_harness_issue": "Temporary manual linker omitted OpenMP required by ggml-base; fixed in retained CMake host harness. No inference result affected.",
+  "limitations": [
+    "Host C++ and CPU fixtures cannot validate Metal arithmetic or throughput.",
+    "Fixture timing numbers are test duration only.",
+    "Final original-regression cap assertion added after fixture run; pinned trained model path needs M3 execution."
+  ],
+  "metal_gpu_executed": false,
+  "platform_guard": "Linux inference configuration with TOKENOMICS_METAL_SHORT_MV=ON correctly rejected",
+  "speed_claim": null,
+  "state": "host_checks_passed_metal_unverified"
+}

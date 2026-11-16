@@ -1,0 +1,7 @@
+[ 20%] Building CXX object CMakeFiles/ggml-metal.dir/tokenomics-metal-common.cpp.o
+[ 40%] Building CXX object CMakeFiles/ggml-metal.dir/tokenomics-metal-ops.cpp.o
+[ 60%] Linking CXX static library libggml-metal.a
+[ 60%] Built target ggml-metal
+[ 80%] Building CXX object CMakeFiles/test_metal_dispatch.dir/workspace/tokenomics/tests/test_metal_dispatch.cpp.o
+[100%] Linking CXX executable test_metal_dispatch
+[100%] Built target test_metal_dispatch

@@ -6,6 +6,12 @@ America/New_York). All changes and experiment source stay on
 on `main`. That instruction supersedes older documentation's main-push route.
 Start commit: `2260c1d`.
 
+User update: Codespaces quota is exhausted. Do not start or retry Codespaces.
+Use Cloud for correctness and component diagnostics, and prepare a local runner
+for the user to execute after the session. Cloud timings do not establish speed
+on their machine. The repository is now public; exclude credentials and private
+data from committed files, retained artifacts and logs.
+
 ## Working hypothesis
 
 The completed CPU controller result is 0.9709 times ordinary throughput and
@@ -58,9 +64,10 @@ baseline and development/validation split; do not tune on held-out prompts.
 
 Keep the clean upstream pin, immutable historical results, exact IDs/stops,
 charged catch-up, baseline execution settings and current held-out reservation.
-Compile and check locally before publishing the research branch. Use explicit
-branch workflow dispatch through the existing owned Codespaces lifecycle;
-require actual shutdown after each bounded run. No main push is needed.
+Compile and check locally before publishing the research branch. The user has
+superseded the earlier Codespaces route: use no more Codespaces execution during
+this session. No main push is needed. Final performance measurements belong to
+the user's local machine, with both baseline and candidate in the same run.
 
 Record all unsuccessful experiments as well as gains. Compare candidate
 speculation with both its ordinary decoder and the unchanged ordinary baseline.
@@ -107,3 +114,37 @@ with enough time to retain evidence and shut down remote compute by the deadline
   retained bytes. The owned lifecycle suite passes all 24 tests. Release
   formatting and staged-artifact checks pass. First checked stage is ready for
   branch-only publication and explicit `q4-pair` dispatch.
+- Published checked source `6d133ef` to the research branch. Attempted run
+  [43790995111](https://github.com/VictorWong123/tokenomics/actions/runs/43790995111)
+  failed in initialization before any Codespace start request: the legacy
+  admission check requires a private repository, while the repository is now
+  public. `claimed` remained false; workload and finalizer were skipped. This
+  supplies no inference/performance result or observed Shutdown assertion.
+  The user then prohibited Codespaces because quota is exhausted. Do not retry
+  or change lifecycle credentials/admission to work around that constraint.
+- Checked all 35 files published in the first research commit for GitHub/API
+  token patterns, private-key headers and credential-bearing URLs: no matches.
+  This is a bounded pattern check, not a guarantee about all repository history.
+
+### M3 priority update
+
+The user confirmed **Apple M3 with Metal**. The x86 Q4 pair prototype remains a
+separate component experiment; it is not an optimization for their GPU. The
+next candidate targets the existing Metal one-row verification split.
+
+- Added opt-in `TOKENOMICS_METAL_SHORT_MV`, default OFF. Generated host dispatch
+  copies use existing mat-vec kernels for two-to-nine-row batches and leave
+  ordinary one-row and larger-batch dispatch intact. Runtime MMA fusion is
+  excluded for short shapes; structural fusion planning stays unchanged.
+- Both generated host sources compile on Linux. A host-only program passes 320
+  predicate cases across five dtypes, 32 row counts and two head shapes. This
+  does not execute Metal shaders or establish whole-graph invariance.
+- Added a local M3 runner and cross-profile gate, starting with the original
+  `development-code-03` failure case. The broader gate has 330 requests covering
+  both caches, fixed caps, scripted fallback, resets, minimal logs and context
+  boundaries. CPU fixtures pass the orchestration test and simulated divergence
+  test; they are explicitly not GPU arithmetic evidence.
+- The runner enables a paired 72-record development screen only after the gate
+  passes. It loads only the pinned 0.5B target, accommodating the user's M3
+  memory constraints. No Metal timing or exactness result is available here.
+- Local instructions: [Metal short-MV experiment](metal-short-mv.md).

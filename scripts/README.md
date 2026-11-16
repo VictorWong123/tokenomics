@@ -70,3 +70,13 @@ runs the existing 272-case trained gate, and collects the fixed 72-record
 development comparison in `configs/q4-pair-screen-v1.json`. Use the explicit
 `q4-pair` phase of the owned experiment workflow on the research branch. It
 does not change the default profile or establish a held-out/controller gain.
+
+## Local M3 Metal research experiment
+
+`metal_short_mv_study.py --model PATH --out FRESH_DIRECTORY` builds the guarded
+and opt-in short-MV profiles on native Apple Silicon, runs correctness checks,
+and enables the 72-record development screen only after cross-profile equality.
+Use `--gate-only` to omit timings. `check_metal_profile.py` runs that gate against
+already-built binaries. See [M3 instructions and limitations](../docs/metal-short-mv.md).
+For the 16 November research session, the user's no-Codespaces instruction
+supersedes the older workflow route above.

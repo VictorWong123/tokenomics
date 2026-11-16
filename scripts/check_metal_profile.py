@@ -1,0 +1,300 @@
+#!/usr/bin/env python3
+"""Cross-binary Metal gate. Raw failures are retained; this is not a benchmark."""
+
+import argparse
+import json
+from pathlib import Path
+import sys
+from types import SimpleNamespace
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from bench.common import ROOT, atomic_json, read_jsonl, sha256, source_fingerprint
+from scripts.check_models import check_cycles, compare, execute
+
+REFERENCE_MARKER = "TOKENOMICS_METAL_VERIFY_SINGLE_ROW=ON"
+CANDIDATE_MARKER = "TOKENOMICS_METAL_SHORT_MV=ON"
+MODEL_SHA256 = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+
+
+def metal_profile(row, candidate):
+    info = row["system_info"]
+    marker, excluded = (
+        (CANDIDATE_MARKER, REFERENCE_MARKER)
+        if candidate
+        else (REFERENCE_MARKER, CANDIDATE_MARKER)
+    )
+    if (
+        marker not in info
+        or excluded in info
+        or "devices=MTL0" not in info
+        or "offloaded 25/25 layers to GPU" not in info
+        or row["settings"]["gpu_layers"] != 99
+    ):
+        raise ValueError(
+            "Expected fully offloaded Qwen 0.5B Metal profile was not executed"
+        )
+
+
+def variants():
+    yield {"configuration_id": "target", "policy": "target"}
+    for cache in ("retain", "upstream"):
+        for k in (1, 2, 4, 6, 8):
+            yield {
+                "configuration_id": f"{cache}-fixed{k}",
+                "policy": "fixed",
+                "drafter": "ngram",
+                "cache": cache,
+                "k": k,
+            }
+        yield {
+            "configuration_id": f"{cache}-script",
+            "policy": "script",
+            "drafter": "ngram",
+            "cache": cache,
+            "k": 8,
+            "script": [0, 4, 1, 8, 2, 0, 6],
+        }
+    for k in (4, 8):
+        yield {
+            "configuration_id": f"minimal-fixed{k}",
+            "policy": "fixed",
+            "drafter": "ngram",
+            "k": k,
+            "detailed": False,
+        }
+
+
+def gate(
+    reference,
+    candidate,
+    model,
+    out,
+    *,
+    context=2048,
+    threads=2,
+    gpu_layers=99,
+    profile_validator=metal_profile,
+):
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=False)
+    a = SimpleNamespace(
+        binary=reference,
+        target=model,
+        out=out,
+        context=context,
+        batch=512,
+        threads=threads,
+        gpu_layers=gpu_layers,
+        timeout_seconds=3600,
+    )
+    checked = 0
+    failures = []
+    source = source_fingerprint()
+    atomic_json(
+        out / "manifest.json",
+        {
+            "schema_version": 1,
+            "purpose": "cross-profile correctness, not performance",
+            "source": source,
+            "binary_sha256": {
+                "reference": sha256(reference),
+                "candidate": sha256(candidate),
+            },
+            "model_sha256": sha256(model),
+            "settings": {
+                "context": context,
+                "batch": a.batch,
+                "threads": threads,
+                "gpu_layers": gpu_layers,
+            },
+        },
+    )
+    try:
+        corpus = {p["id"]: p for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")}
+        ids = [
+            "development-code-03",
+            "development-qa-01",
+            "development-code-01",
+            "development-summary-01",
+        ]
+        cases = [
+            {"prompt_id": pid, "prompt": corpus[pid]["prompt"], "max_tokens": 128}
+            for pid in ids
+        ]
+        cases += [
+            {"prompt_id": f"budget-{cap}", "prompt": "a", "max_tokens": cap}
+            for cap in (0, 1, 2, 7)
+        ]
+        expected = {}
+        with (out / "correctness.jsonl").open("w") as audit:
+
+            def check(row, is_candidate):
+                nonlocal checked
+                profile_validator(row, is_candidate)
+                mismatch = compare(expected[row["prompt_id"]], row)
+                record = {
+                    "prompt_id": row["prompt_id"],
+                    "configuration_id": row["configuration_id"],
+                    "repetition": row["repetition"],
+                    "candidate": is_candidate,
+                    "mismatch": mismatch,
+                }
+                audit.write(json.dumps(record) + "\n")
+                audit.flush()
+                checked += 1
+                if mismatch is not None:
+                    failures.append(record)
+                    raise RuntimeError(
+                        "Cross-profile divergence; see correctness.jsonl and raw cycle logits"
+                    )
+
+            # Fail quickly on the original M3 regression, before the wider gate.
+            smoke = {
+                **cases[0],
+                "configuration_id": "target",
+                "policy": "target",
+                "repetition": 0,
+                "diagnostic_logits": True,
+            }
+            rows = execute(a, "smoke-reference", [smoke], False)
+            profile_validator(rows[0], False)
+            if sha256(model) == MODEL_SHA256 and rows[0]["generated_tokens"] != 128:
+                raise RuntimeError(
+                    "Original M3 regression did not reach its full 128-token cap"
+                )
+            expected[cases[0]["prompt_id"]] = rows[0]
+            smoke_jobs = [
+                {
+                    **smoke,
+                    "configuration_id": f"fixed{k}",
+                    "policy": "fixed",
+                    "drafter": "ngram",
+                    "k": k,
+                }
+                for k in (4, 8)
+            ]
+            execute(
+                a, "smoke-guarded", smoke_jobs, False, lambda row: check(row, False)
+            )
+            a.binary = candidate
+            execute(
+                a,
+                "smoke-candidate",
+                [smoke, *smoke_jobs],
+                False,
+                lambda row: check(row, True),
+            )
+
+            a.binary = reference
+            jobs = [
+                {
+                    **case,
+                    "configuration_id": "target",
+                    "policy": "target",
+                    "repetition": 0,
+                }
+                for case in cases
+            ]
+            references = execute(a, "reference", jobs, False)
+            for row in references:
+                profile_validator(row, False)
+                if row["prompt_id"] in expected:
+                    check(row, False)
+                expected[row["prompt_id"]] = row
+            seed = references[-1]["prompt_ids"]
+            # Full-context and short-tail cases use actual tokenizer IDs.
+            boundary = [
+                {
+                    "prompt_id": f"context-tail-{room}",
+                    "prefix_tokens": (seed * (context // len(seed) + 1))[
+                        : context - room
+                    ],
+                    "max_tokens": 16,
+                }
+                for room in (0, 3, 9)
+            ]
+            rows = execute(
+                a,
+                "boundary-reference",
+                [
+                    {
+                        **case,
+                        "configuration_id": "target",
+                        "policy": "target",
+                        "repetition": 0,
+                    }
+                    for case in boundary
+                ],
+                False,
+            )
+            for row in rows:
+                profile_validator(row, False)
+                expected[row["prompt_id"]] = row
+            cases += boundary
+            jobs = [
+                {**case, **variant, "repetition": repetition}
+                for case in cases
+                for variant in variants()
+                for repetition in (0, 1)
+            ]
+            a.binary = candidate
+            actual = execute(a, "candidate", jobs, False, lambda row: check(row, True))
+        # Detailed and minimal paths intentionally differ in cycle logging.
+        cycles = read_jsonl(out / "candidate.cycles.jsonl")
+        check_cycles(
+            [r for r in actual if not r["configuration_id"].startswith("minimal-")],
+            cycles,
+        )
+        coverage = {
+            "drafted": sum(r["execution"]["drafted"] for r in actual),
+            "accepted": sum(r["execution"]["accepted"] for r in actual),
+            "stop_reasons": sorted({r["stop"] for r in actual}),
+        }
+        if not coverage["drafted"] or not coverage["accepted"]:
+            raise RuntimeError("Gate did not exercise nonzero proposals and acceptance")
+        if source_fingerprint() != source:
+            raise RuntimeError("Source changed during the gate")
+        result = {
+            "schema_version": 1,
+            "state": "passed",
+            "checked_comparisons": checked,
+            "candidate_cases": len(actual),
+            "coverage": coverage,
+            "limitation": "Only this model, inputs, settings and observed paths are covered. No speed claim.",
+        }
+        atomic_json(out / "status.json", result)
+        return result
+    except Exception as exc:
+        atomic_json(
+            out / "status.json",
+            {
+                "schema_version": 1,
+                "state": "failed",
+                "checked_comparisons": checked,
+                "first_mismatch": failures[0] if failures else None,
+                "error": str(exc),
+                "error_type": type(exc).__name__,
+            },
+        )
+        raise
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--reference", type=Path, required=True)
+    parser.add_argument("--candidate", type=Path, required=True)
+    parser.add_argument("--model", type=Path, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    args = parser.parse_args()
+    if sha256(args.model) != MODEL_SHA256:
+        parser.error("Requires the pinned Qwen2.5 0.5B Q4_K_M model")
+    gate(
+        args.reference.resolve(),
+        args.candidate.resolve(),
+        args.model.resolve(),
+        args.out,
+    )
+
+
+if __name__ == "__main__":
+    main()

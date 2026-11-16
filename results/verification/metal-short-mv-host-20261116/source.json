@@ -1,0 +1,24 @@
+{
+  "generated_sources_sha256": {
+    "tokenomics-metal-common.cpp": "2df15e10db263679ad855cda83b50afe54f9c958047370748a91c1caa4b9c4e8",
+    "tokenomics-metal-ops.cpp": "742e95030750b1b56390c0dad7c0e0cab2c943e988bd60b0f6acd154db8e568c"
+  },
+  "host_test_binary_sha256": "5f75d8c666bf153de35e06d919854534f3b4ee0c2c127d1bd86af6913aa8192e",
+  "owned_files_sha256": {
+    "CMakeLists.txt": "e10e3f91a9b251dce913c6e3f496d2f510563de5d388cd2b92a3ca06f49dda8e",
+    "analysis/metal_short_mv.py": "669ae08903589df37473c9a5cc59dafb27ff280aadaf51f647587b7b57b90f92",
+    "cmake/metal-short-mv.cmake": "32d39912153ef7ea317585753cf079eb4a23ee3a0eef9f78453fd7bc5d003bc6",
+    "configs/metal-short-mv-screen-v1.json": "b902231c5b2c0fa236169d4a149b30257dca50f0fca69047408c7db9f2f08326",
+    "scripts/check_metal_profile.py": "1d6c75160a8ad1c2d5c64b515fd4b47a03353f5afe2e19b5d1f8f8e1af2badda",
+    "scripts/metal_short_mv_study.py": "d126144bb4f0e01daadd46cda44accdc75b0a09a7224a09b55af1a358e8939fa",
+    "src/metal_short_mv.h": "f4e3ffac5b42b67195962badb8681eb0f68dc38436d5b07e94feb90213a140d9",
+    "src/runtime.cpp": "4c78d11977659231a88157d8ea1221c29daf208b6ff10b8d64c48f09bb7322f7",
+    "tests/metal-host/CMakeLists.txt": "8967608178281411ba5987ca5dd4d7a1d9f33d57b919d80668d6ed3883847d64",
+    "tests/test_metal_dispatch.cpp": "9d16107478ebc4423852b43e27cc6258e74f05d9f111d810b31c53d1f4b625ee",
+    "tests/test_metal_profile.py": "0159d5a3f0f18b4096a60a69f694b391e59dd5f8a9668d222d6e618499172313"
+  },
+  "source": {
+    "owned_source_sha256": "1fb3f214941b0f9efe8f292365b98fac2164dd59b24d1fbaa1e83baef38bff3d",
+    "revision": "6d133efdc35e36173303c016af3d4e48429a24ee"
+  }
+}

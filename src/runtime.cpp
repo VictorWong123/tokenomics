@@ -219,6 +219,11 @@ std::string Engine::system_info() const {
     if (impl_->cfg.gpu_layers > 0)
         info += "; TOKENOMICS_METAL_VERIFY_SINGLE_ROW=ON; verification_ubatch=1";
 #endif
+#ifdef TOKENOMICS_METAL_SHORT_MV
+    if (impl_->cfg.gpu_layers > 0)
+        info +=
+            "; TOKENOMICS_METAL_SHORT_MV=ON; short_mv_max_rows=9; verification_ubatch=configured";
+#endif
     return info;
 }
 

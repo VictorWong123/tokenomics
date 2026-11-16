@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "phase": "metal_short_mv_comparison",
+  "split": "development",
+  "prompt_ids": [
+    "development-qa-01",
+    "development-code-01",
+    "development-summary-01"
+  ],
+  "output_caps": [
+    128
+  ],
+  "repetitions": 3,
+  "seed": 20261116,
+  "warmup_tokens": 16,
+  "warmup_prompt": "Warm-up: continue briefly.",
+  "context": 2048,
+  "batch": 512,
+  "threads": 2,
+  "configurations": [
+    {
+      "id": "target",
+      "policy": "target",
+      "kernel_profile": "guarded",
+      "detailed": false
+    },
+    {
+      "id": "short-mv-target",
+      "policy": "target",
+      "kernel_profile": "short-mv",
+      "detailed": false
+    },
+    {
+      "id": "guarded-fixed1",
+      "policy": "fixed",
+      "k": 1,
+      "drafter": "ngram",
+      "kernel_profile": "guarded",
+      "detailed": false
+    },
+    {
+      "id": "short-mv-fixed1",
+      "policy": "fixed",
+      "k": 1,
+      "drafter": "ngram",
+      "kernel_profile": "short-mv",
+      "detailed": false
+    },
+    {
+      "id": "guarded-fixed4",
+      "policy": "fixed",
+      "k": 4,
+      "drafter": "ngram",
+      "kernel_profile": "guarded",
+      "detailed": false
+    },
+    {
+      "id": "short-mv-fixed4",
+      "policy": "fixed",
+      "k": 4,
+      "drafter": "ngram",
+      "kernel_profile": "short-mv",
+      "detailed": false
+    },
+    {
+      "id": "guarded-fixed8",
+      "policy": "fixed",
+      "k": 8,
+      "drafter": "ngram",
+      "kernel_profile": "guarded",
+      "detailed": false
+    },
+    {
+      "id": "short-mv-fixed8",
+      "policy": "fixed",
+      "k": 8,
+      "drafter": "ngram",
+      "kernel_profile": "short-mv",
+      "detailed": false
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+.screen: 1/9 blocks complete (development-qa-01-n128-r1)
+screen: 2/9 blocks complete (development-qa-01-n128-r0)
+screen: 3/9 blocks complete (development-summary-01-n128-r0)
+screen: 4/9 blocks complete (development-code-01-n128-r1)
+screen: 5/9 blocks complete (development-qa-01-n128-r2)
+screen: 6/9 blocks complete (development-summary-01-n128-r1)
+screen: 7/9 blocks complete (development-code-01-n128-r2)
+screen: 8/9 blocks complete (development-summary-01-n128-r2)
+screen: 9/9 blocks complete (development-code-01-n128-r0)
+..
+----------------------------------------------------------------------
+Ran 3 tests in 2.132s
+
+OK
