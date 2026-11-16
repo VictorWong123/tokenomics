@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "scope": "Post-hoc exploratory development work replay on already inspected CPU fit/validation trajectories; no new validation, deployment, speed or reserved held-out claim",
+  "output_cap": 64,
+  "primary": "Request-local longest suffix, minimum5/maximum32, most recent source on equal match lengths",
+  "fallbacks": ["upstream_ngram3", "guided_minimum3_top64_no_fallback"],
+  "caps": [1, 4, 8],
+  "controls": ["ordinary", "upstream_ngram3", "suffix5", "guided_minimum3_top64_no_fallback"],
+  "guidance_access": "Only if the strong suffix abstains; prior row predicting the already committed pending token; no first-cycle hint",
+  "reserved_held_out_access": false
+}

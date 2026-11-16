@@ -1,6 +1,7 @@
 """Independent latest-edge search for causal linear transition composition."""
 
 import itertools
+import gzip
 import json
 from pathlib import Path
 import tempfile
@@ -87,3 +88,58 @@ class TransitionCollectionTest(unittest.TestCase):
                 set(json.loads((root / "out/complete.json").read_text())["sha256"]),
                 {"report.json", "cycles.jsonl.gz"},
             )
+
+    def test_priority_grid_preserves_strong_copy_without_ranking(self):
+        output = [1, 2] * 32
+        target = {
+            "prompt_id": "fixture",
+            "prompt_ids": [1, 2] * 5,
+            "token_ids": output,
+            "stop": "budget",
+            "rows": [
+                {
+                    "output_index": i,
+                    "top_ids": [token] + [x for x in range(64) if x != token],
+                }
+                for i, token in enumerate(output)
+            ],
+        }
+        receipt = {"model_id": "fixture", "platform": {"machine": "fixture"}}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "complete.json").write_text("{}")
+            with patch(
+                "analysis.transition_replay.load_collection",
+                return_value=([target], receipt),
+            ):
+                report = analyze(root, root / "out", family="priority")
+            self.assertEqual(len(report["totals"]), 16)
+            traces = [
+                json.loads(line)
+                for line in gzip.decompress(
+                    (root / "out/cycles.jsonl.gz").read_bytes()
+                ).splitlines()
+            ]
+            priority = [
+                row
+                for row in traces
+                if row["configuration"]["id"] == "suffix5-priority-guided3"
+            ]
+            self.assertTrue(priority)
+            self.assertTrue(all(row["hint_output_index"] is None for row in priority))
+            self.assertTrue(
+                all(
+                    row["hint_output_index"] is None
+                    or row["hint_output_index"] == row["output_index"] - 1
+                    for row in traces
+                )
+            )
+            for cap in [1, 4, 8]:
+                counts = {
+                    row["id"]: row for row in report["totals"] if row["cap"] == cap
+                }
+                self.assertEqual(
+                    counts["suffix5-priority-guided3"]["cycles"],
+                    counts["suffix5"]["cycles"],
+                )
+                self.assertEqual(counts["suffix5-priority-guided3"]["wasted_rows"], 0)

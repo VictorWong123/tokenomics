@@ -7,12 +7,20 @@ import json
 from pathlib import Path
 
 from analysis.frequency_copy import frontier
-from analysis.logit_copy import load_collection, past_hint, replay_canonical, WORK
+from analysis.logit_copy import (
+    load_collection,
+    past_hint,
+    replay_canonical,
+    guided_draft,
+    WORK,
+)
 from analysis.proposal_replay import suffix_draft, upstream_ngram
 from bench.common import ROOT, atomic_json, sha256, source_fingerprint
 
 PROTOCOL = ROOT / "configs/transition-replay-v1.json"
 PROTOCOL_SHA256 = "07f2a640e2569049a89792a54214040fcd513a0616216ba7e2a9ced2b7dd0b85"
+PRIORITY_PROTOCOL = ROOT / "configs/retrieval-priority-v1.json"
+PRIORITY_SHA256 = "1cc45b5095d78e34b4ceb51859604f4d9bcbef629b15c8cc39d5418ece81af25"
 
 
 def transition_draft(history, pending, cap, *, order):
@@ -36,22 +44,36 @@ def transition_draft(history, pending, cap, *, order):
     return proposal
 
 
-def analyze(collection, out):
+def analyze(collection, out, family="transition"):
+    if family not in ("transition", "priority"):
+        raise ValueError("Unknown exploratory proposal family")
+    protocol_path = PROTOCOL if family == "transition" else PRIORITY_PROTOCOL
+    expected_protocol_sha = (
+        PROTOCOL_SHA256 if family == "transition" else PRIORITY_SHA256
+    )
     targets, receipt = load_collection(collection)
-    if sha256(PROTOCOL) != PROTOCOL_SHA256:
+    if sha256(protocol_path) != expected_protocol_sha:
         raise ValueError("Exploratory protocol changed")
-    protocol = json.loads(PROTOCOL.read_text())
+    protocol = json.loads(protocol_path.read_text())
     source = source_fingerprint()
-    configs = [
-        {"id": f"recent-transition{order}", "order": order, "cap": cap}
-        for order in protocol["transition_orders"]
-        for cap in protocol["transition_caps"]
-    ]
-    configs += [{"id": "previous-second-logit", "cap": 1}]
+    if family == "transition":
+        configs = [
+            {"id": f"recent-transition{order}", "order": order, "cap": cap}
+            for order in protocol["transition_orders"]
+            for cap in protocol["transition_caps"]
+        ]
+        configs += [{"id": "previous-second-logit", "cap": 1}]
+    else:
+        configs = [
+            {"id": "suffix5-priority-" + fallback, "cap": cap}
+            for fallback in ("ngram3", "guided3")
+            for cap in protocol["caps"]
+        ]
+        configs += [{"id": "guided3", "cap": cap} for cap in protocol["caps"]]
     configs += [
         {"id": name, "cap": cap}
         for name in ("upstream-ngram3", "suffix5")
-        for cap in protocol["control_caps"]
+        for cap in protocol.get("control_caps", protocol.get("caps"))
     ]
     configs += [{"id": "ordinary", "cap": 0}]
     result, traces = [], []
@@ -63,7 +85,36 @@ def analyze(collection, out):
             def propose(history, pending, cap):
                 cursor = len(history) + 1 - len(target["prompt_ids"])
                 hint_index = None
-                if "order" in config:
+                if config["id"].startswith("suffix5-priority-"):
+                    value = suffix_draft(history, pending, cap, minimum=5)
+                    if not value and cap:
+                        if config["id"].endswith("ngram3"):
+                            value = upstream_ngram(history, pending, cap)
+                        else:
+                            hint = past_hint(target["rows"], cursor, pending)
+                            value = guided_draft(
+                                history,
+                                pending,
+                                cap,
+                                hint,
+                                minimum=3,
+                                cutoff=64,
+                                fallback=False,
+                            )
+                            hint_index = cursor - 1 if hint is not None else None
+                elif config["id"] == "guided3":
+                    hint = past_hint(target["rows"], cursor, pending)
+                    value = guided_draft(
+                        history,
+                        pending,
+                        cap,
+                        hint,
+                        minimum=3,
+                        cutoff=64,
+                        fallback=False,
+                    )
+                    hint_index = cursor - 1 if hint is not None else None
+                elif "order" in config:
                     value = transition_draft(
                         history, pending, cap, order=config["order"]
                     )
@@ -129,7 +180,8 @@ def analyze(collection, out):
         "collection_phase": receipt.get("collection_phase", "fit"),
         "platform": receipt["platform"],
         "collection_complete_sha256": sha256(Path(collection) / "complete.json"),
-        "protocol_sha256": sha256(PROTOCOL),
+        "protocol_sha256": sha256(protocol_path),
+        "proposal_family": family,
         "totals": totals,
         "per_prompt": result,
         "work_frontier": frontier(
@@ -170,10 +222,13 @@ def analyze(collection, out):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--family", choices=("transition", "priority"), default="transition"
+    )
     parser.add_argument("--collection", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
-    report = analyze(args.collection, args.out)
+    report = analyze(args.collection, args.out, args.family)
     print(
         json.dumps(
             {
