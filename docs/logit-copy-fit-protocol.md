@@ -37,3 +37,13 @@ branches. Replay reports cycles, accepted/drafted/wasted rows and query shapes,
 with no fitted latency or generalization claim. Any useful point still needs
 runtime integration, actual speculative checks and an M3 comparison against the
 optimized ordinary decoder.
+
+The collector is compiled only with `TOKENOMICS_LOGIT_COLLECTOR=ON`, with the
+original guarded CPU/sampler profile. Its read-only observer is absent from
+normal benchmark builds. Each prompt runs once without and once with the
+observer; IDs and stops must agree, and each stable top64 row must select the
+same token as the original sampler. The synthetic fixture checks first-index
+ties explicitly. Collection refuses model/protocol hash changes and fresh-output
+overwrite. A bounded standard public Ubuntu workflow is capped at25 minutes.
+The log transport includes only compressed numeric data from these fixed public
+prompts and selected hashes, never weights or environment variables.

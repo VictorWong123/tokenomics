@@ -335,7 +335,7 @@ int main(int argc, char **argv) {
         int cases = 0, values = 0;
         for (auto type : {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_Q4_K, GGML_TYPE_Q6_K,
                           GGML_TYPE_Q5_0, GGML_TYPE_Q8_0})
-            for (int width : {64, 128, 256, 896, 1536, 4864})
+            for (int width : {64, 128, 256, 896, 1536, 4864, 8960})
                 for (int rows : {2, 3, 5, 7, 9})
                     for (int heads : {1, 4}) {
                         // Quantized widths must align with their 256-value blocks.
@@ -349,23 +349,27 @@ int main(int argc, char **argv) {
                             ++cases;
                         }
                     }
-        // Actual Qwen0.5B grouped-query attention has 14 query heads and
-        // 2 KV heads: exercise the odd broadcast ratio, including KV widths.
-        for (auto type : {GGML_TYPE_F32, GGML_TYPE_F16})
-            for (int width : {64, 256, 512, 768, 2048})
-                for (int rows : {2, 3, 5, 7, 9}) {
-                    values += run_case(backend.get(), type, width, rows, 14, 2);
-                    ++cases;
+        // Header-confirmed Qwen0.5B/1.5B GQA: 14:2 heads with64-wide
+        // heads, and12:2 with128-wide heads. Include KV cache extents too.
+        for (int heads : {12, 14})
+            for (auto type : {GGML_TYPE_F32, GGML_TYPE_F16})
+                for (int width : {64, 128, 256, 512, 768, 2048}) {
+                    if ((heads == 12 && width == 64) || (heads == 14 && width == 128))
+                        continue;
+                    for (int rows : {2, 3, 5, 7, 9}) {
+                        values += run_case(backend.get(), type, width, rows, heads, 2);
+                        ++cases;
+                    }
                 }
         int softmax_cases = 0, softmax_values = 0;
         for (int width : {256, 512, 768, 2048})
             for (int rows : {2, 3, 9})
-                for (int heads : {1, 2, 4, 14}) {
+                for (int heads : {1, 2, 4, 12, 14}) {
                     softmax_values += run_softmax(backend.get(), width, rows, heads);
                     ++softmax_cases;
                 }
         int row_cases = 0, row_values = 0;
-        for (int width : {32, 896, 1536, 4864})
+        for (int width : {32, 896, 1536, 4864, 8960})
             for (int rows : {2, 3, 5, 7, 9})
                 for (int mode = 0; mode < 3; ++mode) {
                     row_values += run_row_operation(backend.get(), width, rows, mode);
@@ -379,10 +383,16 @@ int main(int argc, char **argv) {
                     row_values += run_row_operation(backend.get(), width, rows, mode);
                     ++row_cases;
                 }
+        // The1.5B FFN crosses that unary threshold between three and four rows.
+        for (int rows : {2, 3, 4, 5, 6, 7, 9})
+            for (int mode = 3; mode < 6; ++mode) {
+                row_values += run_row_operation(backend.get(), 8960, rows, mode);
+                ++row_cases;
+            }
         int rope_cases = 0, rope_values = 0;
         for (int width : {64, 128})
             for (int rows : {2, 3, 5, 7, 9})
-                for (int heads : {2, 14})
+                for (int heads : {2, 12, 14})
                     for (int prefix : {0, 248, 255, 511})
                         for (int mode : {GGML_ROPE_TYPE_NORMAL, GGML_ROPE_TYPE_NEOX}) {
                             rope_values +=

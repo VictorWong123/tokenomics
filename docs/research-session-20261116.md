@@ -1011,3 +1011,23 @@ sampling remain applicable candidates. Ten existing0.5B screen configurations
 are unchanged. All120 Python tests pass (eight optional skips), including a
 second-model orchestration fixture, wrong-offload and unsupported-kernel checks.
 No1.5B Metal execution or M3 timing has been claimed.
+
+### 10:50 UTC — direct learned ARM proof and1.5B backend shapes
+
+Corrected native run43848978979 passes160 learned0.5B CPU comparisons for the
+eligible direct sampler, including actual call-count checks and equal work.
+The compact summary retains the public run/source and explicitly notes that
+raw records/binary hashes reside in the seven-day artifact. Run43849593799
+checks the direct sampler on1.5B separately.
+
+The direct backend harness now passes1072 cases/7508672 bitwise comparisons in
+Release and ASAN/UBSAN. Added1.5B coverage includes8960-wide FFN operations,
+12:2 GQA,128-wide heads and the three/four-row unary dispatch boundary. These
+are CPU observations; the older native804-case receipt remains unchanged.
+
+The predeclared logit-copy protocol is checkpointa2bcef2, SHA256
+028018e39653338e2454c6d3a7e61ad01fabd314afed6cf5ee4d972b637f1cec.
+An opt-in CPU diagnostic records ordinary top64 ranks and checks that its
+read-only observer preserves IDs/stops. Its stable-tie fixture passes. Collection
+uses only public development-fit prompts and retains compact numeric data and
+hash receipts in logs; no private context or weights are published.

@@ -216,6 +216,10 @@ class MetalProfileIdentityTests(unittest.TestCase):
         for bad in (
             {**row, "system_info": row["system_info"].replace("MTL0", "CPU")},
             {**row, "system_info": row["system_info"] + REFERENCE_MARKER},
+            {
+                **row,
+                "system_info": row["system_info"] + "; TOKENOMICS_LOGIT_COLLECTOR=ON",
+            },
             {**row, "settings": {"gpu_layers": 0}},
         ):
             with self.assertRaises(ValueError):

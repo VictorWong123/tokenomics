@@ -45,3 +45,15 @@ Experiment source fingerprints now include verification source files and nested
 CMakeLists, so editing a gate implementation during a run invalidates source
 identity. Component/executable hashes remain recorded separately. Older saved
 fingerprints retain the scope of their own source revision.
+
+## Header-confirmed1.5B shapes
+
+The next harness revision adds8960-wide FFN operations,12:2 GQA with128-wide
+heads,12-head softmax/RoPE and the8960-element unary dispatch boundary between
+three and four query rows. It now covers1072 cases/7508672 bitwise comparisons:
+640 matrix,60 softmax,132 normalization/activation and240 RoPE cases. Linux
+Release and ASAN/UBSAN execution both pass with guarded CPU and Q4 pairOFF.
+[Receipts](../results/verification/backend-15-local-20261116/summary.json) bind
+the exact harness and executable hashes. This extends the earlier804-case
+checkpoint; it does not retroactively enlarge that checkpoint's native Apple
+receipt. Native compilation and actual GPU execution remain separate checks.

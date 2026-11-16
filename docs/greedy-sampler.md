@@ -141,3 +141,9 @@ suffix cap8 uses288 verification cycles/418 rows, versus ngram cap4's269/412;
 more lookahead is not automatically useful. These are work counts, not latency.
 Raw records and binary hashes remain in the seven-day workflow artifact; the
 compact archived summary explicitly discloses that limitation.
+
+Native Apple ARM run43848978979 additionally passes160 learned0.5B comparisons
+for the direct sampler. The gate checks eligibility and actual per-request call
+counts, as well as equal output IDs/stops and logical work. This is CPU execution
+on a hosted VM. The archived compact summary discloses its raw-artifact limit;
+it does not establish Metal or M3 throughput.

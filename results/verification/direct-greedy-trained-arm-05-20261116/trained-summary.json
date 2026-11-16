@@ -1,0 +1,137 @@
+{
+  "candidate_profile": "direct",
+  "checked_comparisons": 160,
+  "model_id": "qwen25-05",
+  "model_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+  "performance_claim": null,
+  "same_work_between_sampler_profiles": true,
+  "state": "passed",
+  "synthetic_fixture": false,
+  "totals": {
+    "greedy": {
+      "ngram1": {
+        "accepted": 50,
+        "cycles": 298,
+        "drafted": 61,
+        "synced_tokens": 0,
+        "verified_rows": 359
+      },
+      "ngram4": {
+        "accepted": 78,
+        "cycles": 270,
+        "drafted": 127,
+        "synced_tokens": 0,
+        "verified_rows": 397
+      },
+      "ngram8": {
+        "accepted": 87,
+        "cycles": 261,
+        "drafted": 171,
+        "synced_tokens": 0,
+        "verified_rows": 432
+      },
+      "script-ngram": {
+        "accepted": 73,
+        "cycles": 275,
+        "drafted": 116,
+        "synced_tokens": 0,
+        "verified_rows": 391
+      },
+      "suffix1": {
+        "accepted": 41,
+        "cycles": 307,
+        "drafted": 45,
+        "synced_tokens": 0,
+        "verified_rows": 352
+      },
+      "suffix4": {
+        "accepted": 65,
+        "cycles": 283,
+        "drafted": 81,
+        "synced_tokens": 0,
+        "verified_rows": 364
+      },
+      "suffix8": {
+        "accepted": 71,
+        "cycles": 277,
+        "drafted": 110,
+        "synced_tokens": 0,
+        "verified_rows": 387
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    },
+    "guarded": {
+      "ngram1": {
+        "accepted": 50,
+        "cycles": 298,
+        "drafted": 61,
+        "synced_tokens": 0,
+        "verified_rows": 359
+      },
+      "ngram4": {
+        "accepted": 78,
+        "cycles": 270,
+        "drafted": 127,
+        "synced_tokens": 0,
+        "verified_rows": 397
+      },
+      "ngram8": {
+        "accepted": 87,
+        "cycles": 261,
+        "drafted": 171,
+        "synced_tokens": 0,
+        "verified_rows": 432
+      },
+      "script-ngram": {
+        "accepted": 73,
+        "cycles": 275,
+        "drafted": 116,
+        "synced_tokens": 0,
+        "verified_rows": 391
+      },
+      "suffix1": {
+        "accepted": 41,
+        "cycles": 307,
+        "drafted": 45,
+        "synced_tokens": 0,
+        "verified_rows": 352
+      },
+      "suffix4": {
+        "accepted": 65,
+        "cycles": 283,
+        "drafted": 81,
+        "synced_tokens": 0,
+        "verified_rows": 364
+      },
+      "suffix8": {
+        "accepted": 71,
+        "cycles": 277,
+        "drafted": 110,
+        "synced_tokens": 0,
+        "verified_rows": 387
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    }
+  },
+  "provenance": {
+    "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43848978979",
+    "source_commit": "3fdfa8cff29264f4bceb92c0d15ca23e24a8aed4",
+    "runner": "macos-15 standard public Apple ARM hosted VM",
+    "evidence_kind": "Workflow-reported learned CPU exactness with eligible direct sampler call-count checks",
+    "raw_payload_location": "Seven-day trained-cpu-smoke workflow artifact; not downloaded into this archive",
+    "local_archive_limitation": "Raw token/cycle payloads and executable hashes are not reproduced in this compact summary",
+    "scope": "Four development prompts, tiny budgets and two KV boundaries; no Metal execution, M3 timing or held-out data"
+  }
+}

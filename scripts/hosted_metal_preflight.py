@@ -131,6 +131,7 @@ def main():
                     "-DTOKENOMICS_CPU_PACKED_VERIFY=OFF",
                     "-DTOKENOMICS_CPU_Q4_PAIR=OFF",
                     "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
+                    "-DTOKENOMICS_LOGIT_COLLECTOR=OFF",
                     "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
                     "-DTOKENOMICS_GREEDY_DIRECT=OFF",
                     f"-DTOKENOMICS_METAL_SHORT_MV={short}",

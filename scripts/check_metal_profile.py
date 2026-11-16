@@ -54,6 +54,7 @@ def metal_profile(
         or (GREEDY_MARKER in info) != greedy
         or (DIRECT_MARKER in info) != direct
         or (INTERLEAVE_MARKER in info) != (candidate and interleave)
+        or "TOKENOMICS_LOGIT_COLLECTOR=ON" in info
         or marker not in info
         or excluded in info
         or "devices=MTL0" not in info

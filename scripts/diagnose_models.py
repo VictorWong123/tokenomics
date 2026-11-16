@@ -33,6 +33,7 @@ def build_configuration(binary):
         "TOKENOMICS_VERIFY_STAGE_TIMING",
         "TOKENOMICS_GREEDY_NO_TEMP",
         "TOKENOMICS_GREEDY_DIRECT",
+        "TOKENOMICS_LOGIT_COLLECTOR",
         "GGML_NATIVE",
         "GGML_CPU_REPACK",
         "GGML_LLAMAFILE",

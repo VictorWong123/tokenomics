@@ -1,0 +1,38 @@
+{
+  "scope": "Synthetic direct CPU backend rows for header-confirmed0.5B and1.5B shapes; no Metal execution or model throughput claim",
+  "cases": 1072,
+  "bitwise_comparisons": 7508672,
+  "matrix": {
+    "cases": 640,
+    "comparisons": 1943552
+  },
+  "normalization_activation": {
+    "cases": 132,
+    "comparisons": 2791104
+  },
+  "rope": {
+    "cases": 240,
+    "comparisons": 1118208
+  },
+  "masked_softmax": {
+    "cases": 60,
+    "comparisons": 1655808
+  },
+  "source_sha256": {
+    "tests/test_backend_rows.cpp": "67ff004b438f9a772c1731b308811415aafde44073a1f2a33fb96de323fa2823"
+  },
+  "llama_revision": "fd27b2034905f8dadd8bd6d2cc44595f4929d391",
+  "binary_sha256": {
+    "build-cpu/test_backend_rows": "afa8020ac39498219aadb628cedc3cce546f7926db4df9a2baacef0388d2c10f",
+    "build-q4-asan/test_backend_rows": "3fe4b872868628972c52fba34795b8b4757c4c406b744e9e35a0da2631621847"
+  },
+  "new_coverage": [
+    "8960-wide FFN matrices and normalization/activation rows",
+    "12:2 grouped-query attention and128-wide heads",
+    "8960-wide unary threshold across three/four query rows"
+  ],
+  "profiles": {
+    "release": "Original guarded CPU; Q4 pairOFF",
+    "sanitizer": "Debug ASAN/UBSAN, original guarded CPU, Q4 pairOFF; optional direct sampler enabled in runtime but not linked into this backend-only executable"
+  }
+}

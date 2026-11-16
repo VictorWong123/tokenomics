@@ -215,6 +215,9 @@ Engine::~Engine() = default;
 double Engine::load_ms() const { return impl_->loading; }
 std::string Engine::system_info() const {
     auto info = std::string(llama_print_system_info()) + impl_->execution_evidence;
+#ifdef TOKENOMICS_LOGIT_COLLECTOR
+    info += "; TOKENOMICS_LOGIT_COLLECTOR=ON";
+#endif
 #ifdef TOKENOMICS_VERIFY_STAGE_TIMING
     info += "; TOKENOMICS_VERIFY_STAGE_TIMING=ON";
 #endif
@@ -289,6 +292,10 @@ Result Engine::generate(const Request &r) {
         require(r.prefix_tokens.empty() || r.prefix_tokens == checkpoint->prefix,
                 "checkpoint prefix does not match request");
     }
+#ifdef TOKENOMICS_LOGIT_COLLECTOR
+    require(!r.logit_observer || (r.mode == "target" && e.cfg.gpu_layers == 0),
+            "ranking observer requires ordinary CPU target decoding");
+#endif
     const bool use_model = r.drafter == "model" && r.mode != "target";
     require(!r.controller || r.mode == "cost-aware",
             "controller configuration requires cost-aware policy");
@@ -521,6 +528,13 @@ Result Engine::generate(const Request &r) {
         const auto ids = common_sampler_sample_and_accept_n(smpl.get(), tgt, proposed);
 #ifdef TOKENOMICS_VERIFY_STAGE_TIMING
         c.target_sampling_ms = elapsed(sampling_start);
+#endif
+#ifdef TOKENOMICS_LOGIT_COLLECTOR
+        if (r.logit_observer) {
+            const float *values = llama_get_logits_ith(tgt, 0);
+            require(values != nullptr, "missing target-ranking logits");
+            r.logit_observer(int(out.tokens.size()), values, llama_vocab_n_tokens(vocab));
+        }
 #endif
         c.verify_ms = elapsed(t); // reading logits synchronizes target backend work
         t = Clock::now();

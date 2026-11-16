@@ -18,6 +18,10 @@ struct Request {
     double confidence = 0.5;
     bool detailed = true;
     bool diagnostic_logits = false; // opt-in correctness probe; never benchmark timing
+#ifdef TOKENOMICS_LOGIT_COLLECTOR
+    // Read-only diagnostic, target-only, CPU-only. Compiled out of benchmark builds.
+    std::function<void(int, const float *, int)> logit_observer;
+#endif
     std::vector<int> script;
     // Test-only fault injection after upstream drafting. Never exposed by CLI.
     std::function<void(std::vector<int> &, int)> proposal_transform;

@@ -1,0 +1,4 @@
+{
+  "utf8": "backend=CPU\n132 normalization/activation cases; 2791104 bitwise comparisons passed\n240 positional RoPE cases; 1118208 bitwise comparisons passed\n60 masked softmax cases; 1655808 bitwise comparisons passed\n640 backend matrix cases; 1943552 bitwise row comparisons passed\n",
+  "sha256": "d27d1b6b49c2f2a3612eab07af6640a2235614075193b90cd311042e5c6bff2f"
+}
