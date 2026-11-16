@@ -1,0 +1,8 @@
+{
+  "scope": "Post-hoc combination work replay, not a fresh validation, inference or speed result",
+  "source_checkpoint": "0452cb55631147e5ab0eb2c5c1de5f48bbbe5210",
+  "collections": 5,
+  "per_prompt_cells": 384,
+  "computed_cycles": 19616,
+  "decision": "No new native drafter. Strong suffix before ngram is mostly identical to ngram; strong suffix before guidance yields work tradeoffs, not a general baseline win."
+}

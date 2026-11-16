@@ -1,0 +1,14 @@
+{
+  "build_log_sha256": "5bc965329d87747c26a919f2fd7c75302bd76fba38c4af6f3d3565ad91aa856d",
+  "compiled_core_source_sha256": {
+    "src/commit.cpp": "b559ba87623f585f3f432402390b05793364e881155eca3fc6409e8499300f43",
+    "src/controller_io.cpp": "80331d30a9a147bfd7e0326e9aa81249d71db40a0c434fbbcc2306c37109b817",
+    "src/logit_copy.cpp": "e460ba168323f6108d4933e1e58cf53b0feffc8558a7ae93bcc448b3f41fbc55",
+    "src/policy.cpp": "9c088df669e21c66e3ce6cac767a4c517f557f48c3302087b1ff5d85de9fc604",
+    "src/suffix.cpp": "7c104289e2b26c1a74cfb7b2980ddf437e3c9397a89c59c4e066bfb5067c21a0"
+  },
+  "configure_log_sha256": "28cad87611c5088124fc63eed34f96744c53eb2b35b79067f71dfa79d4eeb6e9",
+  "scope": "Fresh default-OFF C++ core build with Python package finding disabled; five registered native suites, no model/runtime benchmark",
+  "test_log": "Internal ctest changing into directory: /workspace/tokenomics/build-native-research-final\nTest project /workspace/tokenomics/build-native-research-final\n    Start 1: logit_copy\n1/5 Test #1: logit_copy .......................   Passed    0.02 sec\n    Start 2: core\n2/5 Test #2: core .............................   Passed    0.00 sec\n    Start 3: suffix\n3/5 Test #3: suffix ...........................   Passed    0.20 sec\n    Start 4: controller\n4/5 Test #4: controller .......................   Passed    0.00 sec\n    Start 5: controller_io\n5/5 Test #5: controller_io ....................   Passed    0.00 sec\n\n100% tests passed, 0 tests failed out of 5\n\nTotal Test time (real) =   0.23 sec\n",
+  "test_log_sha256": "3de2cb22e9b38826f3269d03f41a66fb645f84ebee162d8cdf2ca72e8a28f935"
+}

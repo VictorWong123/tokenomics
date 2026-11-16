@@ -1,0 +1,42 @@
+{
+  "checks": {
+    "asan-ubsan": {
+      "binary_sha256": "e6a8260e3aad0a76b48c7a86863a4b485ec34cf9f987284f30f390ee52c7977b",
+      "fixture_file_sha256": "435c15241459f749fcddc94b1c2a3b2395c12d38c4b70cf7b5660d6978ecd4f0",
+      "models": {
+        "qwen25-05": {
+          "compared_values": 10240,
+          "gates": 20
+        },
+        "qwen25-15": {
+          "compared_values": 5120,
+          "gates": 10
+        }
+      }
+    },
+    "release": {
+      "binary_sha256": "8c7e90c3d93a73594dde8470ba066b84451ec9af9a76b0aded90c7814ec0873b",
+      "fixture_file_sha256": "435c15241459f749fcddc94b1c2a3b2395c12d38c4b70cf7b5660d6978ecd4f0",
+      "models": {
+        "qwen25-05": {
+          "compared_values": 10240,
+          "gates": 20
+        },
+        "qwen25-15": {
+          "compared_values": 5120,
+          "gates": 10
+        }
+      }
+    }
+  },
+  "compiled_component_checkpoint": "c7e42321cdfcc45651ca455a13b4612142d3184d",
+  "component_source_sha256": "ff38c8f9538408905157ee007e53b13c4cb9aa92ae42443fed4442b82050e9c4",
+  "formatting": "Black107 Python files and clang-format src/tests passed",
+  "performance_claim": null,
+  "python_tests": {
+    "count": 138,
+    "log_sha256": "517bbf3f3617453f4c82796dc0ce1a3600130b371e17392d79c3b7a98e22f66b",
+    "skipped": 8
+  },
+  "scope": "Small synthetic CPU matrix fixture and model-geometry CLI; no large matrices, Metal execution or timing"
+}

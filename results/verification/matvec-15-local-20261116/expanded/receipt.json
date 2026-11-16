@@ -1,0 +1,36 @@
+{
+  "checks": {
+    "asan-ubsan": {
+      "binary_sha256": "6859abb50b62504eb6ee268b43b07147f82fd7ab95abc97d1906fad0f047c5f8",
+      "models": {
+        "qwen25-05": {
+          "compared_values": 10240,
+          "gates": 20
+        },
+        "qwen25-15": {
+          "compared_values": 5120,
+          "gates": 10
+        }
+      },
+      "payload_sha256": "a33645553f1bc8a5367eec42a6c7d4835e3995af7a22a1469309a88417e76e6d"
+    },
+    "release": {
+      "binary_sha256": "aa9b0d81aa687fb4154805e718d3ca2606f961f263d7baba2bb2adc38ba9883a",
+      "models": {
+        "qwen25-05": {
+          "compared_values": 10240,
+          "gates": 20
+        },
+        "qwen25-15": {
+          "compared_values": 5120,
+          "gates": 10
+        }
+      },
+      "payload_sha256": "a33645553f1bc8a5367eec42a6c7d4835e3995af7a22a1469309a88417e76e6d"
+    }
+  },
+  "compiled_component_checkpoint": "5ce28cf18b4eb6749da373d0a4ebedeaa16e53cf",
+  "performance_claim": null,
+  "scope": "Expanded native geometry listing and tiny synthetic CPU fixture only; no large matrices, Metal work or speed",
+  "source_sha256": "fc5cdfdee8a8f6591737ae251e521cc92c4a2c01baed8de0ec200ad43866acd6"
+}

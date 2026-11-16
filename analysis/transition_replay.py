@@ -1,4 +1,4 @@
-"""Exploratory linear transition composition; work only, no published-tree claim."""
+"""Exploratory proposal work replays; no runtime, latency or published-tree claim."""
 
 import argparse
 from collections import Counter

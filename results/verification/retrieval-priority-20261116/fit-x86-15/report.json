@@ -1,0 +1,1064 @@
+{
+  "collection_complete_sha256": "3d7f5195aae8616bd263f1cac6ff766e61d7b959d777f1d500d422167702a4aa",
+  "collection_phase": "fit",
+  "computed_cycles": 2405,
+  "model_id": "qwen25-15",
+  "per_prompt": [
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5-priority-ngram3"
+      },
+      "cycles": 62,
+      "drafted": 4,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 58,
+        "2": 4
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5-priority-ngram3"
+      },
+      "cycles": 60,
+      "drafted": 8,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 58,
+        "5": 2
+      },
+      "tokens": 64,
+      "verified_rows": 68,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5-priority-ngram3"
+      },
+      "cycles": 60,
+      "drafted": 16,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 58,
+        "9": 2
+      },
+      "tokens": 64,
+      "verified_rows": 76,
+      "wasted_rows": 12
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5-priority-guided3"
+      },
+      "cycles": 62,
+      "drafted": 3,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 59,
+        "2": 3
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5-priority-guided3"
+      },
+      "cycles": 60,
+      "drafted": 4,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 59,
+        "5": 1
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5-priority-guided3"
+      },
+      "cycles": 60,
+      "drafted": 8,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 59,
+        "9": 1
+      },
+      "tokens": 64,
+      "verified_rows": 68,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 1,
+        "id": "guided3"
+      },
+      "cycles": 62,
+      "drafted": 2,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 60,
+        "2": 2
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 4,
+        "id": "guided3"
+      },
+      "cycles": 60,
+      "drafted": 4,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 59,
+        "5": 1
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 8,
+        "id": "guided3"
+      },
+      "cycles": 60,
+      "drafted": 8,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 59,
+        "9": 1
+      },
+      "tokens": 64,
+      "verified_rows": 68,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 62,
+      "drafted": 4,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 58,
+        "2": 4
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 60,
+      "drafted": 8,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 58,
+        "5": 2
+      },
+      "tokens": 64,
+      "verified_rows": 68,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 4,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 60,
+      "drafted": 16,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 58,
+        "9": 2
+      },
+      "tokens": 64,
+      "verified_rows": 76,
+      "wasted_rows": 12
+    },
+    {
+      "accepted": 1,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 63,
+      "drafted": 2,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 61,
+        "2": 2
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 62,
+      "drafted": 4,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 61,
+        "5": 1
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 2,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 62,
+      "drafted": 8,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 61,
+        "9": 1
+      },
+      "tokens": 64,
+      "verified_rows": 70,
+      "wasted_rows": 6
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-qa-01",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 13,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5-priority-ngram3"
+      },
+      "cycles": 51,
+      "drafted": 14,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "2": 14
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 19,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5-priority-ngram3"
+      },
+      "cycles": 45,
+      "drafted": 32,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "5": 8
+      },
+      "tokens": 64,
+      "verified_rows": 77,
+      "wasted_rows": 13
+    },
+    {
+      "accepted": 22,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5-priority-ngram3"
+      },
+      "cycles": 42,
+      "drafted": 40,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "9": 5
+      },
+      "tokens": 64,
+      "verified_rows": 82,
+      "wasted_rows": 18
+    },
+    {
+      "accepted": 13,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5-priority-guided3"
+      },
+      "cycles": 51,
+      "drafted": 14,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "2": 14
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 19,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5-priority-guided3"
+      },
+      "cycles": 45,
+      "drafted": 32,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "5": 8
+      },
+      "tokens": 64,
+      "verified_rows": 77,
+      "wasted_rows": 13
+    },
+    {
+      "accepted": 22,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5-priority-guided3"
+      },
+      "cycles": 42,
+      "drafted": 40,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "9": 5
+      },
+      "tokens": 64,
+      "verified_rows": 82,
+      "wasted_rows": 18
+    },
+    {
+      "accepted": 10,
+      "configuration": {
+        "cap": 1,
+        "id": "guided3"
+      },
+      "cycles": 54,
+      "drafted": 10,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 44,
+        "2": 10
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 18,
+      "configuration": {
+        "cap": 4,
+        "id": "guided3"
+      },
+      "cycles": 46,
+      "drafted": 24,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 40,
+        "5": 6
+      },
+      "tokens": 64,
+      "verified_rows": 70,
+      "wasted_rows": 6
+    },
+    {
+      "accepted": 22,
+      "configuration": {
+        "cap": 8,
+        "id": "guided3"
+      },
+      "cycles": 42,
+      "drafted": 40,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "9": 5
+      },
+      "tokens": 64,
+      "verified_rows": 82,
+      "wasted_rows": 18
+    },
+    {
+      "accepted": 13,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 51,
+      "drafted": 14,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "2": 14
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 19,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 45,
+      "drafted": 32,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "5": 8
+      },
+      "tokens": 64,
+      "verified_rows": 77,
+      "wasted_rows": 13
+    },
+    {
+      "accepted": 22,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 42,
+      "drafted": 40,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 37,
+        "9": 5
+      },
+      "tokens": 64,
+      "verified_rows": 82,
+      "wasted_rows": 18
+    },
+    {
+      "accepted": 9,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 55,
+      "drafted": 10,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 45,
+        "2": 10
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 15,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 49,
+      "drafted": 16,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 45,
+        "5": 4
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 16,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 48,
+      "drafted": 24,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 45,
+        "9": 3
+      },
+      "tokens": 64,
+      "verified_rows": 72,
+      "wasted_rows": 8
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-code-01",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    },
+    {
+      "accepted": 18,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5-priority-ngram3"
+      },
+      "cycles": 46,
+      "drafted": 23,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 23,
+        "2": 23
+      },
+      "tokens": 64,
+      "verified_rows": 69,
+      "wasted_rows": 5
+    },
+    {
+      "accepted": 29,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5-priority-ngram3"
+      },
+      "cycles": 35,
+      "drafted": 48,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 23,
+        "5": 12
+      },
+      "tokens": 64,
+      "verified_rows": 83,
+      "wasted_rows": 19
+    },
+    {
+      "accepted": 32,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5-priority-ngram3"
+      },
+      "cycles": 32,
+      "drafted": 72,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 23,
+        "9": 9
+      },
+      "tokens": 64,
+      "verified_rows": 104,
+      "wasted_rows": 40
+    },
+    {
+      "accepted": 18,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5-priority-guided3"
+      },
+      "cycles": 46,
+      "drafted": 20,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 26,
+        "2": 20
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 29,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5-priority-guided3"
+      },
+      "cycles": 35,
+      "drafted": 36,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 26,
+        "5": 9
+      },
+      "tokens": 64,
+      "verified_rows": 71,
+      "wasted_rows": 7
+    },
+    {
+      "accepted": 32,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5-priority-guided3"
+      },
+      "cycles": 32,
+      "drafted": 48,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 26,
+        "9": 6
+      },
+      "tokens": 64,
+      "verified_rows": 80,
+      "wasted_rows": 16
+    },
+    {
+      "accepted": 14,
+      "configuration": {
+        "cap": 1,
+        "id": "guided3"
+      },
+      "cycles": 50,
+      "drafted": 15,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 35,
+        "2": 15
+      },
+      "tokens": 64,
+      "verified_rows": 65,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 29,
+      "configuration": {
+        "cap": 4,
+        "id": "guided3"
+      },
+      "cycles": 35,
+      "drafted": 36,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 26,
+        "5": 9
+      },
+      "tokens": 64,
+      "verified_rows": 71,
+      "wasted_rows": 7
+    },
+    {
+      "accepted": 31,
+      "configuration": {
+        "cap": 8,
+        "id": "guided3"
+      },
+      "cycles": 33,
+      "drafted": 48,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 27,
+        "9": 6
+      },
+      "tokens": 64,
+      "verified_rows": 81,
+      "wasted_rows": 17
+    },
+    {
+      "accepted": 18,
+      "configuration": {
+        "cap": 1,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 46,
+      "drafted": 23,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 23,
+        "2": 23
+      },
+      "tokens": 64,
+      "verified_rows": 69,
+      "wasted_rows": 5
+    },
+    {
+      "accepted": 28,
+      "configuration": {
+        "cap": 4,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 36,
+      "drafted": 51,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 23,
+        "4": 1,
+        "5": 12
+      },
+      "tokens": 64,
+      "verified_rows": 87,
+      "wasted_rows": 23
+    },
+    {
+      "accepted": 32,
+      "configuration": {
+        "cap": 8,
+        "id": "upstream-ngram3"
+      },
+      "cycles": 32,
+      "drafted": 72,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 23,
+        "9": 9
+      },
+      "tokens": 64,
+      "verified_rows": 104,
+      "wasted_rows": 40
+    },
+    {
+      "accepted": 14,
+      "configuration": {
+        "cap": 1,
+        "id": "suffix5"
+      },
+      "cycles": 50,
+      "drafted": 16,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 34,
+        "2": 16
+      },
+      "tokens": 64,
+      "verified_rows": 66,
+      "wasted_rows": 2
+    },
+    {
+      "accepted": 22,
+      "configuration": {
+        "cap": 4,
+        "id": "suffix5"
+      },
+      "cycles": 42,
+      "drafted": 32,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 34,
+        "5": 8
+      },
+      "tokens": 64,
+      "verified_rows": 74,
+      "wasted_rows": 10
+    },
+    {
+      "accepted": 24,
+      "configuration": {
+        "cap": 8,
+        "id": "suffix5"
+      },
+      "cycles": 40,
+      "drafted": 48,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 34,
+        "9": 6
+      },
+      "tokens": 64,
+      "verified_rows": 88,
+      "wasted_rows": 24
+    },
+    {
+      "accepted": 0,
+      "configuration": {
+        "cap": 0,
+        "id": "ordinary"
+      },
+      "cycles": 64,
+      "drafted": 0,
+      "prompt_id": "development-summary-01",
+      "query_size_histogram": {
+        "1": 64
+      },
+      "tokens": 64,
+      "verified_rows": 64,
+      "wasted_rows": 0
+    }
+  ],
+  "performance_claim": null,
+  "platform": {
+    "machine": "x86_64",
+    "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39"
+  },
+  "proposal_family": "priority",
+  "protocol_sha256": "1cc45b5095d78e34b4ceb51859604f4d9bcbef629b15c8cc39d5418ece81af25",
+  "scope": "Post-hoc exploratory development work replay on already inspected CPU fit/validation trajectories; no new validation, deployment, speed or reserved held-out claim",
+  "source": {
+    "owned_source_sha256": "244e974d317c97b150056f32adbab98fe47811f6f1a06a675aa00b9db0bb9017",
+    "revision": "0452cb55631147e5ab0eb2c5c1de5f48bbbe5210"
+  },
+  "totals": [
+    {
+      "accepted": 33,
+      "cap": 1,
+      "cycles": 159,
+      "drafted": 41,
+      "id": "suffix5-priority-ngram3",
+      "tokens": 192,
+      "verified_rows": 200,
+      "wasted_rows": 8
+    },
+    {
+      "accepted": 52,
+      "cap": 4,
+      "cycles": 140,
+      "drafted": 88,
+      "id": "suffix5-priority-ngram3",
+      "tokens": 192,
+      "verified_rows": 228,
+      "wasted_rows": 36
+    },
+    {
+      "accepted": 58,
+      "cap": 8,
+      "cycles": 134,
+      "drafted": 128,
+      "id": "suffix5-priority-ngram3",
+      "tokens": 192,
+      "verified_rows": 262,
+      "wasted_rows": 70
+    },
+    {
+      "accepted": 33,
+      "cap": 1,
+      "cycles": 159,
+      "drafted": 37,
+      "id": "suffix5-priority-guided3",
+      "tokens": 192,
+      "verified_rows": 196,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 52,
+      "cap": 4,
+      "cycles": 140,
+      "drafted": 72,
+      "id": "suffix5-priority-guided3",
+      "tokens": 192,
+      "verified_rows": 212,
+      "wasted_rows": 20
+    },
+    {
+      "accepted": 58,
+      "cap": 8,
+      "cycles": 134,
+      "drafted": 96,
+      "id": "suffix5-priority-guided3",
+      "tokens": 192,
+      "verified_rows": 230,
+      "wasted_rows": 38
+    },
+    {
+      "accepted": 26,
+      "cap": 1,
+      "cycles": 166,
+      "drafted": 27,
+      "id": "guided3",
+      "tokens": 192,
+      "verified_rows": 193,
+      "wasted_rows": 1
+    },
+    {
+      "accepted": 51,
+      "cap": 4,
+      "cycles": 141,
+      "drafted": 64,
+      "id": "guided3",
+      "tokens": 192,
+      "verified_rows": 205,
+      "wasted_rows": 13
+    },
+    {
+      "accepted": 57,
+      "cap": 8,
+      "cycles": 135,
+      "drafted": 96,
+      "id": "guided3",
+      "tokens": 192,
+      "verified_rows": 231,
+      "wasted_rows": 39
+    },
+    {
+      "accepted": 33,
+      "cap": 1,
+      "cycles": 159,
+      "drafted": 41,
+      "id": "upstream-ngram3",
+      "tokens": 192,
+      "verified_rows": 200,
+      "wasted_rows": 8
+    },
+    {
+      "accepted": 51,
+      "cap": 4,
+      "cycles": 141,
+      "drafted": 91,
+      "id": "upstream-ngram3",
+      "tokens": 192,
+      "verified_rows": 232,
+      "wasted_rows": 40
+    },
+    {
+      "accepted": 58,
+      "cap": 8,
+      "cycles": 134,
+      "drafted": 128,
+      "id": "upstream-ngram3",
+      "tokens": 192,
+      "verified_rows": 262,
+      "wasted_rows": 70
+    },
+    {
+      "accepted": 24,
+      "cap": 1,
+      "cycles": 168,
+      "drafted": 28,
+      "id": "suffix5",
+      "tokens": 192,
+      "verified_rows": 196,
+      "wasted_rows": 4
+    },
+    {
+      "accepted": 39,
+      "cap": 4,
+      "cycles": 153,
+      "drafted": 52,
+      "id": "suffix5",
+      "tokens": 192,
+      "verified_rows": 205,
+      "wasted_rows": 13
+    },
+    {
+      "accepted": 42,
+      "cap": 8,
+      "cycles": 150,
+      "drafted": 80,
+      "id": "suffix5",
+      "tokens": 192,
+      "verified_rows": 230,
+      "wasted_rows": 38
+    },
+    {
+      "accepted": 0,
+      "cap": 0,
+      "cycles": 192,
+      "drafted": 0,
+      "id": "ordinary",
+      "tokens": 192,
+      "verified_rows": 192,
+      "wasted_rows": 0
+    }
+  ],
+  "work_frontier": [
+    {
+      "aliases": [
+        {
+          "cap": 8,
+          "family": "suffix-priority",
+          "id": "suffix5-priority-guided3"
+        }
+      ],
+      "cycles": 134,
+      "wasted_rows": 38
+    },
+    {
+      "aliases": [
+        {
+          "cap": 4,
+          "family": "suffix-priority",
+          "id": "suffix5-priority-guided3"
+        }
+      ],
+      "cycles": 140,
+      "wasted_rows": 20
+    },
+    {
+      "aliases": [
+        {
+          "cap": 4,
+          "family": "control",
+          "id": "guided3"
+        }
+      ],
+      "cycles": 141,
+      "wasted_rows": 13
+    },
+    {
+      "aliases": [
+        {
+          "cap": 1,
+          "family": "suffix-priority",
+          "id": "suffix5-priority-guided3"
+        }
+      ],
+      "cycles": 159,
+      "wasted_rows": 4
+    },
+    {
+      "aliases": [
+        {
+          "cap": 1,
+          "family": "control",
+          "id": "guided3"
+        }
+      ],
+      "cycles": 166,
+      "wasted_rows": 1
+    },
+    {
+      "aliases": [
+        {
+          "cap": 0,
+          "family": "control",
+          "id": "ordinary"
+        }
+      ],
+      "cycles": 192,
+      "wasted_rows": 0
+    }
+  ]
+}
