@@ -806,3 +806,30 @@ source-derived partials on native Apple ARM CPU, and retains its compiler IR.
 The original/interleaved IR comparison explicitly lists additional functions
 outside its semantic comparison. This avoids presenting successful compilation
 of a new kernel as proof of its GPU arithmetic. [Prototype notes](metal-q8-shared-prototype.md).
+
+### Shared-Q8 opt-in integration
+
+[Native prototype run43830852115](https://github.com/VictorWong123/tokenomics/actions/runs/43830852115)
+passes Apple ARM strict/contracted partial checks and Metal AIR compilation.
+All262 original functions and four interleaved wrappers still match their
+separate original module. The two shared helper/kernel additions are explicitly
+outside that comparison. Their AIR shows one integer conversion feeding both
+query recurrences; `fast` flags permit further GPU optimization, so this is not
+a final GPU equivalence proof. Selected exact AIR bodies and native host counts
+are retained with the prototype evidence.
+
+Integrated `TOKENOMICS_METAL_Q8_SHARED=ON` as a default-OFF variant requiring
+Q8 grouping, short-MV and embedded Apple shaders. The same row selector/grid
+uses `_shared2` instead of `_grouped2`. The trained local runner's `--share-q8`
+selects it and preserves the original ordinary/ngram controls. Profile gates
+exclude other kernel variants and accidental greedy-sampler mixing. This also
+closes a profile-labeling gap in the older short-MV validators.
+
+The model-free component study now rotates four profiles through four blocks,
+retaining5120 timing pairs/320 gates. It compares serial grouping against actual
+shared weight work. Host C++ generation/compilation passes,448 dispatch and589896
+split checks pass, all12 profile/orchestration tests pass, and all7 default suites
+pass in45.79 seconds. Strict/contracted Release and ASAN partial checks also pass
+with an added finite-value/poison-read rejection. The full native runtime profile
+is pending; actual M3 graphs/tokens/timing remain unmeasured.
+[Integration host evidence](../results/verification/q8-shared-integration-20261116/host-summary.json).

@@ -1,0 +1,32 @@
+{
+  "arithmetic_check_sha256": "f3a6a7ed7277f8c29244894ba221ca323e6bbdf9fded1d3090df935ee8ebd9d6",
+  "bitwise_partials_per_variant": 3311616,
+  "cases_per_arithmetic_variant": 2016,
+  "component_analyzer_tests": 3,
+  "component_protocol": {
+    "expected_gate_records": 320,
+    "expected_timing_pairs": 5120,
+    "profiles": 4,
+    "rotated_blocks": 4
+  },
+  "default_ctest_seconds": 45.79,
+  "default_ctest_suites": 7,
+  "finite_partial_check": true,
+  "generated_device_sha256": "3adba8bcece15dfb482b54ce5c634f3509d6cb00a3493a3b0d865b46c7d5102e",
+  "generated_shader_sha256": "0ba16fe8b7900c856e99c60b7ffd1d21f486a6fd426cc128dcb5de02069236ff",
+  "grouped_serial_and_interleaved_wrappers_absent": true,
+  "host_dispatch_cases": 448,
+  "metal_graph_execution": false,
+  "native_full_profile_compilation": "pending",
+  "padding_split_cases": 589896,
+  "performance_claim": null,
+  "profile_tests": 12,
+  "selected_kernel": "kernel_mul_mv_q8_0_f32_shared2",
+  "shader_source_sha256": "9c6648c0cfec422d721f1c75755ab84791895594aa17108045223dbdb1f2c3d9",
+  "source": {
+    "owned_source_sha256": "c6c5acafb1b3a779d9b93ed91c1b379746159793fa4caa15a6f165e64800cfc4",
+    "revision": "5b2e3d80b1558940b154f1033a985fe35f06128a"
+  },
+  "source_arithmetic_variants": 4,
+  "state": "passed"
+}

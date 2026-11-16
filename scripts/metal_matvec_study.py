@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build three Metal kernel candidates and compare synthetic matrix components."""
+"""Build four Metal kernel candidates and compare synthetic matrix components."""
 
 import argparse
 from pathlib import Path
@@ -55,7 +55,10 @@ def study(args):
                 "TOKENOMICS_METAL_INTERLEAVE": (
                     "ON" if profile == "interleaved" else "OFF"
                 ),
-                "TOKENOMICS_METAL_Q8_GROUP": "ON" if profile == "q8-group" else "OFF",
+                "TOKENOMICS_METAL_Q8_GROUP": (
+                    "ON" if profile in ("q8-group", "q8-shared") else "OFF"
+                ),
+                "TOKENOMICS_METAL_Q8_SHARED": "ON" if profile == "q8-shared" else "OFF",
                 "BUILD_TESTING": "ON",
                 "Python3_EXECUTABLE": sys.executable,
             }
@@ -108,10 +111,13 @@ def study(args):
 
         check_identities()
         records = []
-        for block in range(3):
+        for block in range(len(PROFILES)):
             order = PROFILES[block:] + PROFILES[:block]
             for profile in order:
-                print(f"Matrix component: block{block + 1}/3 {profile}", flush=True)
+                print(
+                    f"Matrix component: block{block + 1}/{len(PROFILES)} {profile}",
+                    flush=True,
+                )
                 check_identities()
                 raw = out / f"{profile}-{block}.jsonl"
                 command([binaries[profile], "--metal"], raw)

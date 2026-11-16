@@ -10,7 +10,7 @@ on:
       metal_profiles:
         description: Apple correctness profiles (all or one candidate)
         type: choice
-        options: [all, interleaved, q8-group]
+        options: [all, interleaved, q8-group, q8-shared]
         default: all
       trained_runner:
         description: Standard public runner for trained CPU correctness
@@ -49,7 +49,7 @@ jobs:
       github.ref == 'refs/heads/research/speculative-throughput-20261116' &&
       !github.event.repository.private
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -124,7 +124,7 @@ jobs:
             -DTOKENOMICS_CPU_BATCH_INVARIANT=ON -DTOKENOMICS_CPU_PACKED_VERIFY=OFF \
             -DTOKENOMICS_CPU_Q4_PAIR=OFF -DTOKENOMICS_GREEDY_NO_TEMP=OFF \
             -DTOKENOMICS_VERIFY_STAGE_TIMING=OFF -DTOKENOMICS_METAL_SHORT_MV=OFF \
-            -DTOKENOMICS_METAL_INTERLEAVE=OFF -DTOKENOMICS_METAL_Q8_GROUP=OFF
+            -DTOKENOMICS_METAL_INTERLEAVE=OFF -DTOKENOMICS_METAL_Q8_GROUP=OFF -DTOKENOMICS_METAL_Q8_SHARED=OFF
           .venv/bin/cmake --build build-hosted-trained --target tokenomics -j 2
           cp build-hosted-trained/tokenomics results/local/trained-cpu/binaries/guarded
           .venv/bin/python -c 'from bench.common import atomic_json; from scripts.diagnose_models import build_configuration; atomic_json("results/local/trained-cpu/compilation-reference.json", build_configuration("build-hosted-trained/tokenomics"))'

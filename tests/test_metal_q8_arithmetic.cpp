@@ -133,6 +133,7 @@ static size_t run_case(int width, int outputs, int rows, int family, int padding
     for (size_t i = 0; i < original.partials.size(); ++i) {
         require(original.writes[i] == 1 && shared.writes[i] == 1, "missing query/lane partial");
         const float a = original.partials[i], b = shared.partials[i];
+        require(std::isfinite(a) && std::isfinite(b), "nonfinite source arithmetic or poison read");
         if (std::bit_cast<uint32_t>(a) != std::bit_cast<uint32_t>(b)) {
             std::cerr << "partial mismatch width=" << width << " outputs=" << outputs
                       << " rows=" << rows << " nsg=" << FC_mul_mv_nsg << " family=" << family

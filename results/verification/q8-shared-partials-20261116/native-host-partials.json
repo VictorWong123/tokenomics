@@ -1,0 +1,27 @@
+{
+  "architecture": "Apple ARM hosted CPU",
+  "gpu_execution": false,
+  "results": [
+    {
+      "cases": 2016,
+      "compared_partials": 3311616,
+      "gpu_execution": false,
+      "scope": "Source-derived scalar per-thread Q8 arithmetic only; Metal reduction helper replaced by a capture stub",
+      "state": "passed"
+    },
+    {
+      "cases": 2016,
+      "compared_partials": 3311616,
+      "gpu_execution": false,
+      "scope": "Source-derived scalar per-thread Q8 arithmetic only; Metal reduction helper replaced by a capture stub",
+      "state": "passed"
+    }
+  ],
+  "run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43830852115",
+  "source_commit": "5b2e3d80b1558940b154f1033a985fe35f06128a",
+  "state": "passed",
+  "variants": [
+    "strict",
+    "native FMA-contracted"
+  ]
+}

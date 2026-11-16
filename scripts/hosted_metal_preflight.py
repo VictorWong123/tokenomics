@@ -17,7 +17,14 @@ def main():
     parser.add_argument("--probe-only", action="store_true")
     parser.add_argument(
         "--profiles",
-        choices=("all", "reference", "short-mv", "interleaved", "q8-group"),
+        choices=(
+            "all",
+            "reference",
+            "short-mv",
+            "interleaved",
+            "q8-group",
+            "q8-shared",
+        ),
         default="all",
     )
     args = parser.parse_args()
@@ -91,11 +98,12 @@ def main():
             == 0
         )
         report["shader_compilation"] = "pending" if metal_compiler else "unavailable"
-        for profile, short, interleave, grouped in (
-            ("reference", "OFF", "OFF", "OFF"),
-            ("short-mv", "ON", "OFF", "OFF"),
-            ("interleaved", "ON", "ON", "OFF"),
-            ("q8-group", "ON", "OFF", "ON"),
+        for profile, short, interleave, grouped, shared in (
+            ("reference", "OFF", "OFF", "OFF", "OFF"),
+            ("short-mv", "ON", "OFF", "OFF", "OFF"),
+            ("interleaved", "ON", "ON", "OFF", "OFF"),
+            ("q8-group", "ON", "OFF", "ON", "OFF"),
+            ("q8-shared", "ON", "OFF", "ON", "ON"),
         ):
             if args.profiles != "all" and profile != args.profiles:
                 continue
@@ -127,6 +135,7 @@ def main():
                     f"-DTOKENOMICS_METAL_SHORT_MV={short}",
                     f"-DTOKENOMICS_METAL_INTERLEAVE={interleave}",
                     f"-DTOKENOMICS_METAL_Q8_GROUP={grouped}",
+                    f"-DTOKENOMICS_METAL_Q8_SHARED={shared}",
                 ],
             )
             run(
@@ -193,6 +202,34 @@ def main():
                 f"{profile}-cpu-component-fixture",
                 [str(build / "test_matvec_component"), "--cpu-fixture"],
             )
+            if shared == "ON":
+                arithmetic = ROOT / "build-hosted-q8-shared-arithmetic"
+                run(
+                    "q8-shared-source-arithmetic-configure",
+                    [
+                        sys.prefix + "/bin/cmake",
+                        "-S",
+                        str(ROOT / "tests/metal-q8-arithmetic"),
+                        "-B",
+                        str(arithmetic),
+                        "-DCMAKE_BUILD_TYPE=Release",
+                        "-DTOKENOMICS_ARITHMETIC_SANITIZE=OFF",
+                    ],
+                )
+                run(
+                    "q8-shared-source-arithmetic-compile",
+                    [
+                        sys.prefix + "/bin/cmake",
+                        "--build",
+                        str(arithmetic),
+                        "--parallel",
+                        "2",
+                    ],
+                )
+                run(
+                    "q8-shared-source-arithmetic-test",
+                    [sys.prefix + "/bin/ctest", "--test-dir", str(arithmetic), "-V"],
+                )
             if report["metal_device"]["available"]:
                 run(
                     f"{profile}-metal-library-compile",

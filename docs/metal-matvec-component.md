@@ -1,6 +1,6 @@
 # M3 matrix component diagnostic
 
-This diagnostic compares the plain short-MV, interleaved and grouped-Q8
+This diagnostic compares the plain short-MV, interleaved, grouped-Q8 and shared-Q8
 candidates using synthetic quantized matrices. It needs no downloaded model.
 It answers whether the changed dispatch helps selected matrix operations on
 the actual Mac before spending time on a full trained-model study.
@@ -32,11 +32,11 @@ backend or invalid duration rejects the report.
 
 Each cell has four warmup pairs and16 alternating batch/serial timing pairs,
 with eight completed graph computations per measurement. Every computation
-explicitly synchronizes the selected backend. Three blocks rotate profile order:
-short/interleaved/grouped, interleaved/grouped/short, grouped/short/interleaved.
-Raw2880 timing pairs and180 gate records remain available. Summary reports
+explicitly synchronizes the selected backend. Four blocks rotate the order
+short/interleaved/grouped/shared so each profile occupies each position once.
+Raw5120 timing pairs and320 gate records remain available. Summary reports
 per-block medians and candidate ratios against plain short-MV. Inspect one-row
-controls and block variation alongside any apparent improvement; three blocks
+controls and block variation alongside any apparent improvement; four blocks
 are not a confidence interval.
 
 The serial control contains all independent one-row matrix operations in one

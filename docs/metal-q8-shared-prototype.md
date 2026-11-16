@@ -1,7 +1,6 @@
 # Shared-load Q8 prototype
 
-`src/metal_q8_shared.metal.inc` is an unselected shader prototype. No production
-CMake option or runtime dispatch uses it yet. It shares each quantized integer
+`src/metal_q8_shared.metal.inc` is an experimental, default-OFF shader. It shares each quantized integer
 weight load/conversion and scale load across two query rows. Each query keeps
 the original eight-element dot-product order, multiplies its completed dot by
 the block scale, and calls the unchanged pinned reduction helper. A uniform
@@ -39,5 +38,31 @@ measured by this test.
 The source-only Metal diagnostic can append this prototype while leaving the
 interleaved/native runtime inputs unchanged. The compiler-IR report explicitly
 lists additional functions outside its semantic comparison. Native shader
-compilation, compiler arithmetic inspection, real GPU row equality, trained
-exact-output gates and M3 timing are still required before selecting the kernel.
+compilation and source-derived partial checks also pass on Apple ARM. Its AIR
+contains a shared integer conversion feeding two independent accumulators;
+the operations carry `fast` flags, so later GPU compilation remains relevant.
+All262 original functions and four interleaved wrappers still match their
+separate reference. The new shared helper/kernel are explicitly outside that
+semantic comparison. [Native diagnostic](../results/verification/q8-shared-partials-20261116/native-ir-comparison.json).
+
+An opt-in runtime integration now requires `TOKENOMICS_METAL_Q8_GROUP=ON` and
+`TOKENOMICS_METAL_Q8_SHARED=ON`, in addition to Apple Metal, embedded shaders
+and short-MV. The existing selector and ceiling-divided two-query grid remain
+the same; only the named kernel changes from `_grouped2` to `_shared2`.
+The runtime adds a distinct marker, and gates reject mixed sampler/kernel
+profiles. Ordinary one-row decode and prefills keep the original dispatch.
+
+The runner builds the original guarded reference, executes the actual GPU row
+suite and trained exact-output gates, then measures only if those pass:
+
+```bash
+.venv/bin/python scripts/metal_short_mv_study.py \
+  --share-q8 --screen retrieval \
+  --model models/qwen2.5-0.5b-instruct-q4_k_m.gguf \
+  --out results/local/metal-q8-shared-retrieval-01
+```
+
+`--gate-only` skips timings. The model-free matrix component runner also includes
+the new profile alongside the serial grouped control, separating actual shared
+weight work from grouping alone. Real GPU equality, trained Metal output
+agreement and M3 throughput remain unmeasured.

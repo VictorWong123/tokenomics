@@ -32,7 +32,7 @@ else()
   tokenomics_metal_interleave("${root}")
 endif()
 option(TOKENOMICS_SOURCE_Q8_SHARED_PROTOTYPE "Append unselected shared-Q8 prototype for compiler diagnostics" OFF)
-if(TOKENOMICS_SOURCE_Q8_SHARED_PROTOTYPE)
+if(TOKENOMICS_SOURCE_Q8_SHARED_PROTOTYPE AND NOT TOKENOMICS_METAL_Q8_SHARED)
   tokenomics_read_source("${root}/src/metal_q8_shared.metal.inc" shared_prototype)
   file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/tokenomics-metal-embed-mul_mv.metal"
     "\n${shared_prototype}\n")

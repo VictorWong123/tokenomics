@@ -30,6 +30,7 @@ from scripts.check_metal_profile import (
     interleaved_profile,
     metal_profile,
     q8_group_profile,
+    q8_shared_profile,
 )
 from scripts.diagnose_models import build_configuration
 
@@ -69,11 +70,13 @@ def study(args):
     atomic_json(out / "source.json", source)
     interleaved = getattr(args, "interleave", False)
     group_q8 = getattr(args, "group_q8", False)
-    candidate = kernel_variant(interleaved, group_q8)
+    shared_q8 = getattr(args, "share_q8", False)
+    candidate = kernel_variant(interleaved, group_q8, shared_q8)
     profile_check = {
         "short-mv": metal_profile,
         "interleaved": interleaved_profile,
         "q8-group": q8_group_profile,
+        "q8-shared": q8_shared_profile,
     }[candidate]
     builds = {
         "guarded": ROOT / "build-metal-reference",
@@ -85,7 +88,10 @@ def study(args):
         for profile, build in builds.items():
             enabled = "ON" if profile == candidate else "OFF"
             locality = "ON" if interleaved and profile == candidate else "OFF"
-            grouped = "ON" if group_q8 and profile == candidate else "OFF"
+            grouped = (
+                "ON" if (group_q8 or shared_q8) and profile == candidate else "OFF"
+            )
+            shared = "ON" if shared_q8 and profile == candidate else "OFF"
             print(f"Metal study: configuring {profile}; logs in {out}", flush=True)
             command(
                 [
@@ -100,6 +106,7 @@ def study(args):
                     "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
                     f"-DTOKENOMICS_METAL_INTERLEAVE={locality}",
                     f"-DTOKENOMICS_METAL_Q8_GROUP={grouped}",
+                    f"-DTOKENOMICS_METAL_Q8_SHARED={shared}",
                     "-DGGML_METAL=ON",
                     "-DGGML_METAL_EMBED_LIBRARY=ON",
                     "-DGGML_CUDA=OFF",
@@ -206,7 +213,7 @@ def study(args):
             state = "gate_passed_no_timings"
         else:
             state = "development_screen"
-            config = screen_configuration(screen, interleaved, group_q8)
+            config = screen_configuration(screen, interleaved, group_q8, shared_q8)
             prompts = [
                 p
                 for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")
@@ -235,6 +242,7 @@ def study(args):
                 screen=screen,
                 interleaved=interleaved,
                 group_q8=group_q8,
+                shared_q8=shared_q8,
             )
             state = "complete"
         if source_fingerprint() != source:
@@ -272,6 +280,11 @@ def study(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     locality = parser.add_mutually_exclusive_group()
+    locality.add_argument(
+        "--share-q8",
+        action="store_true",
+        help="Share Q8 weight loads across two query accumulators per threadgroup",
+    )
     locality.add_argument(
         "--group-q8",
         action="store_true",

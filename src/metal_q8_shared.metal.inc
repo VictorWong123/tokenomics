@@ -1,6 +1,9 @@
 // Experimental Q8_0 weight loads shared across two query rows. Based on the
 // pinned MIT-licensed ggml-metal/kernels/mul_mv.metal Q8 routine. Keep each
 // query's eight-value accumulation, block scale and reduction helper in order.
+#ifdef TOKENOMICS_METAL_Q8_GROUP_ROWS
+static_assert(TOKENOMICS_METAL_Q8_GROUP_ROWS == 2, "Review named shared-query kernel group size");
+#endif
 template<short NR0, typename args_t>
 void tokenomics_mul_mv_q8_shared_impl(
         args_t args,

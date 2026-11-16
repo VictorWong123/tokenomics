@@ -3,7 +3,7 @@
 import math
 import statistics
 
-PROFILES = ("short-mv", "interleaved", "q8-group")
+PROFILES = ("short-mv", "interleaved", "q8-group", "q8-shared")
 ROWS = (1, 2, 3, 5, 9)
 SHAPES = (
     ("q8_0", 896, 151936),
@@ -21,7 +21,7 @@ def summarize(records):
         rows = record["rows"]
         if (
             profile not in PROFILES
-            or block not in range(3)
+            or block not in range(len(PROFILES))
             or shape not in SHAPES
             or rows not in ROWS
             or record["synthetic_fixture"]
@@ -54,7 +54,7 @@ def summarize(records):
     expected = {
         (profile, block, *shape, rows)
         for profile in PROFILES
-        for block in range(3)
+        for block in range(len(PROFILES))
         for shape in SHAPES
         for rows in ROWS
     }
@@ -90,7 +90,7 @@ def summarize(records):
             values = {}
             for profile in PROFILES:
                 blocks = []
-                for block in range(3):
+                for block in range(len(PROFILES)):
                     trials = [
                         timings[(profile, block, *shape, rows, trial)]
                         for trial in range(16)
@@ -139,7 +139,7 @@ def summarize(records):
             "Synthetic weights/activations; shapes borrowed from the pinned target, not its learned weight values",
             "Serial control is a single graph containing one-row matrix operations; it excludes per-token model/context overhead",
             "Repeated resident inputs are cache-warm; the Q8 head exceeds cache but this does not reproduce full-model cache traffic",
-            "Three rotated profile blocks describe variation; their medians are not a confidence interval",
+            "Four rotated profile blocks describe variation; their medians are not a confidence interval",
             "FNV checks detect accidental data changes; source/executable identities use SHA256 in the runner manifest",
             "Actual trained cross-profile gates remain required before end-to-end performance measurements",
         ],

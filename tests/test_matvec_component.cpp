@@ -33,7 +33,9 @@ static uint64_t fingerprint(const void *data, size_t size) {
     return hash;
 }
 static const char *profile() {
-#ifdef TOKENOMICS_METAL_Q8_GROUP
+#ifdef TOKENOMICS_METAL_Q8_SHARED
+    return "q8-shared";
+#elif defined(TOKENOMICS_METAL_Q8_GROUP)
     return "q8-group";
 #elif defined(TOKENOMICS_METAL_INTERLEAVE)
     return "interleaved";

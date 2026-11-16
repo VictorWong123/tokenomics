@@ -242,6 +242,10 @@ std::string Engine::system_info() const {
         info += "; TOKENOMICS_METAL_Q8_GROUP=ON; q8_group_rows=" +
                 std::to_string(TOKENOMICS_METAL_Q8_GROUP_ROWS);
 #endif
+#ifdef TOKENOMICS_METAL_Q8_SHARED
+    if (impl_->cfg.gpu_layers > 0)
+        info += "; TOKENOMICS_METAL_Q8_SHARED=ON; q8_weight_load_reuse=2";
+#endif
     return info;
 }
 

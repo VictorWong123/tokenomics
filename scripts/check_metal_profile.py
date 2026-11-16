@@ -16,10 +16,13 @@ CANDIDATE_MARKER = "TOKENOMICS_METAL_SHORT_MV=ON"
 MODEL_SHA256 = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
 INTERLEAVE_MARKER = "TOKENOMICS_METAL_INTERLEAVE=ON"
 Q8_GROUP_MARKER = "TOKENOMICS_METAL_Q8_GROUP=ON"
+Q8_SHARED_MARKER = "TOKENOMICS_METAL_Q8_SHARED=ON"
 GREEDY_MARKER = "TOKENOMICS_GREEDY_NO_TEMP=ON"
 
 
-def metal_profile(row, candidate, *, interleave=False, group_q8=False):
+def metal_profile(
+    row, candidate, *, interleave=False, group_q8=False, shared_q8=False, greedy=False
+):
     info = row["system_info"]
     marker, excluded = (
         (CANDIDATE_MARKER, REFERENCE_MARKER)
@@ -28,6 +31,8 @@ def metal_profile(row, candidate, *, interleave=False, group_q8=False):
     )
     if (
         (Q8_GROUP_MARKER in info) != (candidate and group_q8)
+        or (Q8_SHARED_MARKER in info) != (candidate and shared_q8)
+        or (GREEDY_MARKER in info) != greedy
         or (INTERLEAVE_MARKER in info) != (candidate and interleave)
         or marker not in info
         or excluded in info
@@ -48,8 +53,12 @@ def q8_group_profile(row, candidate):
     metal_profile(row, candidate, group_q8=True)
 
 
+def q8_shared_profile(row, candidate):
+    metal_profile(row, candidate, group_q8=True, shared_q8=True)
+
+
 def greedy_profile(row, candidate):
-    metal_profile(row, False)
+    metal_profile(row, False, greedy=candidate)
     if (GREEDY_MARKER in row["system_info"]) != candidate:
         raise ValueError("Greedy sampler marker differs from expected profile")
 
@@ -428,7 +437,7 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument(
         "--candidate-profile",
-        choices=("short-mv", "interleaved", "q8-group", "greedy"),
+        choices=("short-mv", "interleaved", "q8-group", "q8-shared", "greedy"),
         default="short-mv",
     )
     args = parser.parse_args()
@@ -443,6 +452,7 @@ def main():
             "short-mv": metal_profile,
             "interleaved": interleaved_profile,
             "q8-group": q8_group_profile,
+            "q8-shared": q8_shared_profile,
             "greedy": greedy_profile,
         }[args.candidate_profile],
     )

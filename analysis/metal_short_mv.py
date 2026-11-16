@@ -12,6 +12,7 @@ from scripts.check_metal_profile import (
     interleaved_profile,
     metal_profile,
     q8_group_profile,
+    q8_shared_profile,
 )
 
 
@@ -21,15 +22,19 @@ SCREENS = {
 }
 
 
-def kernel_variant(interleaved=False, group_q8=False):
-    if interleaved and group_q8:
+def kernel_variant(interleaved=False, group_q8=False, shared_q8=False):
+    if sum(bool(value) for value in (interleaved, group_q8, shared_q8)) > 1:
         raise ValueError("Select only one kernel locality experiment")
-    return "q8-group" if group_q8 else "interleaved" if interleaved else "short-mv"
+    return (
+        "q8-shared"
+        if shared_q8
+        else "q8-group" if group_q8 else "interleaved" if interleaved else "short-mv"
+    )
 
 
-def screen_configuration(screen, interleaved=False, group_q8=False):
+def screen_configuration(screen, interleaved=False, group_q8=False, shared_q8=False):
     config = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
-    variant = kernel_variant(interleaved, group_q8)
+    variant = kernel_variant(interleaved, group_q8, shared_q8)
     if variant != "short-mv":
         config["kernel_variant"] = variant
         config["phase"] = config["phase"].replace(
@@ -42,16 +47,19 @@ def screen_configuration(screen, interleaved=False, group_q8=False):
     return config
 
 
-def analyze(directory, *, screen="ngram", interleaved=False, group_q8=False):
+def analyze(
+    directory, *, screen="ngram", interleaved=False, group_q8=False, shared_q8=False
+):
     directory = Path(directory)
     verify(directory)
     frozen = json.loads((directory / "run_manifest.json").read_text())["frozen"]
-    expected = screen_configuration(screen, interleaved, group_q8)
-    candidate = kernel_variant(interleaved, group_q8)
+    expected = screen_configuration(screen, interleaved, group_q8, shared_q8)
+    candidate = kernel_variant(interleaved, group_q8, shared_q8)
     profile_check = {
         "short-mv": metal_profile,
         "interleaved": interleaved_profile,
         "q8-group": q8_group_profile,
+        "q8-shared": q8_shared_profile,
     }[candidate]
     corpus = {p["id"]: p for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")}
     if (

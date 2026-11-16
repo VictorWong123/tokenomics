@@ -7,7 +7,7 @@ from analysis.matvec_component import PROFILES, ROWS, SHAPES, summarize
 def fixture():
     records = []
     for profile in PROFILES:
-        for block in range(3):
+        for block in range(len(PROFILES)):
             for kind, width, outputs in SHAPES:
                 for rows in ROWS:
                     base = dict(
@@ -48,7 +48,7 @@ def fixture():
 class MatvecComponentTests(unittest.TestCase):
     def test_component_ratios_are_separate_from_serial_control(self):
         result = summarize(fixture())
-        self.assertEqual(result["trial_pairs"], 2880)
+        self.assertEqual(result["trial_pairs"], 5120)
         self.assertEqual(len(result["cells"]), 20)
         values = result["cells"][0]["profiles"]
         self.assertEqual(values["interleaved"]["median_ratio_vs_short_mv"], 2)

@@ -14,7 +14,9 @@ from scripts.check_metal_profile import (
     CANDIDATE_MARKER,
     INTERLEAVE_MARKER,
     Q8_GROUP_MARKER,
+    Q8_SHARED_MARKER,
     q8_group_profile,
+    q8_shared_profile,
     interleaved_profile,
     REFERENCE_MARKER,
     gate,
@@ -25,6 +27,29 @@ from scripts.check_metal_profile import (
 
 
 class MetalProfileIdentityTests(unittest.TestCase):
+    def test_shared_q8_and_sampler_profiles_cannot_be_mislabeled(self):
+        row = {
+            "system_info": CANDIDATE_MARKER
+            + "; "
+            + Q8_GROUP_MARKER
+            + "; "
+            + Q8_SHARED_MARKER
+            + "; devices=MTL0; offloaded 25/25 layers to GPU",
+            "settings": {"gpu_layers": 99},
+        }
+        q8_shared_profile(row, True)
+        for validator in (
+            metal_profile,
+            interleaved_profile,
+            q8_group_profile,
+            greedy_profile,
+        ):
+            with self.assertRaises(ValueError):
+                validator(row, True)
+        row["system_info"] += "; TOKENOMICS_GREEDY_NO_TEMP=ON"
+        with self.assertRaises(ValueError):
+            q8_shared_profile(row, True)
+
     def test_q8_group_marker_excludes_other_kernel_variants(self):
         row = {
             "system_info": CANDIDATE_MARKER
@@ -133,7 +158,12 @@ class MetalGateOrchestrationTests(unittest.TestCase):
     def test_q8_group_retrieval_screen_keeps_distinct_profile_identity(self):
         self._screen_analysis("retrieval", group_q8=True)
 
-    def _screen_analysis(self, screen, interleaved=False, group_q8=False):
+    def test_q8_shared_retrieval_screen_keeps_distinct_profile_identity(self):
+        self._screen_analysis("retrieval", shared_q8=True)
+
+    def _screen_analysis(
+        self, screen, interleaved=False, group_q8=False, shared_q8=False
+    ):
         from analysis.metal_short_mv import (
             SCREENS,
             analyze,
@@ -162,10 +192,12 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             ]
             write_jsonl(root / "bench/prompts-v1.jsonl", prompts)
             (root / "configs" / SCREENS[screen]).write_text(json.dumps(config))
-            if interleaved or group_q8:
+            if interleaved or group_q8 or shared_q8:
                 with patch("analysis.metal_short_mv.ROOT", root):
-                    config = screen_configuration(screen, interleaved, group_q8)
-            candidate_profile = kernel_variant(interleaved, group_q8)
+                    config = screen_configuration(
+                        screen, interleaved, group_q8, shared_q8
+                    )
+            candidate_profile = kernel_variant(interleaved, group_q8, shared_q8)
             model = root / "repeat.gguf"
             create(model, 100, ngram_cycle=True)
             # Distinct executable identity; same actual CPU runtime. This tests
@@ -190,12 +222,16 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             with patch("analysis.metal_short_mv.ROOT", root), patch(
                 "analysis.metal_short_mv.MODEL_SHA256", sha256(model)
             ), patch(
-                "analysis.metal_short_mv.q8_group_profile"
-                if group_q8
+                "analysis.metal_short_mv.q8_shared_profile"
+                if shared_q8
                 else (
-                    "analysis.metal_short_mv.interleaved_profile"
-                    if interleaved
-                    else "analysis.metal_short_mv.metal_profile"
+                    "analysis.metal_short_mv.q8_group_profile"
+                    if group_q8
+                    else (
+                        "analysis.metal_short_mv.interleaved_profile"
+                        if interleaved
+                        else "analysis.metal_short_mv.metal_profile"
+                    )
                 )
             ) as profile:
                 result = analyze(
@@ -203,6 +239,7 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                     screen=screen,
                     interleaved=interleaved,
                     group_q8=group_q8,
+                    shared_q8=shared_q8,
                 )
                 self.assertEqual(result["records"], len(config["configurations"]) * 9)
                 self.assertEqual(profile.call_count, result["records"])
@@ -216,6 +253,7 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                         screen=screen,
                         interleaved=interleaved,
                         group_q8=group_q8,
+                        shared_q8=shared_q8,
                     )
 
     def test_cross_binary_gate_retains_success_and_first_failure(self):
