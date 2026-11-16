@@ -215,6 +215,9 @@ Engine::~Engine() = default;
 double Engine::load_ms() const { return impl_->loading; }
 std::string Engine::system_info() const {
     auto info = std::string(llama_print_system_info()) + impl_->execution_evidence;
+#ifdef TOKENOMICS_LOGIT_COPY
+    info += std::string("; TOKENOMICS_LOGIT_COPY=ON; logit_copy_rank_isa=") + logit_copy_backend();
+#endif
 #ifdef TOKENOMICS_LOGIT_COLLECTOR
     info += "; TOKENOMICS_LOGIT_COLLECTOR=ON";
 #endif
@@ -269,8 +272,13 @@ Result Engine::generate(const Request &r) {
     const auto begin = Clock::now();
     require(r.max_tokens >= 0 && r.max_cycles >= 0, "token/cycle budgets must be nonnegative");
     require(r.cache == "retain" || r.cache == "upstream", "cache must be retain or upstream");
-    require(r.drafter == "model" || r.drafter == "ngram" || r.drafter == "suffix",
-            "drafter must be model, ngram or suffix");
+#ifndef TOKENOMICS_LOGIT_COPY
+    require(r.drafter != "logit-copy",
+            "logit-copy requires TOKENOMICS_LOGIT_COPY=ON at build time");
+#endif
+    require(r.drafter == "model" || r.drafter == "ngram" || r.drafter == "suffix" ||
+                r.drafter == "logit-copy",
+            "drafter must be model, ngram, suffix or logit-copy");
     require(r.confidence >= 0 && r.confidence <= 1, "confidence must be in [0,1]");
     auto captures = r.capture_checkpoints;
     std::sort(captures.begin(), captures.end());
@@ -296,6 +304,11 @@ Result Engine::generate(const Request &r) {
     require(!r.logit_observer || (r.mode == "target" && e.cfg.gpu_layers == 0),
             "ranking observer requires ordinary CPU target decoding");
 #endif
+    const bool owned_drafter = r.drafter == "suffix"
+#ifdef TOKENOMICS_LOGIT_COPY
+                               || r.drafter == "logit-copy"
+#endif
+        ;
     const bool use_model = r.drafter == "model" && r.mode != "target";
     require(!r.controller || r.mode == "cost-aware",
             "controller configuration requires cost-aware policy");
@@ -314,6 +327,14 @@ Result Engine::generate(const Request &r) {
     if (dft)
         llama_synchronize(dft);
     Result out;
+#ifdef TOKENOMICS_LOGIT_COPY
+    if (r.drafter == "logit-copy") {
+        int suppressed = 0;
+        llama_vocab_get_suppress_tokens(vocab, &suppressed);
+        require(suppressed == 0, "logit-copy prototype requires an unsuppressed target vocabulary");
+        out.logit_copy.emplace();
+    }
+#endif
     out.policy_init_ms = policy_init_ms;
     out.controller_active = r.mode == "cost-aware";
     out.prompt_ids = checkpoint
@@ -371,10 +392,9 @@ Result Engine::generate(const Request &r) {
     sp.ngram_simple.size_m = 8;
     sp.ngram_simple.min_hits = 1;
     common_speculative_ptr spec;
-    if (r.mode != "target" && r.drafter != "suffix")
+    if (r.mode != "target" && !owned_drafter)
         spec.reset(common_speculative_init(sp, 1));
-    require(r.mode == "target" || r.drafter == "suffix" || bool(spec),
-            "speculator initialization failed");
+    require(r.mode == "target" || owned_drafter || bool(spec), "speculator initialization failed");
     out.setup_ms = elapsed(begin);
     if (r.max_tokens == 0) {
         out.stop = "budget";
@@ -429,6 +449,9 @@ Result Engine::generate(const Request &r) {
     const auto gen_start = Clock::now();
     int previous = -1;
     int cycle_count = 0;
+#ifdef TOKENOMICS_LOGIT_COPY
+    int last_canonical_row = -1; // Request-local; never reuse another request's logits.
+#endif
     while (int(out.tokens.size()) < r.max_tokens && n < context_limit) {
         Cycle c;
         c.cycle = cycle_count++;
@@ -446,6 +469,10 @@ Result Engine::generate(const Request &r) {
         const int cap = draft_budget(c.action, remaining, context_limit - n);
         c.effective_cap = cap;
         proposed.clear();
+#ifdef TOKENOMICS_LOGIT_COPY
+        if (r.drafter == "logit-copy")
+            c.logit_copy.emplace();
+#endif
         if (cap > 0) {
             if (use_model) {
                 t = Clock::now();
@@ -458,7 +485,24 @@ Result Engine::generate(const Request &r) {
             t = Clock::now();
             if (r.drafter == "suffix") {
                 suffix_draft(prefix, pending, cap, proposed);
-            } else {
+            }
+#ifdef TOKENOMICS_LOGIT_COPY
+            else if (r.drafter == "logit-copy") {
+                std::span<const float> prior;
+                if (last_canonical_row >= 0) {
+                    const auto *logits = llama_get_logits_ith(tgt, last_canonical_row);
+                    require(logits != nullptr, "missing past target distribution for logit-copy");
+                    prior = {logits, size_t(llama_vocab_n_tokens(vocab))};
+                }
+                logit_copy_draft(prefix, pending, cap, prior, proposed, *c.logit_copy);
+                if (c.logit_copy->hint_available)
+                    c.logit_copy->hint_output_index = int(out.tokens.size()) - 1;
+                out.logit_copy->source_candidates += c.logit_copy->source_candidates;
+                out.logit_copy->rank_checks += c.logit_copy->rank_checks;
+                out.logit_copy->logits_examined += c.logit_copy->logits_examined;
+            }
+#endif
+            else {
                 auto &dp = common_speculative_get_draft_params(spec.get(), 0);
                 dp = {};
                 dp.drafting = true;
@@ -545,6 +589,12 @@ Result Engine::generate(const Request &r) {
         }
         auto plan = plan_commit(n, remaining, c.actual, ids,
                                 [vocab](int id) { return llama_vocab_is_eog(vocab, id); });
+#ifdef TOKENOMICS_LOGIT_COPY
+        // The pending token was predicted by this committed row, not by a
+        // rejected suffix or the final hypothetical batch row. Read it only
+        // before the next target decode overwrites the output buffers.
+        last_canonical_row = int(plan.tokens.size()) - 1;
+#endif
         if (spec && cap > 0)
             common_speculative_accept(spec.get(), 0, plan.accepted);
         for (int id : plan.tokens) {

@@ -1,4 +1,7 @@
 #pragma once
+#ifdef TOKENOMICS_LOGIT_COPY
+#include "logit_copy.h"
+#endif
 #include "policy.h"
 #include <cstddef>
 #include <functional>
@@ -48,6 +51,9 @@ struct Cycle {
 #endif
     std::optional<DecisionTrace> controller;
     std::vector<LogitProbe> logits;
+#ifdef TOKENOMICS_LOGIT_COPY
+    std::optional<LogitCopyStats> logit_copy;
+#endif
 };
 struct ActionTotals {
     std::uint64_t cycles = 0, committed_tokens = 0;
@@ -82,6 +88,9 @@ struct Result {
     double checkpoint_save_ms = 0, checkpoint_restore_ms = 0;
     double policy_init_ms = 0;
     bool controller_active = false;
+#ifdef TOKENOMICS_LOGIT_COPY
+    std::optional<LogitCopyStats> logit_copy;
+#endif
     ExecutionTotals execution;
     ControllerTotals controller;
 };

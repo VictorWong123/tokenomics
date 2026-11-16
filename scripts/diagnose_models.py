@@ -34,6 +34,7 @@ def build_configuration(binary):
         "TOKENOMICS_GREEDY_NO_TEMP",
         "TOKENOMICS_GREEDY_DIRECT",
         "TOKENOMICS_LOGIT_COLLECTOR",
+        "TOKENOMICS_LOGIT_COPY",
         "GGML_NATIVE",
         "GGML_CPU_REPACK",
         "GGML_LLAMAFILE",

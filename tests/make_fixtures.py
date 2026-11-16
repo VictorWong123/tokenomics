@@ -53,6 +53,7 @@ def create(
     k_quantized=False,
     unicode_cycle=False,
     ngram_cycle=False,
+    logit_cycle=False,
     width_override=0,
     suppress_tokens=(),
 ):
@@ -97,7 +98,7 @@ def create(
         emb = np.ones((n, width), np.float32)
         out = np.zeros((n, width), np.float32)
         out[winner] = 1
-    if unicode_cycle or ngram_cycle:
+    if unicode_cycle or ngram_cycle or logit_cycle:
         # Three UTF-8 bytes exercise truncated code points. The longer ASCII
         # cycle makes ngram lookup find enough following tokens to draft eight.
         emb.fill(0)
@@ -112,6 +113,8 @@ def create(
             emb[token] = 0
             emb[token, (i + 1) % len(cycle)] = 1
             out[token, i] = 1
+            if logit_cycle:
+                out[cycle[(i + 1) % len(cycle)], i] = 0.5
 
     def tensor(name, value):
         if k_quantized and value.ndim == 2:
@@ -171,5 +174,6 @@ if __name__ == "__main__":
         k_quantized=True,
         width_override=512,
     )
+    create(a.out / "logit-cycle.gguf", 259, logit_cycle=True)
     create(a.out / "utf8-cycle.gguf", 259, unicode_cycle=True)
     create(a.out / "ngram-cycle.gguf", 259, ngram_cycle=True)

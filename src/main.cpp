@@ -17,7 +17,7 @@ static const char *help = R"(Tokenomics: greedy speculative decoding laboratory
   --controller FILE.json (required frozen priors for cost-aware)
   --k 1|2|4|6|8 --max-tokens N --context N --batch N --threads N
   --gpu-layers N   (default 0; compile with optional Metal/CUDA for offload)
-  --cache retain|upstream --drafter model|ngram|suffix --confidence P
+  --cache retain|upstream --drafter model|ngram|suffix|logit-copy --confidence P
   --out FILE.jsonl (default stdout; refuses overwrite)
   --cycles FILE.jsonl --script 0,1,4,0,8 (diagnostic transitions only)
 Jobs contain prompt, policy, k, max_tokens, cache, drafter, confidence,
@@ -26,6 +26,7 @@ replay from exact target trace IDs. No stochastic sampling or context shifting.
 capture_checkpoints + checkpoint_namespace save diagnostic KV states in this
 process; resume_checkpoint restores them. A new ordinary request releases them.
 Cost-aware scheduling is experimental; configuration provenance is retained.
+The experimental logit-copy drafter requires TOKENOMICS_LOGIT_COPY=ON at build time.
 )";
 static json cycle_json(const Cycle &c) {
     json result = {{"cycle", c.cycle},
@@ -51,6 +52,15 @@ static json cycle_json(const Cycle &c) {
                    {"switched", c.switched}};
     if (c.controller)
         result["controller"] = controller_trace_json(*c.controller);
+#ifdef TOKENOMICS_LOGIT_COPY
+    if (c.logit_copy)
+        result["logit_copy"] = {{"hint_available", c.logit_copy->hint_available},
+                                {"hint_output_index", c.logit_copy->hint_output_index},
+                                {"source_candidates", c.logit_copy->source_candidates},
+                                {"rank_checks", c.logit_copy->rank_checks},
+                                {"logits_examined", c.logit_copy->logits_examined},
+                                {"selected_match_length", c.logit_copy->selected_match_length}};
+#endif
 #ifdef TOKENOMICS_VERIFY_STAGE_TIMING
     result["target_compute_ms"] = c.target_compute_ms;
     result["target_sampling_ms"] = c.target_sampling_ms;
@@ -312,6 +322,16 @@ int main(int argc, char **argv) {
             rec["controller_parse_ms"] = controller_parse_ms;
             rec["controller_file_load_ms"] = controller_load_ms;
             rec["execution"] = execution_json(result.execution);
+#ifdef TOKENOMICS_LOGIT_COPY
+            if (result.logit_copy)
+                rec["logit_copy"] = {{"minimum_match_length", 3},
+                                     {"maximum_match_length", 32},
+                                     {"hint_rank_cutoff", 64},
+                                     {"fallback_to_plain_copy", false},
+                                     {"source_candidates", result.logit_copy->source_candidates},
+                                     {"rank_checks", result.logit_copy->rank_checks},
+                                     {"logits_examined", result.logit_copy->logits_examined}};
+#endif
             rec["controller_active"] = result.controller_active;
             if (result.controller_active)
                 rec["controller"] = controller_totals_json(result.controller);

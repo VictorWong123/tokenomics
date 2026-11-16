@@ -158,11 +158,30 @@ def import_collection(log, out, run_url, source_commit, *, allow_synthetic=False
 def load_collection(directory):
     directory = Path(directory)
     seal = json.loads((directory / "complete.json").read_text())["sha256"]
-    if set(seal) != {"data.jsonl", "receipt.json", "provenance.json"} or any(
+    imported = (directory / "receipt.json").is_file()
+    expected = (
+        {"data.jsonl", "receipt.json", "provenance.json"}
+        if imported
+        else {
+            "manifest.json",
+            "status.json",
+            "jobs.jsonl",
+            "data.jsonl",
+            "collector.log",
+        }
+    )
+    if set(seal) != expected or any(
         sha256(directory / name) != digest for name, digest in seal.items()
     ):
         raise ValueError("Imported collection changed")
-    receipt = json.loads((directory / "receipt.json").read_text())
+    if imported:
+        receipt = json.loads((directory / "receipt.json").read_text())
+    else:
+        receipt = {
+            **json.loads((directory / "manifest.json").read_text()),
+            **json.loads((directory / "status.json").read_text()),
+            "payload_sha256": seal,
+        }
     protocol_path, protocol_sha = collection_protocol(
         receipt.get("collection_phase", "fit")
     )
@@ -172,7 +191,11 @@ def load_collection(directory):
     ):
         raise ValueError("Wrong sealed data/protocol")
     identity = model_identity(receipt["model_id"])
-    provenance = json.loads((directory / "provenance.json").read_text())
+    provenance = (
+        json.loads((directory / "provenance.json").read_text())
+        if imported
+        else {"source_commit": receipt["source"]["revision"]}
+    )
     if (
         receipt.get("state") != "passed"
         or receipt["source"]["revision"] != provenance["source_commit"]

@@ -5,7 +5,7 @@ on:
       scope:
         description: Checks to run
         type: choice
-        options: [portable, metal-research, model-metadata, trained-cpu, metal-ir, logit-fit]
+        options: [portable, metal-research, model-metadata, trained-cpu, metal-ir, logit-fit, logit-live]
         default: portable
       metal_profiles:
         description: Apple correctness profiles (all or one candidate)
@@ -259,13 +259,14 @@ jobs:
 
   logit-fit:
     if: >-
-      inputs.scope == 'logit-fit' &&
+      (inputs.scope == 'logit-fit' || inputs.scope == 'logit-live') &&
       github.ref == 'refs/heads/research/speculative-throughput-20261116' &&
       !github.event.repository.private
-    runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    runs-on: ${{ inputs.scope == 'logit-live' && inputs.trained_runner || 'ubuntu-24.04' }}
+    timeout-minutes: ${{ inputs.scope == 'logit-live' && 45 || 25 }}
     env:
-      TOKENOMICS_LOGIT_PHASE: ${{ inputs.logit_phase || 'fit' }}
+      TOKENOMICS_LOGIT_COPY: ${{ inputs.scope == 'logit-live' && 'ON' || 'OFF' }}
+      TOKENOMICS_LOGIT_PHASE: ${{ inputs.scope == 'logit-live' && 'validation' || inputs.logit_phase || 'fit' }}
       TOKENOMICS_FIT_MODEL: ${{ inputs.trained_model || 'qwen25-05' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -288,9 +289,12 @@ jobs:
             -DTOKENOMICS_CPU_BATCH_INVARIANT=ON -DTOKENOMICS_CPU_PACKED_VERIFY=OFF \
             -DTOKENOMICS_CPU_Q4_PAIR=OFF -DTOKENOMICS_GREEDY_NO_TEMP=OFF -DTOKENOMICS_GREEDY_DIRECT=OFF \
             -DTOKENOMICS_VERIFY_STAGE_TIMING=OFF -DTOKENOMICS_LOGIT_COLLECTOR=ON \
+            -DTOKENOMICS_LOGIT_COPY="$TOKENOMICS_LOGIT_COPY" \
             -DTOKENOMICS_METAL_SHORT_MV=OFF -DTOKENOMICS_METAL_INTERLEAVE=OFF \
             -DTOKENOMICS_METAL_Q8_GROUP=OFF -DTOKENOMICS_METAL_Q8_SHARED=OFF
-          .venv/bin/cmake --build build-logit-fit --target collect_target_logits -j 2
+          .venv/bin/cmake --build build-logit-fit --target collect_target_logits tokenomics test_logit_copy test_logit_copy_scalar -j 2
+          build-logit-fit/test_logit_copy
+          build-logit-fit/test_logit_copy_scalar
       - name: Check stable ranks and observer equivalence on a synthetic fixture
         env:
           TOKENOMICS_LOGIT_BINARY: ${{ github.workspace }}/build-logit-fit/collect_target_logits
@@ -303,6 +307,13 @@ jobs:
           .venv/bin/python scripts/collect_logit_fit.py \
             --binary build-logit-fit/collect_target_logits --model "$TOKENOMICS_MODEL_PATH" \
             --model-id "$TOKENOMICS_FIT_MODEL" --phase "$TOKENOMICS_LOGIT_PHASE" --out results/local/logit-fit
+      - name: Verify live guided decoding against canonical validation replay
+        if: inputs.scope == 'logit-live'
+        run: |
+          TOKENOMICS_MODEL_PATH="$(.venv/bin/python -c 'import json,os; from pathlib import Path; pins=json.loads(Path("configs/metal-model-header-pins-v1.json").read_text())["models"]; print("models/"+pins[os.environ["TOKENOMICS_FIT_MODEL"]]["file"])')"
+          .venv/bin/python scripts/check_logit_copy.py \
+            --binary build-logit-fit/tokenomics --model "$TOKENOMICS_MODEL_PATH" \
+            --collection results/local/logit-fit --out results/local/logit-fit/live
       - name: Retain explicit diagnostic data without weights or executables
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -312,5 +323,10 @@ jobs:
             results/local/logit-fit/*.json
             results/local/logit-fit/*.jsonl
             results/local/logit-fit/*.log
+            results/local/logit-fit/live/*.json
+            results/local/logit-fit/live/*.jsonl
+            results/local/logit-fit/live/*.log
+            results/local/logit-fit/live/canonical-replay/*.json
+            results/local/logit-fit/live/canonical-replay/*.gz
           if-no-files-found: warn
           retention-days: 7

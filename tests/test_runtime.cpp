@@ -68,7 +68,12 @@ int main(int argc, char **argv) {
             base.max_tokens = cap;
             const auto expected = e.generate(base);
             for (auto cache : {"retain", "upstream"})
-                for (auto drafter : {"model", "ngram", "suffix"})
+                for (auto drafter : {"model", "ngram", "suffix"
+#ifdef TOKENOMICS_LOGIT_COPY
+                                     ,
+                                     "logit-copy"
+#endif
+                     })
                     for (int variant = 0; variant < 3; ++variant) {
                         Request adaptive = base;
                         adaptive.mode = "cost-aware";
@@ -348,6 +353,52 @@ int main(int argc, char **argv) {
             ++comparisons;
         }
     }
+#ifdef TOKENOMICS_LOGIT_COPY
+    // A second-ranked next-next token makes live past-logit guidance useful.
+    // Rejection injection checks that its next hint comes from the correction
+    // row, rather than from the rejected tail. Action0 and repeated requests
+    // exercise fallback/re-entry and request-local hint reset.
+    Engine guided({dir + "/logit-cycle.gguf", "", 128, 32, 1, 0});
+    Request guided_base;
+    guided_base.prompt = "abcdefghiabcdefghi";
+    guided_base.max_tokens = 64;
+    const auto guided_reference = guided.generate(guided_base);
+    bool guide_full = false, guide_partial = false, guide_zero = false;
+    for (int action : {1, 2, 4, 6, 8, -1}) {
+        Request candidate = guided_base;
+        candidate.drafter = "logit-copy";
+        candidate.mode = action < 0 ? "script" : "fixed";
+        candidate.k = action < 0 ? 4 : action;
+        candidate.script = {8, 0, 4, 1, 0, 6};
+        for (int corrupt = 0; corrupt < 2; ++corrupt) {
+            if (corrupt)
+                candidate.proposal_transform = [](std::vector<int> &ids, int cycle) {
+                    if (!ids.empty())
+                        ids[std::min(size_t(cycle % 3), ids.size() - 1)] = 260;
+                };
+            const auto actual = guided.generate(candidate);
+            CHECK(actual.tokens == guided_reference.tokens && actual.stop == guided_reference.stop);
+            CHECK(actual.logit_copy && actual.logit_copy->rank_checks > 0);
+            CHECK(guided.generate(candidate).tokens == actual.tokens);
+            int cursor = 0;
+            CHECK(!actual.cycles.front().logit_copy->hint_available);
+            for (const auto &cycle : actual.cycles) {
+                CHECK(cycle.logit_copy.has_value());
+                if (cycle.logit_copy->hint_available)
+                    CHECK(cycle.logit_copy->hint_output_index == cursor - 1 && cursor > 0);
+                else
+                    CHECK(cycle.logit_copy->hint_output_index == -1);
+                CHECK(cycle.draft_cached == 0 && cycle.synced == 0);
+                guide_full |= cycle.actual > 0 && cycle.accepted == cycle.actual;
+                guide_partial |= cycle.accepted > 0 && cycle.accepted < cycle.actual;
+                guide_zero |= cycle.actual > 0 && cycle.accepted == 0;
+                cursor += cycle.committed;
+            }
+            ++comparisons;
+        }
+    }
+    CHECK(guide_full && guide_partial && guide_zero);
+#endif
     CHECK(lookup_zero && lookup_partial && lookup_switch);
     std::cout << comparisons
               << " differential fixture cases passed; zero/partial/full acceptance, EOS, rollback, "

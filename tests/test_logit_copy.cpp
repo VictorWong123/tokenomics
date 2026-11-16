@@ -10,6 +10,7 @@
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 using namespace tokenomics;
 using json = nlohmann::json;
 static void check(bool condition, const char *message) {
@@ -86,6 +87,34 @@ static void semantics() {
     nonfinite[2] = NAN;
     logit_copy_draft(history, 2, 4, nonfinite, output, stats, 1, 64);
     check(output.empty(), "nonfinite ranking produced a proposal");
+    for (int candidate : {3, 63, 64, 65, 262})
+        for (int kind = 0; kind < 4; ++kind) {
+            const std::vector<int> prefix{0, 1, 2, candidate, 0, 1};
+            std::vector<float> logits(263, kind == 0 ? 0.0f : -std::numeric_limits<float>::max());
+            logits[2] = std::numeric_limits<float>::max();
+            logits[candidate] = kind == 1   ? std::numeric_limits<float>::denorm_min()
+                                : kind == 2 ? -0.0f
+                                            : 0.0f;
+            for (int cutoff : {2, 8, 64}) {
+                LogitCopyStats check_stats;
+                logit_copy_draft(prefix, 2, 4, logits, output, check_stats, 3, cutoff);
+                check(output == reference(prefix, 2, 4, logits, 3, cutoff),
+                      "rank boundary, signed-zero or subnormal membership differs");
+                ++cases;
+            }
+        }
+    std::vector<int> repeated;
+    for (int i = 0; i < 40; ++i)
+        repeated.push_back(i % 4);
+    repeated.push_back(0);
+    repeated.push_back(1);
+    std::vector<float> just_outside(263, 0.0f);
+    just_outside[2] = 100;
+    just_outside[3] = 1;
+    for (int i = 200; i < 263; ++i)
+        just_outside[i] = 2;
+    logit_copy_draft(repeated, 2, 8, just_outside, output, stats);
+    check(output.empty() && stats.rank_checks == 1, "one source ID was repeatedly rescanned");
     std::cout << cases << " native sorted-reference proposal cases passed\n";
 }
 static void replay_file(const char *path) {
@@ -102,6 +131,7 @@ static void replay_file(const char *path) {
                     int pending = prompt.back(), cursor = 0, cycles = 0, drafted = 0, accepted = 0;
                     std::vector<float> logits(151936, 0.0f);
                     std::uint64_t rank_checks = 0, examined = 0;
+                    json trace = json::array();
                     while (cursor < int(tokens.size())) {
                         std::span<const float> prior;
                         if (cursor) {
@@ -125,6 +155,10 @@ static void replay_file(const char *path) {
                                          proposed, stats, minimum, cutoff);
                         rank_checks += stats.rank_checks;
                         examined += stats.logits_examined;
+                        trace.push_back(
+                            {{"output_index", cursor},
+                             {"proposal_ids", proposed},
+                             {"hint_row_used", cursor ? json(cursor - 1) : json(nullptr)}});
                         int matches = 0;
                         while (matches < int(proposed.size()) &&
                                proposed[matches] == tokens[cursor + matches])
@@ -149,6 +183,7 @@ static void replay_file(const char *path) {
                                        {"wasted_rows", cycles + drafted - int(tokens.size())},
                                        {"rank_checks", rank_checks},
                                        {"logits_examined", examined},
+                                       {"trace", trace},
                                        {"synthetic_rank_embedding", true},
                                        {"performance_claim", nullptr}})
                                      .dump()
@@ -213,7 +248,8 @@ static void benchmark() {
                         a = measure(false);
                     }
                     check(std::get<1>(a) == std::get<1>(b), "component selection differs");
-                    std::cout << json({{"vocabulary", size},
+                    std::cout << json({{"membership_backend", logit_copy_backend()},
+                                       {"vocabulary", size},
                                        {"history_tokens", history.size() + 1},
                                        {"kind", kind},
                                        {"trial", trial},

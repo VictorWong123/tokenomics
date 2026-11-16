@@ -117,3 +117,15 @@ replays exactly three guided cap settings, six fixed retrieval controls, and
 ordinary decoding; it does not rerun the exploratory parameter grid. A synthetic
 phase test checks384 rank rows,60 per-prompt records,10 totals and ordinary
 zero-waste accounting. Old fit receipts remain readable and preserve their grid.
+
+## Frozen development validation
+
+The six separate development prompts produce384 tokens per model. Only the
+three predeclared guided caps and seven controls were replayed; no threshold
+retuning or held-out evaluation followed. On0.5B, guided cap4 C297/W10 loses
+to suffix cap4 C289/W4, and guided cap8 C283/W27 loses to suffix cap8 C279/W15.
+On1.5B, guided cap4 C326/W26 improves on suffix cap4 C342/W30 but trades11
+extra cycles for10 fewer wasted rows versus ngram cap4 C315/W36. These exclude
+ranking cost and do not establish lower latency. The runtime prototype stays
+default-OFF. Full10-cell results and all6447 validation cycle records are
+retained separately from fit. No new guided parameter search used validation.

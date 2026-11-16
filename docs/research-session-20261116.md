@@ -1063,3 +1063,21 @@ now with a durable public receipt binding source/model/executable/payload hashes
 Native run43852475399 passes17 stages including the1072-case CPU backend harness
 and Metal compilation. Its runtime binary is byte-identical to the earlier Q8
 shared checkpoint; no SIMDgroup GPU execution was available.
+
+### 11:50 UTC — guided copying remains a default-OFF research prototype
+
+Frozen six-prompt validation weakens the fit result:0.5B guided caps4/8 are
+dominated by existing suffix controls in both cycle and waste counts.1.5B's
+cap4 improves on suffix but trades more cycles for fewer wasted rows than
+ngram. No general replacement or M3 speed claim is justified. The optional
+runtime is compiled out by default, and normal Metal studies force it OFF.
+
+The native implementation caches per-token membership checks and uses exact
+SSE2/NEON comparisons with scalar fallback. It preserves5546 per-cycle proposals
+and hint references from Python. The opt-in live path reads the last committed
+row before the next target decode, retains upstream verification and exposes
+causal hint telemetry. It passes1362 enabled runtime fixture cases and59082
+native reference cases in Release and ASAN/UBSAN;127 Python tests pass with
+eight unrelated optional skips. A60-request live synthetic validation matches
+canonical replay outputs and work exactly. Bounded learned-model live checks
+will verify that this replay agreement also holds with real target logits.

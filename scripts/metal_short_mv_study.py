@@ -117,6 +117,7 @@ def study(args):
                     "-DTOKENOMICS_SANITIZE=OFF",
                     "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
                     "-DTOKENOMICS_LOGIT_COLLECTOR=OFF",
+                    "-DTOKENOMICS_LOGIT_COPY=OFF",
                     f"-DTOKENOMICS_GREEDY_NO_TEMP={direct_flag}",
                     f"-DTOKENOMICS_GREEDY_DIRECT={direct_flag}",
                     f"-DTOKENOMICS_METAL_INTERLEAVE={locality}",
