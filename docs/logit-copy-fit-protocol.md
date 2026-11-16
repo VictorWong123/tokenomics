@@ -47,3 +47,17 @@ ties explicitly. Collection refuses model/protocol hash changes and fresh-output
 overwrite. A bounded standard public Ubuntu workflow is capped at25 minutes.
 The log transport includes only compressed numeric data from these fixed public
 prompts and selected hashes, never weights or environment variables.
+
+The replay implementation now passes118044 small guided cases against independent
+prefix enumeration, plus matched raw-suffix checks and explicit past-row access
+guards. A synthetic collection passes compressed log import, exact raw data-hash
+reconstruction, the full48-cell guided/control replay, and incomplete/mutated
+payload rejection. All125 Python tests pass with the collector fixture enabled
+(eight unrelated optional skips). This implementation checkpoint precedes reading
+the learned fit results.
+
+The importer preserves numeric rank data exactly and verifies its sealed dataset
+hash against the public workflow receipt. Its local import receipt explicitly
+states that original stdout/jobs/manifest files were not independently downloaded;
+their original hashes remain available. Numeric data, provenance and a new local
+seal are retained separately. This is more limited than a full artifact audit.
