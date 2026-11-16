@@ -721,3 +721,27 @@ Apple ARM runner, with the existing Ubuntu default preserved. It also retains
 48 alternating sampler component timing pairs. The intended evidence is native
 ARM sampler equivalence and learned CPU output/work agreement, not M3 speed or
 GPU correctness. No optimization defaults changed.
+
+### Full-head matrix component diagnostic
+
+The [grouped-Q8 native run](https://github.com/VictorWong123/tokenomics/actions/runs/43825433600)
+passes all10 stages: Apple ARM C++/Metal shader compilation, CPU fixture suites,
+direct CPU row checks and Metal library initialization. GPU graphs remain
+unavailable because the virtual device lacks SIMDgroup reduction.
+[Retained native summary](../results/verification/hosted-metal-20261116/q8-group-native.json).
+
+Added an optional, model-free M3 matrix study for the full896×151936 Q8 head
+and three smaller quantized layer shapes. It compares plain short-MV,
+interleaving and grouped-Q8 across1/2/3/5/9 rows, after exact one-row arithmetic
+gates. Three rotated profile blocks retain2880 timing pairs and180 gates;
+serial controls contain one-row matrix operations in one graph, rather than
+full model decode. Reported component ratios cannot establish generation gains.
+[Protocol and command](metal-matvec-component.md).
+
+The small CPU harness passes20 gates/10240 bitwise comparisons in Release and
+ASAN/UBSAN. The sanitizer build retains Q4-pair and greedy flags; this raw
+harness invokes no sampler/model runtime. Missing Metal is rejected rather than
+falling back to CPU. Three analyzer tests reject missing/duplicate records,
+changed cross-profile data, failed gates, CPU results and invalid durations.
+All7 default suites pass in43.55 seconds; Python/C++ formatting passes.
+[Host evidence](../results/verification/matvec-component-host-20261116/summary.json).

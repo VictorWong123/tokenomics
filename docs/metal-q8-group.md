@@ -19,9 +19,11 @@ may cost more than locality saves; this candidate can be slower. It is an
 alternative to the four-type interleaving candidate, with a different tradeoff.
 
 Host C++ compilation, selector/odd-tail geometry checks, fixture-backed runner
-analysis and default CPU suites pass. Native Metal compilation and actual M3
-numerical/performance results are separate requirements. No GPU speedup is
-claimed from these host checks.
+analysis and default CPU suites pass. A standard public Apple ARM runner also
+passes native C++ compilation, Metal3.1 shader compilation, Metal library
+initialization and CPU fixture suites. Its virtual GPU lacks SIMDgroup
+reduction, so actual M3 numerical/performance results remain unmeasured.
+No GPU speedup is claimed from these checks.
 
 The local runner provides the same strict controls and gates:
 

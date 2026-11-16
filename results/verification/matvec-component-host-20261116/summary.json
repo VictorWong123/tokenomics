@@ -1,0 +1,28 @@
+{
+  "analyzer_tests": 3,
+  "asan_binary_sha256": "435f5208117a9b70be18dca2b11405f7ade1f6babe0dec7a5d2208f05711ccef",
+  "asan_profile": {
+    "cpu_q4_pair": true,
+    "greedy_no_temp": true,
+    "sanitize": true,
+    "stage_timing": false
+  },
+  "asan_scope": "Raw CPU harness; no sampler/model runtime invoked. Q4 pair backend profile remains ON in existing sanitizer build.",
+  "bitwise_comparisons_per_build": 10240,
+  "default_ctest": {
+    "seconds": 43.55,
+    "state": "passed",
+    "suites": 7
+  },
+  "fixture_gates_per_build": 20,
+  "harness_source_sha256": "a74df6904f0b19cd56f2a3d0adc30a0e2b2d26a1ca237c56581cd2fb63f21b52",
+  "metal_execution": false,
+  "metal_requested_without_backend": "Rejected, no CPU fallback",
+  "performance_claim": null,
+  "release_binary_sha256": "0479382ece6f40b8da387e718718a6645fa3768155a0155aaec036da4121b493",
+  "source": {
+    "owned_source_sha256": "4dc8e70e8d79b0f6330d68f8a20cbe6d58d22e7feb320d0b842f37eb2bf657c4",
+    "revision": "4dac2baa05d040836b0f2859a775619758505eca"
+  },
+  "state": "passed"
+}

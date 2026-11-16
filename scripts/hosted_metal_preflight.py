@@ -141,6 +141,7 @@ def main():
                     str(build),
                     "--target",
                     "test_backend_rows",
+                    "test_matvec_component",
                     "-j",
                     "2",
                 ],
@@ -188,6 +189,10 @@ def main():
                 ],
             )
             run(f"{profile}-cpu-rows", [str(build / "test_backend_rows"), "--cpu"])
+            run(
+                f"{profile}-cpu-component-fixture",
+                [str(build / "test_matvec_component"), "--cpu-fixture"],
+            )
             if report["metal_device"]["available"]:
                 run(
                     f"{profile}-metal-library-compile",
