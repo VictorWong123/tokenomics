@@ -15,7 +15,11 @@ from bench.common import (
     sha256,
     source_fingerprint,
 )
-from scripts.check_metal_profile import GREEDY_MARKER
+from scripts.check_metal_profile import (
+    DIRECT_MARKER,
+    GREEDY_MARKER,
+    check_direct_execution,
+)
 from scripts.check_models import check_cycles, compare, execute
 
 MODEL_PINS = json.loads((ROOT / "configs/metal-model-header-pins-v1.json").read_text())[
@@ -48,6 +52,9 @@ def smoke(args, *, expected_sha=None):
     model_id = getattr(args, "model_id", "qwen25-05")
     if model_id not in MODEL_PINS:
         raise ValueError("Unsupported pinned model ID")
+    candidate_profile = getattr(args, "candidate_profile", "greedy")
+    if candidate_profile not in ("greedy", "direct"):
+        raise ValueError("Unsupported candidate sampler profile")
     synthetic_fixture = expected_sha is not None
     expected_sha = expected_sha or MODEL_PINS[model_id]["sha256"]
     out = args.out.resolve()
@@ -56,6 +63,7 @@ def smoke(args, *, expected_sha=None):
         "purpose": "Trained CPU exact-output and work-count smoke; no M3 or speed claim",
         "synthetic_fixture": synthetic_fixture,
         "model_id": model_id,
+        "candidate_profile": candidate_profile,
         "model_pin": MODEL_PINS[model_id],
         "source": source_fingerprint(),
         "hardware": hardware(),
@@ -159,6 +167,11 @@ def smoke(args, *, expected_sha=None):
                         or "TOKENOMICS_CPU_BATCH_INVARIANT=ON" not in row["system_info"]
                     ):
                         raise ValueError("Wrong CPU/sampler profile executed")
+                    direct_expected = candidate and candidate_profile == "direct"
+                    if (DIRECT_MARKER in row["system_info"]) != direct_expected:
+                        raise ValueError("Wrong CPU/sampler direct profile executed")
+                    if direct_expected:
+                        check_direct_execution(row)
                     mismatch = compare(expected[row["prompt_id"]], row)
                     audit = {
                         "stage": stage,
@@ -216,6 +229,7 @@ def smoke(args, *, expected_sha=None):
             "performance_claim": None,
             "synthetic_fixture": report["synthetic_fixture"],
             "model_id": model_id,
+            "candidate_profile": candidate_profile,
             "model_sha256": report["model_sha256"],
         }
         atomic_json(out / "status.json", status)
@@ -253,6 +267,9 @@ def main():
     parser.add_argument("--candidate", type=Path, required=True)
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--model-id", choices=tuple(MODEL_PINS), default="qwen25-05")
+    parser.add_argument(
+        "--candidate-profile", choices=("greedy", "direct"), default="greedy"
+    )
     parser.add_argument("--out", type=Path, required=True)
     smoke(parser.parse_args())
 

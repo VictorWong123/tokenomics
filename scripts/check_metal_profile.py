@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import re
 from pathlib import Path
 import sys
 from types import SimpleNamespace
@@ -17,11 +18,19 @@ MODEL_SHA256 = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db
 INTERLEAVE_MARKER = "TOKENOMICS_METAL_INTERLEAVE=ON"
 Q8_GROUP_MARKER = "TOKENOMICS_METAL_Q8_GROUP=ON"
 Q8_SHARED_MARKER = "TOKENOMICS_METAL_Q8_SHARED=ON"
+DIRECT_MARKER = "TOKENOMICS_GREEDY_DIRECT=ON"
 GREEDY_MARKER = "TOKENOMICS_GREEDY_NO_TEMP=ON"
 
 
 def metal_profile(
-    row, candidate, *, interleave=False, group_q8=False, shared_q8=False, greedy=False
+    row,
+    candidate,
+    *,
+    interleave=False,
+    group_q8=False,
+    shared_q8=False,
+    greedy=False,
+    direct=False,
 ):
     info = row["system_info"]
     marker, excluded = (
@@ -33,6 +42,7 @@ def metal_profile(
         (Q8_GROUP_MARKER in info) != (candidate and group_q8)
         or (Q8_SHARED_MARKER in info) != (candidate and shared_q8)
         or (GREEDY_MARKER in info) != greedy
+        or (DIRECT_MARKER in info) != direct
         or (INTERLEAVE_MARKER in info) != (candidate and interleave)
         or marker not in info
         or excluded in info
@@ -61,6 +71,31 @@ def greedy_profile(row, candidate):
     metal_profile(row, False, greedy=candidate)
     if (GREEDY_MARKER in row["system_info"]) != candidate:
         raise ValueError("Greedy sampler marker differs from expected profile")
+
+
+def check_direct_execution(row):
+    info = row["system_info"]
+    eligibility = re.search(r"(?:^|; )raw_greedy_eligible=(\d+)(?:;|$)", info)
+    calls = re.search(r"(?:^|; )raw_greedy_calls=(\d+)(?:;|$)", info)
+    if (
+        DIRECT_MARKER not in info
+        or not eligibility
+        or not calls
+        or eligibility[1] != "1"
+    ):
+        raise ValueError("Direct greedy path was not eligible/executed")
+    count = int(calls[1])
+    work = row["execution"]
+    if not work["cycles"] <= count <= work["verified_rows"] or (
+        not work["cycles"] and count
+    ):
+        raise ValueError("Direct greedy call count differs from verified work")
+
+
+def direct_profile(row, candidate):
+    metal_profile(row, False, greedy=candidate, direct=candidate)
+    if candidate:
+        check_direct_execution(row)
 
 
 def variants(drafter="ngram"):
@@ -437,7 +472,14 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument(
         "--candidate-profile",
-        choices=("short-mv", "interleaved", "q8-group", "q8-shared", "greedy"),
+        choices=(
+            "short-mv",
+            "interleaved",
+            "q8-group",
+            "q8-shared",
+            "greedy",
+            "direct",
+        ),
         default="short-mv",
     )
     args = parser.parse_args()
@@ -454,6 +496,7 @@ def main():
             "q8-group": q8_group_profile,
             "q8-shared": q8_shared_profile,
             "greedy": greedy_profile,
+            "direct": direct_profile,
         }[args.candidate_profile],
     )
 

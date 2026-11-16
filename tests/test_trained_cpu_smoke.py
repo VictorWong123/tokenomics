@@ -65,6 +65,9 @@ class TrainedCPUSmokeTests(unittest.TestCase):
                 candidate=candidate,
                 model=model,
                 out=root / "passed",
+                candidate_profile=os.getenv(
+                    "TOKENOMICS_TEST_CANDIDATE_PROFILE", "greedy"
+                ),
             )
             with patch("scripts.trained_cpu_smoke.ROOT", root):
                 result = smoke(args, expected_sha=sha256(model))

@@ -17,6 +17,11 @@ on:
         type: choice
         options: [ubuntu-24.04, macos-15]
         default: ubuntu-24.04
+      trained_sampler:
+        description: Target sampler candidate for trained CPU correctness
+        type: choice
+        options: [greedy, direct]
+        default: greedy
       trained_model:
         description: Pinned public model for CPU correctness
         type: choice
@@ -115,6 +120,7 @@ jobs:
     runs-on: ${{ inputs.trained_runner || 'ubuntu-24.04' }}
     timeout-minutes: 45
     env:
+      TOKENOMICS_TRAINED_SAMPLER: ${{ inputs.trained_sampler || 'greedy' }}
       TOKENOMICS_TRAINED_MODEL: ${{ inputs.trained_model || 'qwen25-05' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -136,22 +142,27 @@ jobs:
             -DPython3_EXECUTABLE="$PWD/.venv/bin/python" -DBUILD_TESTING=ON \
             -DGGML_NATIVE=OFF -DGGML_METAL=OFF -DGGML_CUDA=OFF \
             -DTOKENOMICS_CPU_BATCH_INVARIANT=ON -DTOKENOMICS_CPU_PACKED_VERIFY=OFF \
-            -DTOKENOMICS_CPU_Q4_PAIR=OFF -DTOKENOMICS_GREEDY_NO_TEMP=OFF \
+            -DTOKENOMICS_CPU_Q4_PAIR=OFF -DTOKENOMICS_GREEDY_NO_TEMP=OFF -DTOKENOMICS_GREEDY_DIRECT=OFF \
             -DTOKENOMICS_VERIFY_STAGE_TIMING=OFF -DTOKENOMICS_METAL_SHORT_MV=OFF \
             -DTOKENOMICS_METAL_INTERLEAVE=OFF -DTOKENOMICS_METAL_Q8_GROUP=OFF -DTOKENOMICS_METAL_Q8_SHARED=OFF
           .venv/bin/cmake --build build-hosted-trained --target tokenomics -j 2
           cp build-hosted-trained/tokenomics results/local/trained-cpu/binaries/guarded
           .venv/bin/python -c 'from bench.common import atomic_json; from scripts.diagnose_models import build_configuration; atomic_json("results/local/trained-cpu/compilation-reference.json", build_configuration("build-hosted-trained/tokenomics"))'
-          .venv/bin/cmake -S . -B build-hosted-trained -DTOKENOMICS_GREEDY_NO_TEMP=ON
+          TOKENOMICS_DIRECT=OFF
+          if [ "$TOKENOMICS_TRAINED_SAMPLER" = direct ]; then TOKENOMICS_DIRECT=ON; fi
+          .venv/bin/cmake -S . -B build-hosted-trained -DTOKENOMICS_GREEDY_NO_TEMP=ON -DTOKENOMICS_GREEDY_DIRECT="$TOKENOMICS_DIRECT"
           .venv/bin/cmake --build build-hosted-trained --target tokenomics test_greedy_equivalence -j 2
           cp build-hosted-trained/tokenomics results/local/trained-cpu/binaries/greedy
           .venv/bin/python -c 'from bench.common import atomic_json; from scripts.diagnose_models import build_configuration; atomic_json("results/local/trained-cpu/compilation-greedy.json", build_configuration("build-hosted-trained/tokenomics"))'
           build-hosted-trained/test_greedy_equivalence > results/local/trained-cpu/sampler-equivalence.log
           build-hosted-trained/test_greedy_equivalence --bench | tee results/local/trained-cpu/sampler-component.jsonl
+          build-hosted-trained/test_greedy_equivalence --bench-direct | tee results/local/trained-cpu/direct-component.jsonl
+          if [ "$TOKENOMICS_DIRECT" = ON ]; then .venv/bin/ctest --test-dir build-hosted-trained --output-on-failure -R '^(fixtures|greedy_direct_integration)$'; fi
           uname -sm | tee results/local/trained-cpu/architecture.log
       - name: Verify smoke orchestration on synthetic fixtures
         env:
           TOKENOMICS_TEST_BINARY: ${{ github.workspace }}/results/local/trained-cpu/binaries/guarded
+          TOKENOMICS_TEST_CANDIDATE_PROFILE: ${{ inputs.trained_sampler || 'greedy' }}
           TOKENOMICS_GREEDY_BINARY: ${{ github.workspace }}/results/local/trained-cpu/binaries/greedy
         run: .venv/bin/python -m unittest discover -s tests -p test_trained_cpu_smoke.py
       - name: Download and verify pinned public model
@@ -163,6 +174,7 @@ jobs:
             --reference results/local/trained-cpu/binaries/guarded \
             --candidate results/local/trained-cpu/binaries/greedy \
             --model "$TOKENOMICS_MODEL_PATH" --model-id "$TOKENOMICS_TRAINED_MODEL" \
+            --candidate-profile "$TOKENOMICS_TRAINED_SAMPLER" \
             --out results/local/trained-cpu/smoke
       - name: Retain correctness payload without weights or executables
         if: always()
@@ -173,6 +185,7 @@ jobs:
             results/local/trained-cpu/compilation-*.json
             results/local/trained-cpu/*.log
             results/local/trained-cpu/sampler-component.jsonl
+            results/local/trained-cpu/direct-component.jsonl
             results/local/trained-cpu/smoke/*.json
             results/local/trained-cpu/smoke/*.jsonl
             results/local/trained-cpu/smoke/*.log

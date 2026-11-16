@@ -60,5 +60,17 @@ input mutations prevent loop-invariant hoisting, and all checksums must match.
 Raw Linux CPU observations are retained in
 `results/verification/direct-greedy-prototype-20261116`; these are synthetic,
 cache-warm component measurements, not model throughput or M3 measurements.
-The optional prototype is not yet called by inference. A bounded standard
-Apple ARM hosted job will check the same semantics and component next.
+At checkpoint `c55008f`, the prototype was not called by inference. A bounded
+standard Apple ARM hosted job checks the same semantics and component. Later
+runtime integration uses a separate default-OFF option and separate evidence;
+these historical component receipts do not prove that integration.
+
+Standard Apple ARM hosted run43846350645 passes all17 preflight stages,
+including the expanded804-case CPU backend harness, native strict-host sampler
+checks, source arithmetic and Metal library compilation. It reproduces24/27
+backend argmax mismatches. Its direct-host component at151936 entries measures
+median278.3µs original,170.7µs no-temperature and58.9µs direct, with median paired
+no-temperature/direct ratio2.88. The16 raw triples are retained per vocabulary.
+This machine is a hosted Apple ARM VM, not the user's M3. It cannot execute the
+required SIMDgroup Metal graphs. Neither these component timings nor successful
+shader compilation establish an end-to-end or GPU speedup.

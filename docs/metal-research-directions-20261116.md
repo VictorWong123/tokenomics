@@ -122,3 +122,28 @@ and real M3 gates before performance conclusions.
 [DISCO](https://proceedings.mlr.press/v262/mamou24a.html) motivates adaptive draft
 length. Its learned stopping classifier differs from our EWMA cost controller;
 neither can compensate for a verifier whose extra rows remain too expensive.
+
+## Small-model and consumer-runtime studies
+
+[Mainardi, Sandikci and Vanschoren, EACL2026](https://aclanthology.org/2026.eacl-long.255.pdf)
+compare small-model methods under greedy FP16 inference on one NVIDIA A5500.
+Their prompt-lookup method outperforms their other training-free choices;
+external datastore search and tree construction can erase retrieval gains.
+Their Qwen1.5B target matches our prospective model size, but their hardware,
+precision and verification kernels differ. Their task breakdown favors grounded
+summarization/RAG over short QA, supporting separate domain reporting rather
+than a universal lookup speedup claim. A12GB external datastore is especially
+unattractive for the user's small-memory M3. Our request-local suffix chain
+avoids that memory cost; it is not the paper's tree-based REST implementation.
+The useful next test is matched local target/ngram/suffix performance after
+verification batching passes, not adding an expensive external datastore.
+
+[Chordiya, July2026](https://arxiv.org/html/2607.17283v1), sections6.1 and6.5,
+reports slow few-position quantized Metal verification and batch-dependent
+logits. Its best speedup uses a different MPS target; its exact greedy real-model
+check uses FP32 CPU. These do not establish exact quantized-Metal generation.
+The independent diagnosis supports measuring completed verification rows and
+kernel transitions. Its CPU sampling arithmetic is a small share of its runtime,
+so our direct-host-argmax component gain should not be expected to repair the
+main batching bottleneck by itself. It remains an isolated, separately gated
+inference-driver optimization, including an equally optimized ordinary control.

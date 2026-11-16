@@ -32,6 +32,7 @@ def build_configuration(binary):
         "TOKENOMICS_METAL_Q8_SHARED",
         "TOKENOMICS_VERIFY_STAGE_TIMING",
         "TOKENOMICS_GREEDY_NO_TEMP",
+        "TOKENOMICS_GREEDY_DIRECT",
         "GGML_NATIVE",
         "GGML_CPU_REPACK",
         "GGML_LLAMAFILE",

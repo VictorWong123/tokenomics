@@ -913,7 +913,7 @@ public model. It retains metadata only and uses no Codespaces or model-weight
 artifact upload. This will identify which existing kernel paths matter at that
 larger operating point before extending the local study.
 
-### 10:20 UTC — strict raw-logit prototype and second-model metadata
+### 10:10 UTC — strict raw-logit prototype and second-model metadata
 
 The direct host greedy prototype avoids materializing the 151,936-element
 `llama_token_data` array while preserving strict-first comparisons. The pinned
@@ -928,7 +928,7 @@ output projection. The header confirms that the Q8-specific prototype does not
 optimize this model's output projection. Full weights were not downloaded or
 SHA-verified by that metadata job. The receipt explicitly records this limit.
 
-### 10:25 UTC — bounded 1.5B CPU correctness coverage
+### 10:11 UTC — bounded 1.5B CPU correctness coverage
 
 The learned CPU smoke now accepts either pinned 0.5B or 1.5B weights. Model ID,
 full SHA and lock entry travel with each receipt. Synthetic override runs remain
@@ -937,3 +937,34 @@ explicitly synthetic, and an incorrect 1.5B file fails before inference. A
 the same four development prompts, tiny budgets and KV boundaries; reserved
 held-out prompts remain untouched. This checks output/work equivalence between
 the guarded and existing no-temperature sampler, not performance.
+
+### 10:20 UTC — native strict sampler and expanded backend checks
+
+Standard Apple ARM run43846350645 passes17 stages from checkpointc55008f.
+It compiles the expanded backend harness and passes its CPU cases, the source
+arithmetic checks, native strict sampler equivalence and Metal library compile.
+GGML CPU argmax again differs on24/27 probes. The direct host component is
+2.88× faster than the no-temperature component at the real vocabulary size;
+this is cache-warm synthetic host work, not model throughput. Raw48 triples
+and the native preflight receipt are retained. No SIMDgroup GPU execution was
+available. The runtime integration has separate forthcoming gates.
+
+### 10:26 UTC — opt-in direct sampler integration checked locally
+
+`TOKENOMICS_GREEDY_DIRECT` now builds an owned common-sampling copy and enables
+only the adapter's fresh, eligible target sampler. It preserves upstream
+acceptance and the complete verification/correction/rejection tail byte-for-byte.
+Model suppression, bias, grammar, dynamic temperature, backend sampling,
+probability output and performance bookkeeping retain the existing path.
+Cloned/copied samplers remain disabled. Eligibility and per-request call counts
+make actual execution auditable; default builds keep the option OFF.
+
+Eight Release and eight ASAN/UBSAN native suites pass, including1134 runtime
+fixture comparisons and nine eligibility cases. All117 Python tests pass
+(eight optional integration tests skipped). A separate160-comparison synthetic
+cross-binary smoke has equal logical work. Retained ngram and suffix gates each
+pass450 candidate requests/456 comparisons against the original guarded binary,
+including tiny budgets, context tails and short prefill shapes. The compressed
+raw gate payloads and source/binary/configuration receipts are in
+`results/verification/direct-greedy-integration-20261116`. These are synthetic
+CPU checks; learned-model and Metal/M3 gates remain separate.

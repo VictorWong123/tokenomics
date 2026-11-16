@@ -104,6 +104,7 @@ def study(args):
                     "-DTOKENOMICS_SANITIZE=OFF",
                     "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
                     "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
+                    "-DTOKENOMICS_GREEDY_DIRECT=OFF",
                     f"-DTOKENOMICS_METAL_INTERLEAVE={locality}",
                     f"-DTOKENOMICS_METAL_Q8_GROUP={grouped}",
                     f"-DTOKENOMICS_METAL_Q8_SHARED={shared}",

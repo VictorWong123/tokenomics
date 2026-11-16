@@ -1,0 +1,128 @@
+{
+  "candidate_profile": "direct",
+  "checked_comparisons": 160,
+  "model_id": "qwen25-05",
+  "model_sha256": "fd5b73bfe9c544471d83d38044c055db6f8de4f762f5625ffe22c2475f095c53",
+  "performance_claim": null,
+  "same_work_between_sampler_profiles": true,
+  "state": "passed",
+  "synthetic_fixture": true,
+  "totals": {
+    "greedy": {
+      "ngram1": {
+        "accepted": 160,
+        "cycles": 188,
+        "drafted": 160,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      },
+      "ngram4": {
+        "accepted": 255,
+        "cycles": 93,
+        "drafted": 255,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      },
+      "ngram8": {
+        "accepted": 281,
+        "cycles": 67,
+        "drafted": 281,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      },
+      "script-ngram": {
+        "accepted": 237,
+        "cycles": 111,
+        "drafted": 237,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      },
+      "suffix1": {
+        "accepted": 160,
+        "cycles": 188,
+        "drafted": 162,
+        "synced_tokens": 0,
+        "verified_rows": 350
+      },
+      "suffix4": {
+        "accepted": 255,
+        "cycles": 93,
+        "drafted": 259,
+        "synced_tokens": 0,
+        "verified_rows": 352
+      },
+      "suffix8": {
+        "accepted": 281,
+        "cycles": 67,
+        "drafted": 285,
+        "synced_tokens": 0,
+        "verified_rows": 352
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    },
+    "guarded": {
+      "ngram1": {
+        "accepted": 160,
+        "cycles": 188,
+        "drafted": 160,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      },
+      "ngram4": {
+        "accepted": 255,
+        "cycles": 93,
+        "drafted": 255,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      },
+      "ngram8": {
+        "accepted": 281,
+        "cycles": 67,
+        "drafted": 281,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      },
+      "script-ngram": {
+        "accepted": 237,
+        "cycles": 111,
+        "drafted": 237,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      },
+      "suffix1": {
+        "accepted": 160,
+        "cycles": 188,
+        "drafted": 162,
+        "synced_tokens": 0,
+        "verified_rows": 350
+      },
+      "suffix4": {
+        "accepted": 255,
+        "cycles": 93,
+        "drafted": 259,
+        "synced_tokens": 0,
+        "verified_rows": 352
+      },
+      "suffix8": {
+        "accepted": 281,
+        "cycles": 67,
+        "drafted": 285,
+        "synced_tokens": 0,
+        "verified_rows": 352
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    }
+  }
+}

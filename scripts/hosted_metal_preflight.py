@@ -132,6 +132,7 @@ def main():
                     "-DTOKENOMICS_CPU_Q4_PAIR=OFF",
                     "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
                     "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
+                    "-DTOKENOMICS_GREEDY_DIRECT=OFF",
                     f"-DTOKENOMICS_METAL_SHORT_MV={short}",
                     f"-DTOKENOMICS_METAL_INTERLEAVE={interleave}",
                     f"-DTOKENOMICS_METAL_Q8_GROUP={grouped}",

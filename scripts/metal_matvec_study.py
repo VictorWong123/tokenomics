@@ -48,6 +48,7 @@ def study(args):
                 "TOKENOMICS_SANITIZE": "OFF",
                 "TOKENOMICS_VERIFY_STAGE_TIMING": "OFF",
                 "TOKENOMICS_GREEDY_NO_TEMP": "OFF",
+                "TOKENOMICS_GREEDY_DIRECT": "OFF",
                 "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
                 "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
                 "TOKENOMICS_CPU_Q4_PAIR": "OFF",

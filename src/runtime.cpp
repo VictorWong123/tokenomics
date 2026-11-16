@@ -2,6 +2,9 @@
 #include "commit.h"
 #include "common.h"
 #include "ggml-backend.h"
+#ifdef TOKENOMICS_GREEDY_DIRECT
+#include "greedy_direct_sampling.h"
+#endif
 #include "llama.h"
 #include "log.h"
 #include "metal_q8_group_constants.h"
@@ -135,6 +138,10 @@ struct Engine::Impl {
     Model target{nullptr, llama_model_free}, draft{nullptr, llama_model_free};
     Context tgt{nullptr, llama_free}, dft{nullptr, llama_free};
     double loading = 0;
+#ifdef TOKENOMICS_GREEDY_DIRECT
+    bool raw_greedy_eligible = false;
+    std::uint64_t raw_greedy_calls = 0;
+#endif
     std::string execution_evidence;
     std::map<std::string, Checkpoint> checkpoints;
     size_t checkpoint_bytes = 0;
@@ -210,6 +217,11 @@ std::string Engine::system_info() const {
     auto info = std::string(llama_print_system_info()) + impl_->execution_evidence;
 #ifdef TOKENOMICS_VERIFY_STAGE_TIMING
     info += "; TOKENOMICS_VERIFY_STAGE_TIMING=ON";
+#endif
+#ifdef TOKENOMICS_GREEDY_DIRECT
+    info += "; TOKENOMICS_GREEDY_DIRECT=ON; raw_greedy_eligible=" +
+            std::to_string(impl_->raw_greedy_eligible) +
+            "; raw_greedy_calls=" + std::to_string(impl_->raw_greedy_calls);
 #endif
 #ifdef TOKENOMICS_GREEDY_NO_TEMP
     info += "; TOKENOMICS_GREEDY_NO_TEMP=ON";
@@ -326,6 +338,18 @@ Result Engine::generate(const Request &r) {
                             "greedy") == 0,
             "pinned target sampler chain changed; review greedy-only experiment");
     llama_sampler_free(llama_sampler_chain_remove(chain, count - 2));
+#endif
+#ifdef TOKENOMICS_GREEDY_DIRECT
+    e.raw_greedy_eligible = tokenomics_common_enable_direct(smpl.get());
+    e.raw_greedy_calls = 0;
+    struct DirectEvidence {
+        Impl &engine;
+        common_sampler *sampler;
+        ~DirectEvidence() {
+            engine.raw_greedy_eligible = tokenomics_common_direct_enabled(sampler);
+            engine.raw_greedy_calls = tokenomics_common_direct_calls(sampler);
+        }
+    } direct_evidence{e, smpl.get()};
 #endif
     common_params_speculative sp;
     sp.types = {r.drafter == "model" ? COMMON_SPECULATIVE_TYPE_DRAFT_SIMPLE

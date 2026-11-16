@@ -80,3 +80,38 @@ generation throughput. [Raw pairs and summary](../results/verification/trained-a
 build-metal-greedy/test_greedy_equivalence
 build-metal-greedy/test_greedy_equivalence --bench
 ```
+
+## Direct raw-logit selection
+
+`TOKENOMICS_GREEDY_DIRECT=ON` is a second default-OFF experiment. It requires
+`TOKENOMICS_GREEDY_NO_TEMP=ON`; keep Metal verification experiments OFF for its
+isolated comparison. It builds an owned copy of pinned `common/sampling.cpp`
+without modifying the submodule. The target adapter explicitly enables its
+fresh sampler only when the remaining chain is exactly greedy, with no grammar,
+reasoning-budget stage, probabilities, performance counters or backend sampler.
+A model suppression or logit-bias stage makes it ineligible and retains the
+existing no-temperature path. Draft samplers and copied/cloned samplers do not
+automatically enable this optimization.
+
+Eligible calls select directly from the contiguous host logits using strict
+first-maximum comparisons, avoiding candidate-array construction. They retain
+upstream synchronization, accept/history handling, correction, bonus and EOS
+logic. This private path leaves one selected candidate in the common sampler;
+it must not be used by callers that consume a complete distribution or perform
+stochastic rejection. Fast-math compilation is rejected. Later NaNs are ignored,
+a first NaN retains token zero, and ties retain the first index, matching the
+pinned host sampler. Backend GGML argmax is unsuitable: the negative diagnostic
+finds24 mismatches in27 cases, including adjacent finite ties.
+
+Execution evidence adds `TOKENOMICS_GREEDY_DIRECT=ON`,
+`raw_greedy_eligible=0|1` and a per-request `raw_greedy_calls` count. The direct
+gate requires eligibility and a call count between completed verification cycles
+and verified rows; zero-budget requests require zero calls. A build marker
+alone does not establish that the optimization ran.
+
+Build with the flags above and add `-DTOKENOMICS_GREEDY_DIRECT=ON`; use
+`--candidate-profile direct` in the trained Metal gate. Keep the original
+ordinary decoder and the direct candidate's ordinary decoder in later timing
+comparisons. The synthetic component measurements in
+[the sampler contract](backend-sampling-contract.md) do not establish generation
+throughput. The verification batching bottleneck remains separate.

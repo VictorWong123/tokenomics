@@ -54,6 +54,7 @@ def create(
     unicode_cycle=False,
     ngram_cycle=False,
     width_override=0,
+    suppress_tokens=(),
 ):
     rng = np.random.default_rng(seed)
     width = width_override or (256 if quantized or k_quantized else 32)
@@ -76,6 +77,8 @@ def create(
         + [f"<0x{i:02X}>" for i in range(256)]
         + ["▁a", "▁b", "▁"]
     )
+    if suppress_tokens:
+        w.add_suppress_tokens(suppress_tokens)
     w.add_token_list(tokens)
     w.add_token_scores([0.0] * len(tokens))
     w.add_token_types([2, 3, 3] + [6] * 256 + [1, 1, 1])
@@ -157,6 +160,7 @@ if __name__ == "__main__":
     a.out.mkdir(parents=True, exist_ok=True)
     for name, win in (("target", 259), ("wrong", 260), ("eos", 2)):
         create(a.out / f"{name}.gguf", win)
+    create(a.out / "suppressed.gguf", 259, suppress_tokens=(259,))
     create(a.out / "random.gguf", 259, random=True)
     create(a.out / "quantized.gguf", 259, random=True, quantized=True)
     create(a.out / "quantized-k.gguf", 259, random=True, k_quantized=True)

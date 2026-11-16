@@ -1,4 +1,7 @@
 #pragma once
+#if defined(__FAST_MATH__) || (defined(__FINITE_MATH_ONLY__) && __FINITE_MATH_ONLY__)
+#error "Strict greedy requires IEEE NaN/infinity comparisons; disable fast-math"
+#endif
 #include <array>
 #include <cstddef>
 #include <cstdint>

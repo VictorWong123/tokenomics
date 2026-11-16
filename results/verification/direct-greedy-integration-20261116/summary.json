@@ -1,0 +1,126 @@
+{
+  "scope": "Synthetic CPU integration and correctness only; no learned model, Metal execution or speed claim",
+  "default_enabled": false,
+  "source": {
+    "revision": "c5dd25e260bc4e8805ce5c192812bf0eb228ee7a",
+    "owned_source_sha256": "7d311f9c37b51fd835f5231b7cd6063f6369b77ec1286db424fd3eb3f73050fb"
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "789d2ef9113762085053a4dfa734a5d446490fb7d8483f7b5b3031320a11f60a",
+    "cmake/greedy-direct.cmake": "70b88a7990317f13cd151f8d67531ca45abdf2c0b01d79270e2a84db837d5094",
+    "src/greedy_direct.h": "942d42331aa826f029392fddba1dc987bd0649f0eaa123ad7dc1000f418486ca",
+    "src/greedy_direct_sampling.h": "d3f975faf4fa0447256d26683f5f61a2409ee52b503d92226138704e1e763185",
+    "src/greedy_direct_sampling.inc": "b18e4d0072175c94f79493f3b319141d7d58b0746541bb8e7e6d62f14b606f16",
+    "src/runtime.cpp": "a2f0d868a24035cb0da45c87be14b24686bc4af6ffc60e17ab2b2c379b24b926",
+    "tests/test_greedy_direct_integration.cpp": "aafe5838ff506b4e8f046aa177f16b8ded5039ffc50cd22c7f92ae4917b85546"
+  },
+  "configurations": {
+    "build-direct": {
+      "cache_available": true,
+      "values": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_AVX": "ON",
+        "GGML_AVX2": "ON",
+        "GGML_BLAS": "OFF",
+        "GGML_CPU_REPACK": "OFF",
+        "GGML_CUDA": "OFF",
+        "GGML_F16C": "ON",
+        "GGML_FMA": "ON",
+        "GGML_LLAMAFILE": "OFF",
+        "GGML_METAL": "OFF",
+        "GGML_NATIVE": "OFF",
+        "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+        "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
+        "TOKENOMICS_CPU_Q4_PAIR": "OFF",
+        "TOKENOMICS_GREEDY_DIRECT": "ON",
+        "TOKENOMICS_GREEDY_NO_TEMP": "ON",
+        "TOKENOMICS_METAL_INTERLEAVE": "OFF",
+        "TOKENOMICS_METAL_Q8_GROUP": "OFF",
+        "TOKENOMICS_METAL_Q8_SHARED": "OFF",
+        "TOKENOMICS_METAL_SHORT_MV": "OFF",
+        "TOKENOMICS_VERIFY_STAGE_TIMING": "OFF"
+      }
+    },
+    "build-q4-asan": {
+      "cache_available": true,
+      "values": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "GGML_AVX": "ON",
+        "GGML_AVX2": "ON",
+        "GGML_BLAS": "OFF",
+        "GGML_CPU_REPACK": "OFF",
+        "GGML_CUDA": "OFF",
+        "GGML_F16C": "ON",
+        "GGML_FMA": "ON",
+        "GGML_LLAMAFILE": "OFF",
+        "GGML_METAL": "OFF",
+        "GGML_NATIVE": "OFF",
+        "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+        "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
+        "TOKENOMICS_CPU_Q4_PAIR": "OFF",
+        "TOKENOMICS_GREEDY_DIRECT": "ON",
+        "TOKENOMICS_GREEDY_NO_TEMP": "ON",
+        "TOKENOMICS_METAL_INTERLEAVE": "OFF",
+        "TOKENOMICS_METAL_Q8_GROUP": "OFF",
+        "TOKENOMICS_METAL_Q8_SHARED": "OFF",
+        "TOKENOMICS_METAL_SHORT_MV": "OFF",
+        "TOKENOMICS_VERIFY_STAGE_TIMING": "OFF"
+      }
+    }
+  },
+  "binary_sha256": {
+    "build-direct": "1235f745672b2d1e21fd5d84e54b230d27ab4c25e0d4871253cfa8f97b949cca",
+    "build-q4-asan": "0bda677174f9e4047c2c51425e8599796e81d063c42196c60d407b03abf49666",
+    "build-guarded-before-greedy": "dd2413a514c5fb57fbdee294c097172e6a65da52e820f9bddb403e301c1a688d"
+  },
+  "release_ctest": {
+    "passed": 8,
+    "failed": 0
+  },
+  "sanitizer_ctest": {
+    "passed": 8,
+    "failed": 0
+  },
+  "python_tests": {
+    "discovered": 117,
+    "skipped": 8,
+    "failures": 0
+  },
+  "eligibility_cases": 9,
+  "strict_argmax_cases": 349908,
+  "cross_smoke_comparisons": 160,
+  "cross_gates": {
+    "ngram": {
+      "candidate_cases": 450,
+      "checked_comparisons": 456,
+      "coverage": {
+        "accepted": 4128,
+        "drafted": 4128,
+        "stop_reasons": [
+          "budget",
+          "context"
+        ]
+      },
+      "limitation": "Only this model, inputs, settings and observed paths are covered. No speed claim.",
+      "schema_version": 1,
+      "state": "passed"
+    },
+    "suffix": {
+      "candidate_cases": 450,
+      "checked_comparisons": 456,
+      "coverage": {
+        "accepted": 3936,
+        "drafted": 4112,
+        "stop_reasons": [
+          "budget",
+          "context"
+        ]
+      },
+      "limitation": "Only this model, inputs, settings and observed paths are covered. No speed claim.",
+      "schema_version": 1,
+      "state": "passed"
+    }
+  },
+  "original_accept_and_verification_tail_preserved": true,
+  "fast_math_compilation_rejected": true
+}

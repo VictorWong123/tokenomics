@@ -1,0 +1,35 @@
+{
+  "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43846350645",
+  "source_commit": "c55008f3e3388fd5443652195e8f6eeae9ea3a68",
+  "platform": "macOS-15.8.2-arm64-arm-64bit",
+  "machine": "arm64",
+  "scope": "Synthetic cache-warm host sampling only; no M3/model throughput claim",
+  "runtime_enabled": false,
+  "comparison_semantics": "Median of paired ratios across sixteen rotated trials; synthetic cache-warm component only",
+  "component": [
+    {
+      "vocabulary": 263,
+      "trials": 16,
+      "reference_ns": 404.969,
+      "no_temp_ns": 286.469,
+      "direct_ns": 96.3438,
+      "median_no_temp_over_direct": 2.9866997149790646
+    },
+    {
+      "vocabulary": 32768,
+      "trials": 16,
+      "reference_ns": 46397.8,
+      "no_temp_ns": 34543.6,
+      "direct_ns": 11438.15,
+      "median_no_temp_over_direct": 3.005643652077597
+    },
+    {
+      "vocabulary": 151936,
+      "trials": 16,
+      "reference_ns": 278311.5,
+      "no_temp_ns": 170673.5,
+      "direct_ns": 58870.4,
+      "median_no_temp_over_direct": 2.882360629270255
+    }
+  ]
+}

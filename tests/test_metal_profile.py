@@ -12,6 +12,9 @@ from unittest.mock import patch
 from bench.common import ROOT, read_jsonl, sha256, write_jsonl
 from scripts.check_metal_profile import (
     CANDIDATE_MARKER,
+    DIRECT_MARKER,
+    check_direct_execution,
+    direct_profile,
     INTERLEAVE_MARKER,
     Q8_GROUP_MARKER,
     Q8_SHARED_MARKER,
@@ -27,6 +30,45 @@ from scripts.check_metal_profile import (
 
 
 class MetalProfileIdentityTests(unittest.TestCase):
+    def test_direct_sampler_requires_execution_evidence_and_isolated_identity(self):
+        row = {
+            "system_info": REFERENCE_MARKER
+            + "; devices=MTL0; offloaded 25/25 layers to GPU"
+            + "; TOKENOMICS_GREEDY_NO_TEMP=ON; "
+            + DIRECT_MARKER
+            + "; raw_greedy_eligible=1; raw_greedy_calls=3",
+            "settings": {"gpu_layers": 99},
+            "execution": {"cycles": 2, "verified_rows": 4},
+        }
+        direct_profile(row, True)
+        for validator in (
+            greedy_profile,
+            metal_profile,
+            interleaved_profile,
+            q8_group_profile,
+            q8_shared_profile,
+        ):
+            with self.assertRaises(ValueError):
+                validator(row, True)
+        for before, after in (
+            ("raw_greedy_eligible=1", "raw_greedy_eligible=0"),
+            ("raw_greedy_calls=3", "raw_greedy_calls=0"),
+            ("raw_greedy_calls=3", "raw_greedy_calls=5"),
+            ("raw_greedy_calls=3", ""),
+            (DIRECT_MARKER, ""),
+        ):
+            with self.assertRaises(ValueError):
+                check_direct_execution(
+                    {**row, "system_info": row["system_info"].replace(before, after)}
+                )
+        empty = {**row, "execution": {"cycles": 0, "verified_rows": 0}}
+        with self.assertRaises(ValueError):
+            check_direct_execution(empty)
+        empty["system_info"] = row["system_info"].replace(
+            "raw_greedy_calls=3", "raw_greedy_calls=0"
+        )
+        direct_profile(empty, True)
+
     def test_shared_q8_and_sampler_profiles_cannot_be_mislabeled(self):
         row = {
             "system_info": CANDIDATE_MARKER
