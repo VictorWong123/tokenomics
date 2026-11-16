@@ -10,7 +10,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from analysis.metal_short_mv import analyze
+from analysis.metal_short_mv import SCREENS, analyze
 from bench.common import (
     ROOT,
     atomic_json,
@@ -167,13 +167,22 @@ def study(args):
             out / "gate",
         )
         check_binaries()
+        screen = getattr(args, "screen", "ngram")
+        if screen == "retrieval":
+            state = "suffix_correctness_gate"
+            gate(
+                binaries["guarded"],
+                binaries["short-mv"],
+                args.model.resolve(),
+                out / "gate-suffix",
+                drafter="suffix",
+            )
+            check_binaries()
         if args.gate_only:
             state = "gate_passed_no_timings"
         else:
             state = "development_screen"
-            config = json.loads(
-                (ROOT / "configs/metal-short-mv-screen-v1.json").read_text()
-            )
+            config = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
             prompts = [
                 p
                 for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")
@@ -183,7 +192,7 @@ def study(args):
                 c["id"]: binaries[c["kernel_profile"]] for c in config["configurations"]
             }
             print(
-                "Metal study: exact gate passed; running 72 paired development records",
+                f"Metal study: exact gates passed; running {len(config['configurations']) * 9} paired development records",
                 flush=True,
             )
             run(
@@ -197,14 +206,22 @@ def study(args):
                 identity={"purpose": "local M3 short-MV component screen"},
                 executables=executables,
             )
-            analyze(out / "screen")
+            analyze(out / "screen", screen=screen)
             state = "complete"
         if source_fingerprint() != source:
             raise RuntimeError("Source changed during the study")
         check_binaries()
         atomic_json(
             out / "status.json",
-            {"state": state, "gate": "passed", "timing_evidence": not args.gate_only},
+            {
+                "state": state,
+                "gate": "passed",
+                "screen": screen,
+                "gate_drafters": (
+                    ["ngram", "suffix"] if screen == "retrieval" else ["ngram"]
+                ),
+                "timing_evidence": not args.gate_only,
+            },
         )
         print(f"Metal study: {state}; evidence: {out}", flush=True)
     except Exception as exc:
@@ -224,6 +241,12 @@ def study(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--screen",
+        choices=tuple(SCREENS),
+        default="ngram",
+        help="Retrieval adds suffix caps1/4/8 and a separate suffix correctness gate",
+    )
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument(
         "--out",

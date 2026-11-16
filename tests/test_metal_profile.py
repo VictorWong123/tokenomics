@@ -103,7 +103,13 @@ class MetalProfileIdentityTests(unittest.TestCase):
 @unittest.skipUnless(os.getenv("TOKENOMICS_TEST_BINARY"), "requires runtime executable")
 class MetalGateOrchestrationTests(unittest.TestCase):
     def test_screen_analysis_audits_real_cpu_fixture_blocks(self):
-        from analysis.metal_short_mv import analyze
+        self._screen_analysis("ngram")
+
+    def test_retrieval_screen_checks_suffix_work_and_strong_baselines(self):
+        self._screen_analysis("retrieval")
+
+    def _screen_analysis(self, screen):
+        from analysis.metal_short_mv import SCREENS, analyze
         from bench.run import run
         from make_fixtures import create
 
@@ -112,9 +118,7 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             root = Path(tmp)
             (root / "bench").mkdir()
             (root / "configs").mkdir()
-            config = json.loads(
-                (ROOT / "configs/metal-short-mv-screen-v1.json").read_text()
-            )
+            config = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
             config["context"] = 64
             config["threads"] = 1
             prompts = [
@@ -127,9 +131,7 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                 for pid in config["prompt_ids"]
             ]
             write_jsonl(root / "bench/prompts-v1.jsonl", prompts)
-            (root / "configs/metal-short-mv-screen-v1.json").write_text(
-                json.dumps(config)
-            )
+            (root / "configs" / SCREENS[screen]).write_text(json.dumps(config))
             model = root / "repeat.gguf"
             create(model, 100, ngram_cycle=True)
             # Distinct executable identity; same actual CPU runtime. This tests
@@ -154,15 +156,15 @@ class MetalGateOrchestrationTests(unittest.TestCase):
             with patch("analysis.metal_short_mv.ROOT", root), patch(
                 "analysis.metal_short_mv.MODEL_SHA256", sha256(model)
             ), patch("analysis.metal_short_mv.metal_profile") as profile:
-                result = analyze(root / "screen")
-                self.assertEqual(result["records"], 72)
-                self.assertEqual(profile.call_count, 72)
+                result = analyze(root / "screen", screen=screen)
+                self.assertEqual(result["records"], len(config["configurations"]) * 9)
+                self.assertEqual(profile.call_count, result["records"])
                 self.assertTrue(result["same_work_within_each_policy"])
                 rows = read_jsonl(root / "screen/requests.jsonl")
                 rows[0]["generation_ms"] *= 0.5
                 write_jsonl(root / "screen/requests.jsonl", rows)
                 with self.assertRaises(ValueError):
-                    analyze(root / "screen")
+                    analyze(root / "screen", screen=screen)
 
     def test_cross_binary_gate_retains_success_and_first_failure(self):
         from make_fixtures import create

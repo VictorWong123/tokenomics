@@ -169,3 +169,30 @@ context64 fixture gates have450 and context512 gates have600. Older version1
 receipts remain verifiable under their original, narrower coverage, and the
 verifier reports their version. Passing an older gate does not imply coverage
 of the newer prefill shapes.
+
+## Optional retrieval comparison after exactness
+
+Frozen fit replay identifies a useful additional cap to measure: suffix cap4
+uses142 cycles and one rejected row for192 M3 fit tokens, compared with161
+cycles and no rejected rows at cap1. This is a work-count tradeoff, not a
+measured speedup. The [oracle diagnostic](retrieval-envelope.md) explains its
+scope and limits.
+
+The separate, explicitly selected retrieval screen adds suffix caps1/4/8 to
+both kernel profiles, retaining ordinary decoding and ngram caps1/4/8:
+
+```bash
+.venv/bin/python scripts/metal_short_mv_study.py \
+  --screen retrieval \
+  --model models/qwen2.5-0.5b-instruct-q4_k_m.gguf \
+  --out results/local/metal-retrieval-study-01
+```
+
+This performs both the ngram and suffix cross-profile exactness gates before
+any timings (720 candidate requests per gate at context2048), then126 paired
+development records from14 configurations. `--gate-only` omits timings. The
+existing default72-record ngram screen is unchanged. Each policy must do the
+same logical inference work across kernel profiles. Reports compare suffix
+caps against both ordinary baselines, both ngram cap8 baselines, and suffix
+cap1. These fit prompts informed proposal/cap exploration, so the screen cannot
+support a held-out performance claim. The interleaving prototype remains OFF.

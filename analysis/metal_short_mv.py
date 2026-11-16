@@ -10,11 +10,17 @@ from bench.common import ROOT, atomic_json, read_jsonl
 from scripts.check_metal_profile import MODEL_SHA256, metal_profile
 
 
-def analyze(directory):
+SCREENS = {
+    "ngram": "metal-short-mv-screen-v1.json",
+    "retrieval": "metal-retrieval-screen-v1.json",
+}
+
+
+def analyze(directory, *, screen="ngram"):
     directory = Path(directory)
     verify(directory)
     frozen = json.loads((directory / "run_manifest.json").read_text())["frozen"]
-    expected = json.loads((ROOT / "configs/metal-short-mv-screen-v1.json").read_text())
+    expected = json.loads((ROOT / "configs" / SCREENS[screen]).read_text())
     corpus = {p["id"]: p for p in read_jsonl(ROOT / "bench/prompts-v1.jsonl")}
     if (
         frozen["config"] != expected
@@ -78,6 +84,22 @@ def analyze(directory):
             for b in (f"guarded-fixed{k}", "target", "short-mv-target")
         ]
         pairs.append((f"guarded-fixed{k}", "target"))
+    if screen == "retrieval":
+        for k in (1, 4, 8):
+            candidate = f"short-mv-suffix{k}"
+            same_policy.append((candidate, f"guarded-suffix{k}"))
+            pairs += [
+                (candidate, baseline)
+                for baseline in (
+                    f"guarded-suffix{k}",
+                    "target",
+                    "short-mv-target",
+                    "guarded-fixed8",
+                    "short-mv-fixed8",
+                    "short-mv-suffix1",
+                )
+                if baseline != candidate
+            ]
     for group in groups.values():
         for a, b in same_policy:
             if any(
@@ -97,14 +119,19 @@ def analyze(directory):
     }
     summary = {
         "schema_version": 1,
-        "state": "metal_short_mv_comparison_complete",
+        "state": (
+            "metal_short_mv_comparison_complete"
+            if screen == "ngram"
+            else "metal_retrieval_comparison_complete"
+        ),
+        "screen": screen,
         "records": len(rows),
         "comparisons": {f"{a}/{b}": paired_summary(table, a, b) for a, b in pairs},
         "warm_comparisons": {f"{a}/{b}": paired_summary(warm, a, b) for a, b in pairs},
         "work_totals": totals,
         "cross_profile_exact": True,
         "same_work_within_each_policy": True,
-        "limitation": "Three development prompts, cap128, three repeats. This is a component screen, not held-out or controller evidence.",
+        "limitation": "Three development prompts, cap128, three repeats. These fit prompts informed suffix threshold/cap exploration. This is a component screen, not held-out or controller evidence.",
     }
     atomic_json(directory / "analysis/summary.json", summary)
     return summary
