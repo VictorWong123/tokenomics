@@ -17,7 +17,7 @@ static const char *help = R"(Tokenomics: greedy speculative decoding laboratory
   --controller FILE.json (required frozen priors for cost-aware)
   --k 1|2|4|6|8 --max-tokens N --context N --batch N --threads N
   --gpu-layers N   (default 0; compile with optional Metal/CUDA for offload)
-  --cache retain|upstream --drafter model|ngram --confidence P
+  --cache retain|upstream --drafter model|ngram|suffix --confidence P
   --out FILE.jsonl (default stdout; refuses overwrite)
   --cycles FILE.jsonl --script 0,1,4,0,8 (diagnostic transitions only)
 Jobs contain prompt, policy, k, max_tokens, cache, drafter, confidence,

@@ -80,3 +80,14 @@ Use `--gate-only` to omit timings. `check_metal_profile.py` runs that gate again
 already-built binaries. See [M3 instructions and limitations](../docs/metal-short-mv.md).
 For the 16 November research session, the user's no-Codespaces instruction
 supersedes the older workflow route above.
+
+
+## Conservative suffix proposal experiment
+
+`suffix_study.py --model PATH --out FRESH_DIRECTORY` checks the opt-in suffix
+proposal source on the default guarded M3 backend, then compares it with
+ordinary decoding and unchanged ngram cap1/cap8. `--gate-only` omits timings.
+It uses `build-metal/tokenomics` unless `--binary` is supplied. See
+[the suffix design, fit evidence and commands](../docs/suffix-drafter.md).
+`python -m analysis.proposal_replay --out FRESH_DIRECTORY` reproduces the
+archived development-fit proposal comparison without loading models.

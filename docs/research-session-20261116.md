@@ -148,3 +148,47 @@ next candidate targets the existing Metal one-row verification split.
   passes. It loads only the pinned 0.5B target, accommodating the user's M3
   memory constraints. No Metal timing or exactness result is available here.
 - Local instructions: [Metal short-MV experiment](metal-short-mv.md).
+
+### Proposal-quality investigation
+
+- Added a causal offline replay of both archived fit points (M3 Metal 0.5B and
+  Linux CPU 3B), using only the three declared fit prompts at 64 tokens. It
+  reproduces all 30 upstream fixed-policy aggregate work counts. The archives
+  contain empty minimal-log cycle files, so no cycle-by-cycle match is claimed.
+- Explored ngram2/3, longest suffix minima 2/3/4/5/6/8/12 and two-occurrence
+  consensus. At cap1, minimum-five suffix matching removes all wasted rows on
+  both fit points: M3 proposals/acceptances 31/31 versus ngram 37/33; Linux
+  23/23 versus 38/33. Fewer wasted rows trade off against fewer saved cycles.
+  This is fit-set mechanism selection, not speed or held-out evidence.
+- Implemented opt-in `drafter=suffix`, preserving the upstream verifier and
+  unchanged `ngram` baseline. A bounded backward scan chooses longest, then
+  most-recent matches and reads only committed history. Added independent
+  retrieval tests, runtime fallback/rejection checks and calibration binding.
+- Release: seven suites pass; 9,216 retrieval cases and 1,134 runtime fixture
+  cases. The final Release run passes all seven suites in 32.70 seconds,
+  including both 72-record study orchestration tests and suffix calibration.
+  Address/undefined sanitizers with leak detection pass suffix, fixture and
+  runtime suites in 299.81 seconds (the existing Q4-pair sanitizer build).
+  [Retained evidence](../results/verification/suffix-local-20261116/README.md).
+- The pinned 0.5B trained-model download failed at the environment proxy with
+  HTTP 403. No trained inference was run, and no alternative credential or
+  network bypass was attempted. Local model verification remains necessary.
+- [Yemets et al., October 2026](https://arxiv.org/abs/2610.31479) evaluate several
+  speculative methods on Apple systems and report no gain in their common
+  single-request workload. This reinforces measuring the runtime/hardware
+  combination; it is not a proof of impossibility for our M3 setup. Its
+  supplementary cases include positive M3 Max ngram and M3 Pro BF16 tree/block
+  results, emphasizing the scope of the negative common benchmark.
+- [Dovetail, EMNLP 2025](https://aclanthology.org/2025.emnlp-main.879/) uses GPU
+  drafting and CPU verification for heterogeneous systems with constrained
+  GPUs. Its device/model balance differs from the M3's shared-memory 0.5B
+  target; adding a second model is not justified by its published gains alone.
+- Auditing GPU sampling revealed that the pinned Metal argmax reductions use
+  maximum-index tie selection, unlike the host greedy sampler's first maximum.
+  Backend sampling also retains sampled-logit outputs. Enabling it alone would
+  neither establish exact ties nor eliminate all host vocabulary work, so it
+  has not been enabled.
+
+- Added the guarded-M3 suffix study runner: a 330-request correctness gate before
+  a 72-record paired screen against ordinary, ngram1 and ngram8. The synthetic
+  gate, full screen, immutable-record audit and tamper rejection pass on CPU.

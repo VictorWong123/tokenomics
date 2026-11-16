@@ -1,0 +1,21 @@
+{
+  "baseline_aggregate_checks": 30,
+  "baseline_detailed_cycle_checks": 0,
+  "metal_gpu_executed": false,
+  "notes": [
+    "The first offline harness incorrectly expected detailed cycles in minimal-log archives. Corrected to report aggregate checks and zero detailed-cycle checks.",
+    "Suffix minimum 5 was selected after examining these fit trajectories, not on held-out prompts.",
+    "New compiled suffix implementation passes an independent native reference and fixture tests; replay counts alone are not native trained inference."
+  ],
+  "offline_comparisons": 300,
+  "release_seconds": 32.7,
+  "release_suites": 7,
+  "runtime_fixture_cases": 1134,
+  "sanitizer_seconds": 299.81,
+  "sanitizer_suites": 3,
+  "speed_claim": null,
+  "state": "cpu_correctness_and_offline_fit_replay_complete",
+  "suffix_retrieval_cases": 9216,
+  "trained_download": "blocked by network proxy, HTTP 403; no bypass attempted",
+  "trained_inference_executed": false
+}

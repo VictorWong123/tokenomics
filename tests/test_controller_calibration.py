@@ -58,6 +58,12 @@ class BackendIdentity(unittest.TestCase):
 @unittest.skipUnless(os.getenv("TOKENOMICS_TEST_BINARY"), "requires fixture engine")
 class Calibration(unittest.TestCase):
     def test_freeze_replay_binding_ablations_and_tampering(self):
+        self._exercise("ngram")
+
+    def test_suffix_calibration_preserves_drafter_binding(self):
+        self._exercise("suffix")
+
+    def _exercise(self, drafter):
         exe = Path(os.environ["TOKENOMICS_TEST_BINARY"]).resolve()
         model = exe.parent / "fixtures/ngram-cycle.gguf"
         cfg = dict(
@@ -73,7 +79,7 @@ class Calibration(unittest.TestCase):
             warmup_prompt="a b",
             configurations=[{"id": "target", "policy": "target"}]
             + [
-                {"id": f"fixed{a}", "policy": "fixed", "k": a, "drafter": "ngram"}
+                {"id": f"fixed{a}", "policy": "fixed", "k": a, "drafter": drafter}
                 for a in (1, 2, 4, 6, 8)
             ],
         )
@@ -94,23 +100,23 @@ class Calibration(unittest.TestCase):
                 identity={"synthetic_fixture": True},
             )
             investigate(
-                exe, model, None, root / "fit", root / "replay", cfg, drafter="ngram"
+                exe, model, None, root / "fit", root / "replay", cfg, drafter=drafter
             )
             prior = calibrate(
-                root / "fit", root / "replay", "ngram", synthetic_fixture=True
+                root / "fit", root / "replay", drafter, synthetic_fixture=True
             )
             self.assertTrue(prior["synthetic"])
             self.assertEqual(len(prior["priors"]), 6)
             self.assertTrue(all(p["base_ms"] > 0 for p in prior["priors"]))
             self.assertEqual(prior["sync_ms_per_token"], 0)
             frozen = json.loads((root / "fit/run_manifest.json").read_text())["frozen"]
-            point = point_from_frozen(frozen, "ngram")
+            point = point_from_frozen(frozen, drafter)
             validate_binding(prior, point, synthetic_fixture=True)
             mapped = {**frozen, "configuration_binary_sha256": {"alternate": "0" * 64}}
             with self.assertRaisesRegex(ValueError, "operating point"):
                 validate_binding(
                     prior,
-                    point_from_frozen(mapped, "ngram", configuration_id="alternate"),
+                    point_from_frozen(mapped, drafter, configuration_id="alternate"),
                     synthetic_fixture=True,
                 )
             with self.assertRaisesRegex(ValueError, "non-synthetic"):
@@ -174,7 +180,7 @@ class Calibration(unittest.TestCase):
             requests.write_text(requests.read_text() + "\n")
             with self.assertRaisesRegex(ValueError, "hash changed"):
                 calibrate(
-                    root / "fit", root / "replay", "ngram", synthetic_fixture=True
+                    root / "fit", root / "replay", drafter, synthetic_fixture=True
                 )
 
     def test_model_calibration_measures_catchup_and_requires_it(self):

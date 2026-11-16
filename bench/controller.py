@@ -347,7 +347,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fit-dir", type=pathlib.Path, required=True)
     parser.add_argument("--replay-dir", type=pathlib.Path, required=True)
-    parser.add_argument("--drafter", choices=("model", "ngram"), required=True)
+    parser.add_argument(
+        "--drafter", choices=("model", "ngram", "suffix"), required=True
+    )
     parser.add_argument("--out", type=pathlib.Path, required=True)
     parser.add_argument("--synthetic-fixture", action="store_true")
     args = parser.parse_args()

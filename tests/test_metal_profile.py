@@ -137,6 +137,19 @@ class MetalGateOrchestrationTests(unittest.TestCase):
                 self.assertEqual(result["candidate_cases"], 330)
                 self.assertGreater(result["coverage"]["accepted"], 0)
                 self.assertEqual(result["state"], "passed")
+                suffix_result = gate(
+                    binary,
+                    binary,
+                    model,
+                    root / "suffix-passed",
+                    context=64,
+                    threads=1,
+                    gpu_layers=0,
+                    profile_validator=cpu_fixture,
+                    drafter="suffix",
+                )
+                self.assertEqual(suffix_result["candidate_cases"], 330)
+                self.assertGreater(suffix_result["coverage"]["accepted"], 0)
 
                 # Simulate a genuine output divergence at the comparison boundary.
                 def divergent(row, candidate):

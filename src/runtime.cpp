@@ -6,6 +6,7 @@
 #include "log.h"
 #include "sampling.h"
 #include "speculative.h"
+#include "suffix.h"
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -232,7 +233,8 @@ Result Engine::generate(const Request &r) {
     const auto begin = Clock::now();
     require(r.max_tokens >= 0 && r.max_cycles >= 0, "token/cycle budgets must be nonnegative");
     require(r.cache == "retain" || r.cache == "upstream", "cache must be retain or upstream");
-    require(r.drafter == "model" || r.drafter == "ngram", "drafter must be model or ngram");
+    require(r.drafter == "model" || r.drafter == "ngram" || r.drafter == "suffix",
+            "drafter must be model, ngram or suffix");
     require(r.confidence >= 0 && r.confidence <= 1, "confidence must be in [0,1]");
     auto captures = r.capture_checkpoints;
     std::sort(captures.begin(), captures.end());
@@ -303,9 +305,10 @@ Result Engine::generate(const Request &r) {
     sp.ngram_simple.size_m = 8;
     sp.ngram_simple.min_hits = 1;
     common_speculative_ptr spec;
-    if (r.mode != "target")
+    if (r.mode != "target" && r.drafter != "suffix")
         spec.reset(common_speculative_init(sp, 1));
-    require(r.mode == "target" || bool(spec), "speculator initialization failed");
+    require(r.mode == "target" || r.drafter == "suffix" || bool(spec),
+            "speculator initialization failed");
     out.setup_ms = elapsed(begin);
     if (r.max_tokens == 0) {
         out.stop = "budget";
@@ -387,15 +390,19 @@ Result Engine::generate(const Request &r) {
                 c.sync_ms = elapsed(t);
             }
             t = Clock::now();
-            auto &dp = common_speculative_get_draft_params(spec.get(), 0);
-            dp = {};
-            dp.drafting = true;
-            dp.n_max = cap;
-            dp.pos0 = n;
-            dp.id_last = pending;
-            dp.prompt = &prefix;
-            dp.result = &proposed;
-            common_speculative_draft(spec.get());
+            if (r.drafter == "suffix") {
+                suffix_draft(prefix, pending, cap, proposed);
+            } else {
+                auto &dp = common_speculative_get_draft_params(spec.get(), 0);
+                dp = {};
+                dp.drafting = true;
+                dp.n_max = cap;
+                dp.pos0 = n;
+                dp.id_last = pending;
+                dp.prompt = &prefix;
+                dp.result = &proposed;
+                common_speculative_draft(spec.get());
+            }
             if (use_model)
                 llama_synchronize(dft);
             require(

@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
             base.max_tokens = cap;
             const auto expected = e.generate(base);
             for (auto cache : {"retain", "upstream"})
-                for (auto drafter : {"model", "ngram"})
+                for (auto drafter : {"model", "ngram", "suffix"})
                     for (int variant = 0; variant < 3; ++variant) {
                         Request adaptive = base;
                         adaptive.mode = "cost-aware";
@@ -304,38 +304,42 @@ int main(int argc, char **argv) {
     lookup_base.max_tokens = 40;
     const auto lookup_reference = lookup.generate(lookup_base);
     bool lookup_zero = false, lookup_partial = false, lookup_switch = false;
-    for (int action : {1, 2, 4, 6, 8, -1}) {
-        Request candidate = lookup_base;
-        candidate.drafter = "ngram";
-        candidate.mode = action < 0 ? "script" : "fixed";
-        candidate.k = action < 0 ? 4 : action;
-        candidate.script = {8, 0, 0, 2, 0, 6};
-        const auto correct = lookup.generate(candidate);
-        CHECK(correct.tokens == lookup_reference.tokens && correct.stop == lookup_reference.stop);
-        CHECK(lookup.generate(candidate).tokens == correct.tokens);
-        bool proposed = false, reached_cap = false;
-        for (const auto &cycle : correct.cycles) {
-            CHECK(cycle.actual <= cycle.action);
-            CHECK(cycle.draft_cached == 0 && cycle.synced == 0);
-            CHECK(cycle.accepted == cycle.actual);
-            proposed |= cycle.actual > 0;
-            reached_cap |= cycle.actual == action;
-            lookup_switch |= cycle.switched;
+    for (auto drafter : {"ngram", "suffix"}) {
+        for (int action : {1, 2, 4, 6, 8, -1}) {
+            Request candidate = lookup_base;
+            candidate.drafter = drafter;
+            candidate.mode = action < 0 ? "script" : "fixed";
+            candidate.k = action < 0 ? 4 : action;
+            candidate.script = {8, 0, 0, 2, 0, 6};
+            const auto correct = lookup.generate(candidate);
+            CHECK(correct.tokens == lookup_reference.tokens &&
+                  correct.stop == lookup_reference.stop);
+            CHECK(lookup.generate(candidate).tokens == correct.tokens);
+            bool proposed = false, reached_cap = false;
+            for (const auto &cycle : correct.cycles) {
+                CHECK(cycle.actual <= cycle.action);
+                CHECK(cycle.draft_cached == 0 && cycle.synced == 0);
+                CHECK(cycle.accepted == cycle.actual);
+                proposed |= cycle.actual > 0;
+                reached_cap |= cycle.actual == action;
+                lookup_switch |= cycle.switched;
+            }
+            CHECK(proposed);
+            CHECK(action < 0 || reached_cap);
+            ++comparisons;
+            candidate.proposal_transform = [](std::vector<int> &ids, int cycle) {
+                if (!ids.empty())
+                    ids[std::min(size_t(cycle % 3), ids.size() - 1)] = 260;
+            };
+            const auto corrupt = lookup.generate(candidate);
+            CHECK(corrupt.tokens == lookup_reference.tokens &&
+                  corrupt.stop == lookup_reference.stop);
+            for (const auto &cycle : corrupt.cycles) {
+                lookup_zero |= cycle.actual > 0 && cycle.accepted == 0;
+                lookup_partial |= cycle.accepted > 0 && cycle.accepted < cycle.actual;
+            }
+            ++comparisons;
         }
-        CHECK(proposed);
-        CHECK(action < 0 || reached_cap);
-        ++comparisons;
-        candidate.proposal_transform = [](std::vector<int> &ids, int cycle) {
-            if (!ids.empty())
-                ids[std::min(size_t(cycle % 3), ids.size() - 1)] = 260;
-        };
-        const auto corrupt = lookup.generate(candidate);
-        CHECK(corrupt.tokens == lookup_reference.tokens && corrupt.stop == lookup_reference.stop);
-        for (const auto &cycle : corrupt.cycles) {
-            lookup_zero |= cycle.actual > 0 && cycle.accepted == 0;
-            lookup_partial |= cycle.accepted > 0 && cycle.accepted < cycle.actual;
-        }
-        ++comparisons;
     }
     CHECK(lookup_zero && lookup_partial && lookup_switch);
     std::cout << comparisons

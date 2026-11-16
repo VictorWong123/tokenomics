@@ -1,0 +1,46 @@
+{
+  "release": {
+    "cache_available": true,
+    "values": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "GGML_AVX": "ON",
+      "GGML_AVX2": "ON",
+      "GGML_BLAS": "OFF",
+      "GGML_CPU_REPACK": "OFF",
+      "GGML_CUDA": "OFF",
+      "GGML_F16C": "ON",
+      "GGML_FMA": "ON",
+      "GGML_LLAMAFILE": "OFF",
+      "GGML_METAL": "OFF",
+      "GGML_NATIVE": "OFF",
+      "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+      "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
+      "TOKENOMICS_CPU_Q4_PAIR": "OFF",
+      "TOKENOMICS_METAL_SHORT_MV": "OFF"
+    }
+  },
+  "sanitizer": {
+    "cache_available": true,
+    "values": {
+      "CMAKE_BUILD_TYPE": "Debug",
+      "GGML_AVX": "ON",
+      "GGML_AVX2": "ON",
+      "GGML_BLAS": "OFF",
+      "GGML_CPU_REPACK": "OFF",
+      "GGML_CUDA": "OFF",
+      "GGML_F16C": "ON",
+      "GGML_FMA": "ON",
+      "GGML_LLAMAFILE": "OFF",
+      "GGML_METAL": "OFF",
+      "GGML_NATIVE": "OFF",
+      "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+      "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
+      "TOKENOMICS_CPU_Q4_PAIR": "ON",
+      "TOKENOMICS_METAL_SHORT_MV": "OFF"
+    }
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1"
+  },
+  "sanitizer_scope": "suffix, fixtures and runtime suites; combined with previously enabled Q4 pair prototype"
+}

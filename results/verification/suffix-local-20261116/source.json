@@ -1,0 +1,30 @@
+{
+  "binary_sha256": {
+    "release": "dd2413a514c5fb57fbdee294c097172e6a65da52e820f9bddb403e301c1a688d",
+    "sanitizer": "7ecc7c2be8b269723648850c2abcdadfb56aec901c53d121440a89df187ac58c"
+  },
+  "owned_files_sha256": {
+    "CMakeLists.txt": "d6f42a7c03c37c1270d3631ee2626d3d6bab86dedcebc00a005740668f75295b",
+    "analysis/proposal_replay.py": "13ebfbd52a1738cb7c158c816e4537fd15608eb101ca7dc7bb10af5339c35cb3",
+    "analysis/suffix_study.py": "00c95cd146dbd5bd650211b4ba3eab0621d4b3d63bf76db2d47de82039e1beb8",
+    "bench/controller.py": "7cb8eb8ed26013e4fac643133e8674cfef9747fdaa4c6c0eba020c4d1f6834e8",
+    "bench/replay.py": "4f195e1d230f6805b6e51b5246fa8a3a4a929ed9c39d7f1418e16e62714ab923",
+    "configs/suffix-screen-v1.json": "468913ca7ce7fda675a3dde6be0407edfd91c68ec9c7cd534ecc1fbb6d15faa5",
+    "scripts/check_metal_profile.py": "bb40385622a0d6341ef04c3241e1b95ded128cefb1b046c964370bf3a705169a",
+    "scripts/suffix_study.py": "b803de21fafb0ffc1f2d6d52a669e168f0634b7351e153fb2be63ee06dc578b5",
+    "src/main.cpp": "bbe902e768d8394603150531126be5408e167aa99232f2ce8c7e3c2025fc7282",
+    "src/runtime.cpp": "f998eae0a6ddfaf4ddb3d24e930a4e8c11b04b410d699188bcf9c7c3d6fa4a30",
+    "src/suffix.cpp": "7c104289e2b26c1a74cfb7b2980ddf437e3c9397a89c59c4e066bfb5067c21a0",
+    "src/suffix.h": "2ff6be0526af4df72fd9e22b6a3f40a215543b79e9e1dfa55234c2ed80860fe6",
+    "tests/test_controller_calibration.py": "a12403020e70f16250d650d911908731ce24fdc1dcdaeab13e1099d77a08f693",
+    "tests/test_metal_profile.py": "380b8755b83604bf086237c6e1f45985d7d9465d4087f6d3d13da0fa2d1798a4",
+    "tests/test_proposal_replay.py": "ed9058e826f4e25b5315ec9a982a9683d78c7b1de93c6ff42f5663bbf6fcb81a",
+    "tests/test_runtime.cpp": "cf8a8fd7edfa001cb53e5b4db01e733a8b583682531feed6b1de4b43352b3dd0",
+    "tests/test_suffix.cpp": "9f5a0df2ba11c33c7f8a41e1763b7f13c15fbb9f729ac4804c465d6abbe0ce7f",
+    "tests/test_suffix_study.py": "5a2aa0cd490f257bc4bd63ca796a251a3bb34d3dfafba30c3060cbb47bb785e4"
+  },
+  "source": {
+    "owned_source_sha256": "8961b5f8cef83557ae80cce01022e5a738ab05e75d7393070ff61a00932947bb",
+    "revision": "69207183d97fa682dae406f431a3b3f478bc8a52"
+  }
+}

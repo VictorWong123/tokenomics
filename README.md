@@ -40,7 +40,7 @@ licenses are recorded in [the model catalog](configs/models-v1.json).
 
 The full development environment additionally needs Python 3.12+, venv support
 and curl. The bootstrap installs pinned tooling, builds the runtime and runs
-all six CTest suites:
+all seven default CTest suites:
 
 ```bash
 bash scripts/bootstrap.sh cpu

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "phase": "suffix_development_screen_v1",
+  "split": "development",
+  "prompt_ids": [
+    "development-qa-01",
+    "development-code-01",
+    "development-summary-01"
+  ],
+  "output_caps": [
+    64,
+    128
+  ],
+  "repetitions": 3,
+  "seed": 20261116,
+  "warmup_tokens": 16,
+  "warmup_prompt": "Warm-up: continue briefly.",
+  "context": 2048,
+  "batch": 512,
+  "threads": 2,
+  "detailed": false,
+  "configurations": [
+    {
+      "id": "target",
+      "policy": "target"
+    },
+    {
+      "id": "ngram1",
+      "policy": "fixed",
+      "drafter": "ngram",
+      "k": 1
+    },
+    {
+      "id": "ngram8",
+      "policy": "fixed",
+      "drafter": "ngram",
+      "k": 8
+    },
+    {
+      "id": "suffix1",
+      "policy": "fixed",
+      "drafter": "suffix",
+      "k": 1
+    }
+  ]
+}

@@ -35,21 +35,21 @@ def metal_profile(row, candidate):
         )
 
 
-def variants():
+def variants(drafter="ngram"):
     yield {"configuration_id": "target", "policy": "target"}
     for cache in ("retain", "upstream"):
         for k in (1, 2, 4, 6, 8):
             yield {
                 "configuration_id": f"{cache}-fixed{k}",
                 "policy": "fixed",
-                "drafter": "ngram",
+                "drafter": drafter,
                 "cache": cache,
                 "k": k,
             }
         yield {
             "configuration_id": f"{cache}-script",
             "policy": "script",
-            "drafter": "ngram",
+            "drafter": drafter,
             "cache": cache,
             "k": 8,
             "script": [0, 4, 1, 8, 2, 0, 6],
@@ -58,7 +58,7 @@ def variants():
         yield {
             "configuration_id": f"minimal-fixed{k}",
             "policy": "fixed",
-            "drafter": "ngram",
+            "drafter": drafter,
             "k": k,
             "detailed": False,
         }
@@ -74,7 +74,10 @@ def gate(
     threads=2,
     gpu_layers=99,
     profile_validator=metal_profile,
+    drafter="ngram",
 ):
+    if drafter not in ("ngram", "suffix"):
+        raise ValueError("This model-free gate supports ngram or suffix drafting")
     out = Path(out)
     out.mkdir(parents=True, exist_ok=False)
     a = SimpleNamespace(
@@ -101,6 +104,7 @@ def gate(
                 "candidate": sha256(candidate),
             },
             "model_sha256": sha256(model),
+            "drafter": drafter,
             "settings": {
                 "context": context,
                 "batch": a.batch,
@@ -168,7 +172,7 @@ def gate(
                     **smoke,
                     "configuration_id": f"fixed{k}",
                     "policy": "fixed",
-                    "drafter": "ngram",
+                    "drafter": drafter,
                     "k": k,
                 }
                 for k in (4, 8)
@@ -234,7 +238,7 @@ def gate(
             jobs = [
                 {**case, **variant, "repetition": repetition}
                 for case in cases
-                for variant in variants()
+                for variant in variants(drafter)
                 for repetition in (0, 1)
             ]
             a.binary = candidate

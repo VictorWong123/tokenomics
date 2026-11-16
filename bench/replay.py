@@ -23,6 +23,21 @@ from bench.common import (
 from bench.run import first_mismatch, RunPaused
 
 
+def infer_drafter(frozen):
+    """Use the declared proposal mechanism, never infer it from model residency."""
+    mechanisms = {
+        conf.get("drafter", "model")
+        for conf in frozen["config"]["configurations"]
+        if conf["policy"] != "target"
+    }
+    if len(mechanisms) != 1 or not mechanisms <= {"model", "ngram", "suffix"}:
+        raise ValueError("Action replay requires one unambiguous drafter")
+    drafter = mechanisms.pop()
+    if drafter == "model" and frozen["draft_sha256"] is None:
+        raise ValueError("Model drafter requires a frozen draft model")
+    return drafter
+
+
 def run_jobs(exe, target, draft, jobs, directory, cfg, gpu_layers):
     directory.mkdir(parents=True, exist_ok=True)
     jobpath = directory / "jobs.jsonl"
@@ -350,7 +365,11 @@ def investigate(
     answer["dynamic_baseline"] = (
         "pinned upstream confidence, cap 8"
         if drafter == "model"
-        else "upstream variable-length ngram lookup, cap 8 (overlaps fixed8)"
+        else (
+            "request-local suffix lookup, min match 5, cap 8 (overlaps fixed8)"
+            if drafter == "suffix"
+            else "upstream variable-length ngram lookup, cap 8 (overlaps fixed8)"
+        )
     )
     atomic_json(out / "decision.json", answer)
     return answer
@@ -472,7 +491,7 @@ if __name__ == "__main__":
     parser.add_argument("--out", type=pathlib.Path, required=True)
     args = parser.parse_args()
     frozen = json.loads((args.pilot_dir / "run_manifest.json").read_text())["frozen"]
-    drafter = "ngram" if frozen["draft_sha256"] is None else "model"
+    drafter = infer_drafter(frozen)
     investigate(
         args.exe,
         args.target,
