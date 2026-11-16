@@ -68,7 +68,7 @@ local paths before sharing; never upload credentials or model weights.
 ## Checks available without a Mac
 
 The generated host C++ sources compile on Linux. A host-only predicate program
-checks 320 combinations across F32/F16/Q4_0/Q4_K/Q6_K, row counts 1–32 and one or
+checks 448 combinations across F32/F16/Q4_0/Q4_K/Q6_K/Q5_0/Q8_0, row counts 1–32 and one or
 four heads. CPU fixtures test the gate's complete comparison grid and fail-fast
 retention. These checks exercise integration and orchestration only. The Mac
 run above remains necessary, including when these checks pass.
@@ -101,8 +101,8 @@ gates without this receipt need to be rerun to use this check.
 The local runner first builds `test_backend_rows` for the candidate and executes
 it with `--metal`. It compares each row of a batched matrix multiplication with
 an independent one-row multiplication using identical weights and activations.
-The grid includes F32/F16/Q4_K/Q6_K, short batches through nine rows, widths
-64–1536 where supported, and both independent and broadcast weight heads.
+The grid includes F32/F16/Q4_K/Q6_K/Q5_0/Q8_0, short batches through nine rows, widths
+64–4864 where supported, and both independent and broadcast weight heads.
 Outputs must be finite, nondegenerate and bitwise identical. A first mismatch
 prints its shape and values and prevents the trained gate/timing stages.
 

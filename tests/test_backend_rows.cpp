@@ -190,8 +190,9 @@ int main(int argc, char **argv) {
             return 0;
         }
         int cases = 0, values = 0;
-        for (auto type : {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_Q4_K, GGML_TYPE_Q6_K})
-            for (int width : {64, 128, 256, 896, 1536})
+        for (auto type : {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_Q4_K, GGML_TYPE_Q6_K,
+                          GGML_TYPE_Q5_0, GGML_TYPE_Q8_0})
+            for (int width : {64, 128, 256, 896, 1536, 4864})
                 for (int rows : {2, 3, 5, 7, 9})
                     for (int heads : {1, 4}) {
                         // Quantized widths must align with their 256-value blocks.

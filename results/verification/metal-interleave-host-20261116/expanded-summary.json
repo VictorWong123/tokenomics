@@ -1,0 +1,54 @@
+{
+  "state": "expanded_host_checks_passed",
+  "purpose": "Actual Qwen0.5B quantized tensor coverage; no Metal graph or M3 throughput claim",
+  "header_evidence": "../hosted-metal-20261116/qwen05-header-summary.json",
+  "types": [
+    "Q4_K",
+    "Q6_K",
+    "Q5_0",
+    "Q8_0"
+  ],
+  "source_sha256": {
+    "cmake/metal-interleave.cmake": "199527c993397a5ed4a014be23c7789addfac0b5e12f0372c85e2aa360f22e58",
+    "src/metal_interleave.h": "79436079e4cc21aaed074d83cb50168ac768175d7267de829de96ebb4290500d",
+    "src/runtime.cpp": "2176417b0583dfdae9669497f40be0f3fc14a88b2d1a25c8c9ed8976966ef91e",
+    "tests/test_backend_rows.cpp": "9b014c772764a7dc3abd4083b1bbc0dbfe4e892e32c7a2d3fb79e40422fd1f4c",
+    "tests/test_metal_dispatch.cpp": "6f4c8f15d2e768c854f0a1cf960c410ae03c272bd835541565827782af89cdeb"
+  },
+  "host_dispatch_cases": 448,
+  "host_split_cases": 589896,
+  "matrix_cases": 450,
+  "matrix_bitwise_comparisons": 898560,
+  "softmax_cases": 48,
+  "softmax_bitwise_comparisons": 1053696,
+  "original_kernel_body": "preserved with four coordinate wrappers; Q5_0/Q8_0 retain original shared-memory argument",
+  "release_backend_binary_sha256": "91e22a206d6cb39a22a4f2caead61a14c6a210cffc2065a5fd8b9c5b5a2016a6",
+  "asan_backend_binary_sha256": "c51440e546d8b13e8237a7c4801f17dc69fb49b468bc08ffeb71f6e2d7257335",
+  "asan_configuration": {
+    "cache_available": true,
+    "values": {
+      "CMAKE_BUILD_TYPE": "Debug",
+      "GGML_AVX": "ON",
+      "GGML_AVX2": "ON",
+      "GGML_BLAS": "OFF",
+      "GGML_CPU_REPACK": "OFF",
+      "GGML_CUDA": "OFF",
+      "GGML_F16C": "ON",
+      "GGML_FMA": "ON",
+      "GGML_LLAMAFILE": "OFF",
+      "GGML_METAL": "OFF",
+      "GGML_NATIVE": "OFF",
+      "TOKENOMICS_CPU_BATCH_INVARIANT": "ON",
+      "TOKENOMICS_CPU_PACKED_VERIFY": "OFF",
+      "TOKENOMICS_CPU_Q4_PAIR": "ON",
+      "TOKENOMICS_GREEDY_NO_TEMP": "ON",
+      "TOKENOMICS_METAL_INTERLEAVE": "OFF",
+      "TOKENOMICS_METAL_SHORT_MV": "OFF",
+      "TOKENOMICS_VERIFY_STAGE_TIMING": "OFF"
+    }
+  },
+  "asan_options": "detect_leaks=1",
+  "asan_profile_note": "CPU Q4-pair and greedy options are ON in this existing sanitizer build. The backend harness does not link the runtime sampler. This is not the default profile or a Metal test.",
+  "asan_stdout_sha256": "eb72c3e0a3812fc05b08f1b20a4c0b0e6703935114f4a03b9a60976f1b50e371",
+  "asan_stdout_utf8": "backend=CPU\n48 masked softmax cases; 1053696 bitwise comparisons passed\n450 backend matrix cases; 898560 bitwise row comparisons passed\n"
+}

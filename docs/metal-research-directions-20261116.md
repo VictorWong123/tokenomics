@@ -40,7 +40,7 @@ insufficient to satisfy this repository's exact-token correctness gate.
 
 A conservative optimization can change **which threadgroups run next to each
 other**, while retaining the same arithmetic inside each existing mat-vec
-threadgroup. For dense Q4_K/Q6_K weights and 2–9 activation rows, interleaving
+threadgroup. For dense Q4_K/Q6_K/Q5_0/Q8_0 weights and 2–9 activation rows, interleaving
 activation rows within each weight tile may increase cache reuse. A wrapper
 could swap the two dispatch coordinates before calling the unchanged upstream
 kernel implementation. The host grid would swap the corresponding extents.
@@ -49,8 +49,8 @@ reduction order.
 
 An opt-in prototype now implements this scheduling permutation as
 `TOKENOMICS_METAL_INTERLEAVE=ON`, requiring short-MV and embedded shaders.
-The original mat-vec kernel body is preserved; two wrappers pass swapped grid
-coordinates to its existing Q4_K/Q6_K implementations. Host C++ compilation and
+The original mat-vec kernel body is preserved; four wrappers pass swapped grid
+coordinates to its existing implementations, retaining shared-memory arguments. Host C++ compilation and
 dispatch tests pass. No native shader execution or throughput result exists yet.
 The cache-reuse benefit remains a hypothesis. Metal does
 not promise a scheduling order that guarantees the proposed cache benefit.
@@ -70,3 +70,21 @@ cross-profile gate with `--candidate-profile interleaved`. Its marker check
 requires the interleave flag on the candidate and excludes it on the reference.
 The standard short-MV study explicitly forces this extra flag OFF to keep its
 comparison isolated. The hosted preflight also checks an interleaved profile.
+
+## Actual target tensor types
+
+A bounded header inspection of the locked public Qwen0.5B file confirms291
+tensors:121 F32,133 Q5_0,13 Q8_0,12 Q4_K and12 Q6_K. The output projection is
+Q8_0 with shape896×151936 (144643072 encoded bytes), while the first attention
+query projection is Q5_0. FFN down-projection width is4864. The filename's
+`Q4_K_M` designation does not imply K-quant storage for the896-wide matrices.
+The initial two-type prototype missed the large output projection. The expanded
+prototype covers all four quantized types present in this model; its host grid
+preserves Q8_0's distinct grouping of output rows across SIMD groups. Direct
+backend tests now include Q5_0/Q8_0 and the4864-wide FFN input.
+
+The hosted inspection read a16MiB prefix, parsed5947741 header bytes and saved
+only metadata. It did not download or hash the full491400032-byte model, so its
+report explicitly marks full-model SHA256 verification false. The immutable
+repository revision, total byte count, HTTP content range and prefix hash are
+retained with [selected header evidence](../results/verification/hosted-metal-20261116/qwen05-header-summary.json).

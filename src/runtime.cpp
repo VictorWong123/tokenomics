@@ -233,7 +233,7 @@ std::string Engine::system_info() const {
 #endif
 #ifdef TOKENOMICS_METAL_INTERLEAVE
     if (impl_->cfg.gpu_layers > 0)
-        info += "; TOKENOMICS_METAL_INTERLEAVE=ON; interleave_types=q4_K,q6_K";
+        info += "; TOKENOMICS_METAL_INTERLEAVE=ON; interleave_types=q4_K,q6_K,q5_0,q8_0";
 #endif
     return info;
 }

@@ -518,3 +518,29 @@ lock is deliberately local/ignored. Added an explicit tracked JSON containing
 only the two public Qwen revisions, filenames, licenses, byte counts and hashes
 already used by the session. Header inspection now reads that public pin file,
 so a clean checkout does not depend on a developer's ignored model directory.
+
+The [header dispatch](https://github.com/VictorWong123/tokenomics/actions/runs/43809348043)
+succeeded:291 tensors, including133 Q5_0 and13 Q8_0; output.weight is Q8_0,
+896×151936, encoded in144643072 bytes. The first query projection is Q5_0;
+FFN down-projection width is4864. The initial Q4_K/Q6_K-only interleaving
+prototype therefore misses the large output matrix. Expanded it to Q5_0 and
+Q8_0, retaining the original shared-memory parameter and Q8_0's different host
+grid divisor. Four wrappers still call unchanged upstream reductions.
+
+The direct backend harness now includes both actual types and4864-wide inputs:
+450 matrix cases/898560 bitwise values plus48 masked-softmax cases/1053696
+values pass on CPU in Release and address/undefined sanitizers with leak
+checking. The existing sanitizer profile has CPU Q4-pair ON; that fact is
+retained rather than presenting it as the default build. Host compilation and
+448 dispatch cases pass, as do589896 cache-split cases. The original shader body
+is preserved. These are host/CPU checks; expanded Metal shader compilation and
+full local M3 exactness remain separate requirements.
+[Expanded evidence](../results/verification/metal-interleave-host-20261116/expanded-summary.json).
+
+The initial two-type interleaving prototype passed its native Apple hosted job:
+C++/Mach-O linkage, offline Metal shader compilation, native fixture suites,
+CPU row arithmetic and embedded-library initialization all pass. The job
+explicitly reports GPU graph execution unavailable due to missing simdgroup
+reduction. This result belongs to source91f9a56 and does not establish the
+subsequent four-type expansion's native compilation.
+[Initial native receipt](../results/verification/hosted-metal-20261116/interleaved-initial-native.json).

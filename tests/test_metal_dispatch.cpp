@@ -13,8 +13,8 @@ int main() {
     auto *ctx = ggml_init({8 * 1024 * 1024, nullptr, true});
     check(ctx != nullptr);
     int cases = 0;
-    for (auto type :
-         {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_Q4_0, GGML_TYPE_Q4_K, GGML_TYPE_Q6_K}) {
+    for (auto type : {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_Q4_0, GGML_TYPE_Q4_K, GGML_TYPE_Q6_K,
+                      GGML_TYPE_Q5_0, GGML_TYPE_Q8_0}) {
         for (int heads : {1, 4}) {
             auto *weight = ggml_new_tensor_3d(ctx, type, 256, 256, heads);
             for (int rows = 1; rows <= 32; ++rows) {
@@ -22,7 +22,8 @@ int main() {
                 auto *op = ggml_mul_mat(ctx, weight, input);
                 check(tokenomics_metal_interleave(op) ==
                       (heads == 1 && rows >= 2 && rows <= 9 &&
-                       (type == GGML_TYPE_Q4_K || type == GGML_TYPE_Q6_K)));
+                       (type == GGML_TYPE_Q4_K || type == GGML_TYPE_Q6_K ||
+                        type == GGML_TYPE_Q5_0 || type == GGML_TYPE_Q8_0)));
                 // Ordinary decode is still MV; 2..9 no longer select MMA/MM.
                 check(ggml_metal_op_mul_mat_use_mma(op) == (rows >= 10 && rows <= 16));
                 check(ggml_metal_op_mul_mat_use_mm(op, true) == (rows >= 10));
