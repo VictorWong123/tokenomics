@@ -98,6 +98,36 @@ class MetalIRTests(unittest.TestCase):
         missing = reference[: reference.index("define void @same_impl")]
         self.assertNotEqual(compare_ir(missing)["state"], "normalized_ir_matches")
 
+    def test_unique_filename_initializer_is_compared_not_ignored(self):
+        source = forwarding_module()
+        original = (
+            source
+            + "\ndefine internal void @_GLOBAL__sub_I_reference.metal() {\n  ret void\n}"
+        )
+        candidate = (
+            source
+            + "\ndefine internal void @_GLOBAL__sub_I_candidate.metal() {\n  ret void\n}"
+        )
+        result = compare_ir(candidate, reference_module=original)
+        self.assertEqual(result["state"], "normalized_ir_matches")
+        self.assertEqual(len(result["module_initializer_renames"]), 1)
+        changed = candidate.replace(
+            "define internal void @_GLOBAL__sub_I_candidate.metal() {\n  ret void",
+            "define internal void @_GLOBAL__sub_I_candidate.metal() {\n  %x = fadd float 1.0, 2.0\n  ret void",
+        )
+        self.assertNotEqual(
+            compare_ir(changed, reference_module=original)["state"],
+            "normalized_ir_matches",
+        )
+        ambiguous = (
+            candidate
+            + "\ndefine internal void @_GLOBAL__sub_I_extra.metal() {\n  ret void\n}"
+        )
+        self.assertNotEqual(
+            compare_ir(ambiguous, reference_module=original)["state"],
+            "normalized_ir_matches",
+        )
+
     def test_coordinate_permutation_and_ssa_renaming_match(self):
         result = compare_ir(module())
         self.assertEqual(len(functions(module())), 8)

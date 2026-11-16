@@ -40,3 +40,9 @@ definition across the two modules. Matching call sites with changed or missing
 helpers are rejected. Reports distinguish `same_shader_module` from
 `separate_original_module`; a same-module result does not validate original
 library optimization choices.
+
+The first separate-module run matches all four wrappers and their arithmetic
+helpers, and261 original functions. Its remaining mismatch is a compiler-made
+initializer whose symbol contains the source filename. The checker now maps
+only a unique initializer in each module and still compares its entire body.
+Changed initializer code or ambiguous extra initializers remain failures.

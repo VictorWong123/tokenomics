@@ -1,0 +1,132 @@
+{
+  "all_reference_functions_match": false,
+  "gpu_execution": false,
+  "ir_sha256": "dcea547699ff673305a0ace9636fd2ea01468f0041192ef4f0b04f033172aef2",
+  "limitation": "Textual compiler-IR diagnostic only. Ignored metadata and later function-constant/GPU specialization can matter. It cannot replace actual M3 arithmetic/token gates.",
+  "normalization": "Invert grid-coordinate extracts or cancel an exact (1,0,2) shuffle on candidate; reject other whole-grid uses; rename SSA/labels and kernel symbol; resolve attribute groups; ignore metadata attachments and whitespace.",
+  "pairs": [
+    {
+      "candidate_sha256": "dd9e23322bbb3f33ab5eb135bd86fa2e9c46c8487dc57a494d01b7e7b6c62d1d",
+      "direct_callees": {
+        "candidate": [
+          "_Z27kernel_mul_mv_q4_K_f32_implILi2ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT0_PU9MTLdeviceKcS5_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        ],
+        "ordinary": [
+          "_Z27kernel_mul_mv_q4_K_f32_implILi2ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT0_PU9MTLdeviceKcS5_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        ]
+      },
+      "helper_comparisons": [
+        {
+          "candidate_sha256": "780113a5b1ce651d924fa01e751e5bed3c429522d0093ed4a21bb9446c883e45",
+          "ordinary_sha256": "780113a5b1ce651d924fa01e751e5bed3c429522d0093ed4a21bb9446c883e45",
+          "state": "matched",
+          "symbol": "_Z27kernel_mul_mv_q4_K_f32_implILi2ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT0_PU9MTLdeviceKcS5_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        }
+      ],
+      "kind": "q4_K",
+      "normalized_text_equal": true,
+      "ordinary_sha256": "dd9e23322bbb3f33ab5eb135bd86fa2e9c46c8487dc57a494d01b7e7b6c62d1d",
+      "state": "matched",
+      "symbols": [
+        "kernel_mul_mv_q4_K_f32",
+        "kernel_mul_mv_q4_K_f32_interleaved"
+      ]
+    },
+    {
+      "candidate_sha256": "fa758cf591ba478b0d5bda2a253e05a92e1fa376ee0af8d7841f294edcd8f9e7",
+      "direct_callees": {
+        "candidate": [
+          "_Z27kernel_mul_mv_q6_K_f32_implILi2ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT0_PU9MTLdeviceKcS5_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        ],
+        "ordinary": [
+          "_Z27kernel_mul_mv_q6_K_f32_implILi2ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT0_PU9MTLdeviceKcS5_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        ]
+      },
+      "helper_comparisons": [
+        {
+          "candidate_sha256": "0f6012ac0fbed4eef98c83f65229599d23de271b78100c5411a9d32cf0e30ba0",
+          "ordinary_sha256": "0f6012ac0fbed4eef98c83f65229599d23de271b78100c5411a9d32cf0e30ba0",
+          "state": "matched",
+          "symbol": "_Z27kernel_mul_mv_q6_K_f32_implILi2ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT0_PU9MTLdeviceKcS5_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        }
+      ],
+      "kind": "q6_K",
+      "normalized_text_equal": true,
+      "ordinary_sha256": "fa758cf591ba478b0d5bda2a253e05a92e1fa376ee0af8d7841f294edcd8f9e7",
+      "state": "matched",
+      "symbols": [
+        "kernel_mul_mv_q6_K_f32",
+        "kernel_mul_mv_q6_K_f32_interleaved"
+      ]
+    },
+    {
+      "candidate_sha256": "8de1c3665aae191f5965d0525b162ddb547a95ae98f257ad59f6a489b73cf698",
+      "direct_callees": {
+        "candidate": [
+          "_Z20mul_vec_q_n_f32_implI10block_q5_0Ls4ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT1_PU9MTLdeviceKcS6_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        ],
+        "ordinary": [
+          "_Z20mul_vec_q_n_f32_implI10block_q5_0Ls4ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT1_PU9MTLdeviceKcS6_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        ]
+      },
+      "helper_comparisons": [
+        {
+          "candidate_sha256": "b3e52d049bd72f300f9b0143af0da768d2cc50de962a96ef48fd60c2709ad3e8",
+          "ordinary_sha256": "b3e52d049bd72f300f9b0143af0da768d2cc50de962a96ef48fd60c2709ad3e8",
+          "state": "matched",
+          "symbol": "_Z20mul_vec_q_n_f32_implI10block_q5_0Ls4ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT1_PU9MTLdeviceKcS6_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        }
+      ],
+      "kind": "q5_0",
+      "normalized_text_equal": true,
+      "ordinary_sha256": "8de1c3665aae191f5965d0525b162ddb547a95ae98f257ad59f6a489b73cf698",
+      "state": "matched",
+      "symbols": [
+        "kernel_mul_mv_q5_0_f32",
+        "kernel_mul_mv_q5_0_f32_interleaved"
+      ]
+    },
+    {
+      "candidate_sha256": "88765133852e9f2987d33447a6cc90688983cfe8a11be5fd0f02734cd206e713",
+      "direct_callees": {
+        "candidate": [
+          "_Z27kernel_mul_mv_q8_0_f32_implILs2ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT0_PU9MTLdeviceKcS5_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        ],
+        "ordinary": [
+          "_Z27kernel_mul_mv_q8_0_f32_implILs2ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT0_PU9MTLdeviceKcS5_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        ]
+      },
+      "helper_comparisons": [
+        {
+          "candidate_sha256": "1dc568b8e8b54aea6210a0647df2a417617b0c12c265d32cc76e1a3d814b4365",
+          "ordinary_sha256": "1dc568b8e8b54aea6210a0647df2a417617b0c12c265d32cc76e1a3d814b4365",
+          "state": "matched",
+          "symbol": "_Z27kernel_mul_mv_q8_0_f32_implILs2ERU11MTLconstantK23ggml_metal_kargs_mul_mvEvT0_PU9MTLdeviceKcS5_PU9MTLdevicecPU14MTLthreadgroupcDv3_jtt"
+        }
+      ],
+      "kind": "q8_0",
+      "normalized_text_equal": true,
+      "ordinary_sha256": "88765133852e9f2987d33447a6cc90688983cfe8a11be5fd0f02734cd206e713",
+      "state": "matched",
+      "symbols": [
+        "kernel_mul_mv_q8_0_f32",
+        "kernel_mul_mv_q8_0_f32_interleaved"
+      ]
+    }
+  ],
+  "parsed_functions": 266,
+  "performance_claim": null,
+  "reference_function_changes": [
+    {
+      "state": "missing",
+      "symbol": "_GLOBAL__sub_I_tokenomics_metal_reference_mul_mv.metal"
+    }
+  ],
+  "reference_functions": 262,
+  "reference_ir_sha256": "05e59842140608d224d856ae8e0d8647fdd52a92debe949fd99f96041e709f60",
+  "reference_scope": "separate_original_module",
+  "reference_source_sha256": "82b8b250cfb90de1c0edbf519c0f445e52d58facc9a3dd7a08726810010cc15d",
+  "shader_source_sha256": "bfde18aac2f2b40fad372d57215586e71d2aa9acd510b95a3a1890a56a17f3de",
+  "state": "diagnostic_incomplete_or_different",
+  "run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43820057752"
+}

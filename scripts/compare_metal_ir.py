@@ -129,13 +129,21 @@ def compare_ir(module, reference_module=None):
         else attributes
     )
     reference_changes = []
+    initializer_renames = {}
+    original_initializers = [s for s in reference if s.startswith("_GLOBAL__sub_I_")]
+    modified_initializers = [s for s in definitions if s.startswith("_GLOBAL__sub_I_")]
+    if len(original_initializers) == len(modified_initializers) == 1:
+        original, modified = original_initializers[0], modified_initializers[0]
+        if original != modified and original not in definitions:
+            initializer_renames[original] = modified
     if reference_module is not None:
         for symbol, body in reference.items():
-            if symbol not in definitions:
+            candidate_symbol = initializer_renames.get(symbol, symbol)
+            if candidate_symbol not in definitions:
                 reference_changes.append({"symbol": symbol, "state": "missing"})
                 continue
             original = normalize(body, reference_attributes)
-            modified = normalize(definitions[symbol], attributes)
+            modified = normalize(definitions[candidate_symbol], attributes)
             if original != modified:
                 reference_changes.append(
                     {
@@ -242,6 +250,7 @@ def compare_ir(module, reference_module=None):
             not reference_changes if reference_module is not None else None
         ),
         "reference_function_changes": reference_changes,
+        "module_initializer_renames": initializer_renames,
         "gpu_execution": False,
         "performance_claim": None,
         "normalization": "Invert grid-coordinate extracts or cancel an exact (1,0,2) shuffle on candidate; reject other whole-grid uses; rename SSA/labels and kernel symbol; resolve attribute groups; ignore metadata attachments and whitespace.",

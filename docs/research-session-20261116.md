@@ -669,3 +669,11 @@ unit tests pass, including identical call sites whose helper body changes.
 The original source prefix is checked locally to contain the complete pinned
 kernel body and no added wrapper. This remains a textual compiler diagnostic;
 metadata, later specialization and actual GPU behavior remain outside its proof.
+
+The first separate-module run matches the four target wrappers and all reachable
+arithmetic helper bodies. Of262 original functions,261 match; the remaining
+compiler initializer is named from its source filename. Retained that incomplete
+report. Added a unique-initializer name mapping that still compares its entire
+body, rather than ignoring it. Six tests pass, including changed initializer
+math and ambiguous extra initializer rejection.
+[First separate-module report](../results/verification/metal-ir-20261116/separate-module-diagnostic.json).
