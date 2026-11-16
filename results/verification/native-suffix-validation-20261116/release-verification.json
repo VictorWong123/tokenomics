@@ -1,0 +1,18 @@
+{
+  "binary_sha256": "2e230255cacc36e8fd269ba80636638619e96907db28a2b2a2d71a0295f6f34f",
+  "cases": 24,
+  "frozen_validation_sha256": "ad701bb1243755d040199b2c06ea22135ea68eec3d918d5becc951e49a516e84",
+  "limitation": "Actual production C++ proposals replayed against archived canonical IDs. This validates proposal work counts, not alternate-path target arithmetic or throughput.",
+  "model_inference_executed": false,
+  "payload_sha256": {
+    "jobs.jsonl": "f7e71d8a44bb06b2e827172c709f6d939a0d1921cb30ea901fa0d6c429e640a5",
+    "native.jsonl": "c955b2b6c77fdf14b0ca06c113f76cdb3bd26e7cffe4e2af1ddc8d1b087136dd",
+    "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "schema_version": 1,
+  "source": {
+    "owned_source_sha256": "d827f2e948e6ea68506bc6888812e3e643c6d1674f624d8b05946dfbcba66209",
+    "revision": "6ca4f391f06ffcd951c3787240835b2a58930926"
+  },
+  "state": "native_suffix_validation_replay_passed"
+}

@@ -179,3 +179,25 @@ Reproduce this fixed comparison without inference:
 This uses existing development validation only. It leaves the reserved90-prompt
 held-out set untouched and assumes alternate proposal paths retain canonical
 target outputs. The local trained exactness gate must test that assumption.
+
+## Native replay of archived validation IDs
+
+The production C++ retrieval function also reproduces all24 frozen validation
+prompt/cap cells across both historical platforms. This checks that the Python
+counterfactual counts match the code actually used for proposals. It loads no
+GGUF weights, and the canonical target IDs serve as the simulated verifier.
+This still cannot establish target-model batch invariance or throughput.
+
+```bash
+.venv/bin/cmake --build build-cpu --target test_suffix_replay -j2
+.venv/bin/python scripts/check_suffix_replay.py \
+  --binary build-cpu/test_suffix_replay \
+  --out results/local/native-suffix-validation-01
+```
+
+On the Mac, use the same helper target from `build-metal` instead. The helper
+links only the production retrieval/core code and does not initialize Metal or
+run a model. The script re-audits the archived validation payloads and compares
+all counts with the already frozen validation report. It preserves input jobs,
+native outputs, binary identity and hashes. A deliberately incorrect expected
+acceptance count is rejected by the native helper.

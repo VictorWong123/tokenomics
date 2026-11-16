@@ -1,0 +1,29 @@
+{
+  "caps": [
+    64,
+    128
+  ],
+  "cases": 24,
+  "corrupt_expected_count_test": "rejected",
+  "development_validation_prompts_per_point": 6,
+  "limitation": "C++ proposal retrieval and simulated canonical verification only. No target forward pass or validation of alternate-path target arithmetic.",
+  "metal_executed": false,
+  "model_inference_executed": false,
+  "operating_points": 2,
+  "owned_files_sha256": {
+    "CMakeLists.txt": "38ee0c25aa52042c5ea6a177c9f1a1beefacc9754eebf39a3f4082158474c209",
+    "scripts/check_suffix_replay.py": "777f84982747a18ca4f9918ea7e4447490766fb20d7c916e9064dc26c68097df",
+    "src/suffix.cpp": "7c104289e2b26c1a74cfb7b2980ddf437e3c9397a89c59c4e066bfb5067c21a0",
+    "src/suffix.h": "2ff6be0526af4df72fd9e22b6a3f40a215543b79e9e1dfa55234c2ed80860fe6",
+    "tests/test_suffix_native_replay.py": "0ffe740c6362332c265e7f0825a056e8ddd977899c57a249a5cb407e1ef17950",
+    "tests/test_suffix_replay.cpp": "cb2bbad22dacc01f85a089317e1ca51561587d8c0829d2ec6d7f9bce65154d9e"
+  },
+  "release_and_sanitizer_outputs_bitwise_equal": true,
+  "sanitizers": "address,undefined; ASAN_OPTIONS=detect_leaks=1",
+  "source": {
+    "owned_source_sha256": "d827f2e948e6ea68506bc6888812e3e643c6d1674f624d8b05946dfbcba66209",
+    "revision": "6ca4f391f06ffcd951c3787240835b2a58930926"
+  },
+  "speed_claim": null,
+  "state": "native_production_suffix_counts_verified"
+}

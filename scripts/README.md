@@ -100,3 +100,7 @@ zero-temperature filter while preserving upstream greedy verification.
 guarded reference. `test_greedy_equivalence` checks the upstream selection rule;
 its optional `--bench` mode measures synthetic host candidate/sampler cost.
 See [profile scope and local commands](../docs/greedy-sampler.md).
+
+`check_suffix_replay.py` executes the production C++ suffix function on archived
+canonical validation IDs, using the optional `test_suffix_replay` target. It
+loads no model and checks the native counts against the frozen Python replay.

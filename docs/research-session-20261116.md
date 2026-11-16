@@ -342,3 +342,21 @@ OFF. [Retained evidence](../results/verification/greedy-sampler-local-20261116/s
 includes raw component trials, a complete hashed synthetic cross-profile gate,
 source/binary identities and original/candidate compilation settings. The
 reserved held-out set remains untouched.
+
+### Native proposal replay on archived target IDs
+
+Added `test_suffix_replay`, an optional helper linked to the actual production
+suffix function, plus a source/identity-checking driver. Native C++ reproduces
+all24 frozen validation prompt/cap cells across M3 and Linux canonical outputs.
+The helper only sees committed prefix IDs when retrieving proposals; the
+canonical future is used by the simulated verifier. No weights or target model
+execution occurs. This closes the gap between Python proposal-count replay and
+the deployed retrieval implementation, while preserving the stated assumption
+that alternate target execution paths must still pass a trained exactness gate.
+
+Native replay passes in Release and address/undefined sanitizer builds with
+leak detection; their24 output records are byte-identical. An automated test
+also confirms that an incorrect expected acceptance count fails. The driver
+freezes executable/source identity and refuses mutation during checking.
+[Evidence](../results/verification/native-suffix-validation-20261116/summary.json)
+includes canonical input IDs, native results, binary identities and hashes.
