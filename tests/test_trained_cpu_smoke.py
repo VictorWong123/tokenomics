@@ -9,7 +9,30 @@ import unittest
 from unittest.mock import patch
 
 from bench.common import ROOT, sha256, write_jsonl
-from scripts.trained_cpu_smoke import smoke
+from scripts.trained_cpu_smoke import MODEL_PINS, smoke
+
+
+class TrainedModelIdentityTests(unittest.TestCase):
+    def test_second_model_is_pinned_and_wrong_weights_fail_closed(self):
+        self.assertEqual(len(MODEL_PINS["qwen25-15"]["sha256"]), 64)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            model = root / "wrong.gguf"
+            model.write_bytes(b"not the pinned 1.5B weights")
+            args = SimpleNamespace(
+                reference=model,
+                candidate=model,
+                model=model,
+                model_id="qwen25-15",
+                out=root / "failed",
+            )
+            with self.assertRaisesRegex(ValueError, "pinned qwen25-15"):
+                smoke(args)
+            manifest = json.loads((args.out / "manifest.json").read_text())
+            self.assertFalse(manifest["synthetic_fixture"])
+            self.assertEqual(manifest["model_id"], "qwen25-15")
+            self.assertEqual(manifest["model_pin"], MODEL_PINS["qwen25-15"])
+            self.assertFalse((args.out / "complete.json").exists())
 
 
 @unittest.skipUnless(

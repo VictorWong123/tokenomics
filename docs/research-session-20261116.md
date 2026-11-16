@@ -927,3 +927,13 @@ header: 28 layers, hidden width 1536, FFN 8960, 12 query/2 KV heads and Q6_K
 output projection. The header confirms that the Q8-specific prototype does not
 optimize this model's output projection. Full weights were not downloaded or
 SHA-verified by that metadata job. The receipt explicitly records this limit.
+
+### 10:25 UTC — bounded 1.5B CPU correctness coverage
+
+The learned CPU smoke now accepts either pinned 0.5B or 1.5B weights. Model ID,
+full SHA and lock entry travel with each receipt. Synthetic override runs remain
+explicitly synthetic, and an incorrect 1.5B file fails before inference. A
+45-minute standard public runner cap bounds this larger-model check. It uses
+the same four development prompts, tiny budgets and KV boundaries; reserved
+held-out prompts remain untouched. This checks output/work equivalence between
+the guarded and existing no-temperature sampler, not performance.

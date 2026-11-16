@@ -15,8 +15,12 @@ from bench.common import (
     sha256,
     source_fingerprint,
 )
-from scripts.check_metal_profile import GREEDY_MARKER, MODEL_SHA256
+from scripts.check_metal_profile import GREEDY_MARKER
 from scripts.check_models import check_cycles, compare, execute
+
+MODEL_PINS = json.loads((ROOT / "configs/metal-model-header-pins-v1.json").read_text())[
+    "models"
+]
 
 WORK = ("cycles", "drafted", "accepted", "verified_rows", "synced_tokens")
 
@@ -40,12 +44,19 @@ def variants():
     }
 
 
-def smoke(args, *, expected_sha=MODEL_SHA256):
+def smoke(args, *, expected_sha=None):
+    model_id = getattr(args, "model_id", "qwen25-05")
+    if model_id not in MODEL_PINS:
+        raise ValueError("Unsupported pinned model ID")
+    synthetic_fixture = expected_sha is not None
+    expected_sha = expected_sha or MODEL_PINS[model_id]["sha256"]
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=False)
     report = {
         "purpose": "Trained CPU exact-output and work-count smoke; no M3 or speed claim",
-        "synthetic_fixture": expected_sha != MODEL_SHA256,
+        "synthetic_fixture": synthetic_fixture,
+        "model_id": model_id,
+        "model_pin": MODEL_PINS[model_id],
         "source": source_fingerprint(),
         "hardware": hardware(),
         "model_sha256": sha256(args.model),
@@ -60,7 +71,7 @@ def smoke(args, *, expected_sha=MODEL_SHA256):
     }
     atomic_json(out / "manifest.json", report)
     if report["model_sha256"] != expected_sha:
-        raise ValueError("Expected the pinned Qwen0.5B model")
+        raise ValueError(f"Expected the pinned {model_id} model")
     settings = SimpleNamespace(
         binary=args.reference,
         target=args.model,
@@ -204,6 +215,8 @@ def smoke(args, *, expected_sha=MODEL_SHA256):
             "totals": totals,
             "performance_claim": None,
             "synthetic_fixture": report["synthetic_fixture"],
+            "model_id": model_id,
+            "model_sha256": report["model_sha256"],
         }
         atomic_json(out / "status.json", status)
         names = ["manifest.json", "status.json", "correctness.jsonl"] + [
@@ -239,6 +252,7 @@ def main():
     parser.add_argument("--reference", type=Path, required=True)
     parser.add_argument("--candidate", type=Path, required=True)
     parser.add_argument("--model", type=Path, required=True)
+    parser.add_argument("--model-id", choices=tuple(MODEL_PINS), default="qwen25-05")
     parser.add_argument("--out", type=Path, required=True)
     smoke(parser.parse_args())
 

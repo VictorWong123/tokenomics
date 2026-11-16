@@ -17,6 +17,11 @@ on:
         type: choice
         options: [ubuntu-24.04, macos-15]
         default: ubuntu-24.04
+      trained_model:
+        description: Pinned public model for CPU correctness
+        type: choice
+        options: [qwen25-05, qwen25-15]
+        default: qwen25-05
       metadata_model:
         description: Pinned public model header to inspect
         type: choice
@@ -108,7 +113,9 @@ jobs:
       github.ref == 'refs/heads/research/speculative-throughput-20261116' &&
       !github.event.repository.private
     runs-on: ${{ inputs.trained_runner || 'ubuntu-24.04' }}
-    timeout-minutes: 30
+    timeout-minutes: 45
+    env:
+      TOKENOMICS_TRAINED_MODEL: ${{ inputs.trained_model || 'qwen25-05' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -148,13 +155,14 @@ jobs:
           TOKENOMICS_GREEDY_BINARY: ${{ github.workspace }}/results/local/trained-cpu/binaries/greedy
         run: .venv/bin/python -m unittest discover -s tests -p test_trained_cpu_smoke.py
       - name: Download and verify pinned public model
-        run: .venv/bin/python scripts/download_models.py --model qwen25-05 --lock configs/metal-model-header-pins-v1.json --directory models
+        run: .venv/bin/python scripts/download_models.py --model "$TOKENOMICS_TRAINED_MODEL" --lock configs/metal-model-header-pins-v1.json --directory models
       - name: Compare trained CPU outputs and logical work
         run: |
+          TOKENOMICS_MODEL_PATH="$(.venv/bin/python -c 'import json,os; from pathlib import Path; pins=json.loads(Path("configs/metal-model-header-pins-v1.json").read_text())["models"]; print("models/"+pins[os.environ["TOKENOMICS_TRAINED_MODEL"]]["file"])')"
           .venv/bin/python scripts/trained_cpu_smoke.py \
             --reference results/local/trained-cpu/binaries/guarded \
             --candidate results/local/trained-cpu/binaries/greedy \
-            --model models/qwen2.5-0.5b-instruct-q4_k_m.gguf \
+            --model "$TOKENOMICS_MODEL_PATH" --model-id "$TOKENOMICS_TRAINED_MODEL" \
             --out results/local/trained-cpu/smoke
       - name: Retain correctness payload without weights or executables
         if: always()
