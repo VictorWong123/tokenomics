@@ -1031,3 +1031,19 @@ An opt-in CPU diagnostic records ordinary top64 ranks and checks that its
 read-only observer preserves IDs/stops. Its stable-tie fixture passes. Collection
 uses only public development-fit prompts and retains compact numeric data and
 hash receipts in logs; no private context or weights are published.
+
+### 11:00 UTC — causal target-rank copying produces useful CPU fit points
+
+Runs43852465291/43852470240 collect192 top64 rows apiece for pinned0.5B/1.5B,
+with exact observer/ordinary output checks. Replay checkpointa26ba9f passes
+118044 independent selection cases and125 Python tests before reading fit
+results. Both complete36-cell guided grids and12 controls are retained with
+14041 computed cycles and sealed numeric data.
+
+On0.5B, minimum-three/top64/no-fallback at cap8 has133 cycles/3 wasted rows
+versus ngram's133/25. Its cap4 point has144 cycles/zero waste versus the raw
+minimum-five/cap1's161/zero. On1.5B the same conservative cap4 point has141/13
+versus ngram's141/40. Ranking cost and query shapes are not included in these
+work comparisons, and no runtime winner is deployed. The CPU0.5B QA trajectory
+differs from archived M3 while code/summary agree; no Metal rank or speed claim
+follows from this replay.

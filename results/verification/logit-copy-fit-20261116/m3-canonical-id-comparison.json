@@ -1,0 +1,22 @@
+{
+  "scope": "Only three development-fit64-token trajectories; greedy IDs only, not full target logits or rank equivalence",
+  "checks": [
+    {
+      "prompt_id": "development-qa-01",
+      "prompt_ids_equal": true,
+      "canonical_token_ids_equal": false
+    },
+    {
+      "prompt_id": "development-summary-01",
+      "prompt_ids_equal": true,
+      "canonical_token_ids_equal": true
+    },
+    {
+      "prompt_id": "development-code-01",
+      "prompt_ids_equal": true,
+      "canonical_token_ids_equal": true
+    }
+  ],
+  "top64_agreement_tested": false,
+  "m3_speed_claim": null
+}

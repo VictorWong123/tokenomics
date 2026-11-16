@@ -1,0 +1,29 @@
+{
+  "binary_sha256": "0ece340c583aa4ea0c33579cf820b9856504b728328527d1e19c6e084babbb57",
+  "complete_sha256": "3d5f58b7dd2ffcd2f625378b4cbdc395759398339b85f4ba3a6e0d492f842c12",
+  "model_id": "qwen25-15",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "payload_sha256": {
+    "collector.log": "bf11bcb331151e37c930527f2b0b393d431ba824fb0896c7d86abdc338c32500",
+    "data.jsonl": "cd192170db5e0d441327395300d39eb889ae35c419f55598d176475048f38f11",
+    "jobs.jsonl": "4bf68418db8066a7397e0c11727f161b02af2b7efb39b48943ce33912bd63071",
+    "manifest.json": "623679138247631d7c278922a486eca377e91f76f812993141f7c7f77e107c6e",
+    "status.json": "a55ce0f0d2bbfa07cebd2604a7708a5d77aa1346dce622cbb98bccb365b64c0e"
+  },
+  "performance_claim": null,
+  "platform": {
+    "machine": "x86_64",
+    "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39"
+  },
+  "protocol_sha256": "028018e39653338e2454c6d3a7e61ad01fabd314afed6cf5ee4d972b637f1cec",
+  "purpose": "Canonical CPU target rankings for exploratory work replay; no speed claim",
+  "ranking_rows": 192,
+  "requests": 3,
+  "scope": "Three development-fit prompts only; no validation or held-out data",
+  "source": {
+    "owned_source_sha256": "48490cb6a378c2bd038c53220f2db903e89db132feefc7d074de1498ad37bb1e",
+    "revision": "3218ceb7dd507bef409daaa34506f100b8118468"
+  },
+  "state": "passed",
+  "synthetic_fixture": false
+}

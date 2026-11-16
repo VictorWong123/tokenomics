@@ -61,3 +61,34 @@ hash against the public workflow receipt. Its local import receipt explicitly
 states that original stdout/jobs/manifest files were not independently downloaded;
 their original hashes remain available. Numeric data, provenance and a new local
 seal are retained separately. This is more limited than a full artifact audit.
+
+## Completed CPU fit
+
+Both pinned models produce192 canonical output tokens across the three fit
+prompts. Each collection verifies observer/ordinary IDs and stops, full model
+SHA, and192 stable top64 rows. Imported numeric data match the sealed workflow
+hashes. Each model's36 guided cells plus12 controls are retained with144
+per-prompt records; there are14041 computed cycle/proposal records across both.
+These are independently recorded Linux CPU operating points, not M3 data.
+
+| CPU model / strategy | Cap | Cycles | Wasted verification rows |
+|---|---:|---:|---:|
+|0.5B upstream ngram3 |8|133|25|
+|0.5B raw minimum-three suffix |8|133|27|
+|0.5B guided minimum-three, top64, no fallback |8|133|3|
+|0.5B raw minimum-five suffix |1|161|0|
+|0.5B guided minimum-three, top64, no fallback |4|144|0|
+|1.5B upstream ngram3 |4|141|40|
+|1.5B guided minimum-three, top64, no fallback |4|141|13|
+|1.5B guided minimum-one, top64, no fallback |4|128|28|
+
+The conservative guided points reduce wasted rows at equal cycle counts; more
+aggressive points can change both. Computing rank membership is extra work that
+plain copying does not incur. Query-size histograms remain necessary: fewer
+rows or cycles do not establish lower elapsed time. The full grid/frontier,
+including aliases, is retained, with no runtime deployment selected.
+
+The new0.5B CPU canonical IDs match the archived M3 fit on code/summary but
+differ on QA despite matching prompt IDs. Its top64 distributions have not been
+compared with Metal. No cross-hardware rank equivalence or speed transfer is
+claimed. [Evidence and raw numeric data](../results/verification/logit-copy-fit-20261116).
