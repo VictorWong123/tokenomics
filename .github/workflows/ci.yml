@@ -1,7 +1,17 @@
 name: portable-correctness
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: Checks to run
+        type: choice
+        options: [portable, metal-research]
+        default: portable
+permissions:
+  contents: read
 jobs:
   cpu:
+    if: inputs.scope != 'metal-research'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -14,6 +24,7 @@ jobs:
       - run: clang-format --dry-run --Werror src/*.cpp src/*.h tests/*.cpp
       - run: .venv/bin/python scripts/run_all.py --backend cpu --fixtures-only --run-dir results/local/ci
   macos:
+    if: inputs.scope != 'metal-research'
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
@@ -22,3 +33,34 @@ jobs:
         with: {python-version: '3.12'}
       - run: bash scripts/bootstrap.sh metal
       - run: .venv/bin/python scripts/run_all.py --backend metal --fixtures-only --run-dir results/local/ci-metal
+  metal-research:
+    if: >-
+      inputs.scope == 'metal-research' &&
+      github.ref == 'refs/heads/research/speculative-throughput-20261116' &&
+      !github.event.repository.private
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-python@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          python-version: '3.12'
+      - name: Install pinned build dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Compile profiles and check device availability
+        run: .venv/bin/python scripts/hosted_metal_preflight.py --out results/local/hosted-metal
+      - name: Retain explicit diagnostic files
+        if: always()
+        uses: actions/upload-artifact@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          name: hosted-metal-preflight
+          path: |
+            results/local/hosted-metal/*.json
+            results/local/hosted-metal/*.log
+          if-no-files-found: warn
+          retention-days: 7

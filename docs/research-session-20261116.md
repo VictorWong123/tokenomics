@@ -398,3 +398,17 @@ address/undefined sanitizers with leak detection. Default Release passes all
 seven suites in38.50 seconds; five gate tests pass, covering version2 grids and
 legacy version1 receipts.
 [Retained evidence](../results/verification/metal-kv-split-local-20261116/summary.json).
+
+### Standard hosted Apple Silicon compilation
+
+Added an explicitly selected `metal-research` dispatch to the existing portable
+workflow. It is restricted to this research branch and a public repository,
+uses the standard `macos-15` runner (not a larger paid runner), and stops after
+30 minutes. This uses GitHub Actions, not Codespaces. The job installs pinned
+build dependencies, probes `MTLCreateSystemDefaultDevice`, compiles default and
+short-MV profiles, runs native fixture suites and direct backend row checks,
+and retains only explicit JSON/log files for seven days. A missing GPU is
+reported as unavailable; it cannot establish Metal execution correctness.
+Neither hosted M1 execution nor synthetic graphs establish local M3 throughput.
+See [GitHub runner documentation](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
+and [preflight implementation](../scripts/hosted_metal_preflight.py).
