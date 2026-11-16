@@ -63,6 +63,17 @@ def forwarding_module(*, wrong_mask=False, wrong_callee=False, raw_use=False):
 
 
 class MetalIRTests(unittest.TestCase):
+    def test_additional_kernels_are_explicitly_outside_the_comparison(self):
+        reference = forwarding_module()
+        candidate = (
+            reference + "\ndefine void @new_unverified_kernel() {\n  ret void\n}"
+        )
+        result = compare_ir(candidate, reference_module=reference)
+        self.assertEqual(result["state"], "normalized_ir_matches")
+        self.assertEqual(
+            result["uncompared_additional_functions"], ["new_unverified_kernel"]
+        )
+
     def test_forwarding_wrappers_cancel_only_the_exact_grid_swap(self):
         result = compare_ir(forwarding_module())
         self.assertEqual(result["state"], "normalized_ir_matches")

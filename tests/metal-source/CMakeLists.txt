@@ -31,6 +31,12 @@ else()
   include("${root}/cmake/metal-interleave.cmake")
   tokenomics_metal_interleave("${root}")
 endif()
+option(TOKENOMICS_SOURCE_Q8_SHARED_PROTOTYPE "Append unselected shared-Q8 prototype for compiler diagnostics" OFF)
+if(TOKENOMICS_SOURCE_Q8_SHARED_PROTOTYPE)
+  tokenomics_read_source("${root}/src/metal_q8_shared.metal.inc" shared_prototype)
+  file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/tokenomics-metal-embed-mul_mv.metal"
+    "\n${shared_prototype}\n")
+endif()
 set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/tokenomics-metal-embed-mul_mv.s"
   PROPERTIES HEADER_FILE_ONLY TRUE)
 # The prefix is the unchanged upstream program, before appended wrappers.

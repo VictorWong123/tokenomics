@@ -232,6 +232,8 @@ def compare_ir(module, reference_module=None):
             except ValueError as exc:
                 row.update({"state": "unsupported_ir_layout", "error": str(exc)})
         pairs.append(row)
+    covered = set(reference) | set(initializer_renames.values())
+    covered.update(p["symbols"][1] for p in pairs if p["symbols"][1] is not None)
     return {
         "state": (
             "normalized_ir_matches"
@@ -239,6 +241,8 @@ def compare_ir(module, reference_module=None):
             else "diagnostic_incomplete_or_different"
         ),
         "pairs": pairs,
+        "comparison_scope": "Original function bodies and the four interleaved wrappers only; additional kernels are not semantically compared",
+        "uncompared_additional_functions": sorted(set(definitions) - covered),
         "parsed_functions": len(definitions),
         "reference_scope": (
             "separate_original_module"
@@ -288,6 +292,20 @@ def main():
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, indent=2) + "\n")
     print("METAL_IR_SUMMARY=" + json.dumps(result, sort_keys=True))
+    definitions = functions(args.ir.read_text())
+    if any("tokenomics_mul_mv_q8_shared_impl" in name for name in definitions):
+        # These are explicit compiler diagnostics for the unselected prototype,
+        # not another equivalence result. Retain exact IR for local inspection.
+        for name, body in definitions.items():
+            if (
+                "tokenomics_mul_mv_q8_shared_impl" in name
+                or "kernel_mul_mv_q8_0_f32_impl" in name
+            ):
+                print("METAL_Q8_FUNCTION=" + json.dumps({"symbol": name, "ir": body}))
+        attributes = dict(
+            re.findall(r"^attributes #(\d+) = (\{[^\n]*\})", args.ir.read_text(), re.M)
+        )
+        print("METAL_Q8_ATTRIBUTES=" + json.dumps(attributes, sort_keys=True))
 
 
 if __name__ == "__main__":

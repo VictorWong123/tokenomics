@@ -1,0 +1,18 @@
+{
+  "contracted": {
+    "binary_sha256": "157c96cf0cf1f9b2bc02f102065a8996b895b2c58fb05c7485f7b76aa47a33af",
+    "cases": 2016,
+    "compared_partials": 3311616,
+    "gpu_execution": false,
+    "scope": "Source-derived scalar per-thread Q8 arithmetic only; Metal reduction helper replaced by a capture stub",
+    "state": "passed"
+  },
+  "strict": {
+    "binary_sha256": "f5e7becf0c49de85cb66485291fbc707e3740aa72b9cd03b9dd3c4a1ab94e9bb",
+    "cases": 2016,
+    "compared_partials": 3311616,
+    "gpu_execution": false,
+    "scope": "Source-derived scalar per-thread Q8 arithmetic only; Metal reduction helper replaced by a capture stub",
+    "state": "passed"
+  }
+}

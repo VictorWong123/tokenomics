@@ -1,0 +1,8 @@
+{
+  "correct_binary_restored_exactly": true,
+  "correct_source_sha256": "42ecef715b03c5b970c527a78215be7e477028cdd7e9b691380ea6f206a8e784",
+  "exit_code": 1,
+  "expected_rejection": true,
+  "log_utf8": "partial mismatch width=32 outputs=2 rows=2 nsg=1 family=0 padding=0 index=0 original=-1.09733e-05 shared=-1.10504e-05\nQ8 per-thread arithmetic differs\n",
+  "mutation": "Add one to the candidate integer weight conversion only; original reference source remains unchanged."
+}

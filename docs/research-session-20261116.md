@@ -782,3 +782,27 @@ embedded shader hash. Restoring the source and building again restores the
 generated shader byte-for-byte. The upstream submodule remains untouched.
 All7 default suites pass in43.56 seconds and both Metal host suites pass.
 [Probe evidence](../results/verification/source-regeneration-20261116/summary.json).
+
+### Shared-load Q8 arithmetic prototype
+
+Added an unselected shader prototype that shares integer weight loads and
+conversions across two query accumulators, preserving the original Q8
+eight-value accumulation and subsequent block-scale placement. It retains the
+pinned reduction helper and a uniform barrier before scratch reuse. No main
+runtime flag or dispatch selects this prototype yet.
+
+The host test compiles the actual candidate source and the original function
+extracted from the clean pinned shader. A capture stub replaces only the final
+Metal reduction, exposing per-thread partial sums. Each of strict and native
+FMA-contracted Release/ASAN variants passes2016 cases/3311616 exact partial sums,
+covering row counts2–9, widths32–4864, three SIMD-group counts, padded strides,
+zero/extreme half scales, cancellation and tiny activations. This does not
+emulate Metal reduction or synchronization. A one-unit weight-conversion mutant
+is rejected; the source and correct executable are restored byte-for-byte.
+[Evidence](../results/verification/q8-shared-partials-20261116/summary.json).
+
+The bounded compiler diagnostic now appends the unselected prototype, tests the
+source-derived partials on native Apple ARM CPU, and retains its compiler IR.
+The original/interleaved IR comparison explicitly lists additional functions
+outside its semantic comparison. This avoids presenting successful compilation
+of a new kernel as proof of its GPU arithmetic. [Prototype notes](metal-q8-shared-prototype.md).

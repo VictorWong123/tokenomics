@@ -1,0 +1,21 @@
+{
+  "cases_per_variant": 2016,
+  "compared_partials_per_variant": 3311616,
+  "gpu_execution": false,
+  "host_check_source_sha256": "312dfb86327bf5ca642d4d367cd3f33b1d340ffd84c7dc34b07978a55c1790c1",
+  "limitation": "Actual shader loop sources compiled as scalar C++; Metal SIMD reduction replaced with per-lane capture and synchronization with a call counter. Does not prove Metal compiler arithmetic, GPU memory/synchronization safety or trained-token agreement.",
+  "native_contracted_binary_contains_fma": true,
+  "negative_control_rejected": true,
+  "performance_claim": null,
+  "production_dispatch_selected": false,
+  "reference_source_sha256": "c587c6ddc1b2467a1d5f9391adc4b517c7820a1d37b51f4d5a8da897b3874199",
+  "shader_source_sha256": "42ecef715b03c5b970c527a78215be7e477028cdd7e9b691380ea6f206a8e784",
+  "state": "passed",
+  "upstream_pin": "fd27b2034905f8dadd8bd6d2cc44595f4929d391",
+  "variants": [
+    "Release strict",
+    "Release native FMA contraction",
+    "Debug ASAN/UBSAN strict",
+    "Debug ASAN/UBSAN native FMA contraction"
+  ]
+}
