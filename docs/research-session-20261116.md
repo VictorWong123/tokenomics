@@ -544,3 +544,20 @@ explicitly reports GPU graph execution unavailable due to missing simdgroup
 reduction. This result belongs to source91f9a56 and does not establish the
 subsequent four-type expansion's native compilation.
 [Initial native receipt](../results/verification/hosted-metal-20261116/interleaved-initial-native.json).
+
+### Bounded real-model CPU smoke on hosted compute
+
+Added a30-minute standard public Ubuntu job to exercise the pinned learned
+weights beyond synthetic fixtures. It builds guarded and greedy-only sampler
+binaries, reusing compiled dependencies while preserving the first executable,
+then verifies the full downloaded model SHA256. The smoke compares160 requests
+across ordinary decoding, ngram/suffix caps1/4/8 and scripted fallback, with
+four development prompts, tiny budgets and two prefix boundaries. It audits
+IDs/stops, cycle accounting, drafter participation and equal logical work across
+sampler profiles. It is not a performance experiment or a Metal execution test.
+Only explicit correctness/configuration files are uploaded; weights and binaries
+are excluded. The actual learned-model result remains pending.
+
+Before dispatch, its orchestration passes160 synthetic comparisons and a
+negative wrong-sampler-profile test in1.72 seconds. The test explicitly labels
+those outputs synthetic. [Smoke contract](trained-cpu-smoke.md).
