@@ -1,0 +1,25 @@
+{
+  "asan_binary_sha256": "2d848df0869d9d43d5ca87448a1dd8d987b3316c292813d99ff54c7858e6b405",
+  "backend_measured": "CPU",
+  "canonical_sampler": "Pinned temp-ext(0) plus greedy; model suppression absent in synthetic probes",
+  "cases": 27,
+  "harness_source_sha256": "d6e18bd17efb0f0115d65197a657a6aa6413e88bb4fe289fc354b607948cfdff",
+  "host_greedy_equivalence_cases_per_build": 384,
+  "metal_execution": false,
+  "metal_source_observation": "Pinned Metal argmax reduces tied partial winners using maximum candidate IDs; this is a source audit, not observed GPU output.",
+  "performance_claim": null,
+  "release_and_sanitizer_results_identical": true,
+  "release_binary_sha256": "6348b8448a14a7ce304cfcc11fa96f68e9bebccded4c1ccdc6c31c6c63b216ca",
+  "runtime_backend_sampling_enabled": false,
+  "selection_mismatches": 24,
+  "source": {
+    "owned_source_sha256": "0002a4b2c2ff4cecddd29e132880903ba8486cd4da1a1c5316d1d286cadf5f05",
+    "revision": "19431d1f3a931f7b7ee18e884d8547b78ab0063c"
+  },
+  "state": "backend_argmax_not_substitutable_unchanged",
+  "vocabulary_sizes": [
+    263,
+    4096,
+    151936
+  ]
+}

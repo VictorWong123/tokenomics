@@ -889,3 +889,26 @@ report success with8 skips in38.783 seconds. Experiment source fingerprints now
 include verification files and nested CMakeLists; changing a gate during a run
 is detected, while older receipts retain their original scope.
 [Coverage and local command](backend-row-coverage.md).
+
+### Backend-sampling substitution check
+
+Audited the pinned experimental backend sampler as a possible way to reduce
+host logit transfer/scanning. Its argmax contract differs from the original
+strict-first host sampler. A direct actual CPU-backend probe reports24/27
+mismatches in both Release and ASAN/UBSAN; the384-case host sampler equivalence
+suite still passes. A finite151936-entry example with equal maxima at IDs0/1
+selects0 in the reference and1 in GGML argmax. The Metal source also reduces
+equal partial winners using maximum IDs, but no GPU result is claimed.
+
+The backend temp-zero step compresses to one candidate/logit through argmax;
+removing it on that path would retain full sampled-logit copying. Thus the host
+no-temp optimization cannot simply be combined with backend sampling. Left
+backend sampling disabled and added an optional model-free semantic probe,
+avoiding any gather from an invalid argmax index. Native preflight now records
+this diagnostic's mismatches explicitly rather than treating completion as
+proof of substitution. [Contract and reproducer](backend-sampling-contract.md).
+
+Extended bounded model-header inspection to select the already-pinned1.5B
+public model. It retains metadata only and uses no Codespaces or model-weight
+artifact upload. This will identify which existing kernel paths matter at that
+larger operating point before extending the local study.

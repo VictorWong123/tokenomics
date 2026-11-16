@@ -17,6 +17,11 @@ on:
         type: choice
         options: [ubuntu-24.04, macos-15]
         default: ubuntu-24.04
+      metadata_model:
+        description: Pinned public model header to inspect
+        type: choice
+        options: [qwen25-05, qwen25-15]
+        default: qwen25-05
 permissions:
   contents: read
 jobs:
@@ -86,7 +91,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Inspect pinned public GGUF header
-        run: python3 scripts/inspect_gguf_header.py --out results/local/model-header/qwen05.json
+        env:
+          TOKENOMICS_METADATA_MODEL: ${{ inputs.metadata_model || 'qwen25-05' }}
+        run: python3 scripts/inspect_gguf_header.py --model "$TOKENOMICS_METADATA_MODEL" --out results/local/model-header/header.json
       - name: Retain header metadata only
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

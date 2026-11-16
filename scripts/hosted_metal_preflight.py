@@ -151,6 +151,7 @@ def main():
                     "--target",
                     "test_backend_rows",
                     "test_matvec_component",
+                    "test_greedy_equivalence",
                     "-j",
                     "2",
                 ],
@@ -229,6 +230,23 @@ def main():
                 run(
                     "q8-shared-source-arithmetic-test",
                     [sys.prefix + "/bin/ctest", "--test-dir", str(arithmetic), "-V"],
+                )
+                run(
+                    "host-sampler-equivalence",
+                    [str(build / "test_greedy_equivalence")],
+                )
+                run(
+                    "backend-argmax-contract-diagnostic",
+                    [str(build / "test_greedy_equivalence"), "--argmax-probe-cpu"],
+                )
+                # A completed diagnostic is not a successful substitution test.
+                # Retain its observed mismatches explicitly in the main receipt.
+                report["cpu_backend_argmax_contract_probe"] = next(
+                    json.loads(line)
+                    for line in (out / "backend-argmax-contract-diagnostic.log")
+                    .read_text()
+                    .splitlines()
+                    if line.startswith('{"state":"diagnostic_complete"')
                 )
             if report["metal_device"]["available"]:
                 run(
