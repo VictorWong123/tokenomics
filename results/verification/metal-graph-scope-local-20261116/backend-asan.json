@@ -1,0 +1,4 @@
+{
+  "sha256": "9b77217cc944c0416b20f0a3b7a55c0fda94dd2bb72b83b4942d54979a9b5e11",
+  "stdout_utf8": "backend=CPU\n48 masked softmax cases; 1053696 bitwise comparisons passed\n500 backend matrix cases; 1364480 bitwise row comparisons passed\n"
+}

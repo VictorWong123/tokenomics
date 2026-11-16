@@ -577,3 +577,46 @@ short-MV/interleaving candidate rather than claiming an isolated cache effect.
 Eight gate/analysis tests pass in11.42 seconds, covering original, retrieval and
 interleaved retrieval fixture grids plus tampered-output rejection. Those tests
 remain explicitly CPU orchestration evidence.
+
+### Learned-model CPU result
+
+[The pinned learned-model CPU job](https://github.com/VictorWong123/tokenomics/actions/runs/43811081794)
+passes all160 output comparisons and equal-work checks across sampler profiles,
+with accepted proposals for both ngram and suffix drafters. It verifies the full
+model SHA256 before execution. Across348 canonical smoke tokens, suffix4 uses
+296 cycles/353 verified rows versus ngram8's284/422. These totals include tiny
+budgets and artificial prefix boundaries; they are correctness/work evidence,
+not a workload latency estimate or an M3 result. The printed aggregate summary
+is retained; complete raw files remain in the Actions artifact.
+[Retained summary](../results/verification/hosted-metal-20261116/trained-cpu-summary.json).
+
+### Restrict short-MV to verification graphs
+
+The previous shape-only selector could change short-prefill arithmetic before
+speculation began. The owned context now marks only causal, offloaded,
+single-sequence graphs with2–9 tokens and outputs for every row. It uses a
+reserved high tensor flag bit on MUL_MAT/SOFT_MAX nodes, before scheduling.
+Pinned allocator/Metal code tests named low bits; backend tensor copies retain
+flags. A static assertion excludes all named flag bits. Graph reuse checks
+output count, so verification and one-output prefill shapes remain distinct.
+No global/thread-local execution mode or additional synchronization is added.
+
+Only marked operations select short-MV/interleaving and ordinary-row softmax
+geometry. Unmarked prefills/catch-up retain original selectors, including
+short tails of long prompts. Host tests check both tagged verification and
+untagged upstream decisions while preserving original flag bits. The default
+single-row context copy remains byte-identical to its earlier integration.
+
+The actual generated context executes68 prefix/rollback cases per synthetic
+model, including all seven short-prefill shapes. A scheduler metadata callback
+observes2772 tagged and13335 untagged nodes with no scope leaking into prefill or
+ordinary graphs. Periodic and random Q4_K fixtures each pass169252 bitwise logit
+comparisons in Release and address/undefined sanitizers with leak checking.
+This establishes scope propagation on CPU; full M3 graph exactness remains a
+separate gate. [Scope evidence](../results/verification/metal-graph-scope-local-20261116/summary.json).
+
+Default Release remains7/7 suites passed in41.60 seconds. The direct backend
+harness also adds the target's14-query/2-KV-head broadcast ratio at five
+attention widths. All500 matrix cases/1364480 values and48 masked-softmax
+cases/1053696 values pass bitwise on CPU in Release and sanitizers. Native
+compilation of the new graph-scoped candidate is the next separate check.

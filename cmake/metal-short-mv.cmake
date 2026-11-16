@@ -47,7 +47,7 @@ function(tokenomics_metal_short_mv root)
         message(FATAL_ERROR "Pinned Metal softmax thread selection changed")
       endif()
       string(REPLACE "nth*ne01*ne02*ne03 < 256"
-        "nth*(ne01 <= 9 ? 1 : ne01)*ne02*ne03 < 256" softmax_replacement "${softmax_anchor}")
+        "nth*(tokenomics::metal_verification_graph_op(op) && ne01 <= 9 ? 1 : ne01)*ne02*ne03 < 256" softmax_replacement "${softmax_anchor}")
       string(REPLACE "${softmax_anchor}" "${softmax_replacement}" source "${source}")
     endif()
     set(generated "${CMAKE_CURRENT_BINARY_DIR}/tokenomics-metal-${unit}.cpp")

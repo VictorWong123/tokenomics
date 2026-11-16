@@ -3,6 +3,9 @@
 #include "ggml-backend.h"
 #include "ggml-cpu.h"
 #include "ggml.h"
+#ifdef TOKENOMICS_METAL_SHORT_MV
+#include "../src/metal_verification_graph.h"
+#endif
 #ifdef TOKENOMICS_HAS_METAL
 #include "ggml-metal.h"
 #endif
@@ -30,6 +33,9 @@ static int run_case(ggml_backend_t backend, ggml_type type, int width, int rows,
     auto *weights = ggml_new_tensor_3d(ctx.get(), type, width, outputs, weight_heads);
     auto *input = ggml_new_tensor_3d(ctx.get(), GGML_TYPE_F32, width, rows, heads);
     auto *batched = ggml_mul_mat(ctx.get(), weights, input);
+#ifdef TOKENOMICS_METAL_SHORT_MV
+    batched->flags |= tokenomics::metal_verification_graph_flag;
+#endif
     auto *graph = ggml_new_graph_custom(ctx.get(), 1024, false);
     ggml_build_forward_expand(graph, batched);
     std::vector<ggml_tensor *> singles, results;
@@ -107,6 +113,9 @@ static int run_softmax(ggml_backend_t backend, int width, int rows, int heads) {
     auto *input = ggml_new_tensor_3d(ctx.get(), GGML_TYPE_F32, width, rows, heads);
     auto *mask = ggml_new_tensor_2d(ctx.get(), GGML_TYPE_F32, width, rows);
     auto *batch = ggml_soft_max_ext(ctx.get(), input, mask, 0.125f, 0.0f);
+#ifdef TOKENOMICS_METAL_SHORT_MV
+    batch->flags |= tokenomics::metal_verification_graph_flag;
+#endif
     auto *graph = ggml_new_graph_custom(ctx.get(), 1024, false);
     ggml_build_forward_expand(graph, batch);
     std::vector<ggml_tensor *> inputs, masks, results;
@@ -206,6 +215,14 @@ int main(int argc, char **argv) {
                             ++cases;
                         }
                     }
+        // Actual Qwen0.5B grouped-query attention has 14 query heads and
+        // 2 KV heads: exercise the odd broadcast ratio, including KV widths.
+        for (auto type : {GGML_TYPE_F32, GGML_TYPE_F16})
+            for (int width : {64, 256, 512, 768, 2048})
+                for (int rows : {2, 3, 5, 7, 9}) {
+                    values += run_case(backend.get(), type, width, rows, 14, 2);
+                    ++cases;
+                }
         int softmax_cases = 0, softmax_values = 0;
         for (int width : {256, 512, 768, 2048})
             for (int rows : {2, 3, 9})

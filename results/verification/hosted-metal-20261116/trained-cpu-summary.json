@@ -1,0 +1,128 @@
+{
+  "checked_comparisons": 160,
+  "performance_claim": null,
+  "same_work_between_sampler_profiles": true,
+  "state": "passed",
+  "synthetic_fixture": false,
+  "totals": {
+    "greedy": {
+      "ngram1": {
+        "accepted": 36,
+        "cycles": 312,
+        "drafted": 48,
+        "synced_tokens": 0,
+        "verified_rows": 360
+      },
+      "ngram4": {
+        "accepted": 57,
+        "cycles": 291,
+        "drafted": 103,
+        "synced_tokens": 0,
+        "verified_rows": 394
+      },
+      "ngram8": {
+        "accepted": 64,
+        "cycles": 284,
+        "drafted": 138,
+        "synced_tokens": 0,
+        "verified_rows": 422
+      },
+      "script-ngram": {
+        "accepted": 53,
+        "cycles": 295,
+        "drafted": 89,
+        "synced_tokens": 0,
+        "verified_rows": 384
+      },
+      "suffix1": {
+        "accepted": 32,
+        "cycles": 316,
+        "drafted": 35,
+        "synced_tokens": 0,
+        "verified_rows": 351
+      },
+      "suffix4": {
+        "accepted": 52,
+        "cycles": 296,
+        "drafted": 57,
+        "synced_tokens": 0,
+        "verified_rows": 353
+      },
+      "suffix8": {
+        "accepted": 57,
+        "cycles": 291,
+        "drafted": 70,
+        "synced_tokens": 0,
+        "verified_rows": 361
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    },
+    "guarded": {
+      "ngram1": {
+        "accepted": 36,
+        "cycles": 312,
+        "drafted": 48,
+        "synced_tokens": 0,
+        "verified_rows": 360
+      },
+      "ngram4": {
+        "accepted": 57,
+        "cycles": 291,
+        "drafted": 103,
+        "synced_tokens": 0,
+        "verified_rows": 394
+      },
+      "ngram8": {
+        "accepted": 64,
+        "cycles": 284,
+        "drafted": 138,
+        "synced_tokens": 0,
+        "verified_rows": 422
+      },
+      "script-ngram": {
+        "accepted": 53,
+        "cycles": 295,
+        "drafted": 89,
+        "synced_tokens": 0,
+        "verified_rows": 384
+      },
+      "suffix1": {
+        "accepted": 32,
+        "cycles": 316,
+        "drafted": 35,
+        "synced_tokens": 0,
+        "verified_rows": 351
+      },
+      "suffix4": {
+        "accepted": 52,
+        "cycles": 296,
+        "drafted": 57,
+        "synced_tokens": 0,
+        "verified_rows": 353
+      },
+      "suffix8": {
+        "accepted": 57,
+        "cycles": 291,
+        "drafted": 70,
+        "synced_tokens": 0,
+        "verified_rows": 361
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    }
+  },
+  "run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43811081794",
+  "source_commit": "7ec4f66",
+  "scope": "Pinned Qwen0.5B learned model on hosted CPU; no Metal or speed claim"
+}

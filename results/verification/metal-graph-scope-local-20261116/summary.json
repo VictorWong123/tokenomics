@@ -1,0 +1,51 @@
+{
+  "state": "host_and_cpu_scope_checks_passed",
+  "purpose": "Preserve normal prefill selection while marking only verification graphs; not Metal execution or performance",
+  "source_sha256": {
+    "src/metal_verification_graph.h": "f5ac9f8348b2b07ad6fc41f34ecdfd64fb07f2d4e259096ca4a7b1b7e2953578",
+    "src/metal_short_mv.h": "c33bc519e18ce276659dedcfc8ef3b61c23f5b20cd31049b50f3241deb44bc58",
+    "cmake/metal-context.cmake": "c45fe7a1e30530ee0305ad8e761fbd195a35d91b375a699397c2e240ae229af8",
+    "cmake/metal-short-mv.cmake": "8cbbdd7e5c9813651e704699bbfee516a7bea52a3572630ec08e6c62a25b40ef",
+    "tests/test_metal_dispatch.cpp": "332f0f5d1f84e0a59b60bbb8c4c22601f03c016bd0e92c3c090dc692b28a71ab",
+    "tests/test_metal_context_cpu.cpp": "3c212988523e4466cd8c85819e7a7aac135a32d29409fba7b0847e59ef80a1db",
+    "tests/test_backend_rows.cpp": "6b3ec22117ec261c620cc12a7437c153c12f5acb62317da30b9be4f27dde68c1",
+    "CMakeLists.txt": "2be5dc8ad086f650c79de20583173eeece4e2beffac7c4826526948b4eb3e947",
+    "src/runtime.cpp": "f899f585d4ea2fec9b3a43ab3d599be37996c6a1b83dc9060809c0bb41bc4a0d"
+  },
+  "reserved_tensor_flag_bit": 30,
+  "flag_collision_assertion": "all named pinned flags excluded",
+  "graph_selection": "causal, offloaded, single sequence, 2..9 tokens, all rows output",
+  "tagged_ops": [
+    "MUL_MAT",
+    "SOFT_MAX"
+  ],
+  "scope_storage": "graph-local tensor flags, set before scheduler allocation; no global or thread-local mode",
+  "reuse_guard": "pinned graph parameter comparison includes n_outputs",
+  "host_dispatch_cases": 448,
+  "default_context_copy": "byte-identical to prior single-row integration",
+  "cases_per_model": 68,
+  "bitwise_logit_comparisons_per_model": 169252,
+  "tagged_nodes_per_model": 2772,
+  "untagged_nodes_per_model": 13335,
+  "prefill_or_single_row_scope_leaks": 0,
+  "release_models": [
+    "periodic synthetic",
+    "random Q4_K synthetic"
+  ],
+  "sanitizer_models": [
+    "periodic synthetic",
+    "random Q4_K synthetic"
+  ],
+  "sanitizers": "address,undefined; detect_leaks=1",
+  "sanitizer_profile_note": "Existing CPU Q4-pair profile ON; context probe does not link runtime sampler. CPU execution only.",
+  "metal_graph_executed": false,
+  "trained_metal_executed": false,
+  "speed_claim": null,
+  "default_ctest_suites": 7,
+  "default_ctest_seconds": 41.6,
+  "matrix_cases": 500,
+  "matrix_bitwise_comparisons": 1364480,
+  "softmax_cases": 48,
+  "softmax_bitwise_comparisons": 1053696,
+  "actual_gqa_coverage": "F32/F16;14 query heads,2 KV heads; widths64/256/512/768/2048; rows2/3/5/7/9"
+}

@@ -25,5 +25,13 @@ weights and executables are excluded. It uses GitHub Actions, not Codespaces.
 
 The local orchestration test passes160 fixture comparisons and confirms that
 passing a guarded executable as the candidate fails its sampler marker check.
-These fixture results do not establish the trained model result; the hosted
-run must finish separately.
+These fixture results are separate from the learned-model result.
+
+The [hosted learned-model run](https://github.com/VictorWong123/tokenomics/actions/runs/43811081794)
+also passes160 comparisons, including nonzero accepted ngram and suffix
+proposals and identical work between sampler profiles. Across its348 canonical
+output tokens, suffix cap4 uses296 cycles/353 verification rows; ngram cap8 uses
+284 cycles/422 rows. These aggregate smoke counts include tiny budgets and
+artificial prefix-boundary cases. They are not a workload performance estimate.
+Only the printed aggregate summary is retained locally; full raw payloads
+remain in the workflow artifact. No Metal graph or M3 speed claim is made.

@@ -1,15 +1,15 @@
 # M3 Metal short-batch experiment
 
-This research-branch experiment is **off by default and not yet validated on a
-Metal device**. The intended machine is the user's Apple M3. Linux compilation
-and CPU fixture checks cannot establish Metal correctness or speed.
+This research-branch experiment is **off by default**. Native Apple C++/shader
+compilation and CPU fixture checks pass; actual Metal graph correctness and
+speed on the user's M3 remain unvalidated.
 
 The existing Metal guard splits verification into one-row microbatches. It
 repaired a Qwen2.5 0.5B divergence on `development-code-03` at output token 47,
 but serializes work that speculative decoding needs to amortize. The opt-in
 `TOKENOMICS_METAL_SHORT_MV=ON` retains batching away from KV-padding boundaries
-and routes two-to-nine-row
-ordinary matrix multiplications through the existing mat-vec dispatcher. Each
+and routes marked two-to-nine-row
+verification matrix multiplications through the existing mat-vec dispatcher. Each
 GPU threadgroup retains the ordinary per-row arithmetic. It also disables
 MMA/MM selection and runtime MMA+ADD fusion for these shapes. The structural
 fusion planner remains shape-independent, as required upstream.
@@ -17,8 +17,9 @@ fusion planner remains shape-independent, as required upstream.
 The integration generates owned copies of `ggml-metal-common.cpp`,
 `ggml-metal-ops.cpp` and `llama-context.cpp`; it does not modify the upstream pin or Metal shaders.
 Ordinary one-row dispatch and batches above nine rows remain upstream paths.
-The selector also affects short prefills and attention matmuls. Attention KV
-padding, other fused operations and the rest of the graph may still cause a
+Verification attention matmuls are included. Prefill/catch-up graphs retain
+upstream selectors, even for short chunks. Attention KV padding, other fused
+operations and the rest of the graph may still cause a
 whole-request mismatch. This is a hypothesis to test, not a proof of batch
 invariance. It shares a graph/launch across rows but does not introduce a fused
 weight-reuse kernel, so it may remain slower than ordinary decoding.
@@ -103,6 +104,8 @@ it with `--metal`. It compares each row of a batched matrix multiplication with
 an independent one-row multiplication using identical weights and activations.
 The grid includes F32/F16/Q4_K/Q6_K/Q5_0/Q8_0, short batches through nine rows, widths
 64–4864 where supported, and both independent and broadcast weight heads.
+Focused F32/F16 cases also cover the actual14-query/2-KV-head broadcast ratio
+at five attention widths. The full grid has500 matrix cases.
 Outputs must be finite, nondegenerate and bitwise identical. A first mismatch
 prints its shape and values and prevents the trained gate/timing stages.
 
@@ -157,14 +160,14 @@ integration.
 The optional Linux `test_metal_context_cpu` target links the generated context
 copy over the pinned context implementation and executes it on a CPU backend.
 It sets the offload flag only to exercise the splitting condition; model weights
-and computation stay on CPU. Across 40 boundary/row-count cases per fixture,
-periodic and Q4_K random transformers each produce 99,560 bitwise-identical
+and computation stay on CPU. Across 68 boundary/prefill/row-count cases per fixture,
+periodic and Q4_K random transformers each produce 169,252 bitwise-identical
 logits against sequential one-row decoding, preserving cache positions and checking rejection rollback/re-entry.
 These are context-lifecycle checks, not Metal arithmetic results.
 
 Coverage version2 also tests short prefills and long-prefill remainders with
-prefix lengths3/4/9/10/515/521/522. These can select different matrix kernels
-before generation starts. The current default context2048 gate has720 requests;
+prefix lengths3/4/9/10/515/521/522. These catch regressions in the graph-scope
+classification that now preserves original prefill dispatch. The current default context2048 gate has720 requests;
 context64 fixture gates have450 and context512 gates have600. Older version1
 receipts remain verifiable under their original, narrower coverage, and the
 verifier reports their version. Passing an older gate does not imply coverage
@@ -222,3 +225,27 @@ omitting `--screen retrieval` uses the original ngram policy set. This compares
 the combined candidate against unchanged baselines; it does not isolate the
 interleaving effect from the short-MV effect. Neither experimental option is
 enabled by default.
+
+## Preserve prefill arithmetic with graph-local scope
+
+A short shape alone is insufficient to identify speculative verification.
+The owned context copy now marks only graphs with2–9 tokens, outputs for every
+token, causal attention, offloading enabled and one sequence. The mark is
+applied before scheduler allocation to MUL_MAT/SOFT_MAX nodes using a reserved
+high flag bit. Upstream allocator/Metal code tests named low bits, tensor copies
+preserve flags, and a compile-time assertion checks non-collision with all named
+flags at the pinned revision. No global or thread-local execution mode is used.
+Cached graphs retain the mark; the pin's reuse check includes output count.
+
+Only marked operations use short-MV/interleaving and one-row softmax reduction
+geometry. Ordinary decode, prompt prefills and catch-up keep original dispatch,
+including the3/9-row tails of longer prefills. This prevents the candidate from
+silently changing its ordinary prefill arithmetic. The default single-row
+context copy remains byte-identical to its earlier integration.
+
+Host predicates check both marked verification and unmarked prefill decisions.
+A real CPU transformer probe inspects graph metadata through the scheduler
+callback without reading tensors or introducing synchronization: each fixture
+observes2772 marked and13335 unmarked nodes, with no mark leaking into prefills
+or ordinary one-row graphs. This proves scope propagation on that CPU path;
+the complete trained M3 gate still decides whole-graph correctness.
