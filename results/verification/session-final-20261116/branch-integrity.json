@@ -8,7 +8,7 @@
   "owned_source_sha256": "137daef3fb0762d7b1c42a48dc0e8ff54dab057c8ce0339df30299677b87dd76",
   "reviewed_head": "d9a29992221b98225f9b2f1d16c9edf2c9b95780",
   "scope": "Git/source/artifact integrity observations; no performance claim",
-  "starting_main_sha256_commit": "2260c1d3ebc5c8e01224914202c9879f34304f1e",
+  "starting_main_commit": "2260c1d3ebc5c8e01224914202c9879f34304f1e",
   "upstream_clean": true,
   "upstream_commit": "fd27b2034905f8dadd8bd6d2cc44595f4929d391",
   "whole_branch_diff_check": "passed"
