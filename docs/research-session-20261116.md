@@ -968,3 +968,9 @@ including tiny budgets, context tails and short prefill shapes. The compressed
 raw gate payloads and source/binary/configuration receipts are in
 `results/verification/direct-greedy-integration-20261116`. These are synthetic
 CPU checks; learned-model and Metal/M3 gates remain separate.
+
+Native direct-sampler run43848849983 was canceled immediately after identifying
+an orchestration omission: the targeted build did not produce the eligibility
+executable before CTest invoked it. The workflow now explicitly builds that
+target in the direct-only branch before running it. The canceled job provides
+no inference evidence; the corrected source is dispatched separately.

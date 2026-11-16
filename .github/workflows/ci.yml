@@ -157,7 +157,10 @@ jobs:
           build-hosted-trained/test_greedy_equivalence > results/local/trained-cpu/sampler-equivalence.log
           build-hosted-trained/test_greedy_equivalence --bench | tee results/local/trained-cpu/sampler-component.jsonl
           build-hosted-trained/test_greedy_equivalence --bench-direct | tee results/local/trained-cpu/direct-component.jsonl
-          if [ "$TOKENOMICS_DIRECT" = ON ]; then .venv/bin/ctest --test-dir build-hosted-trained --output-on-failure -R '^(fixtures|greedy_direct_integration)$'; fi
+          if [ "$TOKENOMICS_DIRECT" = ON ]; then
+            .venv/bin/cmake --build build-hosted-trained --target test_greedy_direct_integration -j 2
+            .venv/bin/ctest --test-dir build-hosted-trained --output-on-failure -R '^(fixtures|greedy_direct_integration)$'
+          fi
           uname -sm | tee results/local/trained-cpu/architecture.log
       - name: Verify smoke orchestration on synthetic fixtures
         env:
