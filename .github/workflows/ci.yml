@@ -5,7 +5,7 @@ on:
       scope:
         description: Checks to run
         type: choice
-        options: [portable, metal-research, model-metadata, trained-cpu]
+        options: [portable, metal-research, model-metadata, trained-cpu, metal-ir]
         default: portable
       metal_profiles:
         description: Apple profiles (use interleaved to check only the remaining prototype)
@@ -153,5 +153,51 @@ jobs:
             results/local/trained-cpu/smoke/*.json
             results/local/trained-cpu/smoke/*.jsonl
             results/local/trained-cpu/smoke/*.log
+          if-no-files-found: warn
+          retention-days: 7
+  metal-ir:
+    if: >-
+      inputs.scope == 'metal-ir' &&
+      github.ref == 'refs/heads/research/speculative-throughput-20261116' &&
+      !github.event.repository.private
+    runs-on: macos-26
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install pinned source generator
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check cmake==3.31.6
+      - name: Probe newer standard runner device
+        run: .venv/bin/python scripts/hosted_metal_preflight.py --probe-only --out results/local/metal-ir/device
+      - name: Generate exact owned shader source
+        run: .venv/bin/cmake -S tests/metal-source -B build-metal-ir-source
+      - name: Emit compiler IR without executing GPU work
+        run: |
+          xcrun -sdk macosx metal -std=metal3.1 -DGGML_METAL_EMBED_LIBRARY -O3 \
+            -S -emit-llvm build-metal-ir-source/tokenomics-metal-embed-mul_mv.metal \
+            -o results/local/metal-ir/mul_mv.ll
+      - name: Compare textual IR with coordinate permutation
+        run: |
+          .venv/bin/python scripts/compare_metal_ir.py \
+            --ir results/local/metal-ir/mul_mv.ll \
+            --source build-metal-ir-source/tokenomics-metal-embed-mul_mv.metal \
+            --out results/local/metal-ir/comparison.json
+      - name: Retain compiler diagnostics only
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: metal-ir-diagnostic
+          path: |
+            results/local/metal-ir/*.json
+            results/local/metal-ir/*.ll
+            results/local/metal-ir/device/*.json
+            results/local/metal-ir/device/*.log
           if-no-files-found: warn
           retention-days: 7

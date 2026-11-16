@@ -620,3 +620,22 @@ harness also adds the target's14-query/2-KV-head broadcast ratio at five
 attention widths. All500 matrix cases/1364480 values and48 masked-softmax
 cases/1053696 values pass bitwise on CPU in Release and sanitizers. Native
 compilation of the new graph-scoped candidate is the next separate check.
+
+The [graph-scoped native job](https://github.com/VictorWong123/tokenomics/actions/runs/43814656639)
+passes all10 stages, including Apple C++/shader compilation, fixture suites and
+the expanded tagged CPU backend harness. The paravirtual device still cannot
+execute required GPU graphs.
+[Retained receipt](../results/verification/hosted-metal-20261116/interleaved-graph-scope-native.json).
+
+### Inspecting compiler output
+
+Added a separate five-minute standard macOS26 compiler-IR diagnostic. It
+source-generates the exact owned shader through the same CMake helpers,
+requests LLVM-style text, and compares original/wrapper functions after grid
+permutation and textual normalization. Arithmetic, FP flags and addresses
+remain significant; metadata is deliberately ignored, so this is not a formal
+or hardware correctness proof. Three unit tests pass, including negative
+arithmetic/flag/address/coordinate changes and missing functions. Source-only
+CMake generation also passes locally without building or linking a backend.
+The newer runner gets a device-only SIMD capability probe; no paid larger
+runner or Codespaces operation is involved. [Diagnostic contract](metal-ir-diagnostic.md).

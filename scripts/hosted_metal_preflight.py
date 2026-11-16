@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--probe-only", action="store_true")
     parser.add_argument(
         "--profiles",
         choices=("all", "reference", "short-mv", "interleaved"),
@@ -33,6 +34,7 @@ def main():
         "machine": platform.machine(),
         "synthetic_only": True,
         "profile_selection": args.profiles,
+        "probe_only": args.probe_only,
         "stages": [],
     }
 
@@ -79,6 +81,11 @@ def main():
             <= report["metal_device"].keys()
         ):
             raise RuntimeError("Device probe omitted required capability fields")
+        if args.probe_only:
+            report["state"] = "device_probe_complete"
+            report["shader_compilation"] = "not_requested"
+            report["metal_execution"] = "not_requested"
+            return
         metal_compiler = (
             run("shader-compiler-probe", ["xcrun", "--find", "metal"], required=False)
             == 0
