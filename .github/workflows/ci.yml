@@ -12,6 +12,11 @@ on:
         type: choice
         options: [all, interleaved, q8-group]
         default: all
+      trained_runner:
+        description: Standard public runner for trained CPU correctness
+        type: choice
+        options: [ubuntu-24.04, macos-15]
+        default: ubuntu-24.04
 permissions:
   contents: read
 jobs:
@@ -95,7 +100,7 @@ jobs:
       inputs.scope == 'trained-cpu' &&
       github.ref == 'refs/heads/research/speculative-throughput-20261116' &&
       !github.event.repository.private
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.trained_runner || 'ubuntu-24.04' }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -128,6 +133,8 @@ jobs:
           cp build-hosted-trained/tokenomics results/local/trained-cpu/binaries/greedy
           .venv/bin/python -c 'from bench.common import atomic_json; from scripts.diagnose_models import build_configuration; atomic_json("results/local/trained-cpu/compilation-greedy.json", build_configuration("build-hosted-trained/tokenomics"))'
           build-hosted-trained/test_greedy_equivalence > results/local/trained-cpu/sampler-equivalence.log
+          build-hosted-trained/test_greedy_equivalence --bench | tee results/local/trained-cpu/sampler-component.jsonl
+          uname -sm | tee results/local/trained-cpu/architecture.log
       - name: Verify smoke orchestration on synthetic fixtures
         env:
           TOKENOMICS_TEST_BINARY: ${{ github.workspace }}/results/local/trained-cpu/binaries/guarded
@@ -150,6 +157,7 @@ jobs:
           path: |
             results/local/trained-cpu/compilation-*.json
             results/local/trained-cpu/*.log
+            results/local/trained-cpu/sampler-component.jsonl
             results/local/trained-cpu/smoke/*.json
             results/local/trained-cpu/smoke/*.jsonl
             results/local/trained-cpu/smoke/*.log

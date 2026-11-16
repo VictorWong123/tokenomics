@@ -15,13 +15,18 @@ the same logical work. Cycle logs are audited, source/binary identities remain
 fixed, and the first failing record is retained. Reserved held-out prompts are
 not read.
 
-The standard public Ubuntu workflow builds a default guarded executable,
+The standard public Ubuntu or Apple ARM macOS workflow builds a default guarded executable,
 copies it, and rebuilds the sampler-only candidate in the same build tree.
 This reuses compiled dependencies without overwriting the retained reference.
 It first tests the orchestration on synthetic fixtures, then downloads the
 locked public model and runs the trained check. It stops after30 minutes and
 uploads only explicit correctness/configuration files for seven days. Model
 weights and executables are excluded. It uses GitHub Actions, not Codespaces.
+The `trained_runner` dispatch input selects `ubuntu-24.04` or `macos-15`; both
+are standard public runners. The Apple runner checks ARM CPU behavior, not
+Metal GPU behavior or M3 performance. A separate sampler component benchmark
+retains all48 alternating paired timings, including candidate-array preparation;
+it is not an end-to-end generation benchmark.
 
 The local orchestration test passes160 fixture comparisons and confirms that
 passing a guarded executable as the candidate fails its sampler marker check.

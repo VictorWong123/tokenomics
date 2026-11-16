@@ -701,3 +701,23 @@ interleaved shader remains byte-identical (SHA256bfde18aa…a17f3de), so this
 refactor does not alter its compiled input.
 [Host evidence](../results/verification/metal-q8-group-host-20261116/summary.json)
 and [local grouped-Q8 command](metal-q8-group.md).
+
+### Separate-module IR closure and Apple ARM CPU check
+
+[The final separate-module run](https://github.com/VictorWong123/tokenomics/actions/runs/43822261855)
+matches all262 original function definitions, including the uniquely renamed
+filename-derived initializer, and all four interleaved wrapper/helper pairs.
+[Retained diagnostic](../results/verification/metal-ir-20261116/separate-module-matched.json).
+This remains a normalized textual compiler check; metadata, later function
+specialization and actual M3 arithmetic/token gates are outside its scope.
+
+Audited native pipeline routing: the pinned backend indexes actual compiled
+`MTLLibrary.functionNames`, then resolves the requested base name from that
+library. Added kernels do not require an enumerated name registry. Actual
+pipeline creation and execution still require a supported Metal device.
+
+Extended the existing bounded trained CPU workflow to select a standard public
+Apple ARM runner, with the existing Ubuntu default preserved. It also retains
+48 alternating sampler component timing pairs. The intended evidence is native
+ARM sampler equivalence and learned CPU output/work agreement, not M3 speed or
+GPU correctness. No optimization defaults changed.
