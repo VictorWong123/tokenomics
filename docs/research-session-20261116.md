@@ -912,3 +912,18 @@ Extended bounded model-header inspection to select the already-pinned1.5B
 public model. It retains metadata only and uses no Codespaces or model-weight
 artifact upload. This will identify which existing kernel paths matter at that
 larger operating point before extending the local study.
+
+### 10:20 UTC — strict raw-logit prototype and second-model metadata
+
+The direct host greedy prototype avoids materializing the 151,936-element
+`llama_token_data` array while preserving strict-first comparisons. The pinned
+reference agrees on 384 existing and 349,524 exhaustive tie/nonfinite rows in
+Release and ASAN/UBSAN. Runtime integration remains disabled pending native
+Apple ARM component checks. Local x86 component observations are retained;
+no model-throughput benefit is inferred from them.
+
+Public hosted metadata run 43845958766 inspected only the pinned 1.5B GGUF
+header: 28 layers, hidden width 1536, FFN 8960, 12 query/2 KV heads and Q6_K
+output projection. The header confirms that the Q8-specific prototype does not
+optimize this model's output projection. Full weights were not downloaded or
+SHA-verified by that metadata job. The receipt explicitly records this limit.

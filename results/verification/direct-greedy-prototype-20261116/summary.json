@@ -1,0 +1,43 @@
+{
+  "scope": "Synthetic cache-warm host sampling, including candidate preparation where required; no model throughput or M3 speed claim",
+  "runtime_enabled": false,
+  "release_equivalence": "349524 exhaustive raw-logit cases passed\n384 exact greedy selection cases passed, including ties and nonfinite inputs",
+  "sanitizer_equivalence": "349524 exhaustive raw-logit cases passed\n384 exact greedy selection cases passed, including ties and nonfinite inputs",
+  "source_sha256": {
+    "src/greedy_direct.h": "b7e33a588b675448e080ac7de6c48cd23af1768165ccc2a35cce20ac0102bbb7",
+    "tests/test_greedy_equivalence.cpp": "1d1834979421cfa4aa93620ccb7962b3cd31d13edb2e10cf34c69303367ed733"
+  },
+  "binary_sha256": {
+    "build-cpu/test_greedy_equivalence": "589a646c2d685a5da4e444ab63a63bab29da8516e042ae458307d233eb43b875",
+    "build-q4-asan/test_greedy_equivalence": "fc4f7efc69c42372eea3dd408a144becade8f78e791f9870bfbd1e0b0f520dc0"
+  },
+  "component": [
+    {
+      "vocabulary": 263,
+      "trials": 16,
+      "rounds_per_trial": 32,
+      "reference_ns": 411.3905,
+      "no_temp_ns": 261.312,
+      "direct_ns": 97.8125,
+      "median_no_temp_over_direct": 2.667840486354847
+    },
+    {
+      "vocabulary": 32768,
+      "trials": 16,
+      "rounds_per_trial": 32,
+      "reference_ns": 47839.100000000006,
+      "no_temp_ns": 33866.2,
+      "direct_ns": 11476.099999999999,
+      "median_no_temp_over_direct": 2.956832483573743
+    },
+    {
+      "vocabulary": 151936,
+      "trials": 16,
+      "rounds_per_trial": 32,
+      "reference_ns": 236999.5,
+      "no_temp_ns": 159807.0,
+      "direct_ns": 52969.2,
+      "median_no_temp_over_direct": 3.003131392419542
+    }
+  ]
+}

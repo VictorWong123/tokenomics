@@ -239,6 +239,19 @@ def main():
                     "backend-argmax-contract-diagnostic",
                     [str(build / "test_greedy_equivalence"), "--argmax-probe-cpu"],
                 )
+                run(
+                    "host-direct-greedy-component",
+                    [str(build / "test_greedy_equivalence"), "--bench-direct"],
+                )
+                report["host_direct_greedy_component"] = {
+                    "scope": "Synthetic cache-warm host sampling only; no M3/model throughput claim",
+                    "measurements": [
+                        json.loads(line)
+                        for line in (out / "host-direct-greedy-component.log")
+                        .read_text()
+                        .splitlines()
+                    ],
+                }
                 # A completed diagnostic is not a successful substitution test.
                 # Retain its observed mismatches explicitly in the main receipt.
                 report["cpu_backend_argmax_contract_probe"] = next(

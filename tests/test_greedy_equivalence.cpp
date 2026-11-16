@@ -1,3 +1,4 @@
+#include "../src/greedy_direct.h"
 #include "ggml-backend.h"
 #include "ggml-cpu.h"
 #include "ggml.h"
@@ -55,6 +56,57 @@ static void benchmark(llama_sampler *reference, llama_sampler *candidate) {
             std::cout << "{\"vocabulary\":" << size << ",\"trial\":" << trial
                       << ",\"rounds\":" << rounds << ",\"reference_ns\":" << a.first
                       << ",\"candidate_ns\":" << b.first << ",\"checksum\":" << a.second << "}\n";
+        }
+    }
+}
+
+// Component timing includes candidate preparation for the two existing paths.
+// Direct selection reads the same logits without materializing token_data.
+static void benchmark_direct(llama_sampler *reference, llama_sampler *no_temp) {
+    using Clock = std::chrono::steady_clock;
+    for (int size : {263, 32768, 151936}) {
+        std::mt19937 rng(20261116 + size);
+        std::vector<float> logits(size);
+        for (auto &value : logits)
+            value = float(int(rng() % 65536) - 32768) / 1024;
+        std::vector<llama_token_data> data(size);
+        constexpr int rounds = 32;
+        auto measure = [&](int method) {
+            std::uint64_t checksum = 0;
+            auto start = Clock::now();
+            for (int round = 0; round < rounds; ++round) {
+                // Prevent the compiler from hoisting a pure repeated argmax.
+                logits[round % size] += float((round & 1) ? 1 : -1) / 65536;
+                if (method == 2) {
+                    checksum += tokenomics::strict_greedy_argmax(logits.data(), logits.size());
+                } else {
+                    for (int i = 0; i < size; ++i)
+                        data[i] = {i, logits[i], 0.0f};
+                    llama_token_data_array values{data.data(), data.size(), -1, false};
+                    llama_sampler_apply(method == 0 ? reference : no_temp, &values);
+                    checksum += values.data[values.selected].id;
+                }
+                logits[round % size] -= float((round & 1) ? 1 : -1) / 65536;
+            }
+            const double ns =
+                std::chrono::duration<double, std::nano>(Clock::now() - start).count() / rounds;
+            return std::pair{ns, checksum};
+        };
+        for (int method = 0; method < 3; ++method)
+            measure(method);
+        for (int trial = 0; trial < 16; ++trial) {
+            std::array<std::pair<double, std::uint64_t>, 3> results;
+            for (int offset = 0; offset < 3; ++offset) {
+                const int method = (trial + offset) % 3;
+                results[method] = measure(method);
+            }
+            if (results[0].second != results[1].second || results[0].second != results[2].second)
+                throw std::runtime_error("direct benchmark selection mismatch");
+            std::cout << "{\"vocabulary\":" << size << ",\"trial\":" << trial
+                      << ",\"rounds\":" << rounds << ",\"reference_ns\":" << results[0].first
+                      << ",\"no_temp_ns\":" << results[1].first
+                      << ",\"direct_ns\":" << results[2].first
+                      << ",\"checksum\":" << results[0].second << "}\n";
         }
     }
 }
@@ -167,13 +219,17 @@ int main(int argc, char **argv) {
         argmax_probe(reference.get(), std::string(argv[1]) == "--argmax-probe-metal");
         return 0;
     }
+    if (argc == 2 && std::string(argv[1]) == "--bench-direct") {
+        benchmark_direct(reference.get(), candidate.get());
+        return 0;
+    }
     if (argc == 2 && std::string(argv[1]) == "--bench") {
         benchmark(reference.get(), candidate.get());
         return 0;
     }
     if (argc != 1)
-        throw std::runtime_error(
-            "usage: test_greedy_equivalence [--bench | --argmax-probe-cpu | --argmax-probe-metal]");
+        throw std::runtime_error("usage: test_greedy_equivalence [--bench | --bench-direct | "
+                                 "--argmax-probe-cpu | --argmax-probe-metal]");
     std::mt19937 rng(20261116);
     int cases = 0;
     for (int size : {1, 2, 7, 263, 4096, 151936})
@@ -188,6 +244,11 @@ int main(int argc, char **argv) {
                     token.logit = special[trial];
             else if (trial < 20)
                 original[(trial - 4) % size].logit = special[(trial - 4) / 4];
+            std::vector<float> raw_logits;
+            for (const auto &token : original)
+                raw_logits.push_back(token.logit);
+            const auto direct =
+                tokenomics::strict_greedy_argmax(raw_logits.data(), raw_logits.size());
             auto copied = original;
             llama_token_data_array a{original.data(), original.size(), -1, false};
             llama_token_data_array b{copied.data(), copied.size(), -1, false};
@@ -195,8 +256,46 @@ int main(int argc, char **argv) {
             llama_sampler_apply(candidate.get(), &b);
             if (a.selected != b.selected || a.data[a.selected].id != b.data[b.selected].id)
                 throw std::runtime_error("temperature-zero/greedy selection mismatch");
+            if (direct != a.data[a.selected].id)
+                throw std::runtime_error("raw-logit strict greedy selection mismatch");
             ++cases;
         }
+    // Exhaustive ties/nonfinite placements straddle the vector and tail boundary.
+    int exhaustive = 0;
+    for (int size = 1; size <= 9; ++size) {
+        const float alphabet[] = {-INFINITY, -3.0f, INFINITY, NAN};
+        for (int code = 0; code < (1 << (2 * size)); ++code) {
+            std::vector<float> logits(size);
+            std::vector<llama_token_data> data(size);
+            int remaining = code;
+            for (int i = 0; i < size; ++i) {
+                logits[i] = alphabet[remaining & 3];
+                remaining >>= 2;
+                data[i] = {i, logits[i], 0.0f};
+            }
+            llama_token_data_array values{data.data(), data.size(), -1, false};
+            llama_sampler_apply(reference.get(), &values);
+            if (tokenomics::strict_greedy_argmax(logits.data(), logits.size()) !=
+                values.data[values.selected].id)
+                throw std::runtime_error("exhaustive strict greedy mismatch");
+            ++exhaustive;
+        }
+    }
+    for (int invalid = 0; invalid < 3; ++invalid) {
+        const float value = 0;
+        bool rejected = false;
+        try {
+            tokenomics::strict_greedy_argmax(invalid == 0 ? nullptr : &value,
+                                             invalid == 1   ? 0
+                                             : invalid == 2 ? std::size_t(INT32_MAX) + 1
+                                                            : 1);
+        } catch (const std::invalid_argument &) {
+            rejected = true;
+        }
+        if (!rejected)
+            throw std::runtime_error("invalid raw greedy input accepted");
+    }
+    std::cout << exhaustive << " exhaustive raw-logit cases passed\n";
     std::cout << cases
               << " exact greedy selection cases passed, including ties and nonfinite inputs\n";
 }
