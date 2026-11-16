@@ -1047,3 +1047,19 @@ versus ngram's141/40. Ranking cost and query shapes are not included in these
 work comparisons, and no runtime winner is deployed. The CPU0.5B QA trajectory
 differs from archived M3 while code/summary agree; no Metal rank or speed claim
 follows from this replay.
+
+### 11:13 UTC — native guided-chain semantics and a cost failure
+
+The native scalar prototype reproduces108 aggregate guided replay records and
+passes59022 independent sorted-reference cases in Release/ASAN/UBSAN. It is not
+integrated into inference. A192-pair synthetic component reveals nine redundant
+scans for one just-outside-top64 token, costing about1.4ms at151936 vocabulary.
+Original scalar source/binary hashes and all pairs are retained before changing
+the implementation. Caching and comparison batching are next; no component or
+fit result is treated as generation speed.
+
+Learned1.5B Apple ARM run43849593799 also passes160 direct-sampler comparisons,
+now with a durable public receipt binding source/model/executable/payload hashes.
+Native run43852475399 passes17 stages including the1072-case CPU backend harness
+and Metal compilation. Its runtime binary is byte-identical to the earlier Q8
+shared checkpoint; no SIMDgroup GPU execution was available.

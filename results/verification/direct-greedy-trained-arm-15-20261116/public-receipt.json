@@ -1,0 +1,41 @@
+{
+  "binary_sha256": {
+    "greedy": "a9ac3759cf489e739638251ec7bba55ec9ef7b0fd0f630d824856da9fdaf0677",
+    "reference": "05402b78912176d7e936cb8dcf64c2de167e55d014ed2dfc53b6286608c75a41"
+  },
+  "candidate_profile": "direct",
+  "complete_sha256": "32d32a67379013a9ce736c8548f829fb0039154055d9a611abb74d088a5d6aa0",
+  "model_id": "qwen25-15",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "payload_sha256": {
+    "boundary-reference.cycles.jsonl": "cfb614a2197c8b1d7fef19ee24279d8daf83b58eef0b4a822df611f48913aeeb",
+    "boundary-reference.jobs.jsonl": "cc5ab33d1cb551ddb700873c9a67b59c6760dc3e0cd893ec195dec244f782ec7",
+    "boundary-reference.jsonl": "775bd13c81ae3c36cab47ada1ecfcdbc3fcc07573a78bc85a6da6581db12a9dc",
+    "boundary-reference.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "correctness.jsonl": "363d57ddf16f654c5b1426996ef97ef0e6f3adc16b9d0c71eec04ef52f327cb8",
+    "greedy.cycles.jsonl": "95ea83b44ddc4c9aaff41f1fdb39add21f73e1bd72616af248ada4bab236423a",
+    "greedy.jobs.jsonl": "cb3fac0cf7096b629c5668ad19d54d1e2b0c7e49b478bcbe0e8dc27eb24a588d",
+    "greedy.jsonl": "3d5a1f335acd1ea7dfe089ffd6bdbc60218057dd31b9933bbd14998aa7b50870",
+    "greedy.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "guarded.cycles.jsonl": "d30bee4d13739a0e7c84ac906999f3af9e2cd009aea7f42bfb7c5389afe3791c",
+    "guarded.jobs.jsonl": "cb3fac0cf7096b629c5668ad19d54d1e2b0c7e49b478bcbe0e8dc27eb24a588d",
+    "guarded.jsonl": "684802f2e614b61e3008457edc7daf6cbe8ac8d3947942e8d08629a204890e4f",
+    "guarded.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "manifest.json": "edf0de4e2fa528bd1c84582dd56f34a17a51b784e9caabe9f4fd1299f1e47f54",
+    "reference.cycles.jsonl": "f95d2e3c875c3735f937eb42252fc562343ed9a6a4a7873f9f4bbbc910647e4b",
+    "reference.jobs.jsonl": "560c76375e2e0d234a52b6435f54899a6afa0ec05a5bfe4b59fb9b9afefceef2",
+    "reference.jsonl": "e0b16338def7526657f8f7f471096c9fd7486204ffe27447624a9e9b59607ece",
+    "reference.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status.json": "36504e31cfd356596b4e96c11a7abf63d166b20b957d14fed8f29dffb3c64473"
+  },
+  "platform": {
+    "machine": "arm64",
+    "platform": "macOS-15.8.2-arm64-arm-64bit"
+  },
+  "schema_version": 1,
+  "source": {
+    "owned_source_sha256": "cdd7d95b7113e2e51415b8d9a76104a746336df8efcd5b82ebebdb7a4e9d6bfb",
+    "revision": "1af7b53e21090e661334263f263ff3febabe66e3"
+  },
+  "synthetic_fixture": false
+}

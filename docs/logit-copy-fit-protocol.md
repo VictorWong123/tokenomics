@@ -101,3 +101,12 @@ and measure host membership cost. The proposed implementation tests whether the
 best source token at each match length is globally top64, instead of sorting
 all151936 vocabulary entries. This preserves ranking semantics while allowing
 quick rejection after64 better entries. No extra model forward is required.
+
+The first unselected native prototype passes59022 independent sorted-reference
+cases in Release and ASAN/UBSAN and reproduces108 per-prompt Python work records
+across both models. These checks embed recorded ranks in synthetic logits; they
+do not run models. Its192 raw component pairs expose a slow rejection case:
+a just-outside-top64 source token is rescanned nine times. At vocabulary151936,
+that stress case takes roughly1.4ms on this Linux CPU. The prototype is not yet
+called by inference. The next optimization caches repeated membership checks;
+this negative cost result is retained with its original source/binary hashes.

@@ -1,0 +1,134 @@
+{
+  "candidate_profile": "direct",
+  "checked_comparisons": 160,
+  "model_id": "qwen25-15",
+  "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+  "performance_claim": null,
+  "same_work_between_sampler_profiles": true,
+  "state": "passed",
+  "synthetic_fixture": false,
+  "totals": {
+    "greedy": {
+      "ngram1": {
+        "accepted": 39,
+        "cycles": 309,
+        "drafted": 52,
+        "synced_tokens": 0,
+        "verified_rows": 361
+      },
+      "ngram4": {
+        "accepted": 61,
+        "cycles": 287,
+        "drafted": 116,
+        "synced_tokens": 0,
+        "verified_rows": 403
+      },
+      "ngram8": {
+        "accepted": 65,
+        "cycles": 283,
+        "drafted": 177,
+        "synced_tokens": 0,
+        "verified_rows": 460
+      },
+      "script-ngram": {
+        "accepted": 57,
+        "cycles": 291,
+        "drafted": 116,
+        "synced_tokens": 0,
+        "verified_rows": 407
+      },
+      "suffix1": {
+        "accepted": 23,
+        "cycles": 325,
+        "drafted": 30,
+        "synced_tokens": 0,
+        "verified_rows": 355
+      },
+      "suffix4": {
+        "accepted": 35,
+        "cycles": 313,
+        "drafted": 62,
+        "synced_tokens": 0,
+        "verified_rows": 375
+      },
+      "suffix8": {
+        "accepted": 37,
+        "cycles": 311,
+        "drafted": 107,
+        "synced_tokens": 0,
+        "verified_rows": 418
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    },
+    "guarded": {
+      "ngram1": {
+        "accepted": 39,
+        "cycles": 309,
+        "drafted": 52,
+        "synced_tokens": 0,
+        "verified_rows": 361
+      },
+      "ngram4": {
+        "accepted": 61,
+        "cycles": 287,
+        "drafted": 116,
+        "synced_tokens": 0,
+        "verified_rows": 403
+      },
+      "ngram8": {
+        "accepted": 65,
+        "cycles": 283,
+        "drafted": 177,
+        "synced_tokens": 0,
+        "verified_rows": 460
+      },
+      "script-ngram": {
+        "accepted": 57,
+        "cycles": 291,
+        "drafted": 116,
+        "synced_tokens": 0,
+        "verified_rows": 407
+      },
+      "suffix1": {
+        "accepted": 23,
+        "cycles": 325,
+        "drafted": 30,
+        "synced_tokens": 0,
+        "verified_rows": 355
+      },
+      "suffix4": {
+        "accepted": 35,
+        "cycles": 313,
+        "drafted": 62,
+        "synced_tokens": 0,
+        "verified_rows": 375
+      },
+      "suffix8": {
+        "accepted": 37,
+        "cycles": 311,
+        "drafted": 107,
+        "synced_tokens": 0,
+        "verified_rows": 418
+      },
+      "target": {
+        "accepted": 0,
+        "cycles": 348,
+        "drafted": 0,
+        "synced_tokens": 0,
+        "verified_rows": 348
+      }
+    }
+  },
+  "provenance": {
+    "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43849593799",
+    "source_commit": "1af7b53e21090e661334263f263ff3febabe66e3",
+    "scope": "Learned1.5B CPU exactness only on standard Apple ARM hosted VM; no Metal or M3 throughput claim",
+    "raw_payload_location": "Seven-day workflow artifact; not independently downloaded here"
+  }
+}

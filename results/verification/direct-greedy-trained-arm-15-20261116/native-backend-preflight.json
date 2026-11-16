@@ -1,0 +1,689 @@
+{
+  "binary_sha256": {
+    "q8-shared": "b191eacb39e0ee74c8e0d4701633b557a7f7be39e783da5c3ff08fb5f347672f"
+  },
+  "cpu_backend_argmax_contract_probe": {
+    "cases": 27,
+    "performance_claim": null,
+    "runtime_fast_path_enabled": false,
+    "selection_mismatches": 24,
+    "state": "diagnostic_complete"
+  },
+  "host_direct_greedy_component": {
+    "measurements": [
+      {
+        "checksum": 5248,
+        "direct_ns": 95.0312,
+        "no_temp_ns": 289.062,
+        "reference_ns": 427.062,
+        "rounds": 32,
+        "trial": 0,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 96.375,
+        "no_temp_ns": 285.156,
+        "reference_ns": 410.156,
+        "rounds": 32,
+        "trial": 1,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 97.6562,
+        "no_temp_ns": 355.469,
+        "reference_ns": 507.812,
+        "rounds": 32,
+        "trial": 2,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 96.3438,
+        "no_temp_ns": 303.375,
+        "reference_ns": 527.344,
+        "rounds": 32,
+        "trial": 3,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 96.3438,
+        "no_temp_ns": 286.438,
+        "reference_ns": 411.469,
+        "rounds": 32,
+        "trial": 4,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 105.469,
+        "no_temp_ns": 355.469,
+        "reference_ns": 510.406,
+        "rounds": 32,
+        "trial": 5,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 108.062,
+        "no_temp_ns": 290.375,
+        "reference_ns": 526.031,
+        "rounds": 32,
+        "trial": 6,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 118.5,
+        "no_temp_ns": 369.781,
+        "reference_ns": 514.344,
+        "rounds": 32,
+        "trial": 7,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 118.5,
+        "no_temp_ns": 313.812,
+        "reference_ns": 515.625,
+        "rounds": 32,
+        "trial": 8,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 93.75,
+        "no_temp_ns": 313.812,
+        "reference_ns": 440.125,
+        "rounds": 32,
+        "trial": 9,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 93.75,
+        "no_temp_ns": 278.656,
+        "reference_ns": 391.938,
+        "rounds": 32,
+        "trial": 10,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 92.4688,
+        "no_temp_ns": 276.062,
+        "reference_ns": 393.25,
+        "rounds": 32,
+        "trial": 11,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 98.9688,
+        "no_temp_ns": 1960.94,
+        "reference_ns": 391.938,
+        "rounds": 32,
+        "trial": 12,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 96.3438,
+        "no_temp_ns": 286.438,
+        "reference_ns": 410.156,
+        "rounds": 32,
+        "trial": 13,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 95.0625,
+        "no_temp_ns": 287.75,
+        "reference_ns": 408.844,
+        "rounds": 32,
+        "trial": 14,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 5248,
+        "direct_ns": 95.0312,
+        "no_temp_ns": 285.156,
+        "reference_ns": 403.625,
+        "rounds": 32,
+        "trial": 15,
+        "vocabulary": 263
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 10739.6,
+        "no_temp_ns": 33428.4,
+        "reference_ns": 45852.9,
+        "rounds": 32,
+        "trial": 0,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 12048.2,
+        "no_temp_ns": 38660.2,
+        "reference_ns": 46708.3,
+        "rounds": 32,
+        "trial": 1,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 12251.3,
+        "no_temp_ns": 35625,
+        "reference_ns": 47083.3,
+        "rounds": 32,
+        "trial": 2,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 11785.2,
+        "no_temp_ns": 35928.4,
+        "reference_ns": 47906.2,
+        "rounds": 32,
+        "trial": 3,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 11815.1,
+        "no_temp_ns": 35325.5,
+        "reference_ns": 47182.3,
+        "rounds": 32,
+        "trial": 4,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 12414.1,
+        "no_temp_ns": 31151,
+        "reference_ns": 43753.9,
+        "rounds": 32,
+        "trial": 5,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 12923.2,
+        "no_temp_ns": 33628.9,
+        "reference_ns": 41615.9,
+        "rounds": 32,
+        "trial": 6,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 11096.3,
+        "no_temp_ns": 32798.2,
+        "reference_ns": 41867.2,
+        "rounds": 32,
+        "trial": 7,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 10776,
+        "no_temp_ns": 32708.3,
+        "reference_ns": 43589.8,
+        "rounds": 32,
+        "trial": 8,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 12328.1,
+        "no_temp_ns": 34289.1,
+        "reference_ns": 47256.5,
+        "rounds": 32,
+        "trial": 9,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 11548.2,
+        "no_temp_ns": 33541.7,
+        "reference_ns": 44010.4,
+        "rounds": 32,
+        "trial": 10,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 11625,
+        "no_temp_ns": 33226.6,
+        "reference_ns": 44326.8,
+        "rounds": 32,
+        "trial": 11,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 10763,
+        "no_temp_ns": 30981.8,
+        "reference_ns": 42330.8,
+        "rounds": 32,
+        "trial": 12,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 10768.2,
+        "no_temp_ns": 31140.6,
+        "reference_ns": 42233.1,
+        "rounds": 32,
+        "trial": 13,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 12931,
+        "no_temp_ns": 36990.9,
+        "reference_ns": 47425.8,
+        "rounds": 32,
+        "trial": 14,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 808512,
+        "direct_ns": 11237,
+        "no_temp_ns": 33846.3,
+        "reference_ns": 45666.7,
+        "rounds": 32,
+        "trial": 15,
+        "vocabulary": 32768
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 52074.2,
+        "no_temp_ns": 146474,
+        "reference_ns": 211591,
+        "rounds": 32,
+        "trial": 0,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 53815.1,
+        "no_temp_ns": 156607,
+        "reference_ns": 218073,
+        "rounds": 32,
+        "trial": 1,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 52484.4,
+        "no_temp_ns": 166967,
+        "reference_ns": 207452,
+        "rounds": 32,
+        "trial": 2,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 52321.6,
+        "no_temp_ns": 161247,
+        "reference_ns": 226454,
+        "rounds": 32,
+        "trial": 3,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 52447.9,
+        "no_temp_ns": 162591,
+        "reference_ns": 222677,
+        "rounds": 32,
+        "trial": 4,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 54419.3,
+        "no_temp_ns": 195245,
+        "reference_ns": 238935,
+        "rounds": 32,
+        "trial": 5,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 54184.9,
+        "no_temp_ns": 161064,
+        "reference_ns": 222828,
+        "rounds": 32,
+        "trial": 6,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 57039.1,
+        "no_temp_ns": 175816,
+        "reference_ns": 214783,
+        "rounds": 32,
+        "trial": 7,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 49532.6,
+        "no_temp_ns": 159555,
+        "reference_ns": 197952,
+        "rounds": 32,
+        "trial": 8,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 53981.8,
+        "no_temp_ns": 153272,
+        "reference_ns": 212277,
+        "rounds": 32,
+        "trial": 9,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 55976.6,
+        "no_temp_ns": 155475,
+        "reference_ns": 217016,
+        "rounds": 32,
+        "trial": 10,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 53773.4,
+        "no_temp_ns": 151279,
+        "reference_ns": 206539,
+        "rounds": 32,
+        "trial": 11,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 50777.3,
+        "no_temp_ns": 151217,
+        "reference_ns": 209333,
+        "rounds": 32,
+        "trial": 12,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 57755.2,
+        "no_temp_ns": 158934,
+        "reference_ns": 206712,
+        "rounds": 32,
+        "trial": 13,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 54381.5,
+        "no_temp_ns": 156971,
+        "reference_ns": 207840,
+        "rounds": 32,
+        "trial": 14,
+        "vocabulary": 151936
+      },
+      {
+        "checksum": 639552,
+        "direct_ns": 55724,
+        "no_temp_ns": 152039,
+        "reference_ns": 215650,
+        "rounds": 32,
+        "trial": 15,
+        "vocabulary": 151936
+      }
+    ],
+    "scope": "Synthetic cache-warm host sampling only; no M3/model throughput claim"
+  },
+  "machine": "arm64",
+  "metal_device": {
+    "available": true,
+    "name": "Apple Paravirtual device",
+    "simdgroup_reduction": false
+  },
+  "metal_execution": "unavailable_missing_simdgroup_reduction",
+  "platform": "macOS-15.8.2-arm64-arm-64bit",
+  "probe_only": false,
+  "profile_selection": "q8-shared",
+  "purpose": "Apple compilation and correctness only; no M3 speed claim",
+  "shader_compilation": "passed",
+  "source_commit": "3218ceb7dd507bef409daaa34506f100b8118468",
+  "stages": [
+    {
+      "command": [
+        "swift",
+        "-e",
+        "import Metal; import Foundation; let d = MTLCreateSystemDefaultDevice(); let r: [String: Any] = [\"available\": d != nil, \"name\": d?.name ?? \"\", \"simdgroup_reduction\": d.map { $0.supportsFamily(.apple7) || $0.supportsFamily(.metal3) } ?? false]; let b = try JSONSerialization.data(withJSONObject: r, options: [.sortedKeys]); print(String(data: b, encoding: .utf8)!)"
+      ],
+      "exit_code": 0,
+      "log_sha256": "7a227b900a3fb1db1c6818898b36a72e9e5a95b49d0ad004fa75c53339af5a96",
+      "name": "device-probe"
+    },
+    {
+      "command": [
+        "xcrun",
+        "--find",
+        "metal"
+      ],
+      "exit_code": 0,
+      "log_sha256": "85b77a359a8cad536e1b3c3194e7924f0276a9e49965fd7e33ea5a1d61601d0a",
+      "name": "shader-compiler-probe"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/.venv/bin/cmake",
+        "-S",
+        "/Users/runner/work/tokenomics/tokenomics",
+        "-B",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_MAKE_PROGRAM=/Users/runner/work/tokenomics/tokenomics/.venv/bin/ninja",
+        "-DPython3_EXECUTABLE=/Users/runner/work/tokenomics/tokenomics/.venv/bin/python",
+        "-DBUILD_TESTING=ON",
+        "-DTOKENOMICS_PYTHON_TESTS=ON",
+        "-DGGML_NATIVE=ON",
+        "-DGGML_METAL=ON",
+        "-DGGML_METAL_EMBED_LIBRARY=ON",
+        "-DGGML_CUDA=OFF",
+        "-DTOKENOMICS_CPU_BATCH_INVARIANT=ON",
+        "-DTOKENOMICS_CPU_PACKED_VERIFY=OFF",
+        "-DTOKENOMICS_CPU_Q4_PAIR=OFF",
+        "-DTOKENOMICS_VERIFY_STAGE_TIMING=OFF",
+        "-DTOKENOMICS_LOGIT_COLLECTOR=OFF",
+        "-DTOKENOMICS_GREEDY_NO_TEMP=OFF",
+        "-DTOKENOMICS_GREEDY_DIRECT=OFF",
+        "-DTOKENOMICS_METAL_SHORT_MV=ON",
+        "-DTOKENOMICS_METAL_INTERLEAVE=OFF",
+        "-DTOKENOMICS_METAL_Q8_GROUP=ON",
+        "-DTOKENOMICS_METAL_Q8_SHARED=ON"
+      ],
+      "exit_code": 0,
+      "log_sha256": "807f41ce0abe5cf13001b44f1cf6626f3b4046f1ed4ba52e65c7bb6e8a54b1b4",
+      "name": "q8-shared-configure"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/.venv/bin/cmake",
+        "--build",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "log_sha256": "6975d3d0415f89854c097112cf0895525512a217ab359e58b54a453e2b62f55c",
+      "name": "q8-shared-compile"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/.venv/bin/cmake",
+        "--build",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared",
+        "--target",
+        "test_backend_rows",
+        "test_matvec_component",
+        "test_greedy_equivalence",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "log_sha256": "c9d8d8319c724ed8ee3a2611f285bfabc546ea3b90877bf15029f7311098a574",
+      "name": "q8-shared-backend-compile"
+    },
+    {
+      "command": [
+        "xcrun",
+        "-sdk",
+        "macosx",
+        "metal",
+        "-std=metal3.1",
+        "-DGGML_METAL_EMBED_LIBRARY",
+        "-O3",
+        "-c",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/tokenomics-metal-embed-mul_mv.metal",
+        "-o",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/preflight-mul_mv.air"
+      ],
+      "exit_code": 0,
+      "log_sha256": "f3c28a7ec1eae657d17be56a332d94d635e8f89448320dcac9c6f80479bca417",
+      "name": "q8-shared-shader-mul_mv"
+    },
+    {
+      "command": [
+        "xcrun",
+        "-sdk",
+        "macosx",
+        "metal",
+        "-std=metal3.1",
+        "-DGGML_METAL_EMBED_LIBRARY",
+        "-O3",
+        "-c",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/third_party/llama.cpp/ggml/src/ggml-metal/autogenerated/ggml-metal-embed-softmax.metal",
+        "-o",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/preflight-softmax.air"
+      ],
+      "exit_code": 0,
+      "log_sha256": "66efad4cb8484b7c11b9c9ce22b0156a027e8c1639b1eacb638b767472290a9e",
+      "name": "q8-shared-shader-softmax"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/.venv/bin/ctest",
+        "--test-dir",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared",
+        "--output-on-failure",
+        "--timeout",
+        "600"
+      ],
+      "exit_code": 0,
+      "log_sha256": "3882df3a56c4cf006c18e59b1322620116f9335aa31ba4b4230630eb5965b3d0",
+      "name": "q8-shared-ctest"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/test_backend_rows",
+        "--cpu"
+      ],
+      "exit_code": 0,
+      "log_sha256": "d27d1b6b49c2f2a3612eab07af6640a2235614075193b90cd311042e5c6bff2f",
+      "name": "q8-shared-cpu-rows"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/test_matvec_component",
+        "--cpu-fixture"
+      ],
+      "exit_code": 0,
+      "log_sha256": "1c461c28194f20acc6f001ad2737c3171ab1d00ccb40c4b0ce436a342d9d28e7",
+      "name": "q8-shared-cpu-component-fixture"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/.venv/bin/cmake",
+        "-S",
+        "/Users/runner/work/tokenomics/tokenomics/tests/metal-q8-arithmetic",
+        "-B",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared-arithmetic",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DTOKENOMICS_ARITHMETIC_SANITIZE=OFF"
+      ],
+      "exit_code": 0,
+      "log_sha256": "64bd4cdb9c7e603534f866d47dd0e1bce29e856797d79438ccac4aacda574288",
+      "name": "q8-shared-source-arithmetic-configure"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/.venv/bin/cmake",
+        "--build",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared-arithmetic",
+        "--parallel",
+        "2"
+      ],
+      "exit_code": 0,
+      "log_sha256": "7881957c7866322b7dc75cf1f90c126594482dc860cbe485fe1db576343ce8b2",
+      "name": "q8-shared-source-arithmetic-compile"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/.venv/bin/ctest",
+        "--test-dir",
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared-arithmetic",
+        "-V"
+      ],
+      "exit_code": 0,
+      "log_sha256": "ef3e2f71db009e96780e3a1f94ef047e21f45cb063b30e2a4d05c06e5a0b519e",
+      "name": "q8-shared-source-arithmetic-test"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/test_greedy_equivalence"
+      ],
+      "exit_code": 0,
+      "log_sha256": "683c264e9f82698dea1d90122b389506b1bda94091906e565947b80bcd774ae1",
+      "name": "host-sampler-equivalence"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/test_greedy_equivalence",
+        "--argmax-probe-cpu"
+      ],
+      "exit_code": 0,
+      "log_sha256": "762a09748410cd91504be26f1a2086d7037e25221db0dd698c4f55a66d6861e2",
+      "name": "backend-argmax-contract-diagnostic"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/test_greedy_equivalence",
+        "--bench-direct"
+      ],
+      "exit_code": 0,
+      "log_sha256": "03287cda8c30e0140bfb65358a2cb9274f79e2a9f7df22b6058a28d51625960d",
+      "name": "host-direct-greedy-component"
+    },
+    {
+      "command": [
+        "/Users/runner/work/tokenomics/tokenomics/build-hosted-q8-shared/test_backend_rows",
+        "--metal-compile-only"
+      ],
+      "exit_code": 0,
+      "log_sha256": "808b5ac5adbf8ba2f0eebca52c38930cfdf802f9dfb899c739fd3b1ba784e3d3",
+      "name": "q8-shared-metal-library-compile"
+    }
+  ],
+  "state": "passed",
+  "synthetic_only": true,
+  "public_run_url": "https://github.com/VictorWong123/tokenomics/actions/runs/43852475399",
+  "scope_note": "Native compilation and CPU checks include1072-case backend harness; no SIMDgroup GPU execution. Runtime binary byte-identical to earlier shared-Q8 checkpoint."
+}

@@ -1,0 +1,130 @@
+{
+  "scope": "Unselected native chain prototype; synthetic rank embedding for quality checks and cache-warm synthetic host component timings; no model inference, GPU or M3 speed claim",
+  "runtime_integrated": false,
+  "native_sorted_reference_cases": 59022,
+  "native_python_aggregate_records": 108,
+  "sanitizer_aggregate_records_agree": 108,
+  "exact_cycle_proposals_compared": false,
+  "component_scope": "Complete proposal construction against a sorted-vocabulary/prefix-enumeration reference; includes different source search and allocations, not membership alone",
+  "timing_pairs": 192,
+  "source_sha256": {
+    "src/logit_copy.cpp": "41e22f42b2abfd60c79bb5da65db5ff8eb7a679b574bfe548da95d54ab63daef",
+    "src/logit_copy.h": "bd4bffbc336365799d80fa966d9633017418fc80f97672e23799d05ac39a69aa",
+    "tests/test_logit_copy.cpp": "a928e0c9a2ddfab2d5fd73efaf939d48ff0091f68b58c3b7e54c2ba3de9e4fb2"
+  },
+  "binary_sha256": {
+    "build-cpu/test_logit_copy": "1c013c8ac75780a8f4dbe7cea19d432d8a8eeaa32b9f307a89495b3d6ae0f035",
+    "build-q4-asan/test_logit_copy": "f399cd02872815e7eea48c82e748c8077900e336da9228e019cb8e07e8a9cc99"
+  },
+  "stress_observation": "A just-outside-top64 token can cause nine identical full-vocabulary membership scans; caching the result is the next hypothesis",
+  "component": [
+    {
+      "vocabulary": 32768,
+      "history_tokens": 131,
+      "kind": 0,
+      "trials": 16,
+      "sorted_reference_ns": 77064.015625,
+      "membership_ns": 32836.59375,
+      "rank_checks_per_call": 1.0
+    },
+    {
+      "vocabulary": 32768,
+      "history_tokens": 131,
+      "kind": 1,
+      "trials": 16,
+      "sorted_reference_ns": 53541.28125,
+      "membership_ns": 1130.40625,
+      "rank_checks_per_call": 9.0
+    },
+    {
+      "vocabulary": 32768,
+      "history_tokens": 131,
+      "kind": 2,
+      "trials": 16,
+      "sorted_reference_ns": 54922.703125,
+      "membership_ns": 285461.03125,
+      "rank_checks_per_call": 9.0
+    },
+    {
+      "vocabulary": 32768,
+      "history_tokens": 2051,
+      "kind": 0,
+      "trials": 16,
+      "sorted_reference_ns": 267206.546875,
+      "membership_ns": 43894.4375,
+      "rank_checks_per_call": 1.0
+    },
+    {
+      "vocabulary": 32768,
+      "history_tokens": 2051,
+      "kind": 1,
+      "trials": 16,
+      "sorted_reference_ns": 243052.390625,
+      "membership_ns": 12735.140625,
+      "rank_checks_per_call": 9.0
+    },
+    {
+      "vocabulary": 32768,
+      "history_tokens": 2051,
+      "kind": 2,
+      "trials": 16,
+      "sorted_reference_ns": 241122.5,
+      "membership_ns": 299080.953125,
+      "rank_checks_per_call": 9.0
+    },
+    {
+      "vocabulary": 151936,
+      "history_tokens": 131,
+      "kind": 0,
+      "trials": 16,
+      "sorted_reference_ns": 373479.3125,
+      "membership_ns": 151618.296875,
+      "rank_checks_per_call": 1.0
+    },
+    {
+      "vocabulary": 151936,
+      "history_tokens": 131,
+      "kind": 1,
+      "trials": 16,
+      "sorted_reference_ns": 364657.46875,
+      "membership_ns": 1133.6875,
+      "rank_checks_per_call": 9.0
+    },
+    {
+      "vocabulary": 151936,
+      "history_tokens": 131,
+      "kind": 2,
+      "trials": 16,
+      "sorted_reference_ns": 374301.640625,
+      "membership_ns": 1344129.5625,
+      "rank_checks_per_call": 9.0
+    },
+    {
+      "vocabulary": 151936,
+      "history_tokens": 2051,
+      "kind": 0,
+      "trials": 16,
+      "sorted_reference_ns": 565456.703125,
+      "membership_ns": 163798.5625,
+      "rank_checks_per_call": 1.0
+    },
+    {
+      "vocabulary": 151936,
+      "history_tokens": 2051,
+      "kind": 1,
+      "trials": 16,
+      "sorted_reference_ns": 570964.96875,
+      "membership_ns": 12776.15625,
+      "rank_checks_per_call": 9.0
+    },
+    {
+      "vocabulary": 151936,
+      "history_tokens": 2051,
+      "kind": 2,
+      "trials": 16,
+      "sorted_reference_ns": 597087.453125,
+      "membership_ns": 1422479.546875,
+      "rank_checks_per_call": 9.0
+    }
+  ]
+}
