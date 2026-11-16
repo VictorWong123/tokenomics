@@ -1,0 +1,12 @@
+{
+  "generated": "tokenomics-metal-embed-mul_mv.metal",
+  "generated_before_sha256": "ee42aa333c3287199b71d9497d28583ee24b4baa9ba4d772d3599e3cc8211898",
+  "generated_mutated_sha256": "40ac4cd54833ff3ea7bf13cef3a03db513b2044588baf8926c659042b020dcab",
+  "helper_sha256": "51ba0ba15a435aee7f315217333c01c7f49e11f44c666c8c5d30bc02d8e42034",
+  "input": "src/metal_q8_group.metal.inc",
+  "reconfigured_without_manual_configure": true,
+  "restored_source_and_generated_exactly": true,
+  "scope": "Linux generated Metal source regeneration through normal build; no GPU execution",
+  "source_restored_sha256": "dd906ed01687be2bb28352ef00495498333f5471e135b17e03ff8022c54b7475",
+  "state": "passed"
+}

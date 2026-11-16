@@ -1,8 +1,9 @@
+include("${CMAKE_CURRENT_LIST_DIR}/source-input.cmake")
 # Generate owned copies; do not modify the pinned upstream submodule.
 function(tokenomics_metal_short_mv root)
   set(metal_dir "${root}/third_party/llama.cpp/ggml/src/ggml-metal")
   foreach(unit common ops)
-    file(READ "${metal_dir}/ggml-metal-${unit}.cpp" source)
+    tokenomics_read_source("${metal_dir}/ggml-metal-${unit}.cpp" source)
     set(source "#include \"${root}/src/metal_short_mv.h\"\n${source}")
     if(unit STREQUAL "common")
       # Keep supports_op and runtime fusion eligibility consistent with dispatch.

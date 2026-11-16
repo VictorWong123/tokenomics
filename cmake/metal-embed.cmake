@@ -1,12 +1,13 @@
+include("${CMAKE_CURRENT_LIST_DIR}/source-input.cmake")
 # Share the pinned upstream embedding expansion between opt-in kernel variants.
 include_guard(GLOBAL)
 function(tokenomics_embed_metal_mul_mv root kernel)
   set(metal_dir "${root}/third_party/llama.cpp/ggml/src/ggml-metal")
   # Match upstream's embedded source expansion, replacing only mul_mv's ASM.
-  file(READ "${metal_dir}/kernels/common.h" common)
-  file(READ "${metal_dir}/kernels/dequantize.h" dequantize)
-  file(READ "${metal_dir}/../ggml-common.h" ggml_common)
-  file(READ "${metal_dir}/ggml-metal-impl.h" impl)
+  tokenomics_read_source("${metal_dir}/kernels/common.h" common)
+  tokenomics_read_source("${metal_dir}/kernels/dequantize.h" dequantize)
+  tokenomics_read_source("${metal_dir}/../ggml-common.h" ggml_common)
+  tokenomics_read_source("${metal_dir}/ggml-metal-impl.h" impl)
   set(embed "${common}\n${dequantize}\n${kernel}")
   foreach(line "#include \"common.h\"" "#include \"dequantize.h\"" "#pragma once")
     string(REPLACE "${line}" "" embed "${embed}")

@@ -1,3 +1,4 @@
+include("${CMAKE_CURRENT_LIST_DIR}/source-input.cmake")
 # Owned integration against the checked, unmodified llama.cpp pin. Keep native
 # packed matrix-vector arithmetic for every verification row, including its
 # activation quantizer. Large prefills retain upstream's matrix path.
@@ -5,7 +6,7 @@
 # Keep its quantization-layout and GEMV/GEMM thresholds synchronized.
 function(tokenomics_packed_verify)
   set(cpu_dir "${CMAKE_CURRENT_SOURCE_DIR}/third_party/llama.cpp/ggml/src/ggml-cpu")
-  file(READ "${cpu_dir}/repack.cpp" source)
+  tokenomics_read_source("${cpu_dir}/repack.cpp" source)
   set(old1 "if (nrows > 3) {")
   set(new1 "if (nrows > 9) {")
   set(old2 "for (int iter = nrows - (nrows % 4); iter < nrows; iter++) {")

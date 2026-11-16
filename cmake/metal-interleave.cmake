@@ -1,3 +1,4 @@
+include("${CMAKE_CURRENT_LIST_DIR}/source-input.cmake")
 # An opt-in scheduling experiment over unchanged upstream arithmetic.
 function(tokenomics_metal_interleave root)
   if(NOT TOKENOMICS_METAL_SHORT_MV OR NOT GGML_METAL_EMBED_LIBRARY)
@@ -6,7 +7,7 @@ function(tokenomics_metal_interleave root)
   set(metal_dir "${root}/third_party/llama.cpp/ggml/src/ggml-metal")
   set(include "#include \"${root}/src/metal_interleave.h\"\n")
 
-  file(READ "${metal_dir}/ggml-metal-device.cpp" device)
+  tokenomics_read_source("${metal_dir}/ggml-metal-device.cpp" device)
   set(anchor [=[    snprintf(base, 256, "kernel_mul_mv_%s_%s%s", ggml_type_name(tsrc0), ggml_type_name(tsrc1), suffix);]=])
   string(FIND "${device}" "${anchor}" position)
   if(position EQUAL -1)
@@ -43,7 +44,7 @@ function(tokenomics_metal_interleave root)
   endforeach()
   file(WRITE "${ops_path}" "${include}${ops}")
 
-  file(READ "${metal_dir}/kernels/mul_mv.metal" kernel)
+  tokenomics_read_source("${metal_dir}/kernels/mul_mv.metal" kernel)
   foreach(kind q4_K q6_K q5_0 q8_0)
     set(start "kernel void kernel_mul_mv_${kind}_f32(")
     string(FIND "${kernel}" "${start}" position)

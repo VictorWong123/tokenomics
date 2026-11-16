@@ -762,3 +762,23 @@ seven-day Actions artifact. Retained all48 sampler component timings: at151936
 vocabulary entries, reference median146.6µs versus89.9µs, median paired ratio1.69.
 These cache-warm component timings are not model throughput or an M3 result.
 [ARM evidence](../results/verification/trained-arm-cpu-20261116/trained-summary.json).
+
+The matrix component executable also compiles natively on the standard Apple
+runner and passes its small CPU fixture under the grouped-Q8 build. All11
+preflight stages pass in [run43827839125](https://github.com/VictorWong123/tokenomics/actions/runs/43827839125).
+Large GPU matrices remain unexecuted; the device capability limitation remains.
+
+### Incremental generated-source dependency fix
+
+Found that plain `file(READ)` inputs were absent from CMake's regeneration
+dependencies. Editing an owned shader include followed by a normal build could
+therefore leave the embedded shader stale. Added a shared tracked-read helper
+to CPU/Metal source generators. Reads of already-generated intermediate files
+remain ordinary reads, avoiding treating output as an independent source input.
+
+A reversible probe appends a comment to the owned grouped-Q8 shader, invokes
+only `cmake --build`, and verifies automatic reconfiguration plus a changed
+embedded shader hash. Restoring the source and building again restores the
+generated shader byte-for-byte. The upstream submodule remains untouched.
+All7 default suites pass in43.56 seconds and both Metal host suites pass.
+[Probe evidence](../results/verification/source-regeneration-20261116/summary.json).

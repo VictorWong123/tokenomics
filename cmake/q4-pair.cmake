@@ -1,15 +1,16 @@
+include("${CMAKE_CURRENT_LIST_DIR}/source-input.cmake")
 # Experimental integration; the pinned source is never edited in place.
 function(tokenomics_q4_pair)
   if(NOT GGML_AVX2 OR NOT CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
     message(FATAL_ERROR "Q4 pair experiment requires x86-64 AVX2")
   endif()
   set(cpu_dir "${CMAKE_CURRENT_SOURCE_DIR}/third_party/llama.cpp/ggml/src/ggml-cpu")
-  file(READ "${cpu_dir}/arch/x86/quants.c" quants)
+  tokenomics_read_source("${cpu_dir}/arch/x86/quants.c" quants)
   string(REPLACE "\"../../quants.h\"" "\"${cpu_dir}/quants.h\"" quants "${quants}")
   string(REPLACE "\"../../ggml-cpu-impl.h\"" "\"${cpu_dir}/ggml-cpu-impl.h\"" quants "${quants}")
   string(APPEND quants "\n#include \"${CMAKE_CURRENT_SOURCE_DIR}/src/cpu_q4_pair.inc\"\n")
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/tokenomics-x86-quants.c" "${quants}")
-  file(READ "${cpu_dir}/ggml-cpu.c" cpu)
+  tokenomics_read_source("${cpu_dir}/ggml-cpu.c" cpu)
   set(anchor "    // block-tiling attempt\n    const int64_t blck_0 = 16;")
   set(replacement [=[
     // Share Q4 weight unpacking across pairs of short verification rows.

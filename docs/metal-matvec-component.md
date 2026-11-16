@@ -52,3 +52,8 @@ The portable `test_matvec_component --cpu-fixture` mode checks the harness's
 allocation, view layout, quantization and comparisons using four small256×128
 matrices. It records20 arithmetic gates and10240 exact value comparisons and
 never records timings. CPU fixture success is not a Metal arithmetic result.
+
+[Native Apple compilation](https://github.com/VictorWong123/tokenomics/actions/runs/43827839125)
+also passes for the component executable, its small CPU fixture and the grouped
+shader libraries. The hosted virtual GPU cannot run the large Metal matrices;
+those results are pending on the M3.

@@ -1,0 +1,4 @@
+{
+  "log_utf8": "[0/1] Re-running CMake...\n-- Configuring done (0.0s)\n-- Generating done (0.0s)\n-- Build files have been written to: /workspace/tokenomics/build-metal-q8-group-host\n[1/5] Building CXX object CMakeFiles/ggml-metal.dir/tokenomics-metal-common.cpp.o\n[2/5] Building CXX object CMakeFiles/ggml-metal.dir/tokenomics-metal-ops.cpp.o\n[3/5] Building CXX object CMakeFiles/ggml-metal.dir/tokenomics-metal-device.cpp.o\n[4/5] Linking CXX static library libggml-metal.a\n[5/5] Linking CXX executable test_metal_dispatch\n",
+  "sha256": "57b42ef119390ffcb33985e76c355ec6714f0df2a6426d9bd1d45db411517ac0"
+}
