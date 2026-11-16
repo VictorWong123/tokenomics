@@ -1,0 +1,9 @@
+{
+  "sha256": {
+    "README.md": "9b1765af790f76eed08ee77630eec6cf19dcd8818ce4d2e76dc0c9bc230faa93",
+    "branch-integrity.json": "a1adf6fab00a99f1a73f7e5ca715df3ad622dde616710e6a3ae8136241fe2603",
+    "formatting.json": "765ab707ac8966b879e014a69b72ecfd2c445653df9ab1344f7cbb51d0272bbe",
+    "proposal-archive-audit.json": "e8251b212615c80a6d0d705b3fd44c84b649f89b722ea59c9815fe5a4c3f3bd1",
+    "python-tests.json": "1f06808ed1a8930422fb9d4a51f99e5dd72d857afbf2fd57888865b7b6891d58"
+  }
+}
